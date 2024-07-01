@@ -1,0 +1,1210 @@
+{% import "game/macros/map.html.twig" as mapMacros %}
+{% extends 'v2/game.html.twig' %}
+
+{% block title %}Ultimate Warfare - World Map{% endblock title %}
+
+{% block content %}
+    <style>
+        body,
+        html {
+            height:100%;
+            -webkit-box-sizing:border-box;
+            box-sizing:border-box;
+            margin:0;
+            padding:0;
+        }
+        @media only screen and (min-device-width:768px) and (max-device-width:1024px) {
+            body,
+            html {
+                overflow:auto;
+                -webkit-overflow-scrolling:touch
+            }
+        }
+
+        html {
+            overflow-x:hidden!important;
+            overflow-y:hidden!important
+        }
+
+        #game {
+            position:relative;
+            height:100%;
+            width:100%
+        }
+        #game #game_content {
+            position:absolute;
+            width:100%;
+            height:100%;
+            top:0;
+            left:0;
+            overflow:hidden
+        }
+
+        #gameContainer #mapContainer,
+        #game_content {
+            position:absolute;
+            top:0;
+            left:0;
+            width:100%;
+            height:100%
+        }
+        #gameContainer,
+        #gameContainer #mapContainer {
+            overflow:hidden
+        }
+
+        #screen {
+            position: relative;
+
+            width: 100%;
+            height: 100%;
+        }
+
+        #map {
+            position: relative;
+            margin: 0 auto;
+        }
+
+        #mapPadContainer {
+            position: absolute;
+            width: 100%;
+            left: 0px;
+        }
+
+        #mapPadContainer > #mapPad {
+            margin: 0 auto;
+            height: inherit;
+        }
+
+        .tile {
+            position: absolute;
+            background-repeat: no-repeat;
+        }
+
+        .tile > div {
+            position: absolute;
+            left: 0px;
+            background-position: bottom left;
+            background-repeat: no-repeat;
+        }
+
+        .tile > div > div {
+            position: absolute;
+            cursor: pointer;
+        }
+
+        div.tileMenu {
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            width: 140px;
+            border: 1px solid #aaa;
+            z-index: 2;
+        }
+
+        div.tileMenu > a {
+            display: block;
+
+            border: 1px solid #fff;
+            border-bottom-color: #aaa;
+            padding: 1px 0px 1px 22px;
+
+            background: #eee no-repeat 2px 50%;
+        }
+
+        div.tileMenu > a[hover=true] {
+            cursor: pointer;
+        }
+
+        div.tileMenu > a[last] {
+            border-bottom-color: #fff;
+        }
+
+        div.tileMenu > a > div {
+            color: #333;
+
+            background: transparent no-repeat 100% 50%;
+        }
+
+        div.tileMenu > a[hover=true]:hover {
+            border-color: #eee;
+            border-bottom-color: #aaa;
+
+            background-color: #ddd;
+        }
+
+        div.tileMenu > a[hover=true]:hover > div {
+            color: #111;
+        }
+
+        div.tileMenu > a[last]:hover {
+            border-bottom-color: #eee;
+        }
+    </style>
+
+    <div id="screen"></div>
+    <script>
+        class Action {
+            constructor() {
+                this.gameServer = new GameServer;
+            }
+
+            getTiles(coords, onResponse) {
+                let params = {"coords": coords};
+
+                this.gameServer.sendMessage('../game/world/get-tiles', params, onResponse);
+            };
+
+            buyTile(x, y, onResponse) {
+                let params = {'x': x, 'y': y};
+
+                this.gameServer.sendMessage('../game/world/buy-tile', params, onResponse);
+            };
+
+            getBuildingList(x, y, onResponse) {
+                let params = {'x': x, 'y': y};
+
+                this.gameServer.sendMessage('../game/world/get-building-list', params, onResponse);
+            };
+
+            build(x, y, cid, onResponse) {
+                let params = {'x': x, 'y': y, 'cid': cid};
+
+                this.gameServer.sendMessage('../game/world/build', params, onResponse);
+            };
+        }
+
+        class GameServer {
+            sendMessage(url, message, callback) {
+                // Set up options for the fetch request
+                const options = {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json' // Set content type to JSON
+                    },
+                    body: JSON.stringify(message) // Convert JSON data to a string and set it as the request body
+                };
+                // Make the fetch request with the provided options
+                fetch(url, options)
+                    .then(response => {
+                        // Check if the request was successful
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        // Parse the response as JSON
+                        return response.json();
+                    })
+                    .then(data => {
+                        // Handle the JSON data
+                        GameServer.onMessage(data, callback)
+
+                        console.log(data);
+                    })
+                    .catch(error => {
+                        // Handle any errors that occurred during the fetch
+                        GameServer.onError(error, callback)
+
+                        console.error('Fetch error:', error);
+                    });
+                /**
+                let data = 'json_request=' + JSON.stringify(message);
+                $.post(url, data, function(msg) {
+                    GameServer.onMessage(msg, callback)
+                }, 'json').fail(function(message) {
+                    GameServer.onError(message, callback)
+                });
+                console.log("message sent: ", data);
+                */
+                return true
+            };
+
+            static onMessage(message, callback) {
+                let data = message.data || message;
+
+                if(typeof callback == "function") {
+                    callback(data)
+                }
+            };
+
+            static onError(message, callback) {
+                if(typeof callback == "function") {
+                    let err = new Error("Server request failed");
+                    callback(err)
+                }
+            };
+        }
+
+        class Map {
+            constructor() {
+                this.tileWidth = 194;
+                this.tileHeight = 98;
+                this.airHeight = 158;
+
+                this.tileList = [];
+
+                this.width = 0;
+                this.height = 0;
+
+                this.x = 0;
+                this.y = 0;
+
+                this.rootNode = null;
+                this.parentNode = null;
+            }
+
+            init(parentNode) {
+                console.log("Map init");
+                this.parentNode = parentNode;
+
+                this.width = Math.ceil( (this.parentNode.offsetWidth + 2) / (this.tileWidth + 2) ); //2 is space of 2px between each  horizontaly relative tile
+                this.height = Math.ceil( this.parentNode.offsetHeight / this.tileHeight ) + 1; //1 is to fill empty "half-diamond" places
+
+                if(! (this.width % 2)){
+                    this.width++
+                }
+
+                if(! (this.height % 2)){
+                    this.height++
+                }
+
+                let x = -(this.width + this.height-2)/2; //coordinates of very first (top left) tile
+                let y = (this.height - this.width)/2; //coordinates of very first (top left) tile
+
+                for(let i = 0; i < this.height + this.height - 1; i++){
+                    let top = i * (this.tileHeight / 2) - this.airHeight - this.tileHeight/2;
+
+                    for(let j = 0; j < ( this.width + (i % 2) ); j++){
+                        let left = j * (this.tileWidth + 2) - (this.tileWidth + 2) / 2 * (i % 2);
+
+                        let tileData = [];
+                        tileData['offsetX'] = x+j;
+                        tileData['offsetY'] = y+j;
+                        tileData['top'] = top;
+                        tileData['left'] = left;
+                        tileData['tileInstance'] = null;
+                        tileData['projectionIndex'] = null;
+
+                        this.tileList.push(tileData);
+                    }
+
+                    if( i % 2 ){ //if true than next row is "short", and x should decrease
+                        x++;
+                    }else{
+                        y--;
+                    }
+                }
+
+                let rootNode = this.createRootNode();
+                this.rootNode = rootNode;
+                this.parentNode.appendChild(rootNode);
+
+                return(this);
+            };
+
+            createRootNode() {
+                console.log("Map createRootNode");
+
+                let rootNode = document.createElement('div');
+                rootNode.id = 'map';
+                rootNode.style.width = this.width * (this.tileWidth + 2) - 2+'px'; //2 is "horizontal gap" between tiles
+                rootNode.style.height = (this.height - 1) * this.tileHeight+'px';
+                rootNode.style.position = 'relative';
+                rootNode.style.overflow = 'hidden';
+                rootNode.style.backgroundColor = '#41390f';
+
+                return rootNode;
+            }
+            move(x, y) {
+                console.log("Map move");
+
+                this.x = x;
+                this.y = y;
+                this.fill(false); //false to not to load data, data will be loaded separatelly on mousekeyup
+                this.draw();
+            };
+
+            /*
+             *	Function fill() fill empty cells with data - tiles of given coordinates.
+             *	Param "load" - to fetch data from server or not to.
+             *	If false, the tile is empty(grey), and without cachind. It's used only on map scroll, when you
+             *	don't need to load tiles on every mouse movement, but only on mousekeyup.
+             */
+            fill(load) {
+                console.log("Map fill");
+
+                if(load === undefined){
+                    load = true;
+                }
+
+                this.unfill();
+
+                if(load){
+                    console.log('Map fill => getTiles');
+                    window.tileCollection.getTiles(this.tileList);
+                }
+
+                for(let key in this.tileList){
+                    let tileData = this.tileList[key];
+
+                    let x = tileData['offsetX'] + this.x;
+                    let y = tileData['offsetY'] + this.y;
+                    let tileInstance;
+
+                    if(window.tileCollection.hasTile(x, y) || load){
+                        console.log('Map fill => tileCollection.getTile');
+                        tileInstance = window.tileCollection.getTile(x, y);
+                    }else{
+                        tileInstance = new Tile(x, y);
+                    }
+
+                    tileData['tileInstance'] = tileInstance;
+                    tileData['projectionIndex'] = tileInstance.createProjection();
+                }
+
+                return(this);
+            };
+
+            unfill() {
+                console.log("Map unfill");
+
+                for(let key in this.tileList){
+                    let tileData = this.tileList[key];
+
+                    if(tileData['tileInstance']){
+                        let tile = tileData['tileInstance'];
+                        let index = tileData['projectionIndex'];
+
+                        tile.deleteProjection(index);
+
+                        tileData['tileInstance'] = null;
+                    }
+                }
+
+                return(this);
+            };
+
+            draw() {
+                console.log("Map draw");
+
+                if(this.rootNode.childNodes.length){
+                    console.log("Map draw flushScreen");
+
+                    this.flushScreen();
+                }
+
+                for(let key in this.tileList){
+                    let tileData = this.tileList[key];
+
+                    let tile = tileData['tileInstance'];
+                    let pIndex = tileData['projectionIndex'];
+
+                    let tileNode = tile.projections[pIndex];
+                    tileNode.style.top = tileData['top']+'px';
+                    tileNode.style.left = tileData['left']+'px';
+
+                    this.rootNode.appendChild(tileNode);
+                }
+            };
+
+            flushScreen() {
+                console.log("Map flushScreen");
+
+                while(this.rootNode.firstChild){
+                    let child = this.rootNode.firstChild;
+                    this.rootNode.removeChild(child);
+                }
+
+                return(this);
+            };
+        }
+
+        class MapPad {
+            constructor() {
+                this.mouseIsoVector = [0, 0]; //isometric cordinates of mouse
+                this.mouseOverTile = [0, 0]; //local map coordinates of tile, on which mouse is pointing
+                this.tempVector = [0, 0]; //vector for temporary values, to share them between events
+
+                this.isClick = true; //defines if event is click or map scroll
+
+                this.rad = (Math.PI/180)*(45); //-45 degree angle in radians
+            }
+
+            init() {
+                //draw overlay
+                let mapPadOverlay = document.createElement('div');
+                mapPadOverlay.id = 'mapPad';
+                mapPadOverlay.style.width = window.map.width*(window.map.tileWidth + 2) - 2+'px'; //2 is "horizontal gap" between tiles
+                mapPadOverlay.style.height = (window.map.height - 1) * window.map.tileHeight+'px';
+                mapPadOverlay.style.position = 'absolute';
+                mapPadOverlay.style.top = '0px';
+                mapPadOverlay.style.left = '0px';
+                mapPadOverlay.style.zIndex = '2';
+
+                mapPadOverlay.addEventListener('mousemove', function(e) {
+                    //default mouse coordinates transformations in the isometric coordinates
+
+                    let pageX = e.pageX - window.scrollX - ((window.map.tileWidth + 2) * Math.ceil(window.map.width / 2));
+                    let pageY = e.pageY - window.scrollY - (window.map.tileHeight * Math.floor(window.map.height / 2));
+
+                    window.mapPad.mouseIsoVector[0] = [pageX * Math.sin(window.mapPad.rad) / 2 + pageY*Math.cos(window.mapPad.rad)];
+                    window.mapPad.mouseIsoVector[0] = [pageX * Math.sin(window.mapPad.rad) / 2 + pageY*Math.cos(window.mapPad.rad)];
+                    window.mapPad.mouseIsoVector[0] = [pageX * Math.sin(window.mapPad.rad) / 2 + pageY*Math.cos(window.mapPad.rad)];
+                    window.mapPad.mouseIsoVector[0] = [pageX * Math.sin(window.mapPad.rad) / 2 + pageY*Math.cos(window.mapPad.rad)];
+                    window.mapPad.mouseIsoVector[1] = [pageX * Math.cos(window.mapPad.rad) / 2 - pageY*Math.sin(window.mapPad.rad)];
+
+                    window.mapPad.mouseOverTile[0] = Math.ceil(window.mapPad.mouseIsoVector[0]/69); //69 is length of one side of tile, in isometric coords
+                    window.mapPad.mouseOverTile[1] = Math.ceil(window.mapPad.mouseIsoVector[1]/69); //69 is length of one side of tile, in isometric coords
+                }, 0);
+
+                mapPadOverlay.addEventListener('keydown', (ev) => {
+                    console.log("keydown");
+
+                    const dir = (ev.key.match(/(?<=^Arrow)\w+/)||[])[0];
+                    console.log("keydown: " + dir);
+
+                    if (!dir) return; // Not an arrow key.
+
+                    ev.preventDefault(); // Prevent Browser scroll if overflow
+
+                    let x = 0;
+                    let y = 0;
+                    ({
+                        Left:  () => x -= 100,
+                        Right: () => x += 100,
+                        Up:    () => y -= 100,
+                        Down:  () => y += 100,
+                    }[dir])();
+
+                    let pageX = x - window.scrollX - ((window.map.tileWidth + 2) * Math.ceil(window.map.width / 2));
+                    let pageY = y - window.scrollY - (window.map.tileHeight * Math.floor(window.map.height / 2));
+
+                    window.mapPad.mouseIsoVector[0] = [pageX * Math.sin(window.mapPad.rad) / 2 + pageY*Math.cos(window.mapPad.rad)];
+                    window.mapPad.mouseIsoVector[0] = [pageX * Math.sin(window.mapPad.rad) / 2 + pageY*Math.cos(window.mapPad.rad)];
+                    window.mapPad.mouseIsoVector[0] = [pageX * Math.sin(window.mapPad.rad) / 2 + pageY*Math.cos(window.mapPad.rad)];
+                    window.mapPad.mouseIsoVector[0] = [pageX * Math.sin(window.mapPad.rad) / 2 + pageY*Math.cos(window.mapPad.rad)];
+                    window.mapPad.mouseIsoVector[1] = [pageX * Math.cos(window.mapPad.rad) / 2 - pageY*Math.sin(window.mapPad.rad)];
+
+                    window.mapPad.mouseOverTile[0] = Math.ceil(window.mapPad.mouseIsoVector[0]/69); //69 is length of one side of tile, in isometric coords
+                    window.mapPad.mouseOverTile[1] = Math.ceil(window.mapPad.mouseIsoVector[1]/69); //69 is length of one side of tile, in isometric coords
+                }, 0);
+
+                mapPadOverlay.addEventListener('mousedown', function(e) {
+                    if(window.tileMenu.menu){
+                        window.tileMenu.menu.close();
+                    }
+
+                    //writing vector root coordinates.
+                    window.mapPad.tempVector[0] = window.mapPad.mouseOverTile[0];
+                    window.mapPad.tempVector[1] = window.mapPad.mouseOverTile[1];
+
+                    mapPadOverlay.addEventListener('mousemove', window.mapPad.scrolling);
+                    //$(this).bind('mousemove', window.mapPad.scrolling);
+
+                    return(false); //to avoid text selection
+                }, 0);
+
+                //unbind when not scrolling
+                mapPadOverlay.addEventListener('mouseup', function(e) {
+                    mapPadOverlay.removeEventListener('mousemove', window.mapPad.scrolling)
+                    //$(this).unbind('mousemove', window.mapPad.scrolling);
+                    window.map.fill().draw(); //draw map and load all the tiles
+                }, 0);
+
+                mapPadOverlay.addEventListener('click', function(e) {
+                    //mapPadOverlay.click(function(e){
+                    console.log("mapPadOverlay.click");
+                    if(window.mapPad.isClick){
+                        console.log("isClick");
+                        let tile = window.tileCollection.getTile(window.mapPad.mouseOverTile[0] + window.map.x, window.mapPad.mouseOverTile[1] + window.map.y);
+
+                        if (tile.tileData.type !== 'none') {
+                            console.log("myPadOverlay click");
+                            window.tileMenu.open(window.mapPad.mouseOverTile[0] + window.map.x, window.mapPad.mouseOverTile[1] + window.map.y, e);
+                        } else {
+                            console.log("myPadOverlay click type: " + tile.tileData.type);
+                        }
+                    }
+                    window.mapPad.isClick = true;
+                });
+
+                window.map.parentNode.appendChild(mapPadOverlay);
+
+            };
+
+            //on mouse move, we take default mouse coordinates and transform them by adding 45degree angle,
+            //and decrease Y coordinate by 50%. Then coordinates should be isometric.
+            scrolling(e) {
+                let dX = window.mapPad.tempVector[0] - window.mapPad.mouseOverTile[0];
+                let dY = window.mapPad.tempVector[1] - window.mapPad.mouseOverTile[1];
+
+                if( (dX !== 0) || (dY !== 0) ){
+                    window.mapPad.isClick = false; //if map was scrolled for at least 1 tile, then it's definetely is not click ;D
+
+                    window.map.move(window.map.x + dX, window.map.y + dY);
+                    window.mapPad.tempVector[0] = window.mapPad.mouseOverTile[0];
+                    window.mapPad.tempVector[1] = window.mapPad.mouseOverTile[1];
+                }
+            };
+        }
+
+        class Tile {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.landWidth = window.map.tileWidth;
+                this.landHeight = window.map.tileHeight;
+                //this.undergroundHeight = window.map.undergroundHeight;
+                this.airHeight = window.map.airHeight;
+
+                this.tileData = {"type":"none","structures":[]}; //array of tile data
+                //this.loaded = 0;
+                this.projections = []; //array of tile nodes of current object. - Projection registry
+            }
+
+            setTileData(data) {
+                this.tileData = data;
+            };
+
+            createTileBlock() {
+                let tileBlock = document.createElement('div');
+                tileBlock.className = 'tile';
+                tileBlock.setAttribute('x', this.x);
+                tileBlock.setAttribute('y', this.y);
+                tileBlock.style.width = this.landWidth+'px';
+                tileBlock.style.height = this.landHeight+'px';
+                tileBlock.style.position = 'absolute';
+                //tileBlock.style.paddingTop = this.airHeight+'px';
+                //tileBlock.style.paddingBottom = this.undergroundHeight+'px';
+                tileBlock.style.backgroundImage = 'url(../images/map/'+this.tileData['type']+'.png)';
+                tileBlock.style.backgroundRepeat = 'no-repeat';
+                //tileBlock.style.backgroundPosition = '0px '+this.airHeight+'px';
+
+                return tileBlock;
+            }
+
+            createStructureBlock() {
+                let structureBlock = document.createElement('div');
+                //structureBlock.style.bottom = this.undergroundHeight+'px';
+                structureBlock.style.width = this.landWidth+'px';
+                structureBlock.style.height = this.landHeight+'px';
+                structureBlock.style.position = 'absolute';
+                structureBlock.style.left = '0px';
+                //structureBlock.style.paddingTop = this.airHeight+'px';
+                structureBlock.style.backgroundPosition = 'bottom left';
+                structureBlock.style.backgroundRepeat = 'no-repeat';
+
+                return structureBlock;
+            }
+
+            createProjection() {
+                let tileBlock = this.createTileBlock();
+                let structureBlock = this.createStructureBlock();
+
+                if(this.tileData['structures'].length){
+                    structureBlock.style.backgroundImage = 'url('+this.tileData['structures'][0]['name']+'/'+this.tileData['structures'][0]['imageName']+')';
+                }
+
+                tileBlock.appendChild(structureBlock);
+
+                if (this.tileData['owner'] !== undefined && this.tileData['owner'] !== '') {
+                    let gameUnitBlock = document.createElement('div');
+                    //gameUnitBlock.style.bottom = this.undergroundHeight+'px';
+                    gameUnitBlock.style.width = this.landWidth+'px';
+                    gameUnitBlock.style.height = this.landHeight+'px';
+                    gameUnitBlock.style.position = 'absolute';
+                    gameUnitBlock.style.textAlign = 'center';
+                    gameUnitBlock.style.padding = '25px 0';
+                    gameUnitBlock.style.color= 'red';
+                    gameUnitBlock.style.fontWeight = 'bold';
+
+                    gameUnitBlock.innerText = this.tileData['owner'];
+                    tileBlock.appendChild(gameUnitBlock);
+                }
+
+                this.projections.push(tileBlock);
+                let index = this.projections.length-1;
+
+                return(index);
+            };
+
+            refreshProjections() {
+                for(let index in this.projections){
+                    this.refreshProjection(index);
+                }
+            };
+
+            refreshProjection(oldIndex) {
+                let tileBlock = this.projections[oldIndex];
+                tileBlock.style.backgroundImage = 'url(../images/map/'+this.tileData['type']+'.png)';
+
+                let structureBlock = tileBlock.childNodes[0];
+                if(this.tileData['structures'].length){
+                    structureBlock.style.backgroundImage = 'url('+this.tileData['structures'][0]['name']+'/'+this.tileData['structures'][0]['imageName']+')';
+                }
+            };
+
+            deleteProjection(index) {
+                this.projections.splice(index, 1);
+            }
+        }
+
+        class TileCollection {
+            constructor() {
+                this.tiles = [];
+            }
+
+            hasTile(x, y) {
+                if(this.tiles[x] === undefined){
+                    return(false);
+                }else if(this.tiles[x][y] === undefined){
+                    return(false);
+                }else{
+                    return(true);
+                }
+            };
+
+            setTile(x, y, tileInstance) {
+                if(this.tiles[x] === undefined){
+                    this.tiles[x] = [];
+                }
+
+                return(this.tiles[x][y] = tileInstance);
+            };
+
+            getTile(x, y) {
+                let tileInstance;
+
+                if(this.hasTile(x, y)){
+                    tileInstance = this.tiles[x][y];
+                }else{
+                    tileInstance = this.setTile(x, y, new Tile(x, y));
+
+                    let tilesCoordPairs = [];
+                    tilesCoordPairs.push({'x': x, 'y': y});
+
+                    window.action.getTiles(tilesCoordPairs, function(data){
+                        for(let key in data){
+                            if (data.hasOwnProperty(key)) {
+                                let tile = data[key];
+                                let instance = window.tileCollection.getTile(tile['x'], tile['y']);
+                                //instance.loaded = 1;
+                                instance.setTileData(data[key]);
+                                instance.refreshProjections();
+                            }
+                        }
+                    });
+                }
+
+                return(tileInstance);
+            };
+
+            getTiles(tilesList) {
+                let tilesCoordPairs = [];
+                let instance;
+                let instances = [];
+
+                for(let key in tilesList){
+                    if (tilesList.hasOwnProperty(key)) {
+                        let tileData = tilesList[key];
+                        let x = tileData['offsetX'] + window.map.x;
+                        let y = tileData['offsetY'] + window.map.y;
+
+                        if(!this.hasTile(x, y)){
+                            tilesCoordPairs.push({'x': x, 'y': y});
+                            instance = this.setTile(x, y, new Tile(x, y));
+                        }else{
+                            instance = this.getTile(x, y);
+                        }
+
+                        instances.push(instance);
+                    }
+                }
+
+                //get them from server and fill in instances
+                if(tilesCoordPairs.length > 0){
+                    console.log('TileCollection getTiles => action.getTiles');
+
+                    window.action.getTiles(tilesCoordPairs, function(data){
+                        for(let key in data){
+                            if (data.hasOwnProperty(key)) {
+                                let tile = data[key];
+                                let instance = window.tileCollection.getTile(tile['x'], tile['y']);
+                                //instance.loaded = 1;
+                                instance.setTileData(data[key]);
+                                instance.refreshProjections();
+                            }
+                        }
+                    });
+                }
+
+                return(instances);
+            };
+        }
+
+        class TileMenu {
+            constructor() {
+                this.menu = null;
+                this.menus = [];
+            }
+
+            //generate elements of list and show it
+            //if menu was previously opened , then close it
+            open(x, y, event) {
+                if(this.menu){
+                    this.menu.close();
+                }
+
+                this.menu = new TileMenuProjection(this.generateStructure(x, y));
+                this.menu.insert(event.pageX, event.pageY);
+                //$(this.menu.insert(event.pageX, event.pageY)).fadeIn(60);
+            };
+
+            close() {
+                this.menu.close();
+                this.menus = {};
+                this.menu = null;
+            };
+
+            generateStructure(x, y) {
+                let tile = window.tileCollection.getTile(x, y);
+
+                let menuStructure = [
+                    {
+                        'type': 'action',
+                        'name': 'Close',
+                        //'image': 'closeIcon.png',
+                        'image': null,
+                        'value': function(){
+                            window.tileMenu.close();
+                        }
+                    },
+                    {
+                        'type': 'submenu',
+                        'name': 'Info',
+                        //'image': 'infoIcon.png',
+                        'image': null,
+                        'value': [
+                            {
+                                'type': 'data',
+                                'name': 'X',
+                                'image': null,
+                                'value': tile.x
+                            },
+                            {
+                                'type': 'data',
+                                'name': 'Y',
+                                'image': null,
+                                'value': tile.y
+                            },
+                            {
+                                'type': 'data',
+                                'name': 'Z',
+                                'image': null,
+                                'value': tile.tileData.z
+                            },
+                            {
+                                'type': 'data',
+                                'name': 'Type',
+                                'image': null,
+                                'value': tile.tileData.type
+                            },
+                            {
+                                'type': 'data',
+                                'name': 'Owner',
+                                'image': null,
+                                'value': tile.tileData.owner
+                            },
+                            {
+                                'type': 'data',
+                                'name': 'Price',
+                                'image': null,
+                                'value': tile.tileData['price']
+                            }
+                        ]
+                    },
+                    {
+                        'type': 'submenu',
+                        'name': 'Structures',
+                        'image': 'homeIcon.png',
+                        'value': 	(function(){
+                            let structuresMenuStructure = [];
+                            for(let key in tile.tileData.structures){
+                                let structure = tile.tileData.structures[key];
+
+                                let tpl = new Date(structure.createdAt*1000);
+                                structure.dateBuilt = tpl.getDate()+'.'+(tpl.getMonth()+1)+'.'+tpl.getFullYear();
+
+                                structuresMenuStructure.push({
+                                    'type': 'submenu',
+                                    'name': structure.name,
+                                    'image': null,
+                                    'value': [
+                                        {
+                                            'type': 'submenu',
+                                            'name': 'Info',
+                                            'image': 'infoIcon.png',
+                                            'value': [
+                                                {
+                                                    'type': 'data',
+                                                    'name': 'Income',
+                                                    'image': null,
+                                                    'value': structure.income
+                                                },
+                                                {
+                                                    'type': 'data',
+                                                    'name': 'Price',
+                                                    'image': null,
+                                                    'value': structure.price
+                                                },
+                                                {
+                                                    'type': 'data',
+                                                    'name': 'Built',
+                                                    'image': null,
+                                                    'value': structure.dateBuilt
+                                                },
+                                                {
+                                                    'type': 'submenu',
+                                                    'name': 'Product',
+                                                    'image': null,
+                                                    'value': (function(){
+                                                        let products = [];
+                                                        for(let key in structure.product){
+                                                            if (structure.product.hasOwnProperty(key)) {
+                                                                products.push({
+                                                                    'type': 'data',
+                                                                    'name': structure.product[key],
+                                                                    'image': null,
+                                                                    'value': key
+                                                                });
+                                                            }
+                                                        }
+                                                        if(!products.length){
+                                                            products.push({
+                                                                'type': 'data',
+                                                                'name': null,
+                                                                'image': null,
+                                                                'value': 'nothing'
+                                                            });
+                                                        }
+                                                        return products;
+                                                    })()
+                                                },
+                                                {
+                                                    'type': 'submenu',
+                                                    'name': 'Require',
+                                                    'image': null,
+                                                    'value': (function(){
+                                                        let requires = [];
+                                                        for(let key in structure.require){
+                                                            if (structure.require.hasOwnProperty(key)) {
+                                                                requires.push({
+                                                                    'type': 'data',
+                                                                    'name': structure.require[key],
+                                                                    'image': null,
+                                                                    'value': key
+                                                                });
+                                                            }
+                                                        }
+                                                        if(!requires.length){
+                                                            requires.push({
+                                                                'type': 'data',
+                                                                'name': null,
+                                                                'image': null,
+                                                                'value': 'nothing'
+                                                            });
+                                                        }
+                                                        return requires;
+                                                    })()
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            'type': 'submenu',
+                                            'name': 'Actions',
+                                            'image': null,
+                                            'value': [
+                                                {
+                                                    'type': 'action',
+                                                    'name': 'Close',
+                                                    'image': 'closeIcon.png',
+                                                    'value': function(){
+                                                        close();
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                });
+                            }
+                            return structuresMenuStructure;
+                        })()
+                    },
+                    {
+                        'type': 'submenu',
+                        'name': 'Actions',
+                        'image': null,
+                        'value': (function(){
+                            let actions = [];
+
+                            if(tile.tileData.owner === ''){
+                                actions.push({
+                                    'type': 'action',
+                                    'name': 'buy',
+                                    'image': 'buyIcon.png',
+                                    'value': function(){
+                                        window.action.buyTile(tile.x, tile.y, function(newOwnerName){
+                                            if(newOwnerName){
+                                                tile.tileData.owner = newOwnerName;
+                                                close();
+                                            }
+                                        });
+                                    }
+                                });
+                            }
+
+                            if(tile.tileData.owner === 'admin'){
+                                actions.push({
+                                    'type': 'action',
+                                    'name': 'build',
+                                    'image': 'buildIcon.png',
+                                    'value': function(event){
+                                        window.action.getBuildingList(tile.x, tile.y, function(data){
+                                            let list = [];
+                                            for(let key in data){
+                                                if (data.hasOwnProperty(key)) {
+                                                    let building = data[key];
+                                                    list.push({
+                                                        'type': 'action',
+                                                        'name': building.name,
+                                                        'image': null,
+                                                        'value': function(){
+                                                            window.action.build(tile.x, tile.y, building.classId, function(data){
+                                                                alert(data);
+                                                            });
+                                                        }
+                                                    });
+                                                }
+                                            }
+
+                                            let buildMenu = new TileMenuProjection(list);
+                                            this.menu.submenus.push(buildMenu);
+                                            $(buildMenu.insert(event.pageX, event.pageY)).fadeIn(60);
+                                        });
+                                    }
+                                });
+                            }
+
+                            return actions;
+                        })()
+                    }
+                ];
+
+                return(menuStructure)
+            };
+        }
+
+        class TileMenuProjection {
+            constructor(menuStructure) {
+                this.id = null;
+                this.menuStructure = menuStructure;
+                this.submenus = [];
+                this.menuHTMLElement = null;
+                this.init();
+            }
+
+            init() {
+                this.id = 'uiMenu'+Math.round(new Date().getTime() * Math.random());
+
+                window.tileMenu.menus[this.id] = this;
+                this.menuHTMLElement = document.createElement('div');
+                this.menuHTMLElement.id = this.id;
+                this.menuHTMLElement.className = 'tileMenu';
+                //this.menuHTMLElement.style.display = 'none';
+
+                for(let key in this.menuStructure){
+                    console.log("menu structure loop " + key);
+                    if (this.menuStructure.hasOwnProperty(key)) {
+                        let itemElementContainer = document.createElement('a');
+                        let itemElement = document.createElement('div');
+                        let item = this.menuStructure[key];
+
+
+                        //setting icon
+                        if(item.image){
+                            itemElementContainer.style.backgroundImage = 'url(\'i/tileMenu/'+item.image+'\')';
+                            itemElementContainer.style.backgroundSize = '16px';
+                        }
+
+
+                        //if data
+                        if(item.type === 'data'){
+                            console.log("item.type = date");
+                            itemElementContainer.setAttribute('hover','false');
+
+                            if(item.name){
+                                itemElement.innerHTML = item.name+': '+item.value;
+                            }else{
+                                itemElement.innerHTML = item.value;
+                            }
+                        }
+
+
+                        //if action
+                        if(item.type === 'action'){
+                            console.log("item.type = action");
+
+                            itemElementContainer.setAttribute('hover','true');
+
+                            itemElement.innerHTML = item.name;
+                            itemElementContainer.addEventListener('click', item.value);
+                        }
+
+
+                        //if submenu
+                        if(item.type === 'submenu'){
+                            console.log("item.type = submenu");
+
+                            //skip item, if submenu has no items.
+                            if(!item.value.length) {
+                                console.log("item.type = submenu, skipping with value.lenght null");
+
+                                continue;
+                            }
+
+
+                            itemElementContainer.setAttribute('hover','true');
+
+                            itemElement.innerHTML = item.name;
+
+
+                            let submenu = new TileMenuProjection(item.value);
+                            this.submenus.push(submenu);
+
+                            itemElementContainer.setAttribute('submenu', submenu.id);
+
+                            //                            itemElementContainer.addEventListener('hover', function() {
+                            itemElementContainer.addEventListener('mouseover', function() {
+                                console.log("submenu hover event");
+                                let id = itemElementContainer.getAttribute('submenu');
+                                let top = itemElementContainer.offsetTop - 1; //-1 correction
+                                let left = itemElementContainer.offsetLeft + itemElementContainer.offsetWidth + 4; //+4 correction
+
+                                //show current submenu
+                                let submenu = window.tileMenu.menus[id];
+                                submenu.insert(left, top);
+
+                                //close all previously opened submenus
+                                let oldSubmenus = window.tileMenu.menus[itemElementContainer.parentElement.getAttribute('id')].submenus;
+                                for(let key in oldSubmenus){
+                                    if (oldSubmenus.hasOwnProperty(key)) {
+                                        let oldSubmenu = oldSubmenus[key];
+
+                                        if(oldSubmenu.id !== id){ //save current submenu from closure
+                                            oldSubmenu.outsert();
+                                        }
+                                    }
+                                }
+                            });
+                        }
+
+                        itemElementContainer.appendChild(itemElement);
+                        this.menuHTMLElement.appendChild(itemElementContainer);
+                    }
+                }
+
+                //adding attribute "last" for last item in menu.
+                if(this.menuHTMLElement.childNodes.length){
+                    this.menuHTMLElement.childNodes[this.menuHTMLElement.childNodes.length - 1].setAttribute('last','true');
+                }
+            }
+
+            insert(left, top) {
+                let body = document.getElementsByTagName('body').item(0);
+                let menu = this.menuHTMLElement;
+                menu.style.left = left+'px';
+                menu.style.top = top+'px';
+                body.appendChild(menu);
+
+                console.log("insert append child");
+                return(menu);
+            };
+
+            outsert() {
+                //$(this.menuHTMLElement).fadeOut(60, function(){
+                    //$(this).remove(); //remove don't revert htmlelement to state as before insert(), so instead of removing element we are just hidding it.
+                //});
+
+                for(let key in this.submenus){
+                    let submenu = this.submenus[key];
+                    submenu.outsert();
+                }
+            };
+
+            close() {
+                //$(this.menuHTMLElement).fadeOut(60, function(){
+                    //$(this).remove();
+                //});
+                this.menuHTMLElement.remove();
+                let submenu;
+                while(submenu = this.submenus.pop()){
+                    submenu.close();
+                }
+            };
+        }
+
+        class Client {
+            constructor() {
+                window.map = new Map();
+                window.mapPad = new MapPad();
+                window.tileMenu = new TileMenu();
+                window.tileCollection = new TileCollection();
+                window.action = new Action();
+            }
+
+            init() {
+                console.log('New client init!');
+
+                window.map.init(document.getElementById('screen')).fill().draw();
+                window.mapPad.init();
+
+                return(this);
+            };
+        }
+        console.log('Start JS');
+
+        function ready(callback){
+            // in case the document is already rendered
+            if (document.readyState !== 'loading') callback();
+            // modern browsers
+            else if (document.addEventListener) document.addEventListener('DOMContentLoaded', callback);
+            // IE <= 8
+            else document.attachEvent('onreadystatechange', function(){
+                    if (document.readyState === 'complete') callback();
+                });
+        }
+
+        ready(function(){
+            console.log('Ready');
+
+            let client = new Client();
+            client.init();
+        });
+
+        function setHeight(el, val) {
+            if (typeof val === 'function') val = val();
+            if (typeof val === 'string') el.style.height = val;
+            else el.style.height = val + 'px';
+        }
+
+        window.addEventListener('resize', function(event) {
+            console.log('resize');
+
+            let bodyHeight = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+            let screen = document.getElementById('screen');
+            setHeight(screen, bodyHeight);
+
+            let game = document.getElementById('game');
+            setHeight(game, bodyHeight);
+        });
+    </script>
+{% endblock %}

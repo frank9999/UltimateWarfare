@@ -542,6 +542,10 @@ Game/Surrender:
     path:      /game/surrender
     controller: FrankProjects\UltimateWarfare\Controller\Game\SurrenderController::surrender
 
+Game/WorldMap:
+    path:      /game/world-map
+    controller: FrankProjects\UltimateWarfare\Controller\Game\WorldController::worldMap
+
 Game/World:
     path:      /game/world
     controller: FrankProjects\UltimateWarfare\Controller\Game\WorldController::world
@@ -549,6 +553,10 @@ Game/World:
 Game/World/Create:
     path:      /game/world/create
     controller: FrankProjects\UltimateWarfare\Controller\Game\WorldController::create
+
+Game/World/GetTiles:
+    path:      /game/world/get-tiles
+    controller: FrankProjects\UltimateWarfare\Controller\Game\WorldController::getTiles
 
 Game/World/Region:
     path:      /game/world/region/{regionId}
