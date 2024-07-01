@@ -271,4 +271,23 @@ class WorldRegion
 
         return $worldRegion;
     }
+
+    public function toArray(): array
+    {
+        $playerName = '';
+        $player = $this->getPlayer();
+        if ($player !== null) {
+            $playerName = $player->getName();
+        }
+        return [
+            'id' => $this->getId(),
+            'x' => $this->getX(),
+            'y' => $this->getY(),
+            'z' => $this->getZ(),
+            'type' => $this->getType(),
+            'owner' => $playerName,
+            'units' => $this->getWorldRegionUnits()->toArray(),
+            'structures' => []
+        ];
+    }
 }
