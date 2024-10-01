@@ -10,6 +10,7 @@ use FrankProjects\UltimateWarfare\Repository\PlayerRepository;
 use FrankProjects\UltimateWarfare\Repository\WorldRegionRepository;
 use FrankProjects\UltimateWarfare\Repository\WorldRepository;
 use FrankProjects\UltimateWarfare\Service\WorldGeneratorService;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -134,6 +135,18 @@ final class WorldController extends BaseGameController
         );
     }
 
+    public function worldMap(): Response
+    {
+        $player = $this->getPlayer();
+
+        return $this->render(
+            'v2/game/world.html.twig',
+            [
+                'player' => $player
+            ]
+        );
+    }
+
     public function searchFree(): Response
     {
         $player = $this->getPlayer();
@@ -196,6 +209,31 @@ final class WorldController extends BaseGameController
                 ]
             ]
         );
+    }
+
+
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function getTiles(Request $request): JsonResponse
+    {
+        $player = $this->getPlayer();
+
+        //$json = $request->get('json_request');
+
+        $params = json_decode($request->getContent(), true);
+
+        // $params = json_decode($json, true);
+        $tiles = [];
+        foreach ($params['coords'] as $coord) {
+            $worldRegion = $this->worldRegionRepository->findByWorldXY($player->getWorld(), intval($coord['x']), intval($coord['y']));
+            if ($worldRegion !== null) {
+                $tiles[] = $worldRegion->toArray();
+            }
+        }
+
+        return $this->json($tiles);
     }
 
     private function getRegionCount(WorldSector $sector, ?Player $player = null): int
