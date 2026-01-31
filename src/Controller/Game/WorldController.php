@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace FrankProjects\UltimateWarfare\Controller\Game;
 
 use FrankProjects\UltimateWarfare\Entity\Player;
+use FrankProjects\UltimateWarfare\Entity\World;
 use FrankProjects\UltimateWarfare\Entity\WorldSector;
 use FrankProjects\UltimateWarfare\Repository\PlayerRepository;
 use FrankProjects\UltimateWarfare\Repository\WorldRegionRepository;
@@ -113,18 +114,10 @@ final class WorldController extends BaseGameController
     public function world(): Response
     {
         $player = $this->getPlayer();
-        $world = $player->getWorld();
-
-        $sectors = [];
-        foreach ($world->getWorldSectors() as $sector) {
-            $sector->setRegionCount($this->getRegionCount($sector, $player));
-            $sectors[$sector->getX()][$sector->getY()] = $sector;
-        }
 
         return $this->render(
             'game/world.html.twig',
             [
-                'sectors' => $sectors,
                 'player' => $player,
                 'mapSettings' => [
                     'searchFound' => true,
@@ -138,30 +131,51 @@ final class WorldController extends BaseGameController
     public function worldMap(): Response
     {
         $player = $this->getPlayer();
+        $world = $player->getWorld();
+
+        $regions = $this->getWorldRegionsData($world, $player);
 
         return $this->render(
             'v2/game/world.html.twig',
             [
-                'player' => $player
+                'regions' => $regions,
+                'player' => $player,
+                'mapSettings' => [
+                    'searchFound' => true,
+                    'searchFree' => false,
+                    'searchPlayerName' => false
+                ]
             ]
         );
     }
 
+    private function getWorldRegionsData(World $world, Player $player): array
+    {
+        $regions = [];
+        foreach ($world->getWorldRegions() as $region) {
+            $regions[] = [
+                'x' => $region->getX(),
+                'y' => $region->getY(),
+                'id' => $region->getId(),
+                'name' => $region->getName(),
+                'type' => $region->getType(),
+                'image' => $region->getType().'.png',
+                'hasOwner' => $region->getPlayer() !== null,
+                'isYours' => $region->getPlayer() !== null && $region->getPlayer()->getId() === $player->getId(),
+                'ownerName' => $region->getPlayer()?->getName(),
+            ];
+        }
+
+        return $regions;
+    }
     public function searchFree(): Response
     {
         $player = $this->getPlayer();
         $world = $player->getWorld();
 
-        $sectors = [];
-        foreach ($world->getWorldSectors() as $sector) {
-            $sector->setRegionCount($this->getRegionCount($sector));
-            $sectors[$sector->getX()][$sector->getY()] = $sector;
-        }
-
         return $this->render(
             'game/world.html.twig',
             [
-                'sectors' => $sectors,
                 'player' => $player,
                 'mapSettings' => [
                     'searchFound' => true,
@@ -180,26 +194,11 @@ final class WorldController extends BaseGameController
 
         $playerSearch = $this->playerRepository->findByNameAndWorld($playerName, $world);
 
-        if ($playerSearch !== null) {
-            $searchFound = true;
-        } else {
-            $searchFound = false;
-        }
-
-        $sectors = [];
-        foreach ($world->getWorldSectors() as $sector) {
-            if ($searchFound) {
-                $sector->setRegionCount($this->getRegionCount($sector, $playerSearch));
-            } else {
-                $sector->setRegionCount(0);
-            }
-            $sectors[$sector->getX()][$sector->getY()] = $sector;
-        }
+        $searchFound = $playerSearch !== null;
 
         return $this->render(
             'game/world.html.twig',
             [
-                'sectors' => $sectors,
                 'player' => $player,
                 'mapSettings' => [
                     'searchFound' => $searchFound,
