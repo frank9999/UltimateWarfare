@@ -11,9 +11,12 @@ use FrankProjects\UltimateWarfare\Exception\GameUnitTypeNotFoundException;
 use FrankProjects\UltimateWarfare\Exception\WorldRegionNotFoundException;
 use FrankProjects\UltimateWarfare\Repository\GameUnitTypeRepository;
 use FrankProjects\UltimateWarfare\Repository\WorldRegionRepository;
+use FrankProjects\UltimateWarfare\Repository\FleetRepository;
 use FrankProjects\UltimateWarfare\Service\Action\FleetActionService;
 use FrankProjects\UltimateWarfare\Service\Action\RegionActionService;
+use FrankProjects\UltimateWarfare\Service\BattleEngine;
 use FrankProjects\UltimateWarfare\Util\DistanceCalculator;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Throwable;
@@ -29,12 +32,54 @@ final class FleetController extends BaseGameController
         WorldRegionRepository $worldRegionRepository,
         GameUnitTypeRepository $gameUnitTypeRepository,
         FleetActionService $fleetActionService,
-        RegionActionService $regionActionService
+        RegionActionService $regionActionService,
+        FleetRepository $fleetRepository,
+        BattleEngine $battleEngine
     ) {
         $this->worldRegionRepository = $worldRegionRepository;
         $this->gameUnitTypeRepository = $gameUnitTypeRepository;
         $this->fleetActionService = $fleetActionService;
         $this->regionActionService = $regionActionService;
+        $this->fleetRepository = $fleetRepository;
+        $this->battleEngine = $battleEngine;
+    }
+
+    /**
+     * API endpoint for recalling a fleet (JSON response)
+     */
+    public function recallApi(int $fleetId): JsonResponse
+    {
+        try {
+            $this->fleetActionService->recall($fleetId, $this->getPlayer());
+            return new JsonResponse([
+                'success' => true,
+                'message' => 'You successfully recalled your troops!'
+            ]);
+        } catch (Throwable $e) {
+            return new JsonResponse([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 400);
+        }
+    }
+
+    /**
+     * API endpoint for reinforcing a region (JSON response)
+     */
+    public function reinforceApi(int $fleetId): JsonResponse
+    {
+        try {
+            $this->fleetActionService->reinforce($fleetId, $this->getPlayer());
+            return new JsonResponse([
+                'success' => true,
+                'message' => 'You successfully reinforced your region!'
+            ]);
+        } catch (Throwable $e) {
+            return new JsonResponse([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 400);
+        }
     }
 
     public function fleetList(): Response

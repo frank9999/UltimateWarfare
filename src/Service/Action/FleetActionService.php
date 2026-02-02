@@ -16,6 +16,8 @@ use FrankProjects\UltimateWarfare\Repository\FleetUnitRepository;
 use FrankProjects\UltimateWarfare\Repository\GameUnitRepository;
 use FrankProjects\UltimateWarfare\Repository\WorldRegionUnitRepository;
 use RuntimeException;
+use Doctrine\DBAL\LockMode;
+use Doctrine\ORM\EntityManagerInterface;
 
 final class FleetActionService
 {
@@ -23,46 +25,87 @@ final class FleetActionService
     private FleetUnitRepository $fleetUnitRepository;
     private GameUnitRepository $gameUnitRepository;
     private WorldRegionUnitRepository $worldRegionUnitRepository;
+    private EntityManagerInterface $entityManager;
 
     public function __construct(
         FleetRepository $fleetRepository,
         FleetUnitRepository $fleetUnitRepository,
         GameUnitRepository $gameUnitRepository,
-        WorldRegionUnitRepository $worldRegionUnitRepository
+        WorldRegionUnitRepository $worldRegionUnitRepository,
+        EntityManagerInterface $entityManager
     ) {
         $this->fleetRepository = $fleetRepository;
         $this->fleetUnitRepository = $fleetUnitRepository;
         $this->gameUnitRepository = $gameUnitRepository;
         $this->worldRegionUnitRepository = $worldRegionUnitRepository;
+        $this->entityManager = $entityManager;
     }
 
     public function recall(int $fleetId, Player $player): bool
     {
-        $fleet = $this->getFleetByIdAndPlayer($fleetId, $player);
+        // Begin transaction for atomic operation
+        $this->entityManager->beginTransaction();
+        
+        try {
+            // Get and lock the fleet to prevent race conditions
+            $fleet = $this->entityManager->find(
+                Fleet::class, 
+                $fleetId, 
+                LockMode::PESSIMISTIC_WRITE
+            );
+            
+            if ($fleet === null || $fleet->getPlayer()->getId() !== $player->getId()) {
+                throw new RuntimeException('Fleet does not exist!');
+            }
 
-        $targetPlayer = $fleet->getWorldRegion()->getPlayer();
-        if ($targetPlayer === null || $targetPlayer->getId() !== $player->getId()) {
-            throw new RuntimeException('You are not the owner of this region!');
+            $targetPlayer = $fleet->getWorldRegion()->getPlayer();
+            if ($targetPlayer === null || $targetPlayer->getId() !== $player->getId()) {
+                throw new RuntimeException('You are not the owner of this region!');
+            }
+
+            $this->addFleetUnitsToWorldRegion($fleet, $fleet->getWorldRegion());
+            
+            $this->entityManager->commit();
+            
+            return true;
+        } catch (\Exception $e) {
+            $this->entityManager->rollback();
+            throw $e;
         }
-
-        $this->addFleetUnitsToWorldRegion($fleet, $fleet->getWorldRegion());
-
-        return true;
     }
 
     public function reinforce(int $fleetId, Player $player): bool
     {
-        $fleet = $this->getFleetByIdAndPlayer($fleetId, $player);
+        // Begin transaction for atomic operation
+        $this->entityManager->beginTransaction();
+        
+        try {
+            // Get and lock the fleet to prevent race conditions
+            $fleet = $this->entityManager->find(
+                Fleet::class, 
+                $fleetId, 
+                LockMode::PESSIMISTIC_WRITE
+            );
+            
+            if ($fleet === null || $fleet->getPlayer()->getId() !== $player->getId()) {
+                throw new RuntimeException('Fleet does not exist!');
+            }
 
-        $targetPlayer = $fleet->getTargetWorldRegion()->getPlayer();
+            $targetPlayer = $fleet->getTargetWorldRegion()->getPlayer();
 
-        if ($targetPlayer === null || $targetPlayer->getId() !== $player->getId()) {
-            throw new RuntimeException('You are not the owner of this region!');
+            if ($targetPlayer === null || $targetPlayer->getId() !== $player->getId()) {
+                throw new RuntimeException('You are not the owner of this region!');
+            }
+
+            $this->addFleetUnitsToWorldRegion($fleet, $fleet->getTargetWorldRegion());
+            
+            $this->entityManager->commit();
+
+            return true;
+        } catch (\Exception $e) {
+            $this->entityManager->rollback();
+            throw $e;
         }
-
-        $this->addFleetUnitsToWorldRegion($fleet, $fleet->getTargetWorldRegion());
-
-        return true;
     }
 
     /**

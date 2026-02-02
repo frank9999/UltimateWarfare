@@ -366,13 +366,34 @@ Game/Fleet/Attack:
     path:      /game/fleet/attack/{fleetId}
     controller: FrankProjects\UltimateWarfare\Controller\Game\BattleController::battle
 
+Game/Fleet/Attack/Api:
+    path:      /game/api/fleet/attack/{fleetId}
+    controller: FrankProjects\UltimateWarfare\Controller\Game\BattleController::battleApi
+    methods: [POST]
+    requirements:
+        fleetId: '\d+'
+
 Game/Fleet/Recall:
     path:      /game/fleet/recall/{fleetId}
     controller: FrankProjects\UltimateWarfare\Controller\Game\FleetController::recall
 
+Game/Fleet/Recall/Api:
+    path:      /game/api/fleet/recall/{fleetId}
+    controller: FrankProjects\UltimateWarfare\Controller\Game\FleetController::recallApi
+    methods: [POST]
+    requirements:
+        fleetId: '\d+'
+
 Game/Fleet/Reinforce:
     path:      /game/fleet/reinforce/{fleetId}
     controller: FrankProjects\UltimateWarfare\Controller\Game\FleetController::reinforce
+
+Game/Fleet/Reinforce/Api:
+    path:      /game/api/fleet/reinforce/{fleetId}
+    controller: FrankProjects\UltimateWarfare\Controller\Game\FleetController::reinforceApi
+    methods: [POST]
+    requirements:
+        fleetId: '\d+'
 
 Game/Headquarter:
     path:      /game/headquarter
@@ -590,6 +611,13 @@ Game/World/Region/Buy:
     requirements:
         regionId: '\d+'
 
+Game/World/Region/Buy/Api:
+    path:      /game/api/world/region/buy/{regionId}
+    controller: FrankProjects\UltimateWarfare\Controller\Game\RegionController::buyApi
+    methods: [POST]
+    requirements:
+        regionId: '\d+'
+
 Game/World/Region/RemoveGameUnits:
     path:      /game/world/region/remove/{regionId}/{gameUnitTypeId}
     controller: FrankProjects\UltimateWarfare\Controller\Game\ConstructionController::removeGameUnits
@@ -602,14 +630,6 @@ Game/World/Region/SendUnits:
     controller: FrankProjects\UltimateWarfare\Controller\Game\FleetController::sendGameUnits
     requirements:
         regionId: '\d+'
-
-Game/World/Search/Free:
-    path:      /game/world/search/free
-    controller: FrankProjects\UltimateWarfare\Controller\Game\WorldController::searchFree
-
-Game/World/Search/Player:
-    path:      /game/world/search/player
-    controller: FrankProjects\UltimateWarfare\Controller\Game\WorldController::searchPlayer
 
 Game/World/Sector:
     path:      /game/world/sector/{sectorId}

@@ -1,6 +1,6 @@
 /**
  * IsometricMap - A scrollable isometric world map renderer
- * Works on all modern browsers with Canvas API support
+ * Main orchestrator that coordinates all map modules
  */
 class IsometricMap {
     constructor(canvasId, config = {}) {
@@ -14,6 +14,7 @@ class IsometricMap {
             tileWidth: config.tileWidth || 128,
             tileHeight: config.tileHeight || 64,
             imageBasePath: config.imageBasePath || '/images',
+            overlaysEnabled: config.overlaysEnabled || false,
             ...config
         };
 
@@ -21,234 +22,55 @@ class IsometricMap {
         this.sectors = [];
         this.images = new Map();
         this.imagesLoaded = false;
+        this.hoveredTile = null;
 
-        // Camera/viewport
-        this.camera = {
-            x: 0,
-            y: 0,
-            zoom: 1.0,
+        // Initialize modules
+        this.cameraController = new CameraController(this.canvas, {
             minZoom: 0.5,
             maxZoom: 2.0
-        };
+        });
+        this.fleetManager = new FleetManager(this);
+        this.tileRenderer = new TileRenderer(this.ctx, this.config);
 
-        // Interaction
-        this.isDragging = false;
-        this.hasDragged = false;
-        this.lastMousePos = { x: 0, y: 0 };
-        this.hoveredTile = null;
+        // Wire up camera callbacks
+        this.cameraController.onRenderRequest = () => this.render();
+        this.cameraController.onTileHover = (e) => this.updateHoveredTile(e);
+        this.cameraController.onTileClick = (e) => this.handleTileClick(e);
+
+        // Expose camera for external access
+        this.camera = this.cameraController.camera;
 
         this.init();
     }
 
     init() {
         this.setupCanvas();
-        this.setupEventListeners();
-        this.centerCamera();
+        this.cameraController.setupEventListeners();
+        this.cameraController.centerCamera();
     }
 
     setupCanvas() {
-        // Make canvas responsive
         const resizeCanvas = () => {
-            const container = this.canvas.parentElement;
-            this.canvas.width = container.clientWidth;
-            this.canvas.height = Math.max(600, window.innerHeight * 0.7);
-            this.render();
+            const rect = this.canvas.getBoundingClientRect();
+            this.canvas.width = rect.width;
+            this.canvas.height = rect.height;
+            
+            if (this.imagesLoaded) {
+                this.render();
+            }
         };
 
-        resizeCanvas();
+        requestAnimationFrame(() => resizeCanvas());
         window.addEventListener('resize', resizeCanvas);
     }
 
-    setupEventListeners() {
-        // Mouse wheel zoom
-        this.canvas.addEventListener('wheel', (e) => {
-            e.preventDefault();
-            const zoomDelta = e.deltaY > 0 ? 0.9 : 1.1;
-            const newZoom = this.camera.zoom * zoomDelta;
-
-            if (newZoom >= this.camera.minZoom && newZoom <= this.camera.maxZoom) {
-                // Zoom towards mouse position
-                const rect = this.canvas.getBoundingClientRect();
-                const mouseX = e.clientX - rect.left;
-                const mouseY = e.clientY - rect.top;
-
-                this.camera.x -= (mouseX - this.canvas.width / 2) * (zoomDelta - 1);
-                this.camera.y -= (mouseY - this.canvas.height / 2) * (zoomDelta - 1);
-                this.camera.zoom = newZoom;
-
-                this.render();
-            }
-        }, { passive: false });
-
-        // Mouse dragging
-        this.canvas.addEventListener('mousedown', (e) => {
-            this.isDragging = true;
-            this.hasDragged = false;
-            this.lastMousePos = { x: e.clientX, y: e.clientY };
-            this.canvas.style.cursor = 'grabbing';
-        });
-
-        this.canvas.addEventListener('mousemove', (e) => {
-            if (this.isDragging) {
-                const dx = e.clientX - this.lastMousePos.x;
-                const dy = e.clientY - this.lastMousePos.y;
-
-                // If mouse moved more than a small threshold, mark as dragged
-                if (Math.abs(dx) > 3 || Math.abs(dy) > 3) {
-                    this.hasDragged = true;
-                }
-
-                this.camera.x += dx;
-                this.camera.y += dy;
-
-                this.lastMousePos = { x: e.clientX, y: e.clientY };
-                this.render();
-            } else {
-                // Update hovered tile
-                this.updateHoveredTile(e);
-            }
-        });
-
-        this.canvas.addEventListener('mouseup', () => {
-            this.isDragging = false;
-            this.canvas.style.cursor = 'grab';
-        });
-
-        this.canvas.addEventListener('mouseleave', () => {
-            this.isDragging = false;
-            this.canvas.style.cursor = 'default';
-        });
-
-        // Touch support for mobile
-        this.setupTouchEvents();
-
-        // Click handling
-        this.canvas.addEventListener('click', (e) => {
-            // Only trigger click if user didn't drag
-            if (!this.hasDragged) {
-                this.handleTileClick(e);
-            }
-            this.hasDragged = false;
-        });
-
-        this.canvas.style.cursor = 'grab';
-    }
-
-    setupTouchEvents() {
-        let lastTouchDistance = 0;
-
-        this.canvas.addEventListener('touchstart', (e) => {
-            if (e.touches.length === 1) {
-                this.isDragging = true;
-                this.hasDragged = false;
-                this.lastMousePos = {
-                    x: e.touches[0].clientX,
-                    y: e.touches[0].clientY
-                };
-            } else if (e.touches.length === 2) {
-                lastTouchDistance = this.getTouchDistance(e.touches);
-            }
-            e.preventDefault();
-        }, { passive: false });
-
-        this.canvas.addEventListener('touchmove', (e) => {
-            if (e.touches.length === 1 && this.isDragging) {
-                const dx = e.touches[0].clientX - this.lastMousePos.x;
-                const dy = e.touches[0].clientY - this.lastMousePos.y;
-
-                // If touch moved more than a small threshold, mark as dragged
-                if (Math.abs(dx) > 3 || Math.abs(dy) > 3) {
-                    this.hasDragged = true;
-                }
-
-                this.camera.x += dx;
-                this.camera.y += dy;
-
-                this.lastMousePos = {
-                    x: e.touches[0].clientX,
-                    y: e.touches[0].clientY
-                };
-                this.render();
-            } else if (e.touches.length === 2) {
-                // Pinch to zoom
-                const currentDistance = this.getTouchDistance(e.touches);
-                const zoomDelta = currentDistance / lastTouchDistance;
-
-                const newZoom = this.camera.zoom * zoomDelta;
-                if (newZoom >= this.camera.minZoom && newZoom <= this.camera.maxZoom) {
-                    this.camera.zoom = newZoom;
-                    this.render();
-                }
-
-                lastTouchDistance = currentDistance;
-            }
-            e.preventDefault();
-        }, { passive: false });
-
-        this.canvas.addEventListener('touchend', () => {
-            this.isDragging = false;
-        });
-    }
-
-    getTouchDistance(touches) {
-        const dx = touches[0].clientX - touches[1].clientX;
-        const dy = touches[0].clientY - touches[1].clientY;
-        return Math.sqrt(dx * dx + dy * dy);
-    }
-
-    updateHoveredTile(e) {
-        const rect = this.canvas.getBoundingClientRect();
-        const mouseX = e.clientX - rect.left;
-        const mouseY = e.clientY - rect.top;
-
-        const tile = this.getTileAtScreenPos(mouseX, mouseY);
-
-        if (tile !== this.hoveredTile) {
-            this.hoveredTile = tile;
-            this.render();
-        }
-    }
-
-    handleTileClick(e) {
-        const rect = this.canvas.getBoundingClientRect();
-        const mouseX = e.clientX - rect.left;
-        const mouseY = e.clientY - rect.top;
-
-        const tile = this.getTileAtScreenPos(mouseX, mouseY);
-
-        if (tile && this.config.onTileClick) {
-            this.config.onTileClick(tile);
-        }
-    }
-
-    getTileAtScreenPos(screenX, screenY) {
-        // Convert screen coordinates to world coordinates
-        const worldX = (screenX - this.canvas.width / 2 - this.camera.x) / this.camera.zoom;
-        const worldY = (screenY - this.canvas.height / 2 - this.camera.y) / this.camera.zoom;
-
-        // Convert world coordinates to isometric grid coordinates
-        const gridX = Math.floor((worldX / (this.config.tileWidth / 2) + worldY / (this.config.tileHeight / 2)) / 2);
-        const gridY = Math.floor((worldY / (this.config.tileHeight / 2) - worldX / (this.config.tileWidth / 2)) / 2);
-
-        // Find the tile in our sectors array
-        for (const sector of this.sectors) {
-            if (sector.x === gridX && sector.y === gridY) {
-                return sector;
-            }
-        }
-
-        return null;
-    }
+    // ===== Data Methods =====
 
     loadImages(sectors) {
         const imageUrls = new Set();
 
         sectors.forEach(sector => {
             imageUrls.add(`${this.config.imageBasePath}/map/${sector.image}`);
-            if (sector.regionCount > 0) {
-                imageUrls.add(`${this.config.imageBasePath}/player.gif`);
-                imageUrls.add(`${this.config.imageBasePath}/you.png`);
-            }
         });
 
         const loadPromises = Array.from(imageUrls).map(url => {
@@ -273,11 +95,11 @@ class IsometricMap {
         return this.loadImages(sectors);
     }
 
-    centerCamera() {
-        // Center on the middle of the map
-        this.camera.x = 0;
-        this.camera.y = 0;
+    setFleets(fleets) {
+        this.fleetManager.setFleets(fleets);
     }
+
+    // ===== Coordinate Conversion =====
 
     cartesianToIsometric(cartX, cartY) {
         const isoX = (cartX - cartY) * (this.config.tileWidth / 2);
@@ -285,85 +107,90 @@ class IsometricMap {
         return { x: isoX, y: isoY };
     }
 
+    getTileAtScreenPos(screenX, screenY) {
+        const world = this.cameraController.screenToWorld(screenX, screenY);
+        
+        const gridX = Math.floor(world.x / this.config.tileWidth + world.y / this.config.tileHeight + 0.5);
+        const gridY = Math.floor(world.y / this.config.tileHeight - world.x / this.config.tileWidth + 0.5);
+
+        for (const sector of this.sectors) {
+            if (sector.x === gridX && sector.y === gridY) {
+                return sector;
+            }
+        }
+
+        return null;
+    }
+
+    // ===== Interaction =====
+
+    updateHoveredTile(e) {
+        const rect = this.canvas.getBoundingClientRect();
+        const tile = this.getTileAtScreenPos(e.clientX - rect.left, e.clientY - rect.top);
+
+        if (tile !== this.hoveredTile) {
+            this.hoveredTile = tile;
+            this.render();
+        }
+    }
+
+    handleTileClick(e) {
+        const rect = this.canvas.getBoundingClientRect();
+        const tile = this.getTileAtScreenPos(e.clientX - rect.left, e.clientY - rect.top);
+
+        if (tile && this.config.onTileClick) {
+            this.config.onTileClick(tile);
+        }
+    }
+
+    // ===== Rendering =====
+
     render() {
         if (!this.imagesLoaded) {
             return;
         }
 
-        // Clear canvas
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-        // Save context state
         this.ctx.save();
+        this.cameraController.applyTransform(this.ctx);
 
-        // Apply camera transformations
-        this.ctx.translate(this.canvas.width / 2, this.canvas.height / 2);
-        this.ctx.translate(this.camera.x, this.camera.y);
-        this.ctx.scale(this.camera.zoom, this.camera.zoom);
+        // Sort and render tiles
+        const sortedSectors = [...this.sectors].sort((a, b) => (a.x + a.y) - (b.x + b.y));
+        sortedSectors.forEach(sector => this.renderTile(sector));
 
-        // Sort sectors for proper rendering order (back to front)
-        const sortedSectors = [...this.sectors].sort((a, b) => {
-            return (a.x + a.y) - (b.x + b.y);
-        });
+        // Render fleet lines
+        this.fleetManager.renderFleetLines(this.ctx, (x, y) => this.cartesianToIsometric(x, y));
 
-        // Render all tiles
-        sortedSectors.forEach(sector => {
-            this.renderTile(sector);
-        });
-
-        // Restore context state
         this.ctx.restore();
 
-        // Render UI elements (not affected by camera)
+        // Render UI elements
         this.renderUI();
+        this.fleetManager.renderFleetUIElements(
+            this.canvas, 
+            this.camera, 
+            (x, y) => this.cartesianToIsometric(x, y)
+        );
     }
 
     renderTile(sector) {
         const iso = this.cartesianToIsometric(sector.x, sector.y);
-
-        // Get the tile image
         const imageUrl = `${this.config.imageBasePath}/map/${sector.image}`;
         const img = this.images.get(imageUrl);
 
-        if (img) {
-            // Draw the base tile
-            this.ctx.drawImage(
-                img,
-                iso.x - this.config.tileWidth / 2,
-                iso.y - this.config.tileHeight / 2,
-                this.config.tileWidth,
-                this.config.tileHeight
-            );
+        // Delegate to tile renderer with all game-specific logic
+        this.tileRenderer.renderTile(sector, iso, img, this.hoveredTile, this.images);
+    }
 
-            // Highlight hovered tile
-            if (this.hoveredTile && this.hoveredTile.x === sector.x && this.hoveredTile.y === sector.y) {
-                this.ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
-                this.ctx.fillRect(
-                    iso.x - this.config.tileWidth / 2,
-                    iso.y - this.config.tileHeight / 2,
-                    this.config.tileWidth,
-                    this.config.tileHeight
-                );
-            }
-
-            // Draw region count if applicable
-            if (sector.regionCount > 0) {
-                this.ctx.save();
-                this.ctx.fillStyle = '#f3e6c1';
-                this.ctx.font = '14px Arial';
-                this.ctx.textAlign = 'center';
-                this.ctx.fillText(
-                    `${sector.regionCount} regions`,
-                    iso.x,
-                    iso.y
-                );
-                this.ctx.restore();
-            }
-        }
+    /**
+     * Proxy method for unit indicator rendering
+     * Allows external access if needed
+     */
+    renderUnitIndicators(region, isoX, isoY) {
+        this.tileRenderer.renderUnitIndicators(region, isoX, isoY);
     }
 
     renderUI() {
-        // Draw zoom controls
         this.ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
         this.ctx.fillRect(10, 10, 150, 30);
 
@@ -373,8 +200,10 @@ class IsometricMap {
         this.ctx.fillText(`Zoom: ${(this.camera.zoom * 100).toFixed(0)}%`, 20, 30);
     }
 
+    // ===== Cleanup =====
+
     destroy() {
-        // Clean up event listeners and resources
+        this.fleetManager.destroy();
         window.removeEventListener('resize', this.setupCanvas);
     }
 }

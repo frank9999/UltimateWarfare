@@ -105,6 +105,8 @@ class Fleet
             $worldRegion->getX(),
             $worldRegion->getY()
         );
+        // XXX TODO: Remove me before commit
+        $travelTime = 1;
 
         $fleet = new Fleet();
         $fleet->setPlayer($player);

@@ -13,6 +13,7 @@ use FrankProjects\UltimateWarfare\Service\Action\ConstructionActionService;
 use FrankProjects\UltimateWarfare\Service\Action\RegionActionService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Throwable;
 
 final class RegionController extends BaseGameController
@@ -62,6 +63,26 @@ final class RegionController extends BaseGameController
                 'price' => $player->getRegionPrice()
             ]
         );
+    }
+
+    public function buyApi(int $regionId): JsonResponse
+    {
+        try {
+            $player = $this->getPlayer();
+            $this->regionActionService->buyWorldRegion($regionId, $player);
+            
+            return new JsonResponse([
+                'success' => true,
+                'message' => 'You have bought a Region!',
+                'newCash' => $player->getResources()->getCash(),
+                'newRegionPrice' => $player->getRegionPrice()
+            ]);
+        } catch (Throwable $e) {
+            return new JsonResponse([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 400);
+        }
     }
 
     public function region(int $regionId): Response

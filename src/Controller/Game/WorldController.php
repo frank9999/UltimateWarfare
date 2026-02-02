@@ -4,14 +4,15 @@ declare(strict_types=1);
 
 namespace FrankProjects\UltimateWarfare\Controller\Game;
 
+use FrankProjects\UltimateWarfare\Entity\GameUnitType;
 use FrankProjects\UltimateWarfare\Entity\Player;
 use FrankProjects\UltimateWarfare\Entity\World;
-use FrankProjects\UltimateWarfare\Entity\WorldSector;
+use FrankProjects\UltimateWarfare\Entity\WorldRegion;
 use FrankProjects\UltimateWarfare\Repository\PlayerRepository;
 use FrankProjects\UltimateWarfare\Repository\WorldRegionRepository;
+use FrankProjects\UltimateWarfare\Repository\FleetRepository;
 use FrankProjects\UltimateWarfare\Repository\WorldRepository;
 use FrankProjects\UltimateWarfare\Service\WorldGeneratorService;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -19,16 +20,18 @@ final class WorldController extends BaseGameController
 {
     private PlayerRepository $playerRepository;
     private WorldRepository $worldRepository;
-    private WorldRegionRepository $worldRegionRepository;
+    private FleetRepository $fleetRepository;
 
     public function __construct(
         PlayerRepository $playerRepository,
         WorldRepository $worldRepository,
-        WorldRegionRepository $worldRegionRepository
+        WorldRegionRepository $worldRegionRepository,
+        FleetRepository $fleetRepository
     ) {
         $this->playerRepository = $playerRepository;
         $this->worldRepository = $worldRepository;
         $this->worldRegionRepository = $worldRegionRepository;
+        $this->fleetRepository = $fleetRepository;
     }
 
     public function create(WorldGeneratorService $worldGeneratorService): Response
@@ -114,16 +117,18 @@ final class WorldController extends BaseGameController
     public function world(): Response
     {
         $player = $this->getPlayer();
+        $world = $player->getWorld();
+
+        $sectors = [];
+        foreach ($world->getWorldSectors() as $sector) {
+            $sectors[$sector->getX()][$sector->getY()] = $sector;
+        }
 
         return $this->render(
             'game/world.html.twig',
             [
-                'player' => $player,
-                'mapSettings' => [
-                    'searchFound' => true,
-                    'searchFree' => false,
-                    'searchPlayerName' => false
-                ]
+                'sectors' => $sectors,
+                'player' => $player
             ]
         );
     }
@@ -134,17 +139,14 @@ final class WorldController extends BaseGameController
         $world = $player->getWorld();
 
         $regions = $this->getWorldRegionsData($world, $player);
+        $fleets = $this->getPlayerFleetsData($player);
 
         return $this->render(
             'v2/game/world.html.twig',
             [
                 'regions' => $regions,
                 'player' => $player,
-                'mapSettings' => [
-                    'searchFound' => true,
-                    'searchFree' => false,
-                    'searchPlayerName' => false
-                ]
+                'fleets' => $fleets,
             ]
         );
     }
@@ -153,91 +155,126 @@ final class WorldController extends BaseGameController
     {
         $regions = [];
         foreach ($world->getWorldRegions() as $region) {
-            $regions[] = [
+            $isYours = $region->getPlayer() !== null && $region->getPlayer()->getId() === $player->getId();
+            
+            $regionData = [
                 'x' => $region->getX(),
                 'y' => $region->getY(),
                 'id' => $region->getId(),
-                'name' => $region->getName(),
                 'type' => $region->getType(),
-                'image' => $region->getType().'.png',
+                'image' => $region->getType() . '.png',
                 'hasOwner' => $region->getPlayer() !== null,
-                'isYours' => $region->getPlayer() !== null && $region->getPlayer()->getId() === $player->getId(),
+                'isYours' => $isYours,
                 'ownerName' => $region->getPlayer()?->getName(),
+                'units' => [],
             ];
+
+            // Only include unit data for regions owned by the current player
+            if ($isYours) {
+                $regionData['units'] = $this->getUnitSummary($region);
+            }
+
+            $regions[] = $regionData;
         }
 
         return $regions;
     }
-    public function searchFree(): Response
-    {
-        $player = $this->getPlayer();
-        $world = $player->getWorld();
-
-        return $this->render(
-            'game/world.html.twig',
-            [
-                'player' => $player,
-                'mapSettings' => [
-                    'searchFound' => true,
-                    'searchFree' => true,
-                    'searchPlayerName' => false
-                ]
-            ]
-        );
-    }
-
-    public function searchPlayer(Request $request): Response
-    {
-        $playerName = (string) $request->request->get('playerName');
-        $player = $this->getPlayer();
-        $world = $player->getWorld();
-
-        $playerSearch = $this->playerRepository->findByNameAndWorld($playerName, $world);
-
-        $searchFound = $playerSearch !== null;
-
-        return $this->render(
-            'game/world.html.twig',
-            [
-                'player' => $player,
-                'mapSettings' => [
-                    'searchFound' => $searchFound,
-                    'searchFree' => false,
-                    'searchPlayerName' => true,
-                    'playerName' => $playerName
-                ]
-            ]
-        );
-    }
-
 
     /**
-     * @param Request $request
-     * @return JsonResponse
+     * Get a summary of units in a region grouped by type
+     * @return array<string, int|array>
      */
-    public function getTiles(Request $request): JsonResponse
+    private function getUnitSummary(WorldRegion $region): array
     {
-        $player = $this->getPlayer();
+        $summary = [
+            'buildings' => 0,
+            'defences' => 0,
+            'special' => 0,
+            'units' => 0,
+            'specialUnits' => 0,
+            'details' => [
+                'buildings' => [],
+                'defences' => [],
+                'special' => [],
+                'units' => [],
+                'specialUnits' => [],
+            ],
+        ];
 
-        //$json = $request->get('json_request');
+        foreach ($region->getWorldRegionUnits() as $worldRegionUnit) {
+            $typeId = $worldRegionUnit->getGameUnit()->getGameUnitType()->getId();
+            $amount = $worldRegionUnit->getAmount();
+            $unitName = $worldRegionUnit->getGameUnit()->getName();
 
-        $params = json_decode($request->getContent(), true);
-
-        // $params = json_decode($json, true);
-        $tiles = [];
-        foreach ($params['coords'] as $coord) {
-            $worldRegion = $this->worldRegionRepository->findByWorldXY($player->getWorld(), intval($coord['x']), intval($coord['y']));
-            if ($worldRegion !== null) {
-                $tiles[] = $worldRegion->toArray();
-            }
+            match ($typeId) {
+                GameUnitType::GAME_UNIT_TYPE_BUILDINGS => $this->addUnitToSummary($summary, 'buildings', $unitName, $amount),
+                GameUnitType::GAME_UNIT_TYPE_DEFENCE_BUILDINGS => $this->addUnitToSummary($summary, 'defences', $unitName, $amount),
+                GameUnitType::GAME_UNIT_TYPE_SPECIAL_BUILDINGS => $this->addUnitToSummary($summary, 'special', $unitName, $amount),
+                GameUnitType::GAME_UNIT_TYPE_UNITS => $this->addUnitToSummary($summary, 'units', $unitName, $amount),
+                GameUnitType::GAME_UNIT_TYPE_SPECIAL_UNITS => $this->addUnitToSummary($summary, 'specialUnits', $unitName, $amount),
+                default => null,
+            };
         }
 
-        return $this->json($tiles);
+        return $summary;
     }
 
-    private function getRegionCount(WorldSector $sector, ?Player $player = null): int
+    private function addUnitToSummary(array &$summary, string $type, string $unitName, int $amount): void
     {
-        $worldRegions = $this->worldRegionRepository->findByWorldSectorAndPlayer($sector, $player);
-        return count($worldRegions);
+        $summary[$type] += $amount;
+        $summary['details'][$type][] = [
+            'name' => $unitName,
+            'amount' => $amount,
+        ];
+    }
+
+    /**
+     * Get fleet data for the player
+     * @return array<int, array<string, mixed>>
+     */
+    private function getPlayerFleetsData(Player $player): array
+    {
+        $fleets = [];
+        $currentTime = time();
+
+        foreach ($this->fleetRepository->findByPlayer($player) as $fleet) {
+            $sourceRegion = $fleet->getWorldRegion();
+            $targetRegion = $fleet->getTargetWorldRegion();
+            $arriveTime = $fleet->getTimestampArrive();
+            $hasArrived = $currentTime >= $arriveTime;
+
+            // Check if target region belongs to the player
+            $targetIsYours = $targetRegion->getPlayer() !== null
+                && $targetRegion->getPlayer()->getId() === $player->getId();
+
+            // Get unit details
+            $units = [];
+            $totalUnitCount = 0;
+            foreach ($fleet->getFleetUnits() as $fleetUnit) {
+                $amount = $fleetUnit->getAmount();
+                $totalUnitCount += $amount;
+                $units[] = [
+                    'name' => $fleetUnit->getGameUnit()->getName(),
+                    'amount' => $amount,
+                ];
+            }
+
+            $fleets[] = [
+                'id' => $fleet->getId(),
+                'sourceX' => $sourceRegion->getX(),
+                'sourceY' => $sourceRegion->getY(),
+                'targetX' => $targetRegion->getX(),
+                'targetY' => $targetRegion->getY(),
+                'targetRegionId' => $targetRegion->getId(),
+                'timestampArrive' => $arriveTime,
+                'hasArrived' => $hasArrived,
+                'eta' => $hasArrived ? 0 : $arriveTime - $currentTime,
+                'unitCount' => $totalUnitCount,
+                'units' => $units,
+                'targetIsYours' => $targetIsYours,
+            ];
+        }
+
+        return $fleets;
     }
 }

@@ -13,9 +13,57 @@
             background: #2a2a2a;
         }
 
+        .resource-ticker {
+            padding: 8px 15px;
+            background: #3a3a3a;
+            border-bottom: 2px solid #8B7355;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            font-size: 11px;
+            color: #f3e6c1;
+        }
+
+        .resource-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .resource-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 3px;
+        }
+
+        .resource-details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .resource-amount {
+            font-weight: bold;
+            font-size: 13px;
+        }
+
+        .resource-income {
+            font-size: 10px;
+        }
+
+        .resource-income.positive {
+            color: #4CAF50;
+        }
+
+        .resource-income.negative {
+            color: #f44336;
+        }
+
         #worldMap {
             display: block;
+            width: 100%;
             background: #1a1a1a;
+            height: calc(100vh - 350px);
+            min-height: 400px;
         }
 
         .map-controls {
@@ -50,6 +98,58 @@
             background: #a08365;
         }
 
+        .profile-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .profile-icon {
+            padding: 5px 10px;
+            background: #8B7355;
+            color: #f3e6c1;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        .profile-icon:hover {
+            background: #a08365;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            background-color: #2a2a2a;
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 10000;
+            border: 2px solid #8B7355;
+            border-radius: 4px;
+            margin-top: 5px;
+        }
+
+        .dropdown-content a {
+            color: #f3e6c1;
+            padding: 10px 15px;
+            text-decoration: none;
+            display: block;
+            border-bottom: 1px solid #8B7355;
+        }
+
+        .dropdown-content a:last-child {
+            border-bottom: none;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #3a3a3a;
+        }
+
+        .dropdown-content.show {
+            display: block;
+        }
+
         .map-legend {
             padding: 10px;
             background: #3a3a3a;
@@ -57,12 +157,14 @@
             display: flex;
             gap: 15px;
             font-size: 12px;
+            align-items: center;
         }
 
         .legend-item {
             display: flex;
             align-items: center;
             gap: 5px;
+            color: #f3e6c1;
         }
 
         .legend-color {
@@ -70,11 +172,286 @@
             height: 20px;
             border: 1px solid #8B7355;
         }
+
+        .legend-toggle {
+            margin-left: auto;
+            padding: 5px 15px;
+            background: #8B7355;
+            color: #f3e6c1;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .legend-toggle:hover {
+            background: #a08365;
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background-color: #2a2a2a;
+            margin: 10% auto;
+            padding: 20px;
+            border: 2px solid #8B7355;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 500px;
+            color: #f3e6c1;
+        }
+
+        .modal-content.modal-lg {
+            max-width: 700px;
+        }
+
+        .modal-header {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #8B7355;
+            padding-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header .close {
+            order: 2;
+        }
+
+        .modal-body {
+            margin-bottom: 20px;
+        }
+
+        .modal-body .region-info {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+        }
+
+        .modal-body .region-image {
+            flex-shrink: 0;
+        }
+
+        .modal-body .region-image img {
+            width: 80px;
+            height: 80px;
+            border: 2px solid #8B7355;
+            border-radius: 4px;
+        }
+
+        .modal-body .region-details {
+            flex-grow: 1;
+        }
+
+        .modal-footer {
+            text-align: right;
+        }
+
+        .modal-footer button {
+            margin-left: 10px;
+            margin-bottom: 5px;
+            padding: 5px 15px;
+            background: #8B7355;
+            color: #f3e6c1;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .modal-footer button:hover {
+            background: #a08365;
+        }
+
+        .modal-footer.hq-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .modal-footer.hq-buttons button {
+            margin: 0;
+            min-width: 120px;
+        }
+
+        .close {
+            color: #f3e6c1;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            padding: 0 5px;
+            line-height: 1;
+        }
+
+        .close:hover {
+            color: #fff;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+
+        /* Unit tooltip styles */
+        #unitTooltip {
+            display: none;
+            position: fixed;
+            background: rgba(42, 42, 42, 0.95);
+            border: 2px solid #8B7355;
+            border-radius: 6px;
+            padding: 10px 12px;
+            color: #f3e6c1;
+            font-size: 12px;
+            z-index: 10001;
+            pointer-events: none;
+            max-width: 200px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+        }
+
+        #unitTooltip .tooltip-title {
+            font-weight: bold;
+            font-size: 13px;
+            margin-bottom: 6px;
+            padding-bottom: 4px;
+            border-bottom: 1px solid #8B7355;
+        }
+
+        #unitTooltip .tooltip-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 2px 0;
+        }
+
+        #unitTooltip .tooltip-item .unit-name {
+            color: #ccc;
+        }
+
+        #unitTooltip .tooltip-item .unit-count {
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        #unitTooltip .tooltip-total {
+            margin-top: 6px;
+            padding-top: 4px;
+            border-top: 1px solid #8B7355;
+            font-weight: bold;
+        }
+
+        /* Fleet tooltip styles */
+        .fleet-widget {
+            position: absolute;
+            background: rgba(42, 42, 42, 0.95);
+            border: 2px solid #ff6b6b;
+            border-radius: 6px;
+            padding: 8px 10px;
+            color: #f3e6c1;
+            font-size: 11px;
+            z-index: 100;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            min-width: 140px;
+        }
+
+        .fleet-widget-title {
+            font-weight: bold;
+            color: #ff6b6b;
+            margin-bottom: 6px;
+            text-align: center;
+            font-size: 12px;
+        }
+
+        .fleet-widget-buttons {
+            display: flex;
+            gap: 6px;
+            margin-top: 6px;
+        }
+
+        .fleet-widget-btn {
+            flex: 1;
+            padding: 4px 8px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 10px;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+
+        .fleet-widget-btn.attack {
+            background: #c44;
+            color: #fff;
+        }
+
+        .fleet-widget-btn.attack:hover {
+            background: #e55;
+        }
+
+        .fleet-widget-btn.reinforce {
+            background: #4CAF50;
+            color: #fff;
+        }
+
+        .fleet-widget-btn.reinforce:hover {
+            background: #66bb6a;
+        }
+
+        .fleet-widget-btn.recall {
+            background: #666;
+            color: #fff;
+            }
+
+            .fleet-widget-btn.recall:hover {
+                background: #888;
+            }
+
+            .fleet-widget-btn:disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
+            }
+
+            /* Fleet ETA label styles */
+            .fleet-eta-label {
+                position: absolute;
+                background: rgba(255, 204, 0, 0.95);
+                border: 2px solid #ffcc00;
+                border-radius: 6px;
+                padding: 4px 8px;
+                color: #000;
+                font-size: 11px;
+                font-weight: bold;
+                z-index: 100;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+                white-space: nowrap;
+                text-align: center;
+            }
+
+        /* Fleet notification animations */
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes slideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
     </style>
 {% endblock stylesheets %}
 
 {% block javascripts %}
     {{ parent() }}
+    <script src="{{ asset('js/map/camera-controller.js') }}"></script>
+    <script src="{{ asset('js/map/unit-renderer.js') }}"></script>
+    <script src="{{ asset('js/map/tile-renderer.js') }}"></script>
+    <script src="{{ asset('js/map/fleet-manager.js') }}"></script>
     <script src="{{ asset('js/isometric-map.js') }}"></script>
 {% endblock javascripts %}
 
@@ -83,50 +460,179 @@
         <div class="col-md-12">
             <div id="worldMapContainer">
                 <div class="map-controls">
-                    <form action="{{ path('Game/World/Search/Free') }}" method="get">
-                        <button type="submit">Show Free Regions</button>
-                    </form>
+                    <button type="button" id="headquarterBtn">Headquarter</button>
+                    <div style="float: right;">
+                        <button type="button" id="zoomInBtn">Zoom In (+)</button>
+                        <button type="button" id="zoomOutBtn">Zoom Out (-)</button>
+                        <button type="button" id="resetViewBtn">Reset View</button>
+                        <div class="profile-dropdown">
+                            <button type="button" class="profile-icon" id="profileDropdownBtn">👤</button>
+                            <div class="dropdown-content" id="profileDropdown">
+                                <a href="{{ path('Game/Profile', {'playerName': player.name}) }}">Profile</a>
+                                <a href="{{ path('Guide') }}">Help/FAQ</a>
+                                <a href="{{ path('Game/Message/Inbox') }}">Messages</a>
+                                <a href="{{ path('Site/Logout') }}">Log Off</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-                    <form action="{{ path('Game/World/Search/Player') }}" method="post">
-                        <input type="text" name="playerName" placeholder="Search player..."
-                               value="{% if mapSettings is defined and mapSettings.searchPlayerName is defined %}{{ playerName|default('') }}{% endif %}" />
-                        <button type="submit">Search</button>
-                    </form>
-
-                    <form action="{{ path('Game/World') }}" method="get" style="float: right;">
-                        <button type="submit">Reset View</button>
-                    </form>
+                <div class="resource-ticker">
+                    <div class="resource-item">
+                        <img src="{{ asset('images/icons/resource_cash.jpg') }}" alt="Cash" class="resource-icon">
+                        <div class="resource-details">
+                            <span class="resource-amount">{{ player.resources.cash|number_format(0, '.', ',') }}</span>
+                            <span class="resource-income {% if (player.income.cash - player.upkeep.cash) >= 0 %}positive{% else %}negative{% endif %}">
+                                {% if (player.income.cash - player.upkeep.cash) >= 0 %}+{% endif %}{{ (player.income.cash - player.upkeep.cash)|number_format(0, '.', ',') }}/h
+                            </span>
+                        </div>
+                    </div>
+                    <div class="resource-item">
+                        <img src="{{ asset('images/icons/resource_wood.jpg') }}" alt="Wood" class="resource-icon">
+                        <div class="resource-details">
+                            <span class="resource-amount">{{ player.resources.wood|number_format(0, '.', ',') }}</span>
+                            <span class="resource-income {% if (player.income.wood - player.upkeep.wood) >= 0 %}positive{% else %}negative{% endif %}">
+                                {% if (player.income.wood - player.upkeep.wood) >= 0 %}+{% endif %}{{ (player.income.wood - player.upkeep.wood)|number_format(0, '.', ',') }}/h
+                            </span>
+                        </div>
+                    </div>
+                    <div class="resource-item">
+                        <img src="{{ asset('images/icons/resource_food.jpg') }}" alt="Food" class="resource-icon">
+                        <div class="resource-details">
+                            <span class="resource-amount">{{ player.resources.food|number_format(0, '.', ',') }}</span>
+                            <span class="resource-income {% if (player.income.food - player.upkeep.food) >= 0 %}positive{% else %}negative{% endif %}">
+                                {% if (player.income.food - player.upkeep.food) >= 0 %}+{% endif %}{{ (player.income.food - player.upkeep.food)|number_format(0, '.', ',') }}/h
+                            </span>
+                        </div>
+                    </div>
+                    <div class="resource-item">
+                        <img src="{{ asset('images/icons/resource_steel.jpg') }}" alt="Steel" class="resource-icon">
+                        <div class="resource-details">
+                            <span class="resource-amount">{{ player.resources.steel|number_format(0, '.', ',') }}</span>
+                            <span class="resource-income {% if (player.income.steel - player.upkeep.steel) >= 0 %}positive{% else %}negative{% endif %}">
+                                {% if (player.income.steel - player.upkeep.steel) >= 0 %}+{% endif %}{{ (player.income.steel - player.upkeep.steel)|number_format(0, '.', ',') }}/h
+                            </span>
+                        </div>
+                    </div>
                 </div>
 
                 <canvas id="worldMap"></canvas>
 
+                <!-- Unit Tooltip -->
+                <div id="unitTooltip"></div>
+
                 <div class="map-legend">
                     <div class="legend-item">
                         <div class="legend-color" style="background: rgba(74, 124, 89, 0.5);"></div>
-                        <span>Free Region</span>
+                        <span>Free</span>
                     </div>
                     <div class="legend-item">
                         <div class="legend-color" style="background: rgba(124, 74, 74, 0.5);"></div>
-                        <span>Enemy Region</span>
+                        <span>Enemy</span>
                     </div>
                     <div class="legend-item">
                         <div class="legend-color" style="background: rgba(74, 90, 124, 0.5);"></div>
-                        <span>Your Region</span>
+                        <span>Yours</span>
                     </div>
+                    <span style="color: #666;">|</span>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #3d5a80; width: 12px; height: 12px; border-radius: 50%;"></div>
+                        <span>Buildings</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #7b6d8d; width: 12px; height: 12px; border-radius: 50%;"></div>
+                        <span>Defences</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #6b8e6b; width: 12px; height: 12px; border-radius: 50%;"></div>
+                        <span>Units</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #d4a03c; width: 12px; height: 12px; border-radius: 50%;"></div>
+                        <span>Special</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #c75146; width: 12px; height: 12px; border-radius: 50%;"></div>
+                        <span>Elite Units</span>
+                    </div>
+                    <button class="legend-toggle" id="toggleOverlay">Show Overlays</button>
                 </div>
             </div>
+        </div>
+    </div>
 
-            {% if mapSettings is defined and mapSettings.searchPlayerName is defined and not mapSettings.searchFound %}
-                <div class="alert alert-warning" style="margin-top: 20px;">
-                    Player "{{ playerName }}" not found in this world.
-                </div>
-            {% endif %}
+    <!-- Buy Region Modal -->
+    <div id="buyRegionModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="modal-title">Buy World Region</span>
+                <span class="close" id="closeModal">&times;</span>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Content will be populated by JavaScript -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="cancelBtn">Cancel</button>
+                <button type="button" id="confirmBuyBtn">Buy Region</button>
+            </div>
+        </div>
+    </div>
 
-            {% if mapSettings is defined and mapSettings.searchFree %}
-                <div class="alert alert-info" style="margin-top: 20px;">
-                    Showing only free regions. Total: {{ regions|length }}
-                </div>
-            {% endif %}
+    <!-- Enemy Region Modal -->
+    <div id="enemyRegionModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="modal-title">Enemy Region</span>
+                <span class="close" id="closeEnemyModal">&times;</span>
+            </div>
+            <div class="modal-body" id="enemyModalBody">
+                <!-- Content will be populated by JavaScript -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="sendMessageBtn">Send Message</button>
+                <button type="button" id="attackBtn">Attack</button>
+                <button type="button" id="operationBtn">Launch Operation</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Your Region Modal -->
+    <div id="yourRegionModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="modal-title">Your Region</span>
+                <span class="close" id="closeYourModal">&times;</span>
+            </div>
+            <div class="modal-body" id="yourModalBody">
+                <!-- Content will be populated by JavaScript -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="buildBtn">Build</button>
+                <button type="button" id="sendUnitsBtn">Send Units</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Headquarter Modal -->
+    <div id="headquarterModal" class="modal">
+        <div class="modal-content modal-lg">
+            <div class="modal-header">
+                <span class="modal-title">Headquarter</span>
+                <span class="close" id="closeHqModal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p style="text-align: center;">Select an action:</p>
+            </div>
+            <div class="modal-footer hq-buttons">
+                <button type="button" id="hqOldInterfaceBtn">Old Interface</button>
+                <button type="button" id="hqReportsBtn">Reports</button>
+                <button type="button" id="hqMarketBtn">Market</button>
+                <button type="button" id="hqFederationBtn">Federation</button>
+                <button type="button" id="hqResearchBtn">Research</button>
+                <button type="button" id="hqRegionsBtn">Regions</button>
+                <button type="button" id="hqFleetsBtn">Fleets</button>
+                <button type="button" id="hqConstructionBtn">Construction</button>
+            </div>
         </div>
     </div>
 
@@ -134,144 +640,363 @@
         // Build region URL pattern (generated by Twig, used by JavaScript)
         const regionUrlPattern = '/game/world/region/';
 
-        // Prepare WorldRegion data for the isometric map
+        // Modal elements - Buy Region
+        const modal = document.getElementById('buyRegionModal');
+        const closeModal = document.getElementById('closeModal');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const confirmBuyBtn = document.getElementById('confirmBuyBtn');
+        let selectedRegion = null;
+        let isBuyingRegion = false;
+
+        // Modal elements - Enemy Region
+        const enemyModal = document.getElementById('enemyRegionModal');
+        const closeEnemyModal = document.getElementById('closeEnemyModal');
+        const sendMessageBtn = document.getElementById('sendMessageBtn');
+        const attackBtn = document.getElementById('attackBtn');
+        const operationBtn = document.getElementById('operationBtn');
+        let selectedEnemyRegion = null;
+
+        // Modal elements - Your Region
+        const yourModal = document.getElementById('yourRegionModal');
+        const closeYourModal = document.getElementById('closeYourModal');
+        const buildBtn = document.getElementById('buildBtn');
+        const sendUnitsBtn = document.getElementById('sendUnitsBtn');
+        let selectedYourRegion = null;
+
+        // Modal elements - Headquarter
+        const hqModal = document.getElementById('headquarterModal');
+        const closeHqModal = document.getElementById('closeHqModal');
+
+        function showNotification(message, type = 'info') {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.className = `fleet-notification fleet-notification-${type}`;
+            notification.innerHTML = message;
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 15px 25px;
+                border-radius: 6px;
+                color: #fff;
+                font-weight: bold;
+                z-index: 10002;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+                animation: slideIn 0.3s ease;
+                background: ${type === 'success' ? '#4CAF50' : (type === 'error' ? '#f44336' : '#2196F3')};
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        function showBuyRegionModal(region) {
+            selectedRegion = region;
+            const modalBody = document.getElementById('modalBody');
+            const imageUrl = `{{ asset('images') }}/map/${region.image}`;
+            const regionPrice = {{ player.regionPrice }};
+        
+            modalBody.innerHTML = `
+                <div class="region-info">
+                    <div class="region-image">
+                        <img src="${imageUrl}" alt="${region.type}">
+                    </div>
+                    <div class="region-details">
+                        <p><strong>Coordinates:</strong> ${region.x}, ${region.y}</p>
+                        <p><strong>Type:</strong> ${region.type}</p>
+                        <p style="margin-top: 15px;"><strong>Price:</strong> $${regionPrice.toLocaleString('en-US')}</p>
+                        <p style="margin-top: 10px;">Do you want to buy this region?</p>
+                        <p style="color: #ffa500; font-size: 11px; margin-top: 5px;">Note: The price increases with each region you own.</p>
+                    </div>
+                </div>
+            `;
+            modal.style.display = 'block';
+        }
+
+        function showEnemyRegionModal(region) {
+            selectedEnemyRegion = region;
+            const enemyModalBody = document.getElementById('enemyModalBody');
+            const imageUrl = `{{ asset('images') }}/map/${region.image}`;
+            
+            enemyModalBody.innerHTML = `
+                <div class="region-info">
+                    <div class="region-image">
+                        <img src="${imageUrl}" alt="${region.type}">
+                    </div>
+                    <div class="region-details">
+                        <p><strong>Coordinates:</strong> ${region.x}, ${region.y}</p>
+                        <p><strong>Type:</strong> ${region.type}</p>
+                        <p><strong>Owner:</strong> <span style="color: #ff6b6b;">${region.ownerName}</span></p>
+                    </div>
+                </div>
+            `;
+            enemyModal.style.display = 'block';
+        }
+
+        function showYourRegionModal(region) {
+            selectedYourRegion = region;
+            const yourModalBody = document.getElementById('yourModalBody');
+            const imageUrl = `{{ asset('images') }}/map/${region.image}`;
+            
+            yourModalBody.innerHTML = `
+                <div class="region-info">
+                    <div class="region-image">
+                        <img src="${imageUrl}" alt="${region.type}">
+                    </div>
+                    <div class="region-details">
+                        <p><strong>Coordinates:</strong> ${region.x}, ${region.y}</p>
+                        <p><strong>Type:</strong> ${region.type}</p>
+                        <p><strong>Owner:</strong> <span style="color: #6bafff;">You</span></p>
+                    </div>
+                </div>
+            `;
+            yourModal.style.display = 'block';
+        }
+
+        function showHeadquarterModal() {
+            hqModal.style.display = 'block';
+        }
+
+        // Modal event handlers
+        closeModal.onclick = () => { modal.style.display = 'none'; selectedRegion = null; };
+        cancelBtn.onclick = () => { modal.style.display = 'none'; selectedRegion = null; };
+        confirmBuyBtn.onclick = async () => {
+            if (selectedRegion && !isBuyingRegion) {
+                isBuyingRegion = true;
+                confirmBuyBtn.disabled = true;
+                confirmBuyBtn.textContent = 'Buying...';
+                
+                try {
+                    const response = await fetch('/game/api/world/region/buy/' + selectedRegion.id, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        }
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        // Update the region in the data
+                        const regionIndex = worldRegions.findIndex(r => r.id === selectedRegion.id);
+                        if (regionIndex !== -1) {
+                            worldRegions[regionIndex].hasOwner = true;
+                            worldRegions[regionIndex].isYours = true;
+                            worldRegions[regionIndex].ownerName = '{{ player.name }}';
+                        }
+                        
+                        // Update cash display
+                        if (result.newCash !== undefined) {
+                            const cashElements = document.querySelectorAll('.resource-amount');
+                            if (cashElements.length > 0) {
+                                cashElements[0].textContent = result.newCash.toLocaleString('en-US');
+                            }
+                        }
+                        
+                        // Reload the map with updated data
+                        worldMap.setSectors(worldRegions).then(() => {
+                            worldMap.render();
+                        });
+                        
+                        showNotification(result.message, 'success');
+                        modal.style.display = 'none';
+                        selectedRegion = null;
+                    } else {
+                        showNotification(result.message || 'Failed to buy region', 'error');
+                    }
+                } catch (error) {
+                    console.error('Error buying region:', error);
+                    showNotification('An error occurred while buying the region. Please try again.', 'error');
+                } finally {
+                    isBuyingRegion = false;
+                    confirmBuyBtn.disabled = false;
+                    confirmBuyBtn.textContent = 'Buy Region';
+                }
+            }
+        };
+
+        closeEnemyModal.onclick = () => { enemyModal.style.display = 'none'; selectedEnemyRegion = null; };
+        sendMessageBtn.onclick = () => { if (selectedEnemyRegion) window.location.href = '/game/message/new/' + encodeURIComponent(selectedEnemyRegion.ownerName); };
+        attackBtn.onclick = () => { if (selectedEnemyRegion) window.location.href = '/game/world/region/attack/' + selectedEnemyRegion.id; };
+        operationBtn.onclick = () => { if (selectedEnemyRegion) window.location.href = '/game/world/region/select-operation/' + selectedEnemyRegion.id; };
+
+        closeYourModal.onclick = () => { yourModal.style.display = 'none'; selectedYourRegion = null; };
+        buildBtn.onclick = () => { if (selectedYourRegion) window.location.href = '/game/world/region/build/' + selectedYourRegion.id + '/1'; };
+        sendUnitsBtn.onclick = () => { if (selectedYourRegion) window.location.href = '/game/world/region/send-units/' + selectedYourRegion.id; };
+
+        closeHqModal.onclick = () => { hqModal.style.display = 'none'; };
+        document.getElementById('hqOldInterfaceBtn').onclick = () => { window.location.href = '/game/headquarter'; };
+        document.getElementById('hqReportsBtn').onclick = () => { window.location.href = '/game/reports'; };
+        document.getElementById('hqMarketBtn').onclick = () => { window.location.href = '/game/market'; };
+        document.getElementById('hqFederationBtn').onclick = () => { window.location.href = '/game/federation'; };
+        document.getElementById('hqResearchBtn').onclick = () => { window.location.href = '/game/research'; };
+        document.getElementById('hqRegionsBtn').onclick = () => { window.location.href = '/game/region-list'; };
+        document.getElementById('hqFleetsBtn').onclick = () => { window.location.href = '/game/fleets'; };
+        document.getElementById('hqConstructionBtn').onclick = () => { window.location.href = '/game/construction'; };
+
+        document.getElementById('headquarterBtn').addEventListener('click', showHeadquarterModal);
+
+        // Close modals when clicking outside
+        window.onclick = function(event) {
+            if (event.target == modal) { modal.style.display = 'none'; selectedRegion = null; }
+            if (event.target == enemyModal) { enemyModal.style.display = 'none'; selectedEnemyRegion = null; }
+            if (event.target == yourModal) { yourModal.style.display = 'none'; selectedYourRegion = null; }
+            if (event.target == hqModal) { hqModal.style.display = 'none'; }
+        };
+
+        // ===== MAP DATA (from Twig) =====
         const worldRegions = [
             {% for region in regions %}
             {
                 x: {{ region.x }},
                 y: {{ region.y }},
                 id: {{ region.id }},
-                name: {{ region.name|json_encode|raw }},
                 type: {{ region.type|json_encode|raw }},
                 image: {{ region.image|json_encode|raw }},
                 hasOwner: {{ region.hasOwner ? 'true' : 'false' }},
                 isYours: {{ region.isYours ? 'true' : 'false' }},
-                ownerName: {{ region.ownerName|json_encode|raw }}
+                ownerName: {{ region.ownerName|json_encode|raw }},
+                units: {{ region.units|json_encode|raw }}
             }{% if not loop.last %},{% endif %}
             {% endfor %}
         ];
 
+        const playerFleets = [
+            {% for fleet in fleets %}
+            {
+                id: {{ fleet.id }},
+                sourceX: {{ fleet.sourceX }},
+                sourceY: {{ fleet.sourceY }},
+                targetX: {{ fleet.targetX }},
+                targetY: {{ fleet.targetY }},
+                targetRegionId: {{ fleet.targetRegionId }},
+                targetIsYours: {{ fleet.targetIsYours ? 'true' : 'false' }},
+                timestampArrive: {{ fleet.timestampArrive }},
+                hasArrived: {{ fleet.hasArrived ? 'true' : 'false' }},
+                eta: {{ fleet.eta }},
+                unitCount: {{ fleet.unitCount }},
+                units: {{ fleet.units|json_encode|raw }}
+            }{% if not loop.last %},{% endif %}
+            {% endfor %}
+        ];
+
+        // ===== INITIALIZE MAP =====
         console.log('Loading ' + worldRegions.length + ' world regions...');
 
-        // Initialize the isometric map
         const worldMap = new IsometricMap('worldMap', {
             tileWidth: 128,
             tileHeight: 64,
             imageBasePath: '{{ asset('images') }}',
+            overlaysEnabled: false,
             onTileClick: function(region) {
-                // Navigate to region page when clicked
-                window.location.href = regionUrlPattern + region.id;
+                if (!region.hasOwner) {
+                    showBuyRegionModal(region);
+                } else if (region.isYours) {
+                    showYourRegionModal(region);
+                } else {
+                    showEnemyRegionModal(region);
+                }
             }
         });
 
-        // Custom rendering for WorldRegions with ownership overlay
-        worldMap.renderTile = function(region) {
-            const iso = this.cartesianToIsometric(region.x, region.y);
-
-            // Get the base terrain image from the region
-            const imageUrl = `${this.config.imageBasePath}/map/${region.image}`;
-            const img = this.images.get(imageUrl);
-
-            if (img) {
-                // Draw the base terrain tile
-                this.ctx.drawImage(
-                    img,
-                    iso.x - this.config.tileWidth / 2,
-                    iso.y - this.config.tileHeight / 2,
-                    this.config.tileWidth,
-                    this.config.tileHeight
-                );
-
-                // Add ownership overlay
-                this.ctx.save();
-                if (region.hasOwner) {
-                    if (region.isYours) {
-                        // Blue tint for your regions
-                        this.ctx.fillStyle = 'rgba(74, 90, 124, 0.5)';
-                    } else {
-                        // Red tint for enemy regions
-                        this.ctx.fillStyle = 'rgba(124, 74, 74, 0.5)';
-                    }
-                } else {
-                    // Slight green tint for free regions
-                    this.ctx.fillStyle = 'rgba(74, 124, 89, 0.3)';
-                }
-
-                // Draw ownership overlay
-                this.ctx.fillRect(
-                    iso.x - this.config.tileWidth / 2,
-                    iso.y - this.config.tileHeight / 2,
-                    this.config.tileWidth,
-                    this.config.tileHeight
-                );
-                this.ctx.restore();
-
-                // Draw coordinates and owner name always visible
-                this.ctx.save();
-                this.ctx.fillStyle = '#ffffff';
-                this.ctx.font = '9px Arial';
-                this.ctx.textAlign = 'center';
-                this.ctx.strokeStyle = '#000000';
-                this.ctx.lineWidth = 2;
-
-                // Coordinates
-                const coordText = `${region.x},${region.y}`;
-                this.ctx.strokeText(coordText, iso.x, iso.y - 2);
-                this.ctx.fillText(coordText, iso.x, iso.y - 2);
-
-                // Owner name if applicable
-                if (region.hasOwner && region.ownerName) {
-                    this.ctx.font = '8px Arial';
-                    this.ctx.strokeText(region.ownerName, iso.x, iso.y + 8);
-                    this.ctx.fillText(region.ownerName, iso.x, iso.y + 8);
-                }
-
-                this.ctx.restore();
-
-                // Highlight hovered tile
-                if (this.hoveredTile && this.hoveredTile.x === region.x && this.hoveredTile.y === region.y) {
-                    this.ctx.strokeStyle = '#ffffff';
-                    this.ctx.lineWidth = 2;
-                    this.ctx.strokeRect(
-                        iso.x - this.config.tileWidth / 2,
-                        iso.y - this.config.tileHeight / 2,
-                        this.config.tileWidth,
-                        this.config.tileHeight
-                    );
-
-                    // Draw enhanced region info on hover
-                    this.ctx.save();
-                    this.ctx.fillStyle = '#ffffff';
-                    this.ctx.font = 'bold 11px Arial';
-                    this.ctx.textAlign = 'center';
-                    this.ctx.strokeStyle = '#000000';
-                    this.ctx.lineWidth = 3;
-
-                    // Region name
-                    this.ctx.strokeText(region.name, iso.x, iso.y - 15);
-                    this.ctx.fillText(region.name, iso.x, iso.y - 15);
-
-                    this.ctx.restore();
-                }
-            } else {
-                // Fallback if image not loaded - draw colored rectangle
-                this.ctx.fillStyle = region.hasOwner ? (region.isYours ? '#4a5a7c' : '#7c4a4a') : '#4a7c59';
-                this.ctx.fillRect(
-                    iso.x - this.config.tileWidth / 2,
-                    iso.y - this.config.tileHeight / 2,
-                    this.config.tileWidth,
-                    this.config.tileHeight
-                );
-            }
-        };
-
-        // Load regions and render the map
+        // Load and render the map
         worldMap.setSectors(worldRegions).then(function() {
+            worldMap.setFleets(playerFleets);
             worldMap.render();
             console.log('World map loaded successfully with ' + worldRegions.length + ' regions!');
         }).catch(function(error) {
             console.error('Failed to load world map:', error);
-            alert('Failed to load world map. Please check the console for details.');
+            showNotification('Failed to load world map. Please check the console for details.', 'error');
+        });
+
+        // ===== UI CONTROLS =====
+        document.getElementById('toggleOverlay').addEventListener('click', function() {
+            worldMap.config.overlaysEnabled = !worldMap.config.overlaysEnabled;
+            this.textContent = worldMap.config.overlaysEnabled ? 'Hide Overlays' : 'Show Overlays';
+            worldMap.render();
+        });
+
+        document.getElementById('resetViewBtn').addEventListener('click', function() {
+            worldMap.cameraController.resetView();
+        });
+
+        document.getElementById('zoomInBtn').addEventListener('click', function() {
+            worldMap.cameraController.zoomIn();
+        });
+
+        document.getElementById('zoomOutBtn').addEventListener('click', function() {
+            worldMap.cameraController.zoomOut();
+        });
+
+        document.getElementById('profileDropdownBtn').addEventListener('click', function(e) {
+            e.stopPropagation();
+            document.getElementById('profileDropdown').classList.toggle('show');
+        });
+
+        window.addEventListener('click', function(event) {
+            const dropdown = document.getElementById('profileDropdown');
+            if (dropdown && dropdown.classList.contains('show')) {
+                dropdown.classList.remove('show');
+            }
+        });
+
+        // ===== UNIT TOOLTIP =====
+        const unitTooltip = document.getElementById('unitTooltip');
+        
+        worldMap.canvas.addEventListener('mousemove', function(e) {
+            const rect = worldMap.canvas.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+            
+            const worldPos = worldMap.cameraController.screenToWorld(mouseX, mouseY);
+            let foundIcon = null;
+            
+            for (const region of worldMap.sectors) {
+                if (!region.iconPositions) continue;
+                
+                for (const icon of region.iconPositions) {
+                    const dx = worldPos.x - icon.x;
+                    const dy = worldPos.y - icon.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance <= icon.size) {
+                        foundIcon = { icon, region };
+                        break;
+                    }
+                }
+                if (foundIcon) break;
+            }
+            
+            if (foundIcon) {
+                const { icon } = foundIcon;
+                let tooltipHtml = `<div class="tooltip-title" style="color: ${icon.color}">${icon.label}</div>`;
+                
+                if (icon.details && icon.details.length > 0) {
+                    icon.details.forEach(function(unit) {
+                        tooltipHtml += `<div class="tooltip-item">
+                            <span class="unit-name">${unit.name}</span>
+                            <span class="unit-count">${unit.amount}</span>
+                        </div>`;
+                    });
+                }
+                
+                tooltipHtml += `<div class="tooltip-total">Total: ${icon.count}</div>`;
+                
+                unitTooltip.innerHTML = tooltipHtml;
+                unitTooltip.style.display = 'block';
+                unitTooltip.style.left = (e.clientX + 15) + 'px';
+                unitTooltip.style.top = (e.clientY + 10) + 'px';
+            } else {
+                unitTooltip.style.display = 'none';
+            }
+        });
+        
+        worldMap.canvas.addEventListener('mouseleave', function() {
+            unitTooltip.style.display = 'none';
         });
     </script>
 {% endblock content %}

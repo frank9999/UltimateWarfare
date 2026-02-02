@@ -13,7 +13,7 @@
         {% for xRegions in regions %}
             <tr>
                 {% for region in xRegions %}
-                    {{ mapMacros.tileRegion(region, mapSettings, player) }}
+                    {{ mapMacros.tileRegion(region, player) }}
                 {% endfor %}
             </tr>
         {% endfor %}

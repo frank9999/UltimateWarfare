@@ -41,12 +41,7 @@ final class SectorController extends BaseGameController
             [
                 'sector' => $sector,
                 'regions' => $regions,
-                'player' => $player,
-                'mapSettings' => [
-                    'searchFound' => true,
-                    'searchFree' => false,
-                    'searchPlayerName' => false
-                ]
+                'player' => $player
             ]
         );
     }
