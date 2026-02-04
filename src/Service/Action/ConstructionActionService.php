@@ -13,6 +13,7 @@ use FrankProjects\UltimateWarfare\Repository\ConstructionRepository;
 use FrankProjects\UltimateWarfare\Repository\GameUnitRepository;
 use FrankProjects\UltimateWarfare\Repository\PlayerRepository;
 use FrankProjects\UltimateWarfare\Repository\WorldRegionUnitRepository;
+use FrankProjects\UltimateWarfare\Service\GameUnit\GameUnitBehaviorFactory;
 use FrankProjects\UltimateWarfare\Service\NetWorthUpdaterService;
 use RuntimeException;
 
@@ -23,19 +24,22 @@ final class ConstructionActionService
     private PlayerRepository $playerRepository;
     private WorldRegionUnitRepository $worldRegionUnitRepository;
     private NetWorthUpdaterService $netWorthUpdaterService;
+    private GameUnitBehaviorFactory $behaviorFactory;
 
     public function __construct(
         ConstructionRepository $constructionRepository,
         GameUnitRepository $gameUnitRepository,
         PlayerRepository $playerRepository,
         WorldRegionUnitRepository $worldRegionUnitRepository,
-        NetWorthUpdaterService $netWorthUpdaterService
+        NetWorthUpdaterService $netWorthUpdaterService,
+        GameUnitBehaviorFactory $behaviorFactory
     ) {
         $this->constructionRepository = $constructionRepository;
         $this->gameUnitRepository = $gameUnitRepository;
         $this->playerRepository = $playerRepository;
         $this->worldRegionUnitRepository = $worldRegionUnitRepository;
         $this->netWorthUpdaterService = $netWorthUpdaterService;
+        $this->behaviorFactory = $behaviorFactory;
     }
 
     /**
@@ -66,6 +70,14 @@ final class ConstructionActionService
 
             if ($gameUnit->getGameUnitType()->getId() !== $gameUnitType->getId()) {
                 continue;
+            }
+
+            $behavior = $this->behaviorFactory->create($gameUnit);
+            if (!$behavior->canBuild($region, $player)) {
+                throw new RuntimeException(
+                    "Cannot build {$gameUnit->getName()}: " .
+                    $behavior->getBuildRequirementDescription()
+                );
             }
 
             $priceCash = $priceCash + ($amount * $gameUnit->getCost()->getCash());
@@ -114,6 +126,8 @@ final class ConstructionActionService
 
         foreach ($constructions as $construction) {
             $this->constructionRepository->save($construction);
+
+            $behavior->onBuild($region, $amount);
         }
     }
 

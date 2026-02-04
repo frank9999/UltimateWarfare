@@ -39,6 +39,8 @@ class GameUnit
     private Income $income;
     private Upkeep $upkeep;
 
+    private ?string $behaviorClass = null; // Links to behavior implementation
+
     public function __construct()
     {
         $this->worldRegionUnits = new ArrayCollection();
@@ -223,5 +225,10 @@ class GameUnit
     public function setOperations(Collection $operations): void
     {
         $this->operations = $operations;
+    }
+
+    public function getBehaviorClass(): ?string
+    {
+        return $this->behaviorClass;
     }
 }

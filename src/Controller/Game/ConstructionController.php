@@ -278,6 +278,10 @@ final class ConstructionController extends BaseGameController
 
         $units = [];
         foreach ($gameUnitType->getGameUnits() as $gameUnit) {
+            // Check if unit can be built here
+            $behavior = $this->behaviorFactory->create($gameUnit);
+            $canBuild = $behavior->canBuild($worldRegion, $this->getPlayer());
+        
             $units[] = [
                 'id' => $gameUnit->getId(),
                 'name' => $gameUnit->getName(),
@@ -298,11 +302,13 @@ final class ConstructionController extends BaseGameController
                 'upkeepFood' => $gameUnit->getUpkeep()->getFood(),
                 'netWorth' => $gameUnit->getNetWorth(),
                 'timestamp' => $gameUnit->getTimestamp(),
+                'canBuild' => $canBuild,
+                'buildRequirement' => $behavior->getBuildRequirementDescription(),
                 'owned' => $gameUnitData[$gameUnit->getId()] ?? 0,
                 'inConstruction' => $constructionData[$gameUnit->getId()] ?? 0
             ];
         }
-
+    
         return new JsonResponse([
             'success' => true,
             'gameUnitType' => [

@@ -1202,14 +1202,18 @@
                 const timeStr = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 
                 card.innerHTML = `
-                    <div class="build-unit-header">
-                        <img src="{{ asset('images') }}/${unit.imageDir}${unit.image}" alt="${unit.name}" class="build-unit-image">
+                    <div class="build-unit-header ${!unit.canBuild ? 'unit-locked' : ''}">
+                        <img src="{{ asset('images') }}/${unit.imageDir}${unit.image}" alt="${unit.name}" class="build-unit-image ${!unit.canBuild ? 'grayscale' : ''}">
                         <div>
                             <div class="build-unit-name">
                                 ${unit.name}
+                                ${!unit.canBuild ? '🔒' : ''}
                                 <span class="build-unit-info-icon" data-unit-id="${unit.id}">i</span>
                             </div>
-                            <div class="build-unit-owned">You have: ${unit.owned}${constructionText}</div>
+                            ${!unit.canBuild 
+                                ? `<div class="build-requirement">${unit.buildRequirement}</div>` 
+                                : `<div class="build-unit-owned">You have: ${unit.owned}${constructionText}</div>`
+                            }
                         </div>
                     </div>
                     <div class="build-unit-costs">
@@ -1251,6 +1255,10 @@
                     e.stopPropagation();
                     updateUnitInfoTooltipPosition(e);
                 });
+
+                // Disable input if can't build
+                const input = card.querySelector('input');
+                input.disabled = !unit.canBuild;
             });
 
             document.querySelectorAll('.build-quantity-input').forEach(input => {

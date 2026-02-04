@@ -39,6 +39,11 @@
         <option name="fixed"/>
       </options>
     </field>
+    <field name="behaviorClass" column="behavior_class" length="100">
+      <options>
+        <option name="fixed"/>
+      </options>
+    </field>
     <embedded name="battleStats" class="FrankProjects\UltimateWarfare\Entity\GameUnit\BattleStats"/>
     <embedded name="cost" class="FrankProjects\UltimateWarfare\Entity\GameUnit\Cost"/>
     <embedded name="income" class="FrankProjects\UltimateWarfare\Entity\GameUnit\Income"/>
