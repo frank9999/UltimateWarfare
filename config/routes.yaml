@@ -605,6 +605,22 @@ Game/World/Region/Build:
         regionId: '\d+'
         gameUnitTypeId: '\d+'
 
+Game/World/Region/Build/Api:
+    path:      /game/api/world/region/build/{regionId}/{gameUnitTypeId}
+    controller: FrankProjects\UltimateWarfare\Controller\Game\ConstructionController::constructGameUnitsApi
+    methods: [POST]
+    requirements:
+        regionId: '\d+'
+        gameUnitTypeId: '\d+'
+
+Game/World/Region/BuildData/Api:
+    path:      /game/api/world/region/build-data/{regionId}/{gameUnitTypeId}
+    controller: FrankProjects\UltimateWarfare\Controller\Game\ConstructionController::getBuildDataApi
+    methods: [GET]
+    requirements:
+        regionId: '\d+'
+        gameUnitTypeId: '\d+'
+
 Game/World/Region/Buy:
     path:      /game/world/region/buy/{regionId}
     controller: FrankProjects\UltimateWarfare\Controller\Game\RegionController::buy

@@ -16,6 +16,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Throwable;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 final class ConstructionController extends BaseGameController
 {
@@ -198,5 +199,118 @@ final class ConstructionController extends BaseGameController
         }
 
         return $this->redirectToRoute('Game/Construction', [], 302);
+    }
+
+    public function constructGameUnitsApi(Request $request, int $regionId, int $gameUnitTypeId): JsonResponse
+    {
+        try {
+            $worldRegion = $this->regionActionService->getWorldRegionByIdAndPlayer($regionId, $this->getPlayer());
+        } catch (WorldRegionNotFoundException $e) {
+            return new JsonResponse([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 400);
+        }
+
+        try {
+            $gameUnitType = $this->gameUnitTypeRepository->find($gameUnitTypeId);
+        } catch (GameUnitTypeNotFoundException $e) {
+            return new JsonResponse([
+                'success' => false,
+                'message' => 'Unknown GameUnitType!'
+            ], 400);
+        }
+
+        try {
+            $data = json_decode($request->getContent(), true);
+            $construct = $data['construct'] ?? [];
+
+            $this->constructionActionService->constructGameUnits(
+                $worldRegion,
+                $this->getPlayer(),
+                $gameUnitType,
+                $construct
+            );
+
+            $player = $this->getPlayer();
+            $message = $gameUnitType->getId() === GameUnitType::GAME_UNIT_TYPE_UNITS
+                ? 'New units are now being trained!'
+                : 'New buildings are now being built!';
+
+            return new JsonResponse([
+                'success' => true,
+                'message' => $message,
+                'newCash' => $player->getResources()->getCash(),
+                'newWood' => $player->getResources()->getWood(),
+                'newSteel' => $player->getResources()->getSteel()
+            ]);
+        } catch (Throwable $e) {
+            return new JsonResponse([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 400);
+        }
+    }
+
+    public function getBuildDataApi(int $regionId, int $gameUnitTypeId): JsonResponse
+    {
+        try {
+            $worldRegion = $this->regionActionService->getWorldRegionByIdAndPlayer($regionId, $this->getPlayer());
+        } catch (WorldRegionNotFoundException $e) {
+            return new JsonResponse([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 400);
+        }
+
+        try {
+            $gameUnitType = $this->gameUnitTypeRepository->find($gameUnitTypeId);
+        } catch (GameUnitTypeNotFoundException $e) {
+            return new JsonResponse([
+                'success' => false,
+                'message' => 'Unknown GameUnitType!'
+            ], 400);
+        }
+
+        $gameUnitData = $this->worldRegionRepository->getWorldGameUnitSumByWorldRegion($worldRegion);
+        $constructionData = $this->constructionRepository->getGameUnitConstructionSumByWorldRegion($worldRegion);
+        $spaceLeft = $this->constructionActionService->getBuildingSpaceLeft($gameUnitType, $worldRegion);
+
+        $units = [];
+        foreach ($gameUnitType->getGameUnits() as $gameUnit) {
+            $units[] = [
+                'id' => $gameUnit->getId(),
+                'name' => $gameUnit->getName(),
+                'description' => $gameUnit->getDescription(),
+                'image' => $gameUnit->getImage(),
+                'imageDir' => $gameUnitType->getImageDir(),
+                'costCash' => $gameUnit->getCost()->getCash(),
+                'costWood' => $gameUnit->getCost()->getWood(),
+                'costSteel' => $gameUnit->getCost()->getSteel(),
+                'costFood' => $gameUnit->getCost()->getFood(),
+                'incomeCash' => $gameUnit->getIncome()->getCash(),
+                'incomeWood' => $gameUnit->getIncome()->getWood(),
+                'incomeSteel' => $gameUnit->getIncome()->getSteel(),
+                'incomeFood' => $gameUnit->getIncome()->getFood(),
+                'upkeepCash' => $gameUnit->getUpkeep()->getCash(),
+                'upkeepWood' => $gameUnit->getUpkeep()->getWood(),
+                'upkeepSteel' => $gameUnit->getUpkeep()->getSteel(),
+                'upkeepFood' => $gameUnit->getUpkeep()->getFood(),
+                'netWorth' => $gameUnit->getNetWorth(),
+                'timestamp' => $gameUnit->getTimestamp(),
+                'owned' => $gameUnitData[$gameUnit->getId()] ?? 0,
+                'inConstruction' => $constructionData[$gameUnit->getId()] ?? 0
+            ];
+        }
+
+        return new JsonResponse([
+            'success' => true,
+            'gameUnitType' => [
+                'id' => $gameUnitType->getId(),
+                'name' => $gameUnitType->getName()
+            ],
+            'spaceLeft' => $spaceLeft,
+            'units' => $units
+        ]);
     }
 }

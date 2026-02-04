@@ -123,6 +123,10 @@ final class RegionActionService
         $player->setNetWorth($player->getNetWorth() + NetWorthCalculator::NET_WORTH_CALCULATOR_REGION);
 
         $worldRegion->setPlayer($player);
+        
+        // Add the region to the player's collection to keep both sides in sync
+        // This fixes the new buy price for next regions
+        $player->getWorldRegions()->add($worldRegion);
 
         $federation = $player->getFederation();
 

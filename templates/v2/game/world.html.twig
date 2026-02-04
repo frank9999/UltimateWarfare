@@ -433,6 +433,257 @@
                 text-align: center;
             }
 
+            /* Build Modal styles */
+            .build-modal-content {
+                max-width: 900px;
+                max-height: 80vh;
+                overflow-y: auto;
+            }
+
+            .build-tabs {
+                display: flex;
+                gap: 5px;
+                margin-bottom: 20px;
+                border-bottom: 2px solid #8B7355;
+                padding-bottom: 5px;
+            }
+
+            .build-tab {
+                padding: 8px 15px;
+                background: #3a3a3a;
+                color: #f3e6c1;
+                border: 1px solid #8B7355;
+                border-radius: 4px 4px 0 0;
+                cursor: pointer;
+                font-size: 13px;
+                transition: all 0.2s;
+            }
+
+            .build-tab:hover {
+                background: #4a4a4a;
+            }
+
+            .build-tab.active {
+                background: #8B7355;
+                font-weight: bold;
+            }
+
+            .build-units-container {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+                gap: 15px;
+                margin-bottom: 20px;
+            }
+
+            .build-unit-card {
+                background: #3a3a3a;
+                border: 2px solid #8B7355;
+                border-radius: 6px;
+                padding: 12px;
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .build-unit-header {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                border-bottom: 1px solid #8B7355;
+                padding-bottom: 8px;
+            }
+
+            .build-unit-image {
+                width: 60px;
+                height: 50px;
+                border: 1px solid #8B7355;
+                border-radius: 3px;
+                object-fit: cover;
+            }
+
+            .build-unit-name {
+                font-weight: bold;
+                font-size: 14px;
+                color: #f3e6c1;
+                display: flex;
+                align-items: center;
+                gap: 6px;
+            }
+
+            .build-unit-info-icon {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                width: 18px;
+                height: 18px;
+                border-radius: 50%;
+                background: #4a7ba7;
+                color: #fff;
+                font-size: 12px;
+                font-weight: bold;
+                cursor: help;
+                transition: all 0.2s;
+            }
+
+            .build-unit-info-icon:hover {
+                background: #5a8bc7;
+                transform: scale(1.1);
+            }
+
+            .build-unit-costs {
+                display: flex;
+                flex-direction: column;
+                gap: 3px;
+                font-size: 11px;
+            }
+
+            .build-unit-cost-item {
+                display: flex;
+                align-items: center;
+                gap: 5px;
+            }
+
+            .build-unit-cost-icon {
+                width: 18px;
+                height: 18px;
+            }
+
+            .build-unit-owned {
+                font-size: 11px;
+                color: #ccc;
+            }
+
+            .build-unit-input {
+                display: flex;
+                align-items: center;
+                gap: 5px;
+            }
+
+            .build-unit-input input {
+                flex: 1;
+                padding: 5px 8px;
+                border: 1px solid #8B7355;
+                background: #2a2a2a;
+                color: #f3e6c1;
+                border-radius: 3px;
+            }
+
+            .build-space-info {
+                background: #4a4a4a;
+                padding: 10px;
+                border-radius: 4px;
+                margin-bottom: 15px;
+                text-align: center;
+                font-weight: bold;
+            }
+
+            .build-loading {
+                text-align: center;
+                padding: 40px;
+                font-size: 16px;
+            }
+
+            /* Unit Info Tooltip */
+            #unitInfoTooltip {
+                display: none;
+                position: fixed;
+                background: rgba(32, 32, 32, 0.98);
+                border: 2px solid #8B7355;
+                border-radius: 8px;
+                padding: 15px;
+                color: #f3e6c1;
+                font-size: 12px;
+                z-index: 10002;
+                pointer-events: none;
+                max-width: 450px;
+                box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
+            }
+
+            #unitInfoTooltip .unit-info-header {
+                display: flex;
+                gap: 15px;
+                margin-bottom: 15px;
+                padding-bottom: 12px;
+                border-bottom: 2px solid #8B7355;
+                align-items: center;
+            }
+
+            #unitInfoTooltip .unit-info-image {
+                width: 80px;
+                height: 70px;
+                border: 2px solid #8B7355;
+                border-radius: 4px;
+                object-fit: cover;
+            }
+
+            #unitInfoTooltip .unit-info-title {
+                flex: 1;
+            }
+
+            #unitInfoTooltip .unit-info-name {
+                font-size: 16px;
+                font-weight: bold;
+                color: #ffcc66;
+                margin-bottom: 5px;
+            }
+
+            #unitInfoTooltip .unit-info-description {
+                font-size: 11px;
+                color: #ccc;
+                line-height: 1.4;
+                margin-bottom: 12px;
+            }
+
+            #unitInfoTooltip .unit-info-section {
+                margin-bottom: 10px;
+            }
+
+            #unitInfoTooltip .unit-info-section-title {
+                font-weight: bold;
+                color: #ffcc66;
+                margin-bottom: 6px;
+                font-size: 13px;
+            }
+
+            #unitInfoTooltip .unit-info-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
+            }
+
+            #unitInfoTooltip .unit-info-item {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                font-size: 11px;
+            }
+
+            #unitInfoTooltip .unit-info-icon {
+                width: 16px;
+                height: 16px;
+            }
+
+            #unitInfoTooltip .unit-info-label {
+                color: #aaa;
+            }
+
+            #unitInfoTooltip .unit-info-value {
+                font-weight: bold;
+                color: #fff;
+            }
+
+            #unitInfoTooltip .unit-info-value.positive {
+                color: #4CAF50;
+            }
+
+            #unitInfoTooltip .unit-info-value.negative {
+                color: #f44336;
+            }
+
+            #unitInfoTooltip .unit-info-value.neutral {
+                color: #999;
+            }
+
         /* Fleet notification animations */
         @keyframes slideIn {
             from { transform: translateX(100%); opacity: 0; }
@@ -520,6 +771,9 @@
 
                 <!-- Unit Tooltip -->
                 <div id="unitTooltip"></div>
+
+                <!-- Unit Info Tooltip -->
+                <div id="unitInfoTooltip"></div>
 
                 <div class="map-legend">
                     <div class="legend-item">
@@ -636,6 +890,31 @@
         </div>
     </div>
 
+    <!-- Build Modal -->
+    <div id="buildModal" class="modal">
+        <div class="modal-content build-modal-content">
+            <div class="modal-header">
+                <span class="modal-title">Build Units - Region <span id="buildRegionCoords"></span></span>
+                <span class="close" id="closeBuildModal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="build-tabs" id="buildTabs">
+                    <!-- Tabs will be populated by JavaScript -->
+                </div>
+                <div id="buildSpaceInfo" class="build-space-info" style="display: none;">
+                    <!-- Space info will be populated by JavaScript -->
+                </div>
+                <div id="buildUnitsContainer" class="build-units-container">
+                    <div class="build-loading">Loading units...</div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="closeBuildBtn">Cancel</button>
+                <button type="button" id="confirmBuildBtn">Build Selected</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // Build region URL pattern (generated by Twig, used by JavaScript)
         const regionUrlPattern = '/game/world/region/';
@@ -647,6 +926,7 @@
         const confirmBuyBtn = document.getElementById('confirmBuyBtn');
         let selectedRegion = null;
         let isBuyingRegion = false;
+        let currentRegionPrice = {{ player.regionPrice }};
 
         // Modal elements - Enemy Region
         const enemyModal = document.getElementById('enemyRegionModal');
@@ -698,8 +978,8 @@
             selectedRegion = region;
             const modalBody = document.getElementById('modalBody');
             const imageUrl = `{{ asset('images') }}/map/${region.image}`;
-            const regionPrice = {{ player.regionPrice }};
-        
+            // Use currentRegionPrice variable instead of player.regionPrice
+
             modalBody.innerHTML = `
                 <div class="region-info">
                     <div class="region-image">
@@ -708,7 +988,7 @@
                     <div class="region-details">
                         <p><strong>Coordinates:</strong> ${region.x}, ${region.y}</p>
                         <p><strong>Type:</strong> ${region.type}</p>
-                        <p style="margin-top: 15px;"><strong>Price:</strong> $${regionPrice.toLocaleString('en-US')}</p>
+                        <p style="margin-top: 15px;"><strong>Price:</strong> $${currentRegionPrice.toLocaleString('en-US')}</p>
                         <p style="margin-top: 10px;">Do you want to buy this region?</p>
                         <p style="color: #ffa500; font-size: 11px; margin-top: 5px;">Note: The price increases with each region you own.</p>
                     </div>
@@ -796,6 +1076,11 @@
                                 cashElements[0].textContent = result.newCash.toLocaleString('en-US');
                             }
                         }
+
+                        // Update the region price for next purchase
+                        if (result.newRegionPrice !== undefined) {
+                            currentRegionPrice = result.newRegionPrice;
+                        }
                         
                         // Reload the map with updated data
                         worldMap.setSectors(worldRegions).then(() => {
@@ -819,13 +1104,430 @@
             }
         };
 
+
+        // Build modal elements and logic
+        const buildModal = document.getElementById('buildModal');
+        const closeBuildModal = document.getElementById('closeBuildModal');
+        const closeBuildBtn = document.getElementById('closeBuildBtn');
+        const confirmBuildBtn = document.getElementById('confirmBuildBtn');
+        let selectedBuildRegion = null;
+        let currentBuildData = null;
+        let selectedGameUnitTypeId = 1;
+        let buildQuantities = {};
+
+        const gameUnitTypes = [
+            { id: 1, name: 'Buildings' },
+            { id: 2, name: 'Defense' },
+            { id: 4, name: 'Units' },
+            { id: 3, name: 'Special Buildings' },
+            { id: 5, name: 'Elite Units' }
+        ];
+
+        function showBuildModal(region) {
+            selectedBuildRegion = region;
+            buildQuantities = {};
+            document.getElementById('buildRegionCoords').textContent = `${region.x}, ${region.y}`;
+            buildModal.style.display = 'block';
+
+            const tabsContainer = document.getElementById('buildTabs');
+            tabsContainer.innerHTML = '';
+            gameUnitTypes.forEach((type, index) => {
+                const tab = document.createElement('div');
+                tab.className = 'build-tab' + (index === 0 ? ' active' : '');
+                tab.textContent = type.name;
+                tab.onclick = () => selectBuildTab(type.id);
+                tabsContainer.appendChild(tab);
+            });
+
+            loadBuildData(selectedGameUnitTypeId);
+        }
+
+        function selectBuildTab(gameUnitTypeId) {
+            selectedGameUnitTypeId = gameUnitTypeId;
+
+            const tabs = document.querySelectorAll('.build-tab');
+            tabs.forEach((tab, index) => {
+                tab.classList.toggle('active', gameUnitTypes[index].id === gameUnitTypeId);
+            });
+
+            loadBuildData(gameUnitTypeId);
+        }
+
+        async function loadBuildData(gameUnitTypeId) {
+            const container = document.getElementById('buildUnitsContainer');
+            container.innerHTML = '<div class="build-loading">Loading units...</div>';
+
+            try {
+                const response = await fetch(`/game/api/world/region/build-data/${selectedBuildRegion.id}/${gameUnitTypeId}`);
+                const result = await response.json();
+
+                if (result.success) {
+                    currentBuildData = result;
+                    renderBuildUnits(result);
+                } else {
+                    container.innerHTML = `<div class="build-loading" style="color: #f44336;">${result.message}</div>`;
+                }
+            } catch (error) {
+                console.error('Error loading build data:', error);
+                container.innerHTML = '<div class="build-loading" style="color: #f44336;">Failed to load units</div>';
+            }
+        }
+
+        function renderBuildUnits(data) {
+            const container = document.getElementById('buildUnitsContainer');
+            const spaceInfo = document.getElementById('buildSpaceInfo');
+
+            if (data.gameUnitType.id === 1) {
+                spaceInfo.style.display = 'block';
+                spaceInfo.innerHTML = `You have <span style="color: #4CAF50;">${data.spaceLeft}</span> building space left on this region.`;
+            } else {
+                spaceInfo.style.display = 'none';
+            }
+
+            if (data.units.length === 0) {
+                container.innerHTML = '<div class="build-loading">No units available in this category</div>';
+                return;
+            }
+
+            container.innerHTML = '';
+            data.units.forEach(unit => {
+                const card = document.createElement('div');
+                card.className = 'build-unit-card';
+
+                const constructionText = unit.inConstruction > 0 ? ` (${unit.inConstruction})` : '';
+                
+                const hours = Math.floor(unit.timestamp / 3600);
+                const minutes = Math.floor((unit.timestamp % 3600) / 60);
+                const seconds = unit.timestamp % 60;
+                const timeStr = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+
+                card.innerHTML = `
+                    <div class="build-unit-header">
+                        <img src="{{ asset('images') }}/${unit.imageDir}${unit.image}" alt="${unit.name}" class="build-unit-image">
+                        <div>
+                            <div class="build-unit-name">
+                                ${unit.name}
+                                <span class="build-unit-info-icon" data-unit-id="${unit.id}">i</span>
+                            </div>
+                            <div class="build-unit-owned">You have: ${unit.owned}${constructionText}</div>
+                        </div>
+                    </div>
+                    <div class="build-unit-costs">
+                        <div class="build-unit-cost-item">
+                            <img src="{{ asset('images/icons/resource_cash.jpg') }}" class="build-unit-cost-icon">
+                            <span>${unit.costCash.toLocaleString()}</span>
+                        </div>
+                        <div class="build-unit-cost-item">
+                            <img src="{{ asset('images/icons/resource_wood.jpg') }}" class="build-unit-cost-icon">
+                            <span>${unit.costWood.toLocaleString()}</span>
+                        </div>
+                        <div class="build-unit-cost-item">
+                            <img src="{{ asset('images/icons/resource_steel.jpg') }}" class="build-unit-cost-icon">
+                            <span>${unit.costSteel.toLocaleString()}</span>
+                        </div>
+                        <div class="build-unit-cost-item">
+                            <img src="{{ asset('images/icons/time.gif') }}" class="build-unit-cost-icon">
+                            <span>${timeStr}</span>
+                        </div>
+                    </div>
+                    <div class="build-unit-input">
+                        <input type="number" min="0" value="0" data-unit-id="${unit.id}" class="build-quantity-input">
+                    </div>
+                `;
+
+                container.appendChild(card);
+
+                // Add hover event ONLY to the info icon
+                const infoIcon = card.querySelector('.build-unit-info-icon');
+                infoIcon.addEventListener('mouseenter', (e) => {
+                    e.stopPropagation();
+                    showUnitInfoTooltip(e, unit);
+                });
+                infoIcon.addEventListener('mouseleave', (e) => {
+                    e.stopPropagation();
+                    hideUnitInfoTooltip();
+                });
+                infoIcon.addEventListener('mousemove', (e) => {
+                    e.stopPropagation();
+                    updateUnitInfoTooltipPosition(e);
+                });
+            });
+
+            document.querySelectorAll('.build-quantity-input').forEach(input => {
+                input.addEventListener('input', (e) => {
+                    const unitId = parseInt(e.target.dataset.unitId);
+                    const quantity = parseInt(e.target.value) || 0;
+                    buildQuantities[unitId] = quantity;
+                });
+            });
+        }
+
+        // Unit Info Tooltip Functions
+        const unitInfoTooltip = document.getElementById('unitInfoTooltip');
+        let currentTooltipEvent = null;
+
+        function showUnitInfoTooltip(event, unit) {
+            currentTooltipEvent = event;
+            
+            let tooltipHtml = `
+                <div class="unit-info-header">
+                    <img src="{{ asset('images') }}/${unit.imageDir}${unit.image}" alt="${unit.name}" class="unit-info-image">
+                    <div class="unit-info-title">
+                        <div class="unit-info-name">${unit.name}</div>
+                    </div>
+                </div>
+            `;
+
+            if (unit.description) {
+                tooltipHtml += `<div class="unit-info-description">${unit.description}</div>`;
+            }
+
+            tooltipHtml += `
+                <div class="unit-info-section">
+                    <div class="unit-info-section-title">Build Cost</div>
+                    <div class="unit-info-grid">
+            `;
+            
+            if (unit.costCash > 0) {
+                tooltipHtml += `
+                    <div class="unit-info-item">
+                        <img src="{{ asset('images/icons/resource_cash.jpg') }}" class="unit-info-icon">
+                        <span class="unit-info-label">Cash:</span>
+                        <span class="unit-info-value">${unit.costCash.toLocaleString()}</span>
+                    </div>`;
+            }
+            if (unit.costWood > 0) {
+                tooltipHtml += `
+                    <div class="unit-info-item">
+                        <img src="{{ asset('images/icons/resource_wood.jpg') }}" class="unit-info-icon">
+                        <span class="unit-info-label">Wood:</span>
+                        <span class="unit-info-value">${unit.costWood.toLocaleString()}</span>
+                    </div>`;
+            }
+            if (unit.costSteel > 0) {
+                tooltipHtml += `
+                    <div class="unit-info-item">
+                        <img src="{{ asset('images/icons/resource_steel.jpg') }}" class="unit-info-icon">
+                        <span class="unit-info-label">Steel:</span>
+                        <span class="unit-info-value">${unit.costSteel.toLocaleString()}</span>
+                    </div>`;
+            }
+            if (unit.costFood > 0) {
+                tooltipHtml += `
+                    <div class="unit-info-item">
+                        <img src="{{ asset('images/icons/resource_food.jpg') }}" class="unit-info-icon">
+                        <span class="unit-info-label">Food:</span>
+                        <span class="unit-info-value">${unit.costFood.toLocaleString()}</span>
+                    </div>`;
+            }
+            
+            tooltipHtml += `</div></div>`;
+
+            const hasIncome = unit.incomeCash > 0 || unit.incomeWood > 0 || unit.incomeSteel > 0 || unit.incomeFood > 0;
+            if (hasIncome) {
+                tooltipHtml += `
+                    <div class="unit-info-section">
+                        <div class="unit-info-section-title">Income (per hour)</div>
+                        <div class="unit-info-grid">`;
+                
+                if (unit.incomeCash > 0) {
+                    tooltipHtml += `
+                        <div class="unit-info-item">
+                            <img src="{{ asset('images/icons/resource_cash.jpg') }}" class="unit-info-icon">
+                            <span class="unit-info-label">Cash:</span>
+                            <span class="unit-info-value positive">+${unit.incomeCash.toLocaleString()}</span>
+                        </div>`;
+                }
+                if (unit.incomeWood > 0) {
+                    tooltipHtml += `
+                        <div class="unit-info-item">
+                            <img src="{{ asset('images/icons/resource_wood.jpg') }}" class="unit-info-icon">
+                            <span class="unit-info-label">Wood:</span>
+                            <span class="unit-info-value positive">+${unit.incomeWood.toLocaleString()}</span>
+                        </div>`;
+                }
+                if (unit.incomeSteel > 0) {
+                    tooltipHtml += `
+                        <div class="unit-info-item">
+                            <img src="{{ asset('images/icons/resource_steel.jpg') }}" class="unit-info-icon">
+                            <span class="unit-info-label">Steel:</span>
+                            <span class="unit-info-value positive">+${unit.incomeSteel.toLocaleString()}</span>
+                        </div>`;
+                }
+                if (unit.incomeFood > 0) {
+                    tooltipHtml += `
+                        <div class="unit-info-item">
+                            <img src="{{ asset('images/icons/resource_food.jpg') }}" class="unit-info-icon">
+                            <span class="unit-info-label">Food:</span>
+                            <span class="unit-info-value positive">+${unit.incomeFood.toLocaleString()}</span>
+                        </div>`;
+                }
+                
+                tooltipHtml += `</div></div>`;
+            }
+
+            const hasUpkeep = unit.upkeepCash > 0 || unit.upkeepWood > 0 || unit.upkeepSteel > 0 || unit.upkeepFood > 0;
+            if (hasUpkeep) {
+                tooltipHtml += `
+                    <div class="unit-info-section">
+                        <div class="unit-info-section-title">Upkeep (per hour)</div>
+                        <div class="unit-info-grid">`;
+                
+                if (unit.upkeepCash > 0) {
+                    tooltipHtml += `
+                        <div class="unit-info-item">
+                            <img src="{{ asset('images/icons/resource_cash.jpg') }}" class="unit-info-icon">
+                            <span class="unit-info-label">Cash:</span>
+                            <span class="unit-info-value negative">-${unit.upkeepCash.toLocaleString()}</span>
+                        </div>`;
+                }
+                if (unit.upkeepWood > 0) {
+                    tooltipHtml += `
+                        <div class="unit-info-item">
+                            <img src="{{ asset('images/icons/resource_wood.jpg') }}" class="unit-info-icon">
+                            <span class="unit-info-label">Wood:</span>
+                            <span class="unit-info-value negative">-${unit.upkeepWood.toLocaleString()}</span>
+                        </div>`;
+                }
+                if (unit.upkeepSteel > 0) {
+                    tooltipHtml += `
+                        <div class="unit-info-item">
+                            <img src="{{ asset('images/icons/resource_steel.jpg') }}" class="unit-info-icon">
+                            <span class="unit-info-label">Steel:</span>
+                            <span class="unit-info-value negative">-${unit.upkeepSteel.toLocaleString()}</span>
+                        </div>`;
+                }
+                if (unit.upkeepFood > 0) {
+                    tooltipHtml += `
+                        <div class="unit-info-item">
+                            <img src="{{ asset('images/icons/resource_food.jpg') }}" class="unit-info-icon">
+                            <span class="unit-info-label">Food:</span>
+                            <span class="unit-info-value negative">-${unit.upkeepFood.toLocaleString()}</span>
+                        </div>`;
+                }
+                
+                tooltipHtml += `</div></div>`;
+            }
+
+            tooltipHtml += `
+                <div class="unit-info-section">
+                    <div class="unit-info-grid">
+                        <div class="unit-info-item">
+                            <span class="unit-info-label">Net Worth:</span>
+                            <span class="unit-info-value">${unit.netWorth.toLocaleString()}</span>
+                        </div>`;
+            
+            const hours = Math.floor(unit.timestamp / 3600);
+            const minutes = Math.floor((unit.timestamp % 3600) / 60);
+            const seconds = unit.timestamp % 60;
+            const timeStr = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            
+            tooltipHtml += `
+                        <div class="unit-info-item">
+                            <img src="{{ asset('images/icons/time.gif') }}" class="unit-info-icon">
+                            <span class="unit-info-label">Build Time:</span>
+                            <span class="unit-info-value">${timeStr}</span>
+                        </div>
+                    </div>
+                </div>`;
+
+            unitInfoTooltip.innerHTML = tooltipHtml;
+            unitInfoTooltip.style.display = 'block';
+            updateUnitInfoTooltipPosition(event);
+        }
+
+        function hideUnitInfoTooltip() {
+            unitInfoTooltip.style.display = 'none';
+            currentTooltipEvent = null;
+        }
+
+        function updateUnitInfoTooltipPosition(event) {
+            const e = event || currentTooltipEvent;
+            if (!e) return;
+
+            const tooltipWidth = unitInfoTooltip.offsetWidth;
+            const tooltipHeight = unitInfoTooltip.offsetHeight;
+            const padding = 15;
+            
+            let left = e.clientX + padding;
+            let top = e.clientY + padding;
+
+            if (left + tooltipWidth > window.innerWidth) {
+                left = e.clientX - tooltipWidth - padding;
+            }
+            if (top + tooltipHeight > window.innerHeight) {
+                top = e.clientY - tooltipHeight - padding;
+            }
+
+            unitInfoTooltip.style.left = left + 'px';
+            unitInfoTooltip.style.top = top + 'px';
+        }
+
+        async function confirmBuild() {
+            const hasSelection = Object.values(buildQuantities).some(qty => qty > 0);
+            if (!hasSelection) {
+                showNotification("Please select at least one unit to build", 'error');
+                return;
+            }
+
+            confirmBuildBtn.disabled = true;
+            confirmBuildBtn.textContent = 'Building...';
+
+            try {
+                const response = await fetch(`/game/api/world/region/build/${selectedBuildRegion.id}/${selectedGameUnitTypeId}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ construct: buildQuantities })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    if (result.newCash !== undefined) {
+                        const cashElement = document.querySelectorAll('.resource-amount')[0];
+                        if (cashElement) cashElement.textContent = result.newCash.toLocaleString('en-US');
+                    }
+                    if (result.newWood !== undefined) {
+                        const woodElement = document.querySelectorAll('.resource-amount')[1];
+                        if (woodElement) woodElement.textContent = result.newWood.toLocaleString('en-US');
+                    }
+                    if (result.newSteel !== undefined) {
+                        const steelElement = document.querySelectorAll('.resource-amount')[3];
+                        if (steelElement) steelElement.textContent = result.newSteel.toLocaleString('en-US');
+                    }
+
+                    showNotification(result.message, 'success');
+                    buildModal.style.display = 'none';
+                    selectedBuildRegion = null;
+                    buildQuantities = {};
+                } else {
+                    showNotification(result.message || 'Failed to build units', 'error');
+                }
+            } catch (error) {
+                console.error('Error building units:', error);
+                showNotification('An error occurred while building. Please try again.', 'error');
+            } finally {
+                confirmBuildBtn.disabled = false;
+                confirmBuildBtn.textContent = 'Build Selected';
+            }
+        }
+
+        closeBuildModal.onclick = () => { buildModal.style.display = 'none'; selectedBuildRegion = null; };
+        closeBuildBtn.onclick = () => { buildModal.style.display = 'none'; selectedBuildRegion = null; };
+        confirmBuildBtn.onclick = confirmBuild;
+        
         closeEnemyModal.onclick = () => { enemyModal.style.display = 'none'; selectedEnemyRegion = null; };
         sendMessageBtn.onclick = () => { if (selectedEnemyRegion) window.location.href = '/game/message/new/' + encodeURIComponent(selectedEnemyRegion.ownerName); };
         attackBtn.onclick = () => { if (selectedEnemyRegion) window.location.href = '/game/world/region/attack/' + selectedEnemyRegion.id; };
         operationBtn.onclick = () => { if (selectedEnemyRegion) window.location.href = '/game/world/region/select-operation/' + selectedEnemyRegion.id; };
 
         closeYourModal.onclick = () => { yourModal.style.display = 'none'; selectedYourRegion = null; };
-        buildBtn.onclick = () => { if (selectedYourRegion) window.location.href = '/game/world/region/build/' + selectedYourRegion.id + '/1'; };
+        buildBtn.onclick = () => { 
+            if (selectedYourRegion) {
+                yourModal.style.display = 'none';
+                showBuildModal(selectedYourRegion);
+            }
+        };
         sendUnitsBtn.onclick = () => { if (selectedYourRegion) window.location.href = '/game/world/region/send-units/' + selectedYourRegion.id; };
 
         closeHqModal.onclick = () => { hqModal.style.display = 'none'; };
@@ -846,6 +1548,7 @@
             if (event.target == enemyModal) { enemyModal.style.display = 'none'; selectedEnemyRegion = null; }
             if (event.target == yourModal) { yourModal.style.display = 'none'; selectedYourRegion = null; }
             if (event.target == hqModal) { hqModal.style.display = 'none'; }
+            if (event.target == buildModal) { buildModal.style.display = 'none'; selectedBuildRegion = null; }
         };
 
         // ===== MAP DATA (from Twig) =====
@@ -999,4 +1702,5 @@
             unitTooltip.style.display = 'none';
         });
     </script>
+
 {% endblock content %}
