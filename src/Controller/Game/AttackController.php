@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace FrankProjects\UltimateWarfare\Controller\Game;
 
-use FrankProjects\UltimateWarfare\Entity\GameUnitType;
-use FrankProjects\UltimateWarfare\Exception\GameUnitTypeNotFoundException;
+use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitCategory;
 use FrankProjects\UltimateWarfare\Exception\WorldRegionNotFoundException;
-use FrankProjects\UltimateWarfare\Repository\GameUnitTypeRepository;
+use FrankProjects\UltimateWarfare\Repository\GameUnitRepository;
 use FrankProjects\UltimateWarfare\Repository\WorldRegionRepository;
 use FrankProjects\UltimateWarfare\Service\Action\FleetActionService;
 use FrankProjects\UltimateWarfare\Service\Action\RegionActionService;
@@ -18,20 +17,20 @@ use Throwable;
 final class AttackController extends BaseGameController
 {
     private WorldRegionRepository $worldRegionRepository;
-    private GameUnitTypeRepository $gameUnitTypeRepository;
     private FleetActionService $fleetActionService;
     private RegionActionService $regionActionService;
+    private GameUnitRepository $gameUnitRepository;
 
     public function __construct(
         WorldRegionRepository $worldRegionRepository,
-        GameUnitTypeRepository $gameUnitTypeRepository,
         FleetActionService $fleetActionService,
-        RegionActionService $regionActionService
+        RegionActionService $regionActionService,
+        GameUnitRepository $gameUnitRepository
     ) {
         $this->worldRegionRepository = $worldRegionRepository;
-        $this->gameUnitTypeRepository = $gameUnitTypeRepository;
         $this->fleetActionService = $fleetActionService;
         $this->regionActionService = $regionActionService;
+        $this->gameUnitRepository = $gameUnitRepository;
     }
 
     public function attack(int $regionId): Response
@@ -83,8 +82,7 @@ final class AttackController extends BaseGameController
 
         try {
             $playerRegion = $this->regionActionService->getWorldRegionByIdAndPlayer($playerRegionId, $player);
-            $gameUnitType = $this->gameUnitTypeRepository->find(GameUnitType::GAME_UNIT_TYPE_UNITS);
-        } catch (WorldRegionNotFoundException | GameUnitTypeNotFoundException $e) {
+        } catch (WorldRegionNotFoundException $e) {
             $this->addFlash('error', $e->getMessage());
             return $this->redirectToRoute('Game/RegionList', [], 302);
         }
@@ -96,21 +94,21 @@ final class AttackController extends BaseGameController
                 $playerRegion,
                 $worldRegion,
                 $player,
-                $gameUnitType,
+                GameUnitCategory::UNITS,
                 $units
             );
             return $this->redirectToRoute('Game/Fleets', [], 302);
         }
 
         $gameUnitsData = $this->worldRegionRepository->getWorldGameUnitSumByWorldRegion($playerRegion);
-
+        $gameUnits = $this->gameUnitRepository->findByGameUnitCategory(GameUnitCategory::UNITS);
         return $this->render(
             'game/region/attackSelectGameUnits.html.twig',
             [
                 'region' => $worldRegion,
                 'playerRegion' => $playerRegion,
                 'player' => $player,
-                'gameUnitType' => $gameUnitType,
+                'gameUnits' => $gameUnits,
                 'gameUnitsData' => $gameUnitsData
             ]
         );

@@ -259,12 +259,12 @@ Game/Banned:
     controller: FrankProjects\UltimateWarfare\Controller\Game\UserController::banned
 
 Game/Construction:
-    path:      /game/construction/{type}
+    path:      /game/construction/{gameUnitCategoryId}
     controller: FrankProjects\UltimateWarfare\Controller\Game\ConstructionController::construction
     defaults:
-        type: 0
+        gameUnitCategoryId: 0
     requirements:
-        type: '\d+'
+        gameUnitCategoryId: '\d+'
 
 Game/Construction/Cancel:
     path:      /game/construction/cancel/{constructionId}
@@ -599,27 +599,27 @@ Game/World/Region/AttackSelectGameUnits:
         playerRegionId: '\d+'
 
 Game/World/Region/Build:
-    path:      /game/world/region/build/{regionId}/{gameUnitTypeId}
+    path:      /game/world/region/build/{regionId}/{gameUnitCategoryId}
     controller: FrankProjects\UltimateWarfare\Controller\Game\ConstructionController::constructGameUnits
     requirements:
         regionId: '\d+'
-        gameUnitTypeId: '\d+'
+        gameUnitCategoryId: '\d+'
 
 Game/World/Region/Build/Api:
-    path:      /game/api/world/region/build/{regionId}/{gameUnitTypeId}
+    path:      /game/api/world/region/build/{regionId}/{gameUnitCategoryId}
     controller: FrankProjects\UltimateWarfare\Controller\Game\ConstructionController::constructGameUnitsApi
     methods: [POST]
     requirements:
         regionId: '\d+'
-        gameUnitTypeId: '\d+'
+        gameUnitCategoryId: '\d+'
 
 Game/World/Region/BuildData/Api:
-    path:      /game/api/world/region/build-data/{regionId}/{gameUnitTypeId}
+    path:      /game/api/world/region/build-data/{regionId}/{gameUnitCategoryId}
     controller: FrankProjects\UltimateWarfare\Controller\Game\ConstructionController::getBuildDataApi
     methods: [GET]
     requirements:
         regionId: '\d+'
-        gameUnitTypeId: '\d+'
+        gameUnitCategoryId: '\d+'
 
 Game/World/Region/Buy:
     path:      /game/world/region/buy/{regionId}
@@ -635,11 +635,11 @@ Game/World/Region/Buy/Api:
         regionId: '\d+'
 
 Game/World/Region/RemoveGameUnits:
-    path:      /game/world/region/remove/{regionId}/{gameUnitTypeId}
+    path:      /game/world/region/remove/{regionId}/{gameUnitCategoryId}
     controller: FrankProjects\UltimateWarfare\Controller\Game\ConstructionController::removeGameUnits
     requirements:
         regionId: '\d+'
-        gameUnitTypeId: '\d+'
+        gameUnitCategoryId: '\d+'
 
 Game/World/Region/SendUnits:
     path:      /game/world/region/send-units/{regionId}
@@ -708,12 +708,12 @@ Guide/ListResearch:
     controller: FrankProjects\UltimateWarfare\Controller\Site\GuideController::listResearch
 
 Guide/ListUnits:
-    path:      /guide/list-units/{gameUnitTypeId}
+    path:      /guide/list-units/{gameUnitCategoryId}
     controller: FrankProjects\UltimateWarfare\Controller\Site\GuideController::listUnits
     defaults:
-        gameUnitTypeId: 0
+        gameUnitCategoryId: 0
     requirements:
-        gameUnitTypeId: '\d+'
+        gameUnitCategoryId: '\d+'
 
 Guide/Market:
     path:      /guide/market

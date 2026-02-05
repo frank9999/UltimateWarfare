@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace FrankProjects\UltimateWarfare\Service\Action;
 
+use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitCategory;
 use FrankProjects\UltimateWarfare\Entity\Fleet;
 use FrankProjects\UltimateWarfare\Entity\FleetUnit;
 use FrankProjects\UltimateWarfare\Entity\GameUnit;
-use FrankProjects\UltimateWarfare\Entity\GameUnitType;
 use FrankProjects\UltimateWarfare\Entity\Player;
 use FrankProjects\UltimateWarfare\Entity\WorldRegion;
 use FrankProjects\UltimateWarfare\Entity\WorldRegionUnit;
@@ -115,7 +115,7 @@ final class FleetActionService
         WorldRegion $region,
         WorldRegion $targetRegion,
         Player $player,
-        GameUnitType $gameUnitType,
+        GameUnitCategory $gameUnitCategory,
         array $unitData
     ): void {
         if ($targetRegion->getWorld()->getId() !== $player->getWorld()->getId()) {
@@ -138,7 +138,7 @@ final class FleetActionService
                 continue;
             }
 
-            if ($gameUnit->getGameUnitType()->getId() !== $gameUnitType->getId()) {
+            if ($gameUnit->getGameUnitCategory() !== $gameUnitCategory) {
                 continue;
             }
 

@@ -6,6 +6,7 @@ namespace FrankProjects\UltimateWarfare\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitCategory;
 use FrankProjects\UltimateWarfare\Entity\GameUnit\BattleStats;
 use FrankProjects\UltimateWarfare\Entity\GameUnit\Cost;
 use FrankProjects\UltimateWarfare\Entity\GameUnit\Income;
@@ -21,7 +22,6 @@ class GameUnit
     private int $netWorth;
     private int $timestamp;
     private string $description;
-    private GameUnitType $gameUnitType;
 
     /** @var Collection<int, WorldRegionUnit> */
     private Collection $worldRegionUnits;
@@ -40,6 +40,8 @@ class GameUnit
     private Upkeep $upkeep;
 
     private ?string $behaviorClass = null; // Links to behavior implementation
+
+    private GameUnitCategory $gameUnitCategory;
 
     public function __construct()
     {
@@ -153,16 +155,6 @@ class GameUnit
         return $this->upkeep;
     }
 
-    public function getGameUnitType(): GameUnitType
-    {
-        return $this->gameUnitType;
-    }
-
-    public function setGameUnitType(GameUnitType $gameUnitType): void
-    {
-        $this->gameUnitType = $gameUnitType;
-    }
-
     /**
      * @return Collection<int, WorldRegionUnit>
      */
@@ -230,5 +222,15 @@ class GameUnit
     public function getBehaviorClass(): ?string
     {
         return $this->behaviorClass;
+    }
+
+    public function getGameUnitCategory(): GameUnitCategory
+    {
+        return $this->gameUnitCategory;
+    }
+
+    public function setGameUnitCategory(GameUnitCategory $gameUnitCategory): void
+    {
+        $this->gameUnitCategory = $gameUnitCategory;
     }
 }

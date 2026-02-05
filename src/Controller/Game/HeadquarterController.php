@@ -4,43 +4,46 @@ declare(strict_types=1);
 
 namespace FrankProjects\UltimateWarfare\Controller\Game;
 
-use FrankProjects\UltimateWarfare\Entity\GameUnitType;
-use FrankProjects\UltimateWarfare\Repository\GameUnitTypeRepository;
+use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitCategory;
+use FrankProjects\UltimateWarfare\Repository\GameUnitRepository;
 use FrankProjects\UltimateWarfare\Repository\ReportRepository;
 use FrankProjects\UltimateWarfare\Repository\WorldRegionUnitRepository;
 use Symfony\Component\HttpFoundation\Response;
 
 final class HeadquarterController extends BaseGameController
 {
-    private GameUnitTypeRepository $gameUnitTypeRepository;
     private ReportRepository $reportRepository;
     private WorldRegionUnitRepository $worldRegionUnitRepository;
+    private GameUnitRepository $gameUnitRepository;
 
     public function __construct(
-        GameUnitTypeRepository $gameUnitTypeRepository,
         ReportRepository $reportRepository,
-        WorldRegionUnitRepository $worldRegionUnitRepository
+        WorldRegionUnitRepository $worldRegionUnitRepository,
+        GameUnitRepository $gameUnitRepository
     ) {
-        $this->gameUnitTypeRepository = $gameUnitTypeRepository;
         $this->reportRepository = $reportRepository;
         $this->worldRegionUnitRepository = $worldRegionUnitRepository;
+        $this->gameUnitRepository = $gameUnitRepository;
     }
 
     public function army(): Response
     {
-        $gameUnitTypes = [
-            $this->gameUnitTypeRepository->find(GameUnitType::GAME_UNIT_TYPE_UNITS),
-            $this->gameUnitTypeRepository->find(GameUnitType::GAME_UNIT_TYPE_SPECIAL_UNITS)
+        $gameUnitCategories = [
+            GameUnitCategory::UNITS,
+            GameUnitCategory::SPECIAL_UNITS
         ];
+
+        $gameUnits = $this->gameUnitRepository->findAll();
 
         return $this->render(
             'game/headquarter/army.html.twig',
             [
                 'player' => $this->getPlayer(),
-                'gameUnitTypes' => $gameUnitTypes,
-                'gameUnitData' => $this->worldRegionUnitRepository->getGameUnitSumByPlayerAndGameUnitTypes(
+                'gameUnitCategories' => $gameUnitCategories,
+                'gameUnits' => $gameUnits,
+                'gameUnitData' => $this->worldRegionUnitRepository->getGameUnitSumByPlayerAndGameUnitCategories(
                     $this->getPlayer(),
-                    $gameUnitTypes
+                    $gameUnitCategories
                 )
             ]
         );
@@ -72,20 +75,23 @@ final class HeadquarterController extends BaseGameController
 
     public function infrastructure(): Response
     {
-        $gameUnitTypes = [
-            $this->gameUnitTypeRepository->find(GameUnitType::GAME_UNIT_TYPE_BUILDINGS),
-            $this->gameUnitTypeRepository->find(GameUnitType::GAME_UNIT_TYPE_DEFENCE_BUILDINGS),
-            $this->gameUnitTypeRepository->find(GameUnitType::GAME_UNIT_TYPE_SPECIAL_BUILDINGS)
+        $gameUnitCategories = [
+            GameUnitCategory::BUILDINGS,
+            GameUnitCategory::DEFENSE_BUILDINGS,
+            GameUnitCategory::SPECIAL_BUILDINGS
         ];
+
+        $gameUnits = $this->gameUnitRepository->findAll();
 
         return $this->render(
             'game/headquarter/infrastructure.html.twig',
             [
                 'player' => $this->getPlayer(),
-                'gameUnitTypes' => $gameUnitTypes,
-                'gameUnitData' => $this->worldRegionUnitRepository->getGameUnitSumByPlayerAndGameUnitTypes(
+                'gameUnits' => $gameUnits,
+                'gameUnitCategories' => $gameUnitCategories,
+                'gameUnitData' => $this->worldRegionUnitRepository->getGameUnitSumByPlayerAndGameUnitCategories(
                     $this->getPlayer(),
-                    $gameUnitTypes
+                    $gameUnitCategories
                 )
             ]
         );

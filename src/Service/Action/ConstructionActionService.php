@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace FrankProjects\UltimateWarfare\Service\Action;
 
 use FrankProjects\UltimateWarfare\Entity\Construction;
+use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitCategory;
 use FrankProjects\UltimateWarfare\Entity\GameUnit;
-use FrankProjects\UltimateWarfare\Entity\GameUnitType;
 use FrankProjects\UltimateWarfare\Entity\Player;
 use FrankProjects\UltimateWarfare\Entity\WorldRegion;
 use FrankProjects\UltimateWarfare\Repository\ConstructionRepository;
@@ -48,7 +48,7 @@ final class ConstructionActionService
     public function constructGameUnits(
         WorldRegion $region,
         Player $player,
-        GameUnitType $gameUnitType,
+        GameUnitCategory $gameUnitCategory,
         array $constructionData
     ): void {
         $priceCash = 0;
@@ -68,7 +68,7 @@ final class ConstructionActionService
                 continue;
             }
 
-            if ($gameUnit->getGameUnitType()->getId() !== $gameUnitType->getId()) {
+            if ($gameUnit->getGameUnitCategory() !== $gameUnitCategory) {
                 continue;
             }
 
@@ -84,16 +84,16 @@ final class ConstructionActionService
             $priceWood = $priceWood + ($amount * $gameUnit->getCost()->getWood());
             $priceSteel = $priceSteel + ($amount * $gameUnit->getCost()->getSteel());
 
-            if ($gameUnitType->getId() === GameUnitType::GAME_UNIT_TYPE_BUILDINGS) {
+            if ($gameUnitCategory === GameUnitCategory::BUILDINGS) {
                 $totalBuild = $totalBuild + $amount;
             }
 
             $constructions[] = Construction::create($region, $player, $gameUnit, $amount);
         }
 
-        if ($gameUnitType->getId() === GameUnitType::GAME_UNIT_TYPE_BUILDINGS) {
-            $buildingsInConstruction = $this->getCountGameUnitsInConstruction($region, $gameUnitType);
-            $regionBuildings = $this->getCountGameUnitsInWorldRegion($region, $gameUnitType);
+        if ($gameUnitCategory === GameUnitCategory::BUILDINGS) {
+            $buildingsInConstruction = $this->getCountGameUnitsInConstruction($region, $gameUnitCategory);
+            $regionBuildings = $this->getCountGameUnitsInWorldRegion($region, $gameUnitCategory);
             $totalSpace = $region->getSpace() - $regionBuildings - $buildingsInConstruction;
 
             if ($totalBuild > $totalSpace) {
@@ -137,7 +137,7 @@ final class ConstructionActionService
     public function removeGameUnits(
         WorldRegion $region,
         Player $player,
-        GameUnitType $gameUnitType,
+        GameUnitCategory $gameUnitCategory,
         array $destroyData
     ): void {
         $isRemoving = false;
@@ -152,7 +152,7 @@ final class ConstructionActionService
                 continue;
             }
 
-            if ($gameUnit->getGameUnitType()->getId() !== $gameUnitType->getId()) {
+            if ($gameUnit->getGameUnitCategory() !== $gameUnitCategory) {
                 continue;
             }
 
@@ -182,28 +182,28 @@ final class ConstructionActionService
         $this->constructionRepository->remove($construction);
     }
 
-    public function getBuildingSpaceLeft(GameUnitType $gameUnitType, WorldRegion $worldRegion): int
+    public function getBuildingSpaceLeft(GameUnitCategory $gameUnitCategory, WorldRegion $worldRegion): int
     {
-        if ($gameUnitType->getId() !== GameUnitType::GAME_UNIT_TYPE_BUILDINGS) {
+        if ($gameUnitCategory !== GameUnitCategory::BUILDINGS) {
             return 0;
         }
 
-        $buildingsInConstruction = $this->getCountGameUnitsInConstruction($worldRegion, $gameUnitType);
-        $regionBuildings = $this->getCountGameUnitsInWorldRegion($worldRegion, $gameUnitType);
+        $buildingsInConstruction = $this->getCountGameUnitsInConstruction($worldRegion, $gameUnitCategory);
+        $regionBuildings = $this->getCountGameUnitsInWorldRegion($worldRegion, $gameUnitCategory);
 
         return $worldRegion->getSpace() - $regionBuildings - $buildingsInConstruction;
     }
 
-    public function getCountGameUnitsInConstruction(WorldRegion $worldRegion, GameUnitType $gameUnitType): int
+    public function getCountGameUnitsInConstruction(WorldRegion $worldRegion, GameUnitCategory $gameUnitCategory): int
     {
-        return $this->constructionRepository->getGameUnitConstructionSumByWorldRegionAndType($worldRegion, $gameUnitType);
+        return $this->constructionRepository->getGameUnitConstructionSumByWorldRegionAndCategory($worldRegion, $gameUnitCategory);
     }
 
-    public function getCountGameUnitsInWorldRegion(WorldRegion $worldRegion, GameUnitType $gameUnitType): int
+    public function getCountGameUnitsInWorldRegion(WorldRegion $worldRegion, GameUnitCategory $gameUnitCategory): int
     {
         $regionBuildings = 0;
         foreach ($worldRegion->getWorldRegionUnits() as $regionUnit) {
-            if ($regionUnit->getGameUnit()->getGameUnitType()->getId() === $gameUnitType->getId()) {
+            if ($regionUnit->getGameUnit()->getGameUnitCategory() === $gameUnitCategory) {
                 $regionBuildings += $regionUnit->getAmount();
             }
         }

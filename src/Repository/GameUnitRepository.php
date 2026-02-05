@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace FrankProjects\UltimateWarfare\Repository;
 
+use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitCategory;
 use FrankProjects\UltimateWarfare\Entity\GameUnit;
 
 interface GameUnitRepository
@@ -14,6 +15,11 @@ interface GameUnitRepository
      * @return GameUnit[]
      */
     public function findAll(): array;
+
+    /**
+     * @return GameUnit[]
+     */
+    public function findByGameUnitCategory(GameUnitCategory $gameUnitCategory): array;
 
     public function save(GameUnit $gameUnit): void;
 }

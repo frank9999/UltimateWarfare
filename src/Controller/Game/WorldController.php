@@ -4,12 +4,11 @@ declare(strict_types=1);
 
 namespace FrankProjects\UltimateWarfare\Controller\Game;
 
-use FrankProjects\UltimateWarfare\Entity\GameUnitType;
+use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitCategory;
 use FrankProjects\UltimateWarfare\Entity\Player;
 use FrankProjects\UltimateWarfare\Entity\World;
 use FrankProjects\UltimateWarfare\Entity\WorldRegion;
 use FrankProjects\UltimateWarfare\Repository\PlayerRepository;
-use FrankProjects\UltimateWarfare\Repository\WorldRegionRepository;
 use FrankProjects\UltimateWarfare\Repository\FleetRepository;
 use FrankProjects\UltimateWarfare\Repository\WorldRepository;
 use FrankProjects\UltimateWarfare\Service\WorldGeneratorService;
@@ -25,12 +24,10 @@ final class WorldController extends BaseGameController
     public function __construct(
         PlayerRepository $playerRepository,
         WorldRepository $worldRepository,
-        WorldRegionRepository $worldRegionRepository,
         FleetRepository $fleetRepository
     ) {
         $this->playerRepository = $playerRepository;
         $this->worldRepository = $worldRepository;
-        $this->worldRegionRepository = $worldRegionRepository;
         $this->fleetRepository = $fleetRepository;
     }
 
@@ -202,17 +199,16 @@ final class WorldController extends BaseGameController
         ];
 
         foreach ($region->getWorldRegionUnits() as $worldRegionUnit) {
-            $typeId = $worldRegionUnit->getGameUnit()->getGameUnitType()->getId();
+            $gameUnitCategory = $worldRegionUnit->getGameUnit()->getGameUnitCategory();
             $amount = $worldRegionUnit->getAmount();
             $unitName = $worldRegionUnit->getGameUnit()->getName();
 
-            match ($typeId) {
-                GameUnitType::GAME_UNIT_TYPE_BUILDINGS => $this->addUnitToSummary($summary, 'buildings', $unitName, $amount),
-                GameUnitType::GAME_UNIT_TYPE_DEFENCE_BUILDINGS => $this->addUnitToSummary($summary, 'defences', $unitName, $amount),
-                GameUnitType::GAME_UNIT_TYPE_SPECIAL_BUILDINGS => $this->addUnitToSummary($summary, 'special', $unitName, $amount),
-                GameUnitType::GAME_UNIT_TYPE_UNITS => $this->addUnitToSummary($summary, 'units', $unitName, $amount),
-                GameUnitType::GAME_UNIT_TYPE_SPECIAL_UNITS => $this->addUnitToSummary($summary, 'specialUnits', $unitName, $amount),
-                default => null,
+            match ($gameUnitCategory) {
+                GameUnitCategory::BUILDINGS => $this->addUnitToSummary($summary, 'buildings', $unitName, $amount),
+                GameUnitCategory::DEFENSE_BUILDINGS => $this->addUnitToSummary($summary, 'defences', $unitName, $amount),
+                GameUnitCategory::SPECIAL_BUILDINGS => $this->addUnitToSummary($summary, 'special', $unitName, $amount),
+                GameUnitCategory::UNITS => $this->addUnitToSummary($summary, 'units', $unitName, $amount),
+                GameUnitCategory::SPECIAL_UNITS => $this->addUnitToSummary($summary, 'specialUnits', $unitName, $amount),
             };
         }
 

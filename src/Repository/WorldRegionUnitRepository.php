@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace FrankProjects\UltimateWarfare\Repository;
 
-use FrankProjects\UltimateWarfare\Entity\GameUnitType;
+use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitCategory;
 use FrankProjects\UltimateWarfare\Entity\Player;
 use FrankProjects\UltimateWarfare\Entity\WorldRegionUnit;
 
@@ -19,10 +19,10 @@ interface WorldRegionUnitRepository
 
     /**
      * @param Player $player
-     * @param GameUnitType[] $gameUnitTypes
+     * @param GameUnitCategory[] $gameUnitCategories
      * @return array<int|string, mixed>
      */
-    public function getGameUnitSumByPlayerAndGameUnitTypes(Player $player, array $gameUnitTypes): array;
+    public function getGameUnitSumByPlayerAndGameUnitCategories(Player $player, array $gameUnitCategories): array;
 
     public function remove(WorldRegionUnit $worldRegionUnit): void;
 

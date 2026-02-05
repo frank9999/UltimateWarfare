@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace FrankProjects\UltimateWarfare\Controller\Site;
 
 use FrankProjects\UltimateWarfare\Controller\BaseController;
-use FrankProjects\UltimateWarfare\Exception\GameUnitTypeNotFoundException;
+use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitCategory;
 use FrankProjects\UltimateWarfare\Repository\GameUnitRepository;
-use FrankProjects\UltimateWarfare\Repository\GameUnitTypeRepository;
 use FrankProjects\UltimateWarfare\Repository\OperationRepository;
 use FrankProjects\UltimateWarfare\Repository\ResearchRepository;
 use Symfony\Component\HttpFoundation\Response;
@@ -85,25 +84,30 @@ final class GuideController extends BaseController
         );
     }
 
-    public function listUnits(int $gameUnitTypeId, GameUnitTypeRepository $gameUnitTypeRepository): Response
+    public function listUnits(int $gameUnitCategoryId, GameUnitRepository $gameUnitRepository): Response
     {
-        try {
-            $gameUnitType = $gameUnitTypeRepository->find($gameUnitTypeId);
-        } catch (GameUnitTypeNotFoundException) {
-            $gameUnitTypes = $gameUnitTypeRepository->findAll();
+        $gameUnitCategory = GameUnitCategory::fromInteger($gameUnitCategoryId);
+        if ($gameUnitCategory === null) {
+            $gameUnitCategories = GameUnitCategory::getAll();
 
             return $this->render(
-                'site/guide/selectGameUnitType.html.twig',
+                'site/guide/selectGameUnitCategory.html.twig',
                 [
-                    'gameUnitTypes' => $gameUnitTypes
+                    'gameUnitCategories' => $gameUnitCategories
                 ]
             );
+        }
+
+        $gameUnits = [];
+        foreach ($gameUnitRepository->findByGameUnitCategory($gameUnitCategory) as $gameUnit) {
+            $gameUnits[] = $gameUnit;
         }
 
         return $this->render(
             'site/guide/listGameUnits.html.twig',
             [
-                'gameUnitType' => $gameUnitType
+                'gameUnitCategory' => $gameUnitCategory,
+                'gameUnits' => $gameUnits
             ]
         );
     }

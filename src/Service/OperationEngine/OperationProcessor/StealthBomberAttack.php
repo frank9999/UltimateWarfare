@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace FrankProjects\UltimateWarfare\Service\OperationEngine\OperationProcessor;
 
-use FrankProjects\UltimateWarfare\Entity\GameUnitType;
+use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitCategory;
 use FrankProjects\UltimateWarfare\Service\OperationEngine\OperationProcessor;
 
 final class StealthBomberAttack extends OperationProcessor
@@ -30,14 +30,14 @@ final class StealthBomberAttack extends OperationProcessor
     {
         $totalBuildings = 0;
         foreach ($this->region->getWorldRegionUnits() as $worldRegionUnit) {
-            if ($worldRegionUnit->getGameUnit()->getGameUnitType()->getId() === GameUnitType::GAME_UNIT_TYPE_SPECIAL_BUILDINGS) {
+            if ($worldRegionUnit->getGameUnit()->getGameUnitCategory() === GameUnitCategory::SPECIAL_BUILDINGS) {
                 $totalBuildings = $totalBuildings + $worldRegionUnit->getAmount();
             }
         }
 
         if (($this->amount * self::BUILDINGS_DESTROYED_PER_BOMBER) > $totalBuildings) {
             foreach ($this->region->getWorldRegionUnits() as $worldRegionUnit) {
-                if ($worldRegionUnit->getGameUnit()->getGameUnitType()->getId() === GameUnitType::GAME_UNIT_TYPE_SPECIAL_BUILDINGS) {
+                if ($worldRegionUnit->getGameUnit()->getGameUnitCategory() === GameUnitCategory::SPECIAL_BUILDINGS) {
                     $this->worldRegionUnitRepository->remove($worldRegionUnit);
                     $this->addToOperationLog(
                         "You destroyed all {$worldRegionUnit->getGameUnit()->getName()} buildings!"
@@ -51,7 +51,7 @@ final class StealthBomberAttack extends OperationProcessor
         } else {
             $buildingsDestroyed = $this->amount * self::BUILDINGS_DESTROYED_PER_BOMBER;
             foreach ($this->region->getWorldRegionUnits() as $worldRegionUnit) {
-                if ($worldRegionUnit->getGameUnit()->getGameUnitType()->getId() === GameUnitType::GAME_UNIT_TYPE_SPECIAL_BUILDINGS) {
+                if ($worldRegionUnit->getGameUnit()->getGameUnitCategory() === GameUnitCategory::SPECIAL_BUILDINGS) {
                     $percentage = $worldRegionUnit->getAmount() / $totalBuildings;
                     $destroyed = round($buildingsDestroyed * $percentage);
                     $worldRegionUnit->setAmount((int) ($worldRegionUnit->getAmount() - $destroyed));

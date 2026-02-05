@@ -24,8 +24,8 @@
                         <li>Population: {{ regionData.region.population }} / {{ regionData.region.population * 500 }}
                         <li>Click <a class="B" href="{{ path('Game/World/Region', {'regionId': regionData.region.id}) }}">here</a> to go to this region.</li>
                         <li>Quick Links:
-                            <a class="B" href="{{ path('Game/World/Region/Build', {'regionId': regionData.region.id, 'gameUnitTypeId': 1}) }}">Build</a> -
-                            <a class="B" href="{{ path('Game/World/Region/Build', {'regionId': regionData.region.id, 'gameUnitTypeId': 4}) }}">Build Units</a>
+                            <a class="B" href="{{ path('Game/World/Region/Build', {'regionId': regionData.region.id, 'gameUnitCategoryId': 1}) }}">Build</a> -
+                            <a class="B" href="{{ path('Game/World/Region/Build', {'regionId': regionData.region.id, 'gameUnitCategoryId': 4}) }}">Build Units</a>
                         </li>
                     </ul>
                 </td>

@@ -4,17 +4,14 @@ declare(strict_types=1);
 
 namespace FrankProjects\UltimateWarfare\Controller\Game;
 
-use FrankProjects\UltimateWarfare\Entity\GameUnitType;
+use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitCategory;
 use FrankProjects\UltimateWarfare\Entity\Player;
 use FrankProjects\UltimateWarfare\Entity\WorldRegion;
-use FrankProjects\UltimateWarfare\Exception\GameUnitTypeNotFoundException;
 use FrankProjects\UltimateWarfare\Exception\WorldRegionNotFoundException;
-use FrankProjects\UltimateWarfare\Repository\GameUnitTypeRepository;
+use FrankProjects\UltimateWarfare\Repository\GameUnitRepository;
 use FrankProjects\UltimateWarfare\Repository\WorldRegionRepository;
-use FrankProjects\UltimateWarfare\Repository\FleetRepository;
 use FrankProjects\UltimateWarfare\Service\Action\FleetActionService;
 use FrankProjects\UltimateWarfare\Service\Action\RegionActionService;
-use FrankProjects\UltimateWarfare\Service\BattleEngine;
 use FrankProjects\UltimateWarfare\Util\DistanceCalculator;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -24,24 +21,20 @@ use Throwable;
 final class FleetController extends BaseGameController
 {
     private WorldRegionRepository $worldRegionRepository;
-    private GameUnitTypeRepository $gameUnitTypeRepository;
     private FleetActionService $fleetActionService;
     private RegionActionService $regionActionService;
+    private GameUnitRepository $gameUnitRepository;
 
     public function __construct(
         WorldRegionRepository $worldRegionRepository,
-        GameUnitTypeRepository $gameUnitTypeRepository,
         FleetActionService $fleetActionService,
         RegionActionService $regionActionService,
-        FleetRepository $fleetRepository,
-        BattleEngine $battleEngine
+        GameUnitRepository $gameUnitRepository
     ) {
         $this->worldRegionRepository = $worldRegionRepository;
-        $this->gameUnitTypeRepository = $gameUnitTypeRepository;
         $this->fleetActionService = $fleetActionService;
         $this->regionActionService = $regionActionService;
-        $this->fleetRepository = $fleetRepository;
-        $this->battleEngine = $battleEngine;
+        $this->gameUnitRepository = $gameUnitRepository;
     }
 
     /**
@@ -132,8 +125,7 @@ final class FleetController extends BaseGameController
 
         try {
             $worldRegion = $this->regionActionService->getWorldRegionByIdAndPlayer($regionId, $player);
-            $gameUnitType = $this->gameUnitTypeRepository->find(GameUnitType::GAME_UNIT_TYPE_UNITS);
-        } catch (WorldRegionNotFoundException | GameUnitTypeNotFoundException $e) {
+        } catch (WorldRegionNotFoundException $e) {
             $this->addFlash('error', $e->getMessage());
             return $this->redirectToRoute('Game/RegionList', [], 302);
         }
@@ -157,7 +149,7 @@ final class FleetController extends BaseGameController
                     $worldRegion,
                     $targetRegion,
                     $player,
-                    $gameUnitType,
+                    GameUnitCategory::UNITS,
                     $units
                 );
                 $this->addFlash('success', 'You successfully send units!');
@@ -168,13 +160,14 @@ final class FleetController extends BaseGameController
 
         $gameUnitsData = $this->worldRegionRepository->getWorldGameUnitSumByWorldRegion($worldRegion);
         $targetRegions = $this->getTargetWorldRegionData($player, $worldRegion);
+        $gameUnits = $this->gameUnitRepository->findByGameUnitCategory(GameUnitCategory::UNITS);
 
         return $this->render(
             'game/region/sendUnits.html.twig',
             [
                 'region' => $worldRegion,
                 'player' => $player,
-                'gameUnitType' => $gameUnitType,
+                'gameUnits' => $gameUnits,
                 'targetRegions' => $targetRegions,
                 'gameUnitsData' => $gameUnitsData
             ]

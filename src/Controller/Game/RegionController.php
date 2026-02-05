@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace FrankProjects\UltimateWarfare\Controller\Game;
 
-use FrankProjects\UltimateWarfare\Entity\GameUnitType;
-use FrankProjects\UltimateWarfare\Exception\GameUnitTypeNotFoundException;
+use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitCategory;
 use FrankProjects\UltimateWarfare\Exception\WorldRegionNotFoundException;
-use FrankProjects\UltimateWarfare\Repository\GameUnitTypeRepository;
+use FrankProjects\UltimateWarfare\Repository\GameUnitRepository;
 use FrankProjects\UltimateWarfare\Repository\WorldRegionRepository;
 use FrankProjects\UltimateWarfare\Service\Action\ConstructionActionService;
 use FrankProjects\UltimateWarfare\Service\Action\RegionActionService;
@@ -19,20 +18,20 @@ use Throwable;
 final class RegionController extends BaseGameController
 {
     private WorldRegionRepository $worldRegionRepository;
-    private GameUnitTypeRepository $gameUnitTypeRepository;
     private ConstructionActionService $constructionActionService;
     private RegionActionService $regionActionService;
+    private GameUnitRepository $gameUnitRepository;
 
     public function __construct(
         WorldRegionRepository $worldRegionRepository,
-        GameUnitTypeRepository $gameUnitTypeRepository,
         ConstructionActionService $constructionActionService,
-        RegionActionService $regionActionService
+        RegionActionService $regionActionService,
+        GameUnitRepository $gameUnitRepository
     ) {
         $this->worldRegionRepository = $worldRegionRepository;
-        $this->gameUnitTypeRepository = $gameUnitTypeRepository;
         $this->constructionActionService = $constructionActionService;
         $this->regionActionService = $regionActionService;
+        $this->gameUnitRepository = $gameUnitRepository;
     }
 
     public function buy(Request $request, int $regionId): Response
@@ -96,17 +95,18 @@ final class RegionController extends BaseGameController
             return $this->redirectToRoute('Game/RegionList');
         }
 
-        $gameUnitTypes = $this->gameUnitTypeRepository->findAll();
         $gameUnitsData = $this->worldRegionRepository->getWorldGameUnitSumByWorldRegion($worldRegion);
+        $gameUnits = $this->gameUnitRepository->findAll();
 
         return $this->render(
             'game/region.html.twig',
             [
                 'region' => $worldRegion,
                 'player' => $player,
+                'gameUnits' => $gameUnits,
                 'previousRegion' => $this->worldRegionRepository->getPreviousWorldRegionForPlayer($regionId, $player),
                 'nextRegion' => $this->worldRegionRepository->getNextWorldRegionForPlayer($regionId, $player),
-                'gameUnitTypes' => $gameUnitTypes,
+                'gameUnitCategories' => GameUnitCategory::getAll(),
                 'gameUnitsData' => $gameUnitsData
             ]
         );
@@ -120,20 +120,15 @@ final class RegionController extends BaseGameController
         $player = $this->getPlayer();
         $regions = $player->getWorldRegions();
         $regionList = [];
-        try {
-            $gameUnitType = $this->gameUnitTypeRepository->find(GameUnitType::GAME_UNIT_TYPE_BUILDINGS);
-        } catch (GameUnitTypeNotFoundException) {
-            return $this->redirectToRoute('Game/Region');
-        }
 
         foreach ($regions as $region) {
             $buildingsInConstruction = $this->constructionActionService->getCountGameUnitsInConstruction(
                 $region,
-                $gameUnitType
+                GameUnitCategory::BUILDINGS
             );
             $buildings = $this->constructionActionService->getCountGameUnitsInWorldRegion(
                 $region,
-                $gameUnitType
+                GameUnitCategory::BUILDINGS
             );
             $regionList[] = [
                 'region' => $region,

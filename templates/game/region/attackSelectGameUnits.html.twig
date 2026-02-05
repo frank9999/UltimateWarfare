@@ -14,10 +14,10 @@
                 <td>You have</td>
                 <td>Amount</td>
             </tr>
-            {% for gameUnit in gameUnitType.gameUnits %}
+            {% for gameUnit in gameUnits %}
                 <tr>
                     <td width="150">
-                        <img src="{{ asset('images/' ~ gameUnitType.imageDir ~ gameUnit.image) }}" alt="{{ gameUnit.name }}" width="150" height="130">
+                        <img src="{{ asset('images/' ~ gameUnit.gameUnitCategory.imageDir ~ gameUnit.image) }}" alt="{{ gameUnit.name }}" width="150" height="130">
                     </td>
                     <td width="150">
                         <a class="B" href="{{ path('Guide/GameUnit', {'gameUnitId': gameUnit.id}) }}"

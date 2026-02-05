@@ -1,7 +1,7 @@
 {% extends 'site/guideBase.html.twig' %}
 
 {% block content %}
-    {% for gameUnit in gameUnitType.gameUnits %}
+    {% for gameUnit in gameUnits %}
         <table class="table text-center">
             <tr class="tabletop">
                 <td colspan="2"><b>{{ gameUnit.name }}</b></td>
@@ -17,7 +17,7 @@
                     Building time: {{ gameUnit.timestamp }}<br />
                 </td>
                 <td width="350">
-                    <img src="{{ asset('images/' ~ gameUnit.gameUnitType.imageDir ~ gameUnit.image) }}" alt="{{ gameUnit.name }}" width="150" height="130">
+                    <img src="{{ asset('images/' ~ gameUnit.gameUnitCategory.imageDir ~ gameUnit.image) }}" alt="{{ gameUnit.name }}" width="150" height="130">
                 </td>
             </tr>
             <tr>

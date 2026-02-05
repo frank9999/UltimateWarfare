@@ -4,11 +4,10 @@ declare(strict_types=1);
 
 namespace FrankProjects\UltimateWarfare\Controller\Game;
 
-use FrankProjects\UltimateWarfare\Entity\GameUnitType;
-use FrankProjects\UltimateWarfare\Exception\GameUnitTypeNotFoundException;
+use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitCategory;
 use FrankProjects\UltimateWarfare\Exception\WorldRegionNotFoundException;
 use FrankProjects\UltimateWarfare\Repository\ConstructionRepository;
-use FrankProjects\UltimateWarfare\Repository\GameUnitTypeRepository;
+use FrankProjects\UltimateWarfare\Repository\GameUnitRepository;
 use FrankProjects\UltimateWarfare\Repository\WorldRegionRepository;
 use FrankProjects\UltimateWarfare\Service\Action\ConstructionActionService;
 use FrankProjects\UltimateWarfare\Service\Action\RegionActionService;
@@ -21,56 +20,62 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 final class ConstructionController extends BaseGameController
 {
     private ConstructionRepository $constructionRepository;
-    private GameUnitTypeRepository $gameUnitTypeRepository;
     private WorldRegionRepository $worldRegionRepository;
     private ConstructionActionService $constructionActionService;
     private RegionActionService $regionActionService;
+    private GameUnitRepository $gameUnitRepository;
 
     public function __construct(
         ConstructionRepository $constructionRepository,
-        GameUnitTypeRepository $gameUnitTypeRepository,
         WorldRegionRepository $worldRegionRepository,
         ConstructionActionService $constructionActionService,
-        RegionActionService $regionActionService
+        RegionActionService $regionActionService,
+        GameUnitRepository $gameUnitRepository
     ) {
         $this->constructionRepository = $constructionRepository;
-        $this->gameUnitTypeRepository = $gameUnitTypeRepository;
         $this->worldRegionRepository = $worldRegionRepository;
         $this->constructionActionService = $constructionActionService;
         $this->regionActionService = $regionActionService;
+        $this->gameUnitRepository = $gameUnitRepository;
     }
 
-    public function construction(int $type): Response
+    public function construction(int $gameUnitCategoryId): Response
     {
-        $gameUnitTypes = $this->gameUnitTypeRepository->findAll();
-        try {
-            $gameUnitType = $this->gameUnitTypeRepository->find($type);
-        } catch (GameUnitTypeNotFoundException $e) {
+        $gameUnitCategories = GameUnitCategory::getAll();
+        $gameUnitCategory = GameUnitCategory::fromInteger($gameUnitCategoryId);
+        if ($gameUnitCategory === null) {
+            $gameUnits = $this->gameUnitRepository->findAll();
+        } else {
+            $gameUnits = $this->gameUnitRepository->findByGameUnitCategory($gameUnitCategory);
+        }
+
+        if ($gameUnitCategory === null) {
             $constructionData = $this->constructionRepository->getGameUnitConstructionSumByPlayer($this->getPlayer());
             return $this->render(
                 'game/constructionSummary.html.twig',
                 [
                     'player' => $this->getPlayer(),
-                    'gameUnitTypes' => $gameUnitTypes,
+                    'gameUnits' => $gameUnits,
+                    'gameUnitCategories' => $gameUnitCategories,
                     'constructionData' => $constructionData
                 ]
             );
         }
 
-        $constructions = $this->constructionRepository->findByPlayerAndGameUnitType($this->getPlayer(), $gameUnitType);
+        $constructions = $this->constructionRepository->findByPlayerAndGameUnitCategory($this->getPlayer(), $gameUnitCategory);
 
         return $this->render(
             'game/construction.html.twig',
             [
                 'player' => $this->getPlayer(),
                 'constructions' => $constructions,
-                'gameUnitType' => $gameUnitType,
-                'gameUnitTypes' => $gameUnitTypes,
+                'gameUnitCategory' => $gameUnitCategory,
+                'gameUnitCategories' => $gameUnitCategories,
             ]
         );
     }
 
-    public function constructGameUnits(Request $request, int $regionId, int $gameUnitTypeId): Response
+    public function constructGameUnits(Request $request, int $regionId, int $gameUnitCategoryId): Response
     {
         /**
          * XXX TODO: Fix unit info page
@@ -83,10 +88,9 @@ final class ConstructionController extends BaseGameController
             return $this->redirectToRoute('Game/RegionList', [], 302);
         }
 
-        try {
-            $gameUnitType = $this->gameUnitTypeRepository->find($gameUnitTypeId);
-        } catch (GameUnitTypeNotFoundException $e) {
-            $this->addFlash('error', 'Unknown GameUnitType!');
+        $gameUnitCategory = GameUnitCategory::fromInteger($gameUnitCategoryId);
+        if ($gameUnitCategory === null) {
+            $this->addFlash('error', 'Unknown GameUnitCategory!');
             return $this->redirectToRoute('Game/World/Region', ['regionId' => $worldRegion->getId()], 302);
         }
 
@@ -97,24 +101,27 @@ final class ConstructionController extends BaseGameController
                 $this->constructionActionService->constructGameUnits(
                     $worldRegion,
                     $this->getPlayer(),
-                    $gameUnitType,
+                    $gameUnitCategory,
                     $construct
                 );
-                $this->addConstructGameUnitsFlash($gameUnitType);
+                $this->addConstructGameUnitsFlash($gameUnitCategory);
             } catch (Throwable $e) {
                 $this->addFlash('error', $e->getMessage());
             }
         }
+
+        $gameUnits = $this->gameUnitRepository->findByGameUnitCategory($gameUnitCategory);
 
         return $this->render(
             'game/region/constructGameUnits.html.twig',
             [
                 'region' => $worldRegion,
                 'player' => $this->getPlayer(),
-                'spaceLeft' => $this->constructionActionService->getBuildingSpaceLeft($gameUnitType, $worldRegion),
-                'gameUnitType' => $gameUnitType,
-                'gameUnitTypes' => $this->gameUnitTypeRepository->findAll(),
+                'spaceLeft' => $this->constructionActionService->getBuildingSpaceLeft($gameUnitCategory, $worldRegion),
+                'gameUnitCategory' => $gameUnitCategory,
+                'gameUnitCategories' => GameUnitCategory::getAll(),
                 'gameUnitData' => $this->worldRegionRepository->getWorldGameUnitSumByWorldRegion($worldRegion),
+                'gameUnits' => $gameUnits,
                 'constructionData' => $this->constructionRepository->getGameUnitConstructionSumByWorldRegion(
                     $worldRegion
                 )
@@ -122,19 +129,19 @@ final class ConstructionController extends BaseGameController
         );
     }
 
-    private function addConstructGameUnitsFlash(GameUnitType $gameUnitType): void
+    private function addConstructGameUnitsFlash(GameUnitCategory $gameUnitCategory): void
     {
         /**
          * XXX TODO: Refactor to show what game units are being built/trained
          */
-        if ($gameUnitType->getId() === GameUnitType::GAME_UNIT_TYPE_UNITS) {
+        if ($gameUnitCategory === GameUnitCategory::UNITS) {
             $this->addFlash('success', 'New units are now being trained!');
         } else {
             $this->addFlash('success', 'New buildings are now being built!');
         }
     }
 
-    public function removeGameUnits(Request $request, int $regionId, int $gameUnitTypeId): Response
+    public function removeGameUnits(Request $request, int $regionId, int $gameUnitCategoryId): Response
     {
         try {
             $worldRegion = $this->regionActionService->getWorldRegionByIdAndPlayer($regionId, $this->getPlayer());
@@ -143,9 +150,8 @@ final class ConstructionController extends BaseGameController
             return $this->redirectToRoute('Game/RegionList', [], 302);
         }
 
-        try {
-            $gameUnitType = $this->gameUnitTypeRepository->find($gameUnitTypeId);
-        } catch (GameUnitTypeNotFoundException) {
+        $gameUnitCategory = GameUnitCategory::fromInteger($gameUnitCategoryId);
+        if ($gameUnitCategory === null) {
             return $this->redirectToRoute('Game/World/Region', ['regionId' => $worldRegion->getId()], 302);
         }
 
@@ -156,33 +162,36 @@ final class ConstructionController extends BaseGameController
                 $this->constructionActionService->removeGameUnits(
                     $worldRegion,
                     $this->getPlayer(),
-                    $gameUnitType,
+                    $gameUnitCategory,
                     $destroy
                 );
-                $this->addRemoveGameUnitsFlash($gameUnitType);
+                $this->addRemoveGameUnitsFlash($gameUnitCategory);
             } catch (Throwable $e) {
                 $this->addFlash('error', $e->getMessage());
             }
         }
+
+        $gameUnits = $this->gameUnitRepository->findByGameUnitCategory($gameUnitCategory);
 
         return $this->render(
             'game/region/removeGameUnits.html.twig',
             [
                 'region' => $worldRegion,
                 'player' => $this->getPlayer(),
-                'gameUnitType' => $gameUnitType,
-                'gameUnitTypes' => $this->gameUnitTypeRepository->findAll(),
+                'gameUnits' => $gameUnits,
+                'gameUnitCategory' => $gameUnitCategory,
+                'gameUnitCategories' => GameUnitCategory::getAll(),
                 'gameUnitData' => $this->worldRegionRepository->getWorldGameUnitSumByWorldRegion($worldRegion),
             ]
         );
     }
 
-    private function addRemoveGameUnitsFlash(GameUnitType $gameUnitType): void
+    private function addRemoveGameUnitsFlash(GameUnitCategory $gameUnitCategory): void
     {
         /**
          * XXX TODO: Refactor to show what game units are being destroyed/disbanded
          */
-        if ($gameUnitType->getId() === GameUnitType::GAME_UNIT_TYPE_UNITS) {
+        if ($gameUnitCategory === GameUnitCategory::UNITS) {
             $this->addFlash('success', "You have disbanded units!");
         } else {
             $this->addFlash('success', "You have destroyed buildings!");
@@ -201,7 +210,7 @@ final class ConstructionController extends BaseGameController
         return $this->redirectToRoute('Game/Construction', [], 302);
     }
 
-    public function constructGameUnitsApi(Request $request, int $regionId, int $gameUnitTypeId): JsonResponse
+    public function constructGameUnitsApi(Request $request, int $regionId, int $gameUnitCategoryId): JsonResponse
     {
         try {
             $worldRegion = $this->regionActionService->getWorldRegionByIdAndPlayer($regionId, $this->getPlayer());
@@ -212,12 +221,11 @@ final class ConstructionController extends BaseGameController
             ], 400);
         }
 
-        try {
-            $gameUnitType = $this->gameUnitTypeRepository->find($gameUnitTypeId);
-        } catch (GameUnitTypeNotFoundException $e) {
+        $gameUnitCategory = GameUnitCategory::fromInteger($gameUnitCategoryId);
+        if ($gameUnitCategory === null) {
             return new JsonResponse([
                 'success' => false,
-                'message' => 'Unknown GameUnitType!'
+                'message' => 'Unknown GameUnitCategory!'
             ], 400);
         }
 
@@ -228,12 +236,12 @@ final class ConstructionController extends BaseGameController
             $this->constructionActionService->constructGameUnits(
                 $worldRegion,
                 $this->getPlayer(),
-                $gameUnitType,
+                $gameUnitCategory,
                 $construct
             );
 
             $player = $this->getPlayer();
-            $message = $gameUnitType->getId() === GameUnitType::GAME_UNIT_TYPE_UNITS
+            $message = $gameUnitCategory === GameUnitCategory::UNITS
                 ? 'New units are now being trained!'
                 : 'New buildings are now being built!';
 
@@ -252,7 +260,7 @@ final class ConstructionController extends BaseGameController
         }
     }
 
-    public function getBuildDataApi(int $regionId, int $gameUnitTypeId): JsonResponse
+    public function getBuildDataApi(int $regionId, int $gameUnitCategoryId): JsonResponse
     {
         try {
             $worldRegion = $this->regionActionService->getWorldRegionByIdAndPlayer($regionId, $this->getPlayer());
@@ -263,21 +271,25 @@ final class ConstructionController extends BaseGameController
             ], 400);
         }
 
-        try {
-            $gameUnitType = $this->gameUnitTypeRepository->find($gameUnitTypeId);
-        } catch (GameUnitTypeNotFoundException $e) {
+        $gameUnitCategory = GameUnitCategory::fromInteger($gameUnitCategoryId);
+        if ($gameUnitCategory === null) {
             return new JsonResponse([
                 'success' => false,
-                'message' => 'Unknown GameUnitType!'
+                'message' => 'Unknown GameUnitCategory!'
             ], 400);
         }
 
         $gameUnitData = $this->worldRegionRepository->getWorldGameUnitSumByWorldRegion($worldRegion);
         $constructionData = $this->constructionRepository->getGameUnitConstructionSumByWorldRegion($worldRegion);
-        $spaceLeft = $this->constructionActionService->getBuildingSpaceLeft($gameUnitType, $worldRegion);
+        $spaceLeft = $this->constructionActionService->getBuildingSpaceLeft($gameUnitCategory, $worldRegion);
 
         $units = [];
-        foreach ($gameUnitType->getGameUnits() as $gameUnit) {
+        foreach ($worldRegion->getWorldRegionUnits() as $worldRegionUnit) {
+            $gameUnit = $worldRegionUnit->getGameUnit();
+            if ($gameUnit->getGameUnitCategory() !== $gameUnitCategory) {
+                continue;
+            }
+
             // Check if unit can be built here
             $behavior = $this->behaviorFactory->create($gameUnit);
             $canBuild = $behavior->canBuild($worldRegion, $this->getPlayer());
@@ -287,7 +299,7 @@ final class ConstructionController extends BaseGameController
                 'name' => $gameUnit->getName(),
                 'description' => $gameUnit->getDescription(),
                 'image' => $gameUnit->getImage(),
-                'imageDir' => $gameUnitType->getImageDir(),
+                'imageDir' => $gameUnitCategory->getImageDir(),
                 'costCash' => $gameUnit->getCost()->getCash(),
                 'costWood' => $gameUnit->getCost()->getWood(),
                 'costSteel' => $gameUnit->getCost()->getSteel(),
@@ -311,9 +323,9 @@ final class ConstructionController extends BaseGameController
     
         return new JsonResponse([
             'success' => true,
-            'gameUnitType' => [
-                'id' => $gameUnitType->getId(),
-                'name' => $gameUnitType->getName()
+            'gameUnitCategory' => [
+                'id' => $gameUnitCategory->value,
+                'name' => $gameUnitCategory->getLabel()
             ],
             'spaceLeft' => $spaceLeft,
             'units' => $units

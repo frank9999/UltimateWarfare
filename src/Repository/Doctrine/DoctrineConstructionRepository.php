@@ -7,8 +7,8 @@ namespace FrankProjects\UltimateWarfare\Repository\Doctrine;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use FrankProjects\UltimateWarfare\Entity\Construction;
+use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitCategory;
 use FrankProjects\UltimateWarfare\Entity\GameUnit;
-use FrankProjects\UltimateWarfare\Entity\GameUnitType;
 use FrankProjects\UltimateWarfare\Entity\Player;
 use FrankProjects\UltimateWarfare\Entity\WorldRegion;
 use FrankProjects\UltimateWarfare\Repository\ConstructionRepository;
@@ -63,17 +63,17 @@ final class DoctrineConstructionRepository implements ConstructionRepository
         return $gameUnits;
     }
 
-    public function getGameUnitConstructionSumByWorldRegionAndType(WorldRegion $worldRegion, GameUnitType $gameUnitType): int
+    public function getGameUnitConstructionSumByWorldRegionAndCategory(WorldRegion $worldRegion, GameUnitCategory $gameUnitCategory): int
     {
         $results = $this->entityManager
             ->createQuery(
                 'SELECT gu.id, sum(c.number) as total
               FROM ' . Construction::class . ' c
               JOIN ' . GameUnit::class . ' gu ON c.gameUnit = gu
-              WHERE c.worldRegion = :worldRegion AND gu.gameUnitType = :gameUnitType
+              WHERE c.worldRegion = :worldRegion AND gu.gameUnitCategory = :gameUnitCategory
               GROUP BY gu.id'
             )->setParameter('worldRegion', $worldRegion)
-            ->setParameter('gameUnitType', $gameUnitType)
+            ->setParameter('gameUnitCategory', $gameUnitCategory)
             ->getArrayResult();
 
         $gameUnitsUnderConstruction = 0;
@@ -108,22 +108,22 @@ final class DoctrineConstructionRepository implements ConstructionRepository
 
     /**
      * @param Player $player
-     * @param GameUnitType $gameUnitType
+     * @param GameUnitCategory $gameUnitCategory
      * @return Construction[]
      */
-    public function findByPlayerAndGameUnitType(Player $player, GameUnitType $gameUnitType): array
+    public function findByPlayerAndGameUnitCategory(Player $player, GameUnitCategory $gameUnitCategory): array
     {
         return $this->entityManager
             ->createQuery(
                 'SELECT c
               FROM ' . Construction::class . ' c
               JOIN ' . GameUnit::class . ' gu ON c.gameUnit = gu
-              WHERE c.player = :player AND gu.gameUnitType = :gameUnitType
+              WHERE c.player = :player AND gu.gameUnitCategory = :gameUnitCategory
               ORDER BY c.timestamp DESC'
             )->setParameter(
                 'player',
                 $player
-            )->setParameter('gameUnitType', $gameUnitType)
+            )->setParameter('gameUnitCategory', $gameUnitCategory)
             ->getResult();
     }
 

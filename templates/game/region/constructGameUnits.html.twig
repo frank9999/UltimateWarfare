@@ -4,17 +4,17 @@
 
 {% block content %}
     Go to: <a class="B" href="{{ path('Game/World/Region', {'regionId': region.id}) }}">Region</a>
-    {% for gameUnitType in gameUnitTypes %}
-        - <a class="B" href="{{ path('Game/World/Region/Build', {'regionId': region.id, 'gameUnitTypeId': gameUnitType.id}) }}">{{ gameUnitType.name }}</a>
+    {% for gameUnitCategory in gameUnitCategories %}
+        - <a class="B" href="{{ path('Game/World/Region/Build', {'regionId': region.id, 'gameUnitCategoryId': gameUnitCategory.value}) }}">{{ gameUnitCategory.label }}</a>
     {% endfor %}
 
-    <form method="post" action="{{ path('Game/World/Region/Build', {'regionId': region.id, 'gameUnitTypeId': gameUnitType.id}) }}">
+    <form method="post" action="{{ path('Game/World/Region/Build', {'regionId': region.id, 'gameUnitCategoryId': gameUnitCategory.value}) }}">
         <table class="table text-center">
             <tr class="tabletop">
                 <td colspan="4"><b>Units</b></td>
             </tr>
 
-            {% if gameUnitType.id == 1 %}
+            {% if gameUnitCategory.value == 1 %}
                 <tr>
                     <td colspan="4">You have <b>{{ spaceLeft }}</b> building space left on this region.</td>
                 </tr>
@@ -25,10 +25,10 @@
                 <td>You have</td>
                 <td>Amount</td>
             </tr>
-            {% for gameUnit in gameUnitType.gameUnits %}
+            {% for gameUnit in gameUnits %}
                 <tr>
                     <td width="150">
-                        <img src="{{ asset('images/' ~ gameUnitType.imageDir ~ gameUnit.image) }}" alt="{{ gameUnit.name }}" width="150" height="130">
+                        <img src="{{ asset('images/' ~ gameUnit.gameUnitCategory.imageDir ~ gameUnit.image) }}" alt="{{ gameUnit.name }}" width="150" height="130">
                     </td>
                     <td width="150">
                         <a class="B" href="{{ path('Guide/GameUnit', {'gameUnitId': gameUnit.id}) }}" target="_blank" title="Information about {{ gameUnit.name }}" tabIndex="-1">

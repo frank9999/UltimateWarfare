@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace FrankProjects\UltimateWarfare\Repository;
 
 use FrankProjects\UltimateWarfare\Entity\Construction;
-use FrankProjects\UltimateWarfare\Entity\GameUnitType;
+use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitCategory;
 use FrankProjects\UltimateWarfare\Entity\Player;
 use FrankProjects\UltimateWarfare\Entity\WorldRegion;
 
@@ -24,7 +24,7 @@ interface ConstructionRepository
      */
     public function getGameUnitConstructionSumByWorldRegion(WorldRegion $worldRegion): array;
 
-    public function getGameUnitConstructionSumByWorldRegionAndType(WorldRegion $worldRegion, GameUnitType $gameUnitType): int;
+    public function getGameUnitConstructionSumByWorldRegionAndCategory(WorldRegion $worldRegion, GameUnitCategory $gameUnitCategory): int;
 
     /**
      * @return array<int|string, mixed>
@@ -33,10 +33,10 @@ interface ConstructionRepository
 
     /**
      * @param Player $player
-     * @param GameUnitType $gameUnitType
+     * @param GameUnitCategory $gameUnitCategory
      * @return Construction[]
      */
-    public function findByPlayerAndGameUnitType(Player $player, GameUnitType $gameUnitType): array;
+    public function findByPlayerAndGameUnitCategory(Player $player, GameUnitCategory $gameUnitCategory): array;
 
     /**
      * @param int $timestamp

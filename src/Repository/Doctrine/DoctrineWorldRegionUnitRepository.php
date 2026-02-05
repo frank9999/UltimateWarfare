@@ -6,8 +6,8 @@ namespace FrankProjects\UltimateWarfare\Repository\Doctrine;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
+use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitCategory;
 use FrankProjects\UltimateWarfare\Entity\GameUnit;
-use FrankProjects\UltimateWarfare\Entity\GameUnitType;
 use FrankProjects\UltimateWarfare\Entity\Player;
 use FrankProjects\UltimateWarfare\Entity\WorldRegion;
 use FrankProjects\UltimateWarfare\Entity\WorldRegionUnit;
@@ -53,10 +53,10 @@ final class DoctrineWorldRegionUnitRepository implements WorldRegionUnitReposito
 
     /**
      * @param Player $player
-     * @param GameUnitType[] $gameUnitTypes
+     * @param GameUnitCategory[] $gameUnitCategories
      * @return array<int|string, int>
      */
-    public function getGameUnitSumByPlayerAndGameUnitTypes(Player $player, array $gameUnitTypes): array
+    public function getGameUnitSumByPlayerAndGameUnitCategories(Player $player, array $gameUnitCategories): array
     {
         $results = $this->entityManager
             ->createQuery(
@@ -64,10 +64,10 @@ final class DoctrineWorldRegionUnitRepository implements WorldRegionUnitReposito
               FROM ' . WorldRegionUnit::class . ' wru
               JOIN ' . WorldRegion::class . ' wr ON wru.worldRegion = wr
               JOIN ' . GameUnit::class . ' gu ON wru.gameUnit = gu
-              WHERE wr.player = :player AND gu.gameUnitType IN (:gameUnitTypes)
+              WHERE wr.player = :player AND gu.gameUnitCategory IN (:gameUnitCategories)
               GROUP BY gu.id'
             )->setParameter('player', $player)
-            ->setParameter('gameUnitTypes', $gameUnitTypes)
+            ->setParameter('gameUnitCategories', $gameUnitCategories)
             ->getArrayResult();
 
         $gameUnits = [];

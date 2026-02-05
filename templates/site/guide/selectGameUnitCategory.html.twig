@@ -7,8 +7,8 @@
         </tr>
         <tr>
             <td>
-                {% for gameUnitType in gameUnitTypes %}
-                    <a href="{{ path('Guide/ListUnits', {'gameUnitTypeId': gameUnitType.id}) }}" class="B">{{ gameUnitType.name }}</a><br />
+                {% for gameUnitCategory in gameUnitCategories %}
+                    <a href="{{ path('Guide/ListUnits', {'gameUnitCategoryId': gameUnitCategory.value}) }}" class="B">{{ gameUnitCategory.label }}</a><br />
                 {% endfor %}
             </td>
         </tr>

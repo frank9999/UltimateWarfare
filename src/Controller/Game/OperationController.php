@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace FrankProjects\UltimateWarfare\Controller\Game;
 
-use FrankProjects\UltimateWarfare\Entity\GameUnitType;
-use FrankProjects\UltimateWarfare\Exception\GameUnitTypeNotFoundException;
+use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitCategory;
 use FrankProjects\UltimateWarfare\Exception\WorldRegionNotFoundException;
-use FrankProjects\UltimateWarfare\Repository\GameUnitTypeRepository;
 use FrankProjects\UltimateWarfare\Repository\OperationRepository;
 use FrankProjects\UltimateWarfare\Repository\WorldRegionRepository;
 use FrankProjects\UltimateWarfare\Service\Action\RegionActionService;
@@ -20,20 +18,17 @@ final class OperationController extends BaseGameController
 {
     private OperationRepository $operationRepository;
     private WorldRegionRepository $worldRegionRepository;
-    private GameUnitTypeRepository $gameUnitTypeRepository;
     private RegionActionService $regionActionService;
     private OperationService $operationService;
 
     public function __construct(
         OperationRepository $operationRepository,
         WorldRegionRepository $worldRegionRepository,
-        GameUnitTypeRepository $gameUnitTypeRepository,
         RegionActionService $regionActionService,
         OperationService $operationService
     ) {
         $this->operationRepository = $operationRepository;
         $this->worldRegionRepository = $worldRegionRepository;
-        $this->gameUnitTypeRepository = $gameUnitTypeRepository;
         $this->regionActionService = $regionActionService;
         $this->operationService = $operationService;
     }
@@ -127,8 +122,7 @@ final class OperationController extends BaseGameController
 
         try {
             $worldRegion = $this->regionActionService->getWorldRegionByIdAndWorld($regionId, $player->getWorld());
-            $gameUnitType = $this->gameUnitTypeRepository->find(GameUnitType::GAME_UNIT_TYPE_UNITS);
-        } catch (WorldRegionNotFoundException | GameUnitTypeNotFoundException $e) {
+        } catch (WorldRegionNotFoundException $e) {
             $this->addFlash('error', $e->getMessage());
             return $this->redirectToRoute('Game/RegionList', [], 302);
         }
@@ -151,7 +145,7 @@ final class OperationController extends BaseGameController
                 'region' => $worldRegion,
                 'player' => $player,
                 'operations' => $operations,
-                'gameUnitType' => $gameUnitType
+                'gameUnitCategory' => GameUnitCategory::UNITS
             ]
         );
     }

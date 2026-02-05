@@ -22,7 +22,7 @@
                     {{ gameUnit.description }}
                 </td>
                 <td>
-                    {{ gameUnit.gameUnitType.name }}
+                    {{ gameUnit.gameUnitCategory.label }}
                 </td>
                 <td>
                     <a class="btn btn-primary" href="{{ path('Admin/GameUnit/Edit', {'gameUnitId': gameUnit.id}) }}">Edit</a><br />

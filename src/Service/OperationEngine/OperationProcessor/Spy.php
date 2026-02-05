@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace FrankProjects\UltimateWarfare\Service\OperationEngine\OperationProcessor;
 
-use FrankProjects\UltimateWarfare\Entity\GameUnitType;
+use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitCategory;
 use FrankProjects\UltimateWarfare\Entity\Report;
 use FrankProjects\UltimateWarfare\Service\OperationEngine\OperationProcessor;
 
@@ -30,7 +30,7 @@ final class Spy extends OperationProcessor
         $this->addToOperationLog("Searching for buildings...");
         $buildingsFound = false;
         foreach ($this->region->getWorldRegionUnits() as $worldRegionUnit) {
-            if ($worldRegionUnit->getGameUnit()->getGameUnitType()->getId() === GameUnitType::GAME_UNIT_TYPE_BUILDINGS) {
+            if ($worldRegionUnit->getGameUnit()->getGameUnitCategory() === GameUnitCategory::BUILDINGS) {
                 $this->addToOperationLog(
                     "- {$worldRegionUnit->getAmount()} {$worldRegionUnit->getGameUnit()->getNameMulti()}"
                 );
@@ -47,7 +47,7 @@ final class Spy extends OperationProcessor
         $this->addToOperationLog("Searching for units...");
         $unitsFound = false;
         foreach ($this->region->getWorldRegionUnits() as $worldRegionUnit) {
-            if ($worldRegionUnit->getGameUnit()->getGameUnitType()->getId() === GameUnitType::GAME_UNIT_TYPE_UNITS) {
+            if ($worldRegionUnit->getGameUnit()->getGameUnitCategory() === GameUnitCategory::UNITS) {
                 $this->addToOperationLog(
                     "- {$worldRegionUnit->getAmount()} {$worldRegionUnit->getGameUnit()->getNameMulti()}"
                 );
