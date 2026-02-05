@@ -539,6 +539,11 @@ Game/Reports:
     requirements:
         type: '\d+'
 
+Game/Reports/Api:
+    path:      /game/api/reports
+    controller: FrankProjects\UltimateWarfare\Controller\Game\ReportController::reportsApi
+    methods: [GET]
+
 Game/Research:
     path:      /game/research
     controller: FrankProjects\UltimateWarfare\Controller\Game\ResearchController::research
