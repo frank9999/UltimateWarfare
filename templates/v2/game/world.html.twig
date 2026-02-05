@@ -1278,22 +1278,18 @@
                 const tab = document.createElement('div');
                 tab.className = 'build-tab' + (index === 0 ? ' active' : '');
                 tab.textContent = type.name;
-                tab.onclick = () => selectBuildTab(type.id);
+                tab.addEventListener('click', () => {
+                    const categoryId = type.id;
+                    const tabs = document.querySelectorAll('#buildTabs .build-tab');
+                    tabs.forEach((t, i) => {
+                        t.classList.toggle('active', gameUnitCategories[i].id === categoryId);
+                    });
+                    loadBuildData(categoryId);
+                });
                 tabsContainer.appendChild(tab);
             });
 
             loadBuildData(selectedGameUnitCategoryId);
-        }
-
-        function selectBuildTab(gameUnitCategoryId) {
-            selectedGameUnitCategoryId = gameUnitCategoryId;
-
-            const tabs = document.querySelectorAll('.build-tab');
-            tabs.forEach((tab, index) => {
-                tab.classList.toggle('active', gameUnitCategories[index].id === gameUnitCategoryId);
-            });
-
-            loadBuildData(gameUnitCategoryId);
         }
 
         async function loadBuildData(gameUnitCategoryId) {
