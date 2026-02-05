@@ -22,6 +22,18 @@ class TileRenderer {
                 this.config.tileHeight
             );
 
+            // Draw fog of war if region is not visible
+            if (region.isVisible === false) {
+                this.renderFogOfWar(
+                    iso.x,
+                    iso.y,
+                    this.config.tileWidth,
+                    this.config.tileHeight,
+                    region.x,
+                    region.y
+                );
+            }
+
             // Add ownership overlay if enabled
             if (this.config.overlaysEnabled) {
                 this.renderOwnershipOverlay(region, iso);
@@ -85,7 +97,8 @@ class TileRenderer {
 
         // Owner name if applicable
         if (region.hasOwner && region.ownerName) {
-            this.ctx.font = '8px Arial';
+            this.ctx.fillStyle = region.isYours ? 'rgba(100, 150, 255, 0.95)' : 'rgba(255, 100, 100, 0.95)';
+            this.ctx.font = '10px Arial';
             this.ctx.strokeText(region.ownerName, iso.x, iso.y + 2);
             this.ctx.fillText(region.ownerName, iso.x, iso.y + 2);
         }
@@ -155,6 +168,74 @@ class TileRenderer {
      */
     renderUnitIndicators(region, isoX, isoY) {
         this.unitRenderer.renderUnitIndicators(region, isoX, isoY, this.config.tileHeight);
+    }
+
+    /**
+     * Render fog of war as a semi-transparent cloud overlay
+     * Highly optimized for performance with static shapes
+     */
+    renderFogOfWar(isoX, isoY, tileWidth, tileHeight, tileX, tileY) {
+        // Save context state
+        this.ctx.save();
+
+        // Create diamond shape clipping path
+        this.ctx.beginPath();
+        this.ctx.moveTo(isoX, isoY - tileHeight / 2);
+        this.ctx.lineTo(isoX + tileWidth / 2, isoY);
+        this.ctx.lineTo(isoX, isoY + tileHeight / 2);
+        this.ctx.lineTo(isoX - tileWidth / 2, isoY);
+        this.ctx.closePath();
+        this.ctx.clip();
+
+        // Base dark overlay with subtle gradient (50% transparent)
+        const baseGradient = this.ctx.createRadialGradient(
+            isoX, isoY, 0,
+            isoX, isoY, tileWidth / 2
+        );
+        baseGradient.addColorStop(0, 'rgba(25, 25, 35, 0.45)');
+        baseGradient.addColorStop(1, 'rgba(15, 15, 25, 0.5)');
+        this.ctx.fillStyle = baseGradient;
+        this.ctx.fill();
+
+        // Add static cloud effect (cheap to render)
+        // Using deterministic positions based on tile coordinates for consistency
+        const seed = tileX * 73 + tileY * 37;
+        const numClouds = 2; // Keep minimal for performance
+
+        for (let i = 0; i < numClouds; i++) {
+            const angle = ((seed + i * 100) % 360) * Math.PI / 180;
+            const offsetX = Math.cos(angle) * 12;
+            const offsetY = Math.sin(angle) * 8;
+            const radius = 25 + ((seed + i * 50) % 10);
+
+            const gradient = this.ctx.createRadialGradient(
+                isoX + offsetX, isoY + offsetY, 0,
+                isoX + offsetX, isoY + offsetY, radius
+            );
+            gradient.addColorStop(0, 'rgba(50, 50, 70, 0.25)');
+            gradient.addColorStop(0.5, 'rgba(40, 40, 60, 0.15)');
+            gradient.addColorStop(1, 'rgba(30, 30, 50, 0)');
+
+            this.ctx.fillStyle = gradient;
+            this.ctx.fillRect(
+                isoX - tileWidth / 2,
+                isoY - tileHeight / 2,
+                tileWidth,
+                tileHeight
+            );
+        }
+
+        // Add question mark in center for unknown territory (50% transparent)
+        this.ctx.fillStyle = 'rgba(160, 160, 180, 0.5)';
+        this.ctx.font = 'bold 28px Arial';
+        this.ctx.textAlign = 'center';
+        this.ctx.textBaseline = 'middle';
+        this.ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+        this.ctx.shadowBlur = 4;
+        this.ctx.fillText('?', isoX, isoY);
+
+        // Restore context state (removes clipping and shadow)
+        this.ctx.restore();
     }
 }
 

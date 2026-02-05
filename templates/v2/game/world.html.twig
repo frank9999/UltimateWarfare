@@ -1571,6 +1571,7 @@
                 hasOwner: {{ region.hasOwner ? 'true' : 'false' }},
                 isYours: {{ region.isYours ? 'true' : 'false' }},
                 ownerName: {{ region.ownerName|json_encode|raw }},
+                isVisible: {{ region.isVisible ? 'true' : 'false' }},
                 units: {{ region.units|json_encode|raw }}
             }{% if not loop.last %},{% endif %}
             {% endfor %}

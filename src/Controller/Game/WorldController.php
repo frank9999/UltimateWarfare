@@ -150,9 +150,15 @@ final class WorldController extends BaseGameController
 
     private function getWorldRegionsData(World $world, Player $player): array
     {
+        $playerRegions = $this->getPlayerRegionCoordinates($player);
+        $visibleRegions = $this->calculateVisibleRegions($playerRegions);
+        
         $regions = [];
         foreach ($world->getWorldRegions() as $region) {
             $isYours = $region->getPlayer() !== null && $region->getPlayer()->getId() === $player->getId();
+            $coordinates = $region->getX() . ',' . $region->getY();
+            // If player has no regions, make everything visible (no fog of war yet)
+            $isVisible = empty($playerRegions) || isset($visibleRegions[$coordinates]);
             
             $regionData = [
                 'x' => $region->getX(),
@@ -163,6 +169,7 @@ final class WorldController extends BaseGameController
                 'hasOwner' => $region->getPlayer() !== null,
                 'isYours' => $isYours,
                 'ownerName' => $region->getPlayer()?->getName(),
+                'isVisible' => $isVisible,
                 'units' => [],
             ];
 
@@ -175,6 +182,44 @@ final class WorldController extends BaseGameController
         }
 
         return $regions;
+    }
+
+    /**
+     * Get coordinates of all regions owned by the player
+     * @return array<string, true>
+     */
+    private function getPlayerRegionCoordinates(Player $player): array
+    {
+        $coordinates = [];
+        foreach ($player->getWorldRegions() as $region) {
+            $coordinates[$region->getX() . ',' . $region->getY()] = true;
+        }
+        return $coordinates;
+    }
+
+    /**
+     * Calculate which regions are visible (owned + directly adjacent)
+     * @param array<string, true> $playerRegions
+     * @return array<string, true>
+     */
+    private function calculateVisibleRegions(array $playerRegions): array
+    {
+        $visibleRegions = $playerRegions;
+        
+        // For each owned region, add all 4 adjacent regions
+        foreach (array_keys($playerRegions) as $coordString) {
+            [$x, $y] = explode(',', $coordString);
+            $x = (int)$x;
+            $y = (int)$y;
+            
+            // Add 4 adjacent tiles (up, down, left, right in isometric grid)
+            $visibleRegions[($x - 1) . ',' . $y] = true;  // Left
+            $visibleRegions[($x + 1) . ',' . $y] = true;  // Right
+            $visibleRegions[$x . ',' . ($y - 1)] = true;  // Up
+            $visibleRegions[$x . ',' . ($y + 1)] = true;  // Down
+        }
+        
+        return $visibleRegions;
     }
 
     /**
