@@ -11,6 +11,7 @@ use FrankProjects\UltimateWarfare\Repository\GameUnitRepository;
 use FrankProjects\UltimateWarfare\Repository\WorldRegionRepository;
 use FrankProjects\UltimateWarfare\Service\Action\ConstructionActionService;
 use FrankProjects\UltimateWarfare\Service\Action\RegionActionService;
+use FrankProjects\UltimateWarfare\Service\GameUnit\GameUnitBehaviorFactory;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -24,19 +25,22 @@ final class ConstructionController extends BaseGameController
     private ConstructionActionService $constructionActionService;
     private RegionActionService $regionActionService;
     private GameUnitRepository $gameUnitRepository;
+    private GameUnitBehaviorFactory $behaviorFactory;
 
     public function __construct(
         ConstructionRepository $constructionRepository,
         WorldRegionRepository $worldRegionRepository,
         ConstructionActionService $constructionActionService,
         RegionActionService $regionActionService,
-        GameUnitRepository $gameUnitRepository
+        GameUnitRepository $gameUnitRepository,
+        GameUnitBehaviorFactory $behaviorFactory
     ) {
         $this->constructionRepository = $constructionRepository;
         $this->worldRegionRepository = $worldRegionRepository;
         $this->constructionActionService = $constructionActionService;
         $this->regionActionService = $regionActionService;
         $this->gameUnitRepository = $gameUnitRepository;
+        $this->behaviorFactory = $behaviorFactory;
     }
 
     public function construction(int $gameUnitCategoryId): Response
@@ -283,13 +287,9 @@ final class ConstructionController extends BaseGameController
         $constructionData = $this->constructionRepository->getGameUnitConstructionSumByWorldRegion($worldRegion);
         $spaceLeft = $this->constructionActionService->getBuildingSpaceLeft($gameUnitCategory, $worldRegion);
 
+        $gameUnits = $this->gameUnitRepository->findByGameUnitCategory($gameUnitCategory);
         $units = [];
-        foreach ($worldRegion->getWorldRegionUnits() as $worldRegionUnit) {
-            $gameUnit = $worldRegionUnit->getGameUnit();
-            if ($gameUnit->getGameUnitCategory() !== $gameUnitCategory) {
-                continue;
-            }
-
+        foreach ($gameUnits as $gameUnit) {
             // Check if unit can be built here
             $behavior = $this->behaviorFactory->create($gameUnit);
             $canBuild = $behavior->canBuild($worldRegion, $this->getPlayer());
