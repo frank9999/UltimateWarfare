@@ -21,7 +21,7 @@
 
             {% set gameUnitInConstruction = 0 %}
             {% for gameUnit in gameUnits %}
-                {% if constructionData[gameUnit.id] is defined and constructionData[gameUnit.id] > 0 %}
+                {% if gameUnit.gameUnitCategory == gameUnitCategory and constructionData[gameUnit.id] is defined and constructionData[gameUnit.id] > 0 %}
                     {% set gameUnitInConstruction = 1 %}
                     <tr>
                         <td width="350">{{ gameUnit.nameMulti }}:</td>
