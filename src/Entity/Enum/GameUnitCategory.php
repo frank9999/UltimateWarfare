@@ -11,6 +11,9 @@ enum GameUnitCategory: int
     case SPECIAL_BUILDINGS = 3;
     case UNITS = 4;
     case SPECIAL_UNITS = 5;
+    case TROOPS = 6;
+    case NAVAL_UNITS = 7;
+    case AIR_UNITS = 8;
 
     public function getImageDir(): string
     {
@@ -20,6 +23,7 @@ enum GameUnitCategory: int
             self::SPECIAL_BUILDINGS => 'units/special_buildings/',
             self::UNITS => 'units/units/',
             self::SPECIAL_UNITS => 'units/special_units/',
+            default => 'units/units/'
         };
     }
 
@@ -31,6 +35,9 @@ enum GameUnitCategory: int
             self::SPECIAL_BUILDINGS => 'Special Buildings',
             self::UNITS => 'Units',
             self::SPECIAL_UNITS => 'Elite Units',
+            self::TROOPS => 'Troops',
+            self::NAVAL_UNITS => 'Naval Units',
+            self::AIR_UNITS => 'Air Units',
         };
     }
 
@@ -63,7 +70,10 @@ enum GameUnitCategory: int
             self::DEFENSE_BUILDINGS,
             self::SPECIAL_BUILDINGS,
             self::UNITS,
-            self::SPECIAL_UNITS
+            self::SPECIAL_UNITS,
+            self::TROOPS,
+            self::NAVAL_UNITS,
+            self::AIR_UNITS
         ];
     }
 }
