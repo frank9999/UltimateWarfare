@@ -9,11 +9,11 @@ enum GameUnitCategory: int
     case BUILDINGS = 1;
     case DEFENSE_BUILDINGS = 2;
     case SPECIAL_BUILDINGS = 3;
-    case UNITS = 4;
     case SPECIAL_UNITS = 5;
     case TROOPS = 6;
     case NAVAL_UNITS = 7;
     case AIR_UNITS = 8;
+    case MISSILES = 9;
 
     public function getImageDir(): string
     {
@@ -21,9 +21,7 @@ enum GameUnitCategory: int
             self::BUILDINGS => 'units/buildings/',
             self::DEFENSE_BUILDINGS => 'units/defense_buildings/',
             self::SPECIAL_BUILDINGS => 'units/special_buildings/',
-            self::UNITS => 'units/units/',
-            self::SPECIAL_UNITS => 'units/special_units/',
-            default => 'units/units/'
+            default => 'units/'
         };
     }
 
@@ -33,11 +31,11 @@ enum GameUnitCategory: int
             self::BUILDINGS => 'Buildings',
             self::DEFENSE_BUILDINGS => 'Defense Buildings',
             self::SPECIAL_BUILDINGS => 'Special Buildings',
-            self::UNITS => 'Units',
             self::SPECIAL_UNITS => 'Elite Units',
             self::TROOPS => 'Troops',
             self::NAVAL_UNITS => 'Naval Units',
             self::AIR_UNITS => 'Air Units',
+            self::MISSILES => 'Missiles'
         };
     }
 
@@ -69,11 +67,11 @@ enum GameUnitCategory: int
             self::BUILDINGS,
             self::DEFENSE_BUILDINGS,
             self::SPECIAL_BUILDINGS,
-            self::UNITS,
             self::SPECIAL_UNITS,
             self::TROOPS,
             self::NAVAL_UNITS,
-            self::AIR_UNITS
+            self::AIR_UNITS,
+            self::MISSILES
         ];
     }
 }

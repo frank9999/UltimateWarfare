@@ -29,8 +29,10 @@ final class HeadquarterController extends BaseGameController
     public function army(): Response
     {
         $gameUnitCategories = [
-            GameUnitCategory::UNITS,
-            GameUnitCategory::SPECIAL_UNITS
+            GameUnitCategory::TROOPS,
+            GameUnitCategory::AIR_UNITS,
+            GameUnitCategory::NAVAL_UNITS,
+            GameUnitCategory::MISSILES
         ];
 
         $gameUnits = $this->gameUnitRepository->findAll();

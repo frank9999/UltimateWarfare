@@ -4,7 +4,7 @@
     <id name="id" type="integer" column="id">
       <generator strategy="IDENTITY"/>
     </id>
-    <field name="name" column="name" length="20">
+    <field name="name" column="name" length="25">
       <options>
         <option name="fixed"/>
       </options>
@@ -14,7 +14,7 @@
         <option name="fixed"/>
       </options>
     </field>
-    <field name="rowName" column="row_name" length="20">
+    <field name="rowName" column="row_name" length="25">
       <options>
         <option name="fixed"/>
       </options>
@@ -39,7 +39,7 @@
         <option name="fixed"/>
       </options>
     </field>
-    <field name="behaviorClass" column="behavior_class" length="100">
+    <field name="behaviorClass" column="behavior_class" length="100" nullable="true">
       <options>
         <option name="fixed"/>
       </options>
