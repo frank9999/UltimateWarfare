@@ -46,6 +46,11 @@ final class DoctrineGameUnitRepository implements GameUnitRepository
         return $this->repository->findBy(['gameUnitCategory' => $gameUnitCategory]);
     }
 
+    public function findByGameUnitCategories(array $gameUnitCategories): array
+    {
+        return $this->repository->findBy(['gameUnitCategory' => $gameUnitCategories]);
+    }
+
     public function save(GameUnit $gameUnit): void
     {
         $this->entityManager->persist($gameUnit);

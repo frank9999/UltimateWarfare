@@ -232,14 +232,20 @@ final class WorldController extends BaseGameController
             'buildings' => 0,
             'defences' => 0,
             'special' => 0,
-            'units' => 0,
             'specialUnits' => 0,
+            'troops' => 0,
+            'navalUnits' => 0,
+            'airUnits' => 0,
+            'missiles' => 0,
             'details' => [
                 'buildings' => [],
                 'defences' => [],
                 'special' => [],
-                'units' => [],
                 'specialUnits' => [],
+                'troops' => [],
+                'navalUnits' => [],
+                'airUnits' => [],
+                'missiles' => [],
             ],
         ];
 
@@ -252,8 +258,11 @@ final class WorldController extends BaseGameController
                 GameUnitCategory::BUILDINGS => $this->addUnitToSummary($summary, 'buildings', $unitName, $amount),
                 GameUnitCategory::DEFENSE_BUILDINGS => $this->addUnitToSummary($summary, 'defences', $unitName, $amount),
                 GameUnitCategory::SPECIAL_BUILDINGS => $this->addUnitToSummary($summary, 'special', $unitName, $amount),
-                GameUnitCategory::UNITS => $this->addUnitToSummary($summary, 'units', $unitName, $amount),
                 GameUnitCategory::SPECIAL_UNITS => $this->addUnitToSummary($summary, 'specialUnits', $unitName, $amount),
+                GameUnitCategory::TROOPS => $this->addUnitToSummary($summary, 'troops', $unitName, $amount),
+                GameUnitCategory::NAVAL_UNITS => $this->addUnitToSummary($summary, 'navalUnits', $unitName, $amount),
+                GameUnitCategory::AIR_UNITS => $this->addUnitToSummary($summary, 'airUnits', $unitName, $amount),
+                GameUnitCategory::MISSILES => $this->addUnitToSummary($summary, 'missiles', $unitName, $amount),
             };
         }
 

@@ -47,7 +47,7 @@ final class Spy extends OperationProcessor
         $this->addToOperationLog("Searching for units...");
         $unitsFound = false;
         foreach ($this->region->getWorldRegionUnits() as $worldRegionUnit) {
-            if ($worldRegionUnit->getGameUnit()->getGameUnitCategory() === GameUnitCategory::UNITS) {
+            if ($worldRegionUnit->getGameUnit()->getGameUnitCategory() === GameUnitCategory::TROOPS) {
                 $this->addToOperationLog(
                     "- {$worldRegionUnit->getAmount()} {$worldRegionUnit->getGameUnit()->getNameMulti()}"
                 );

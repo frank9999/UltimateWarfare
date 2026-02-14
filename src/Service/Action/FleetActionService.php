@@ -115,7 +115,6 @@ final class FleetActionService
         WorldRegion $region,
         WorldRegion $targetRegion,
         Player $player,
-        GameUnitCategory $gameUnitCategory,
         array $unitData
     ): void {
         if ($targetRegion->getWorld()->getId() !== $player->getWorld()->getId()) {
@@ -138,7 +137,7 @@ final class FleetActionService
                 continue;
             }
 
-            if ($gameUnit->getGameUnitCategory() !== $gameUnitCategory) {
+            if ($gameUnit->getGameUnitCategory()->isSendable() === false) {
                 continue;
             }
 

@@ -149,7 +149,6 @@ final class FleetController extends BaseGameController
                     $worldRegion,
                     $targetRegion,
                     $player,
-                    GameUnitCategory::UNITS,
                     $units
                 );
                 $this->addFlash('success', 'You successfully send units!');
@@ -160,7 +159,12 @@ final class FleetController extends BaseGameController
 
         $gameUnitsData = $this->worldRegionRepository->getWorldGameUnitSumByWorldRegion($worldRegion);
         $targetRegions = $this->getTargetWorldRegionData($player, $worldRegion);
-        $gameUnits = $this->gameUnitRepository->findByGameUnitCategory(GameUnitCategory::UNITS);
+        $gameUnits = $this->gameUnitRepository->findByGameUnitCategories([
+            GameUnitCategory::TROOPS,
+            GameUnitCategory::AIR_UNITS,
+            GameUnitCategory::NAVAL_UNITS,
+            GameUnitCategory::SPECIAL_UNITS
+        ]);
 
         return $this->render(
             'game/region/sendUnits.html.twig',

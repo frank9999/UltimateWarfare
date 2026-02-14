@@ -144,8 +144,7 @@ final class OperationController extends BaseGameController
             [
                 'region' => $worldRegion,
                 'player' => $player,
-                'operations' => $operations,
-                'gameUnitCategory' => GameUnitCategory::UNITS
+                'operations' => $operations
             ]
         );
     }

@@ -94,14 +94,18 @@ final class AttackController extends BaseGameController
                 $playerRegion,
                 $worldRegion,
                 $player,
-                GameUnitCategory::UNITS,
                 $units
             );
             return $this->redirectToRoute('Game/Fleets', [], 302);
         }
 
         $gameUnitsData = $this->worldRegionRepository->getWorldGameUnitSumByWorldRegion($playerRegion);
-        $gameUnits = $this->gameUnitRepository->findByGameUnitCategory(GameUnitCategory::UNITS);
+        $gameUnits = $this->gameUnitRepository->findByGameUnitCategories([
+            GameUnitCategory::TROOPS,
+            GameUnitCategory::AIR_UNITS,
+            GameUnitCategory::NAVAL_UNITS,
+        ]);
+
         return $this->render(
             'game/region/attackSelectGameUnits.html.twig',
             [

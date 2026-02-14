@@ -135,14 +135,7 @@ final class ConstructionController extends BaseGameController
 
     private function addConstructGameUnitsFlash(GameUnitCategory $gameUnitCategory): void
     {
-        /**
-         * XXX TODO: Refactor to show what game units are being built/trained
-         */
-        if ($gameUnitCategory === GameUnitCategory::UNITS) {
-            $this->addFlash('success', 'New units are now being trained!');
-        } else {
-            $this->addFlash('success', 'New buildings are now being built!');
-        }
+        $this->addFlash('success', "New {$gameUnitCategory->getLabel()} are now being {$gameUnitCategory->getConstructionAction()}!");
     }
 
     public function removeGameUnits(Request $request, int $regionId, int $gameUnitCategoryId): Response
@@ -192,14 +185,7 @@ final class ConstructionController extends BaseGameController
 
     private function addRemoveGameUnitsFlash(GameUnitCategory $gameUnitCategory): void
     {
-        /**
-         * XXX TODO: Refactor to show what game units are being destroyed/disbanded
-         */
-        if ($gameUnitCategory === GameUnitCategory::UNITS) {
-            $this->addFlash('success', "You have disbanded units!");
-        } else {
-            $this->addFlash('success', "You have destroyed buildings!");
-        }
+        $this->addFlash('success', "You have {$gameUnitCategory->getRemoveGameUnitActionDescription()} {$gameUnitCategory->getLabel()}!");
     }
 
     public function cancel(int $constructionId): RedirectResponse
@@ -245,9 +231,7 @@ final class ConstructionController extends BaseGameController
             );
 
             $player = $this->getPlayer();
-            $message = $gameUnitCategory === GameUnitCategory::UNITS
-                ? 'New units are now being trained!'
-                : 'New buildings are now being built!';
+            $message = "New {$gameUnitCategory->getLabel()} are now being {$gameUnitCategory->getConstructionAction()}!";
 
             return new JsonResponse([
                 'success' => true,

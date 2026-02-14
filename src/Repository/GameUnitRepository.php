@@ -21,5 +21,11 @@ interface GameUnitRepository
      */
     public function findByGameUnitCategory(GameUnitCategory $gameUnitCategory): array;
 
+    /**
+     * @param GameUnitCategory[] $gameUnitCategories
+     * @return GameUnit[]
+     */
+    public function findByGameUnitCategories(array $gameUnitCategories): array;
+
     public function save(GameUnit $gameUnit): void;
 }

@@ -74,4 +74,31 @@ enum GameUnitCategory: int
             self::MISSILES
         ];
     }
+
+    public function isSendable(): bool
+    {
+        return in_array($this, [
+            self::SPECIAL_UNITS,
+            self::TROOPS,
+            self::NAVAL_UNITS,
+            self::AIR_UNITS,
+            self::MISSILES
+        ]);
+    }
+
+    public function getConstructionAction(): string
+    {
+        return match($this) {
+            self::BUILDINGS, self::DEFENSE_BUILDINGS, self::SPECIAL_BUILDINGS, self::NAVAL_UNITS, self::AIR_UNITS, self::MISSILES => 'built',
+            self::SPECIAL_UNITS, self::TROOPS => 'trained'
+        };
+    }
+
+    public function getRemoveGameUnitActionDescription(): string
+    {
+        return match($this) {
+            self::BUILDINGS, self::DEFENSE_BUILDINGS, self::SPECIAL_BUILDINGS, self::NAVAL_UNITS, self::AIR_UNITS, self::MISSILES => 'destroyed',
+            self::SPECIAL_UNITS, self::TROOPS => 'disbanded'
+        };
+    }
 }
