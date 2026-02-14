@@ -1272,6 +1272,7 @@
         function showBuildModal(region) {
             selectedBuildRegion = region;
             buildQuantities = {};
+            selectedGameUnitCategoryId = 1;
             document.getElementById('buildRegionCoords').textContent = `${region.x}, ${region.y}`;
             buildModal.style.display = 'block';
 
@@ -1283,6 +1284,7 @@
                 tab.textContent = type.name;
                 tab.addEventListener('click', () => {
                     const categoryId = type.id;
+                    selectedGameUnitCategoryId = categoryId;
                     const tabs = document.querySelectorAll('#buildTabs .build-tab');
                     tabs.forEach((t, i) => {
                         t.classList.toggle('active', gameUnitCategories[i].id === categoryId);
