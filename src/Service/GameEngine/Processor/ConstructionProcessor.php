@@ -22,24 +22,32 @@ final class ConstructionProcessor implements Processor
     private ReportRepository $reportRepository;
     private WorldRegionUnitRepository $worldRegionUnitRepository;
     private NetWorthUpdaterService $netWorthUpdaterService;
+    private int $constructionTimeOverride;
 
     public function __construct(
         ConstructionRepository $constructionRepository,
         PlayerRepository $playerRepository,
         ReportRepository $reportRepository,
         WorldRegionUnitRepository $worldRegionUnitRepository,
-        NetWorthUpdaterService $netWorthUpdaterService
+        NetWorthUpdaterService $netWorthUpdaterService,
+        int $constructionTimeOverride
     ) {
         $this->constructionRepository = $constructionRepository;
         $this->playerRepository = $playerRepository;
         $this->reportRepository = $reportRepository;
         $this->worldRegionUnitRepository = $worldRegionUnitRepository;
         $this->netWorthUpdaterService = $netWorthUpdaterService;
+        $this->constructionTimeOverride = $constructionTimeOverride;
     }
 
     public function run(int $timestamp): void
     {
-        $constructions = $this->constructionRepository->getCompletedConstructions($timestamp);
+        // Override construction time for testing purposes
+        if ($this->constructionTimeOverride > 0) {
+            $constructions = $this->constructionRepository->getAllConstructions();
+        } else {
+            $constructions = $this->constructionRepository->getCompletedConstructions($timestamp);
+        }
 
         foreach ($constructions as $construction) {
             $worldRegion = $construction->getWorldRegion();

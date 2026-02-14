@@ -44,6 +44,11 @@ interface ConstructionRepository
      */
     public function getCompletedConstructions(int $timestamp): array;
 
+    /**
+     * @return Construction[]
+     */
+    public function getAllConstructions(): array;
+
     public function remove(Construction $construction): void;
 
     public function save(Construction $construction): void;

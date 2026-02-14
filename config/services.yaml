@@ -7,6 +7,9 @@ parameters:
     app.gg_recaptcha_site_key: '%env(GOOGLE_RECAPTCHA_SITE_KEY)%'
     app.avatars_directory: '%kernel.project_dir%/var/uploads/avatars'
     app.uw_forum_enabled: '%env(bool:UW_FORUM_ENABLED)%'
+    app.uw_construction_time_override: '%env(default::int:UW_CONSTRUCTION_TIME_OVERRIDE)%'
+    app.uw_research_time_override: '%env(default::int:UW_RESEARCH_TIME_OVERRIDE)%'
+    app.uw_fleet_travel_time_override: '%env(default::int:UW_FLEET_TRAVEL_TIME_OVERRIDE)%'
 
 services:
     # default configuration for services in *this* file
@@ -32,6 +35,17 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+    FrankProjects\UltimateWarfare\Service\GameEngine\Processor\ConstructionProcessor:
+        arguments:
+            $constructionTimeOverride: '%app.uw_construction_time_override%'
+
+    FrankProjects\UltimateWarfare\Service\GameEngine\Processor\ResearchProcessor:
+        arguments:
+            $researchTimeOverride: '%app.uw_research_time_override%'
+
+    FrankProjects\UltimateWarfare\Util\DistanceCalculator:
+        arguments:
+            $fleetTravelTimeOverride: '%app.uw_fleet_travel_time_override%'
 
     ReCaptcha\ReCaptcha:
         arguments:

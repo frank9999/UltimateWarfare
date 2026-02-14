@@ -15,20 +15,28 @@ final class ResearchProcessor implements Processor
     private ResearchPlayerRepository $researchPlayerRepository;
     private ReportRepository $reportRepository;
     private NetWorthUpdaterService $netWorthUpdaterService;
+    private int $researchTimeOverride;
 
     public function __construct(
         ResearchPlayerRepository $researchPlayerRepository,
         ReportRepository $reportRepository,
-        NetWorthUpdaterService $netWorthUpdaterService
+        NetWorthUpdaterService $netWorthUpdaterService,
+        int $researchTimeOverride
     ) {
         $this->researchPlayerRepository = $researchPlayerRepository;
         $this->reportRepository = $reportRepository;
         $this->netWorthUpdaterService = $netWorthUpdaterService;
+        $this->researchTimeOverride = $researchTimeOverride;
     }
 
     public function run(int $timestamp): void
     {
-        $researches = $this->researchPlayerRepository->getNonActiveCompletedResearch($timestamp);
+        // Override research time for testing purposes
+        if ($this->researchTimeOverride > 0) {
+            $researches = $this->researchPlayerRepository->getAllNonActiveResearch();
+        } else {
+            $researches = $this->researchPlayerRepository->getNonActiveCompletedResearch($timestamp);
+        }
 
         foreach ($researches as $researchPlayer) {
             $researchPlayer->setActive(true);

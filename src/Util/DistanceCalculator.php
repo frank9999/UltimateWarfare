@@ -6,6 +6,11 @@ namespace FrankProjects\UltimateWarfare\Util;
 
 final class DistanceCalculator
 {
+    public function __construct(
+        private readonly int $fleetTravelTimeOverride = 0
+    ) {
+    }
+
     public function calculateDistance(int $targetX, int $targetY, int $sourceX, int $sourceY): int
     {
         $differenceX = abs($targetX - $sourceX);
@@ -17,6 +22,10 @@ final class DistanceCalculator
 
     public function calculateDistanceTravelTime(int $targetX, int $targetY, int $sourceX, int $sourceY): int
     {
+        if ($this->fleetTravelTimeOverride === 1) {
+            return 1;
+        }
+
         return $this->calculateDistance($targetX, $targetY, $sourceX, $sourceY) * 100;
     }
 }

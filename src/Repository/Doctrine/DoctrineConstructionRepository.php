@@ -143,6 +143,14 @@ final class DoctrineConstructionRepository implements ConstructionRepository
             ->getResult();
     }
 
+    /**
+     * @return Construction[]
+     */
+    public function getAllConstructions(): array
+    {
+        return $this->repository->findAll();
+    }
+
     public function remove(Construction $construction): void
     {
         $this->entityManager->remove($construction);
