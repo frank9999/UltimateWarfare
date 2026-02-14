@@ -4,11 +4,17 @@ declare(strict_types=1);
 
 namespace FrankProjects\UltimateWarfare\Util;
 
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
+
 final class DistanceCalculator
 {
+    private int $fleetTravelTimeOverride;
+
     public function __construct(
-        private readonly int $fleetTravelTimeOverride = 0
+        #[Autowire(param: 'app.uw_fleet_travel_time_override')]
+        int $fleetTravelTimeOverride
     ) {
+        $this->fleetTravelTimeOverride = $fleetTravelTimeOverride;
     }
 
     public function calculateDistance(int $targetX, int $targetY, int $sourceX, int $sourceY): int
@@ -22,7 +28,7 @@ final class DistanceCalculator
 
     public function calculateDistanceTravelTime(int $targetX, int $targetY, int $sourceX, int $sourceY): int
     {
-        if ($this->fleetTravelTimeOverride === 1) {
+        if ($this->fleetTravelTimeOverride > 0) {
             return 1;
         }
 

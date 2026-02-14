@@ -15,6 +15,7 @@ use FrankProjects\UltimateWarfare\Repository\FleetRepository;
 use FrankProjects\UltimateWarfare\Repository\FleetUnitRepository;
 use FrankProjects\UltimateWarfare\Repository\GameUnitRepository;
 use FrankProjects\UltimateWarfare\Repository\WorldRegionUnitRepository;
+use FrankProjects\UltimateWarfare\Service\FleetFactory;
 use RuntimeException;
 use Doctrine\DBAL\LockMode;
 use Doctrine\ORM\EntityManagerInterface;
@@ -26,19 +27,22 @@ final class FleetActionService
     private GameUnitRepository $gameUnitRepository;
     private WorldRegionUnitRepository $worldRegionUnitRepository;
     private EntityManagerInterface $entityManager;
+    private FleetFactory $fleetFactory;
 
     public function __construct(
         FleetRepository $fleetRepository,
         FleetUnitRepository $fleetUnitRepository,
         GameUnitRepository $gameUnitRepository,
         WorldRegionUnitRepository $worldRegionUnitRepository,
-        EntityManagerInterface $entityManager
+        EntityManagerInterface $entityManager,
+        FleetFactory $fleetFactory
     ) {
         $this->fleetRepository = $fleetRepository;
         $this->fleetUnitRepository = $fleetUnitRepository;
         $this->gameUnitRepository = $gameUnitRepository;
         $this->worldRegionUnitRepository = $worldRegionUnitRepository;
         $this->entityManager = $entityManager;
+        $this->fleetFactory = $fleetFactory;
     }
 
     public function recall(int $fleetId, Player $player): bool
@@ -151,7 +155,7 @@ final class FleetActionService
             throw new RuntimeException('No game units selected to send!');
         }
 
-        $fleet = Fleet::createForPlayer($player, $region, $targetRegion);
+        $fleet = $this->fleetFactory->createForPlayer($player, $region, $targetRegion);
         $this->fleetRepository->save($fleet);
 
         foreach ($gameUnitsToSend as $gameUnitData) {

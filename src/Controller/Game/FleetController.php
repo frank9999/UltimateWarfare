@@ -24,17 +24,20 @@ final class FleetController extends BaseGameController
     private FleetActionService $fleetActionService;
     private RegionActionService $regionActionService;
     private GameUnitRepository $gameUnitRepository;
+    private DistanceCalculator $distanceCalculator;
 
     public function __construct(
         WorldRegionRepository $worldRegionRepository,
         FleetActionService $fleetActionService,
         RegionActionService $regionActionService,
-        GameUnitRepository $gameUnitRepository
+        GameUnitRepository $gameUnitRepository,
+        DistanceCalculator $distanceCalculator
     ) {
         $this->worldRegionRepository = $worldRegionRepository;
         $this->fleetActionService = $fleetActionService;
         $this->regionActionService = $regionActionService;
         $this->gameUnitRepository = $gameUnitRepository;
+        $this->distanceCalculator = $distanceCalculator;
     }
 
     /**
@@ -183,11 +186,9 @@ final class FleetController extends BaseGameController
      */
     private function getTargetWorldRegionData(Player $player, WorldRegion $region): array
     {
-        $distanceCalculator = new DistanceCalculator();
-
         $targetRegions = [];
         foreach ($player->getWorldRegions() as $worldRegion) {
-            $travelTime = $distanceCalculator->calculateDistanceTravelTime(
+            $travelTime = $this->distanceCalculator->calculateDistanceTravelTime(
                 $worldRegion->getX(),
                 $worldRegion->getY(),
                 $region->getX(),
