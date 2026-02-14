@@ -43,10 +43,6 @@ services:
         arguments:
             $researchTimeOverride: '%app.uw_research_time_override%'
 
-    FrankProjects\UltimateWarfare\Util\DistanceCalculator:
-        arguments:
-            $fleetTravelTimeOverride: '%app.uw_fleet_travel_time_override%'
-
     ReCaptcha\ReCaptcha:
         arguments:
             - '%env(GOOGLE_RECAPTCHA_SECRET_KEY)%'
