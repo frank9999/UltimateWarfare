@@ -3,12 +3,12 @@
  * Depends on: notifications.js, modals.js (WorldApp.defaultTileClick)
  */
 (function () {
-    var worldRegions = WorldApp.worldRegions;
-    var playerFleets = WorldApp.playerFleets;
+    const worldRegions = WorldApp.worldRegions;
+    const playerFleets = WorldApp.playerFleets;
 
     console.log('Loading ' + worldRegions.length + ' world regions...');
 
-    var worldMap = new IsometricMap('worldMap', {
+    const worldMap = new IsometricMap('worldMap', {
         tileWidth: 128,
         tileHeight: 64,
         imageBasePath: WorldApp.imageBasePath,
@@ -52,32 +52,32 @@
     });
 
     window.addEventListener('click', function () {
-        var dropdown = document.getElementById('profileDropdown');
+        const dropdown = document.getElementById('profileDropdown');
         if (dropdown && dropdown.classList.contains('show')) {
             dropdown.classList.remove('show');
         }
     });
 
     // ===== Unit Tooltip =====
-    var unitTooltip = document.getElementById('unitTooltip');
+    const unitTooltip = document.getElementById('unitTooltip');
 
     worldMap.canvas.addEventListener('mousemove', function (e) {
-        var rect = worldMap.canvas.getBoundingClientRect();
-        var mouseX = e.clientX - rect.left;
-        var mouseY = e.clientY - rect.top;
+        const rect = worldMap.canvas.getBoundingClientRect();
+        const mouseX = e.clientX - rect.left;
+        const mouseY = e.clientY - rect.top;
 
-        var worldPos = worldMap.cameraController.screenToWorld(mouseX, mouseY);
-        var foundIcon = null;
+        const worldPos = worldMap.cameraController.screenToWorld(mouseX, mouseY);
+        let foundIcon = null;
 
-        for (var i = 0; i < worldMap.sectors.length; i++) {
-            var region = worldMap.sectors[i];
+        for (let i = 0; i < worldMap.sectors.length; i++) {
+            const region = worldMap.sectors[i];
             if (!region.iconPositions) continue;
 
-            for (var j = 0; j < region.iconPositions.length; j++) {
-                var icon = region.iconPositions[j];
-                var dx = worldPos.x - icon.x;
-                var dy = worldPos.y - icon.y;
-                var distance = Math.sqrt(dx * dx + dy * dy);
+            for (let j = 0; j < region.iconPositions.length; j++) {
+                const icon = region.iconPositions[j];
+                const dx = worldPos.x - icon.x;
+                const dy = worldPos.y - icon.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
 
                 if (distance <= icon.size) {
                     foundIcon = { icon: icon, region: region };
@@ -88,8 +88,8 @@
         }
 
         if (foundIcon) {
-            var fi = foundIcon.icon;
-            var tooltipHtml = '<div class="tooltip-title" style="color: ' + fi.color + '">' + fi.label + '</div>';
+            const fi = foundIcon.icon;
+            let tooltipHtml = '<div class="tooltip-title" style="color: ' + fi.color + '">' + fi.label + '</div>';
 
             if (fi.details && fi.details.length > 0) {
                 fi.details.forEach(function (unit) {

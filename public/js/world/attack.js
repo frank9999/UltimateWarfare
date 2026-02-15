@@ -28,8 +28,8 @@
         showNotification('Loading eligible regions...', 'info');
 
         try {
-            var response = await fetch('/game/api/world/region/attack-from/' + enemyRegion.id);
-            var result = await response.json();
+            const response = await fetch('/game/api/world/region/attack-from/' + enemyRegion.id);
+            const result = await response.json();
 
             if (!result.success) {
                 showNotification(result.message || 'Failed to load attack data', 'error');
@@ -45,7 +45,7 @@
             attackTargetRegion = enemyRegion;
             attackEligibleRegionIds = new Set(result.eligibleRegions.map(function (r) { return r.regionId; }));
 
-            var worldMap = WorldApp.worldMap;
+            const worldMap = WorldApp.worldMap;
             worldMap.sectors.forEach(function (region) {
                 region._attackEligible = attackEligibleRegionIds.has(region.id);
                 region._attackTarget = (region.id === enemyRegion.id);
@@ -77,7 +77,7 @@
         attackTargetRegion = null;
         attackEligibleRegionIds.clear();
 
-        var worldMap = WorldApp.worldMap;
+        const worldMap = WorldApp.worldMap;
         worldMap.sectors.forEach(function (region) {
             delete region._attackEligible;
             delete region._attackTarget;
@@ -100,13 +100,13 @@
             '<strong>Attacking from:</strong> ' + sourceRegion.x + ', ' + sourceRegion.y +
             ' → <strong>Target:</strong> ' + targetRegion.x + ', ' + targetRegion.y;
 
-        var container = document.getElementById('attackUnitsContainer');
+        const container = document.getElementById('attackUnitsContainer');
         container.innerHTML = '<div class="build-loading">Loading available units...</div>';
         attackUnitsModal.style.display = 'block';
 
         try {
-            var response = await fetch('/game/api/world/region/attack-units/' + targetRegion.id + '/' + sourceRegion.id);
-            var result = await response.json();
+            const response = await fetch('/game/api/world/region/attack-units/' + targetRegion.id + '/' + sourceRegion.id);
+            const result = await response.json();
 
             if (!result.success) {
                 container.innerHTML = '<div class="build-loading" style="color: #f44336;">' + result.message + '</div>';
@@ -124,12 +124,12 @@
     }
 
     function renderAttackUnits(units) {
-        var container = document.getElementById('attackUnitsContainer');
-        var imgBase = WorldApp.imageBasePath;
+        const container = document.getElementById('attackUnitsContainer');
+        const imgBase = WorldApp.imageBasePath;
         container.innerHTML = '';
 
         units.forEach(function (unit) {
-            var card = document.createElement('div');
+            const card = document.createElement('div');
             card.className = 'build-unit-card';
             card.innerHTML =
                 '<div class="build-unit-header">' +
@@ -148,9 +148,9 @@
 
         container.querySelectorAll('.attack-quantity-input').forEach(function (input) {
             input.addEventListener('input', function (e) {
-                var unitId = parseInt(e.target.dataset.unitId);
-                var max = parseInt(e.target.max);
-                var val = parseInt(e.target.value) || 0;
+                let unitId = parseInt(e.target.dataset.unitId);
+                let max = parseInt(e.target.max);
+                let val = parseInt(e.target.value) || 0;
                 if (val > max) { val = max; e.target.value = max; }
                 if (val < 0) { val = 0; e.target.value = 0; }
                 attackUnitQuantities[unitId] = val;
@@ -159,7 +159,7 @@
     }
 
     async function sendAttackFleet() {
-        var hasSelection = Object.values(attackUnitQuantities).some(function (qty) { return qty > 0; });
+        const hasSelection = Object.values(attackUnitQuantities).some(function (qty) { return qty > 0; });
         if (!hasSelection) {
             showNotification('Select at least one unit to send!', 'error');
             return;
@@ -169,7 +169,7 @@
         confirmAttackUnitsBtn.textContent = '⚔ Sending...';
 
         try {
-            var response = await fetch(
+            const response = await fetch(
                 '/game/api/world/region/attack-send/' + currentAttackTarget.id + '/' + currentAttackSource.id,
                 {
                     method: 'POST',
@@ -178,13 +178,13 @@
                 }
             );
 
-            var result = await response.json();
+            const result = await response.json();
 
             if (result.success) {
                 attackUnitsModal.style.display = 'none';
                 cancelAttackMode();
 
-                var newFleet = result.fleet;
+                const newFleet = result.fleet;
                 newFleet.id = Date.now();
                 WorldApp.worldMap.fleetManager.fleets.push(newFleet);
                 WorldApp.worldMap.fleetManager.startETACountdown();

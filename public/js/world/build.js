@@ -43,7 +43,7 @@
 
         tooltipHtml += '<div class="unit-info-section"><div class="unit-info-section-title">Build Cost</div><div class="unit-info-grid">';
 
-        var costItems = [
+        const costItems = [
             { key: 'costCash', icon: 'resource_cash.jpg', label: 'Cash' },
             { key: 'costWood', icon: 'resource_wood.jpg', label: 'Wood' },
             { key: 'costSteel', icon: 'resource_steel.jpg', label: 'Steel' },
@@ -59,13 +59,13 @@
         });
         tooltipHtml += '</div></div>';
 
-        var incomeItems = [
+        const incomeItems = [
             { key: 'incomeCash', icon: 'resource_cash.jpg', label: 'Cash' },
             { key: 'incomeWood', icon: 'resource_wood.jpg', label: 'Wood' },
             { key: 'incomeSteel', icon: 'resource_steel.jpg', label: 'Steel' },
             { key: 'incomeFood', icon: 'resource_food.jpg', label: 'Food' }
         ];
-        var hasIncome = incomeItems.some(function (i) { return unit[i.key] > 0; });
+        const hasIncome = incomeItems.some(function (i) { return unit[i.key] > 0; });
         if (hasIncome) {
             tooltipHtml += '<div class="unit-info-section"><div class="unit-info-section-title">Income (per hour)</div><div class="unit-info-grid">';
             incomeItems.forEach(function (item) {
@@ -79,13 +79,13 @@
             tooltipHtml += '</div></div>';
         }
 
-        var upkeepItems = [
+        const upkeepItems = [
             { key: 'upkeepCash', icon: 'resource_cash.jpg', label: 'Cash' },
             { key: 'upkeepWood', icon: 'resource_wood.jpg', label: 'Wood' },
             { key: 'upkeepSteel', icon: 'resource_steel.jpg', label: 'Steel' },
             { key: 'upkeepFood', icon: 'resource_food.jpg', label: 'Food' }
         ];
-        var hasUpkeep = upkeepItems.some(function (i) { return unit[i.key] > 0; });
+        const hasUpkeep = upkeepItems.some(function (i) { return unit[i.key] > 0; });
         if (hasUpkeep) {
             tooltipHtml += '<div class="unit-info-section"><div class="unit-info-section-title">Upkeep (per hour)</div><div class="unit-info-grid">';
             upkeepItems.forEach(function (item) {
@@ -99,10 +99,10 @@
             tooltipHtml += '</div></div>';
         }
 
-        var hours = Math.floor(unit.timestamp / 3600);
-        var minutes = Math.floor((unit.timestamp % 3600) / 60);
-        var seconds = unit.timestamp % 60;
-        var timeStr = String(hours).padStart(2, '0') + ':' + String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
+        const hours = Math.floor(unit.timestamp / 3600);
+        const minutes = Math.floor((unit.timestamp % 3600) / 60);
+        const seconds = unit.timestamp % 60;
+        const timeStr = String(hours).padStart(2, '0') + ':' + String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
 
         tooltipHtml += '<div class="unit-info-section"><div class="unit-info-grid">' +
             '<div class="unit-info-item"><span class="unit-info-label">Net Worth:</span>' +
@@ -122,15 +122,15 @@
     }
 
     function updateUnitInfoTooltipPosition(event) {
-        var e = event || currentTooltipEvent;
+        const e = event || currentTooltipEvent;
         if (!e) return;
 
-        var tooltipWidth = unitInfoTooltip.offsetWidth;
-        var tooltipHeight = unitInfoTooltip.offsetHeight;
-        var padding = 15;
+        const tooltipWidth = unitInfoTooltip.offsetWidth;
+        const tooltipHeight = unitInfoTooltip.offsetHeight;
+        const padding = 15;
 
-        var left = e.clientX + padding;
-        var top = e.clientY + padding;
+        let left = e.clientX + padding;
+        let top = e.clientY + padding;
 
         if (left + tooltipWidth > window.innerWidth) left = e.clientX - tooltipWidth - padding;
         if (top + tooltipHeight > window.innerHeight) top = e.clientY - tooltipHeight - padding;
@@ -146,15 +146,15 @@
         document.getElementById('buildRegionCoords').textContent = region.x + ', ' + region.y;
         buildModal.style.display = 'block';
 
-        var container = document.getElementById('buildUnitsContainer');
+        const container = document.getElementById('buildUnitsContainer');
         container.innerHTML = '<div class="build-loading">Loading...</div>';
 
-        var tabsContainer = document.getElementById('buildTabs');
+        const tabsContainer = document.getElementById('buildTabs');
         tabsContainer.innerHTML = '';
 
         try {
-            var response = await fetch('/game/api/world/region/available-categories/' + region.id);
-            var result = await response.json();
+            const response = await fetch('/game/api/world/region/available-categories/' + region.id);
+            const result = await response.json();
             availableCategories = result.success ? result.categories : gameUnitCategories;
         } catch (error) {
             console.error('Error loading available categories:', error);
@@ -169,7 +169,7 @@
         selectedGameUnitCategoryId = availableCategories[0].id;
 
         availableCategories.forEach(function (type, index) {
-            var tab = document.createElement('div');
+            const tab = document.createElement('div');
             tab.className = 'build-tab' + (index === 0 ? ' active' : '');
             tab.textContent = type.name;
             tab.addEventListener('click', function () {
@@ -186,12 +186,12 @@
     }
 
     async function loadBuildData(gameUnitCategoryId) {
-        var container = document.getElementById('buildUnitsContainer');
+        const container = document.getElementById('buildUnitsContainer');
         container.innerHTML = '<div class="build-loading">Loading units...</div>';
 
         try {
-            var response = await fetch('/game/api/world/region/build-data/' + selectedBuildRegion.id + '/' + gameUnitCategoryId);
-            var result = await response.json();
+            const response = await fetch('/game/api/world/region/build-data/' + selectedBuildRegion.id + '/' + gameUnitCategoryId);
+            const result = await response.json();
 
             if (result.success) {
                 currentBuildData = result;
@@ -206,9 +206,9 @@
     }
 
     function renderBuildUnits(data) {
-        var container = document.getElementById('buildUnitsContainer');
-        var spaceInfo = document.getElementById('buildSpaceInfo');
-        var imgBase = WorldApp.imageBasePath;
+        const container = document.getElementById('buildUnitsContainer');
+        const spaceInfo = document.getElementById('buildSpaceInfo');
+        const imgBase = WorldApp.imageBasePath;
 
         if (data.gameUnitCategory.id === 1) {
             spaceInfo.style.display = 'block';
@@ -224,14 +224,14 @@
 
         container.innerHTML = '';
         data.units.forEach(function (unit) {
-            var card = document.createElement('div');
+            const card = document.createElement('div');
             card.className = 'build-unit-card';
 
-            var constructionText = unit.inConstruction > 0 ? ' (' + unit.inConstruction + ')' : '';
-            var hours = Math.floor(unit.timestamp / 3600);
-            var minutes = Math.floor((unit.timestamp % 3600) / 60);
-            var seconds = unit.timestamp % 60;
-            var timeStr = String(hours).padStart(2, '0') + ':' + String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
+            const constructionText = unit.inConstruction > 0 ? ' (' + unit.inConstruction + ')' : '';
+            const hours = Math.floor(unit.timestamp / 3600);
+            const minutes = Math.floor((unit.timestamp % 3600) / 60);
+            const seconds = unit.timestamp % 60;
+            const timeStr = String(hours).padStart(2, '0') + ':' + String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
 
             card.innerHTML =
                 '<div class="build-unit-header ' + (!unit.canBuild ? 'unit-locked' : '') + '">' +
@@ -256,7 +256,7 @@
 
             container.appendChild(card);
 
-            var infoIcon = card.querySelector('.build-unit-info-icon');
+            const infoIcon = card.querySelector('.build-unit-info-icon');
             infoIcon.addEventListener('mouseenter', function (e) { e.stopPropagation(); showUnitInfoTooltip(e, unit); });
             infoIcon.addEventListener('mouseleave', function (e) { e.stopPropagation(); hideUnitInfoTooltip(); });
             infoIcon.addEventListener('mousemove', function (e) { e.stopPropagation(); updateUnitInfoTooltipPosition(e); });
@@ -272,7 +272,7 @@
     }
 
     async function confirmBuild() {
-        var hasSelection = Object.values(buildQuantities).some(function (qty) { return qty > 0; });
+        const hasSelection = Object.values(buildQuantities).some(function (qty) { return qty > 0; });
         if (!hasSelection) {
             showNotification('Please select at least one unit to build', 'error');
             return;
@@ -282,16 +282,16 @@
         confirmBuildBtn.textContent = 'Building...';
 
         try {
-            var response = await fetch('/game/api/world/region/build/' + selectedBuildRegion.id + '/' + selectedGameUnitCategoryId, {
+            const response = await fetch('/game/api/world/region/build/' + selectedBuildRegion.id + '/' + selectedGameUnitCategoryId, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ construct: buildQuantities })
             });
 
-            var result = await response.json();
+            const result = await response.json();
 
             if (result.success) {
-                var amounts = document.querySelectorAll('.resource-amount');
+                const amounts = document.querySelectorAll('.resource-amount');
                 if (result.newCash !== undefined && amounts[0]) amounts[0].textContent = result.newCash.toLocaleString('en-US');
                 if (result.newWood !== undefined && amounts[1]) amounts[1].textContent = result.newWood.toLocaleString('en-US');
                 if (result.newSteel !== undefined && amounts[3]) amounts[3].textContent = result.newSteel.toLocaleString('en-US');

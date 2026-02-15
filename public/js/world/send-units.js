@@ -46,13 +46,13 @@
         document.getElementById('sendUnitsInfo').innerHTML =
             '<strong>Select units to move from</strong> region ' + sourceRegion.x + ', ' + sourceRegion.y;
 
-        var container = document.getElementById('sendUnitsContainer');
+        const container = document.getElementById('sendUnitsContainer');
         container.innerHTML = '<div class="build-loading">Loading available units...</div>';
         sendUnitsModal.style.display = 'block';
 
         try {
-            var response = await fetch('/game/api/world/region/send-units-data/' + sourceRegion.id);
-            var result = await response.json();
+            const response = await fetch('/game/api/world/region/send-units-data/' + sourceRegion.id);
+            const result = await response.json();
 
             if (!result.success) {
                 container.innerHTML = '<div class="build-loading" style="color: #f44336;">' + result.message + '</div>';
@@ -77,12 +77,12 @@
      * Render unit cards (reuses the same card style as attack/build)
      */
     function renderSendUnits(units) {
-        var container = document.getElementById('sendUnitsContainer');
-        var imgBase = WorldApp.imageBasePath;
+        const container = document.getElementById('sendUnitsContainer');
+        const imgBase = WorldApp.imageBasePath;
         container.innerHTML = '';
 
         units.forEach(function (unit) {
-            var card = document.createElement('div');
+            const card = document.createElement('div');
             card.className = 'build-unit-card';
             card.innerHTML =
                 '<div class="build-unit-header">' +
@@ -101,9 +101,9 @@
 
         container.querySelectorAll('.send-quantity-input').forEach(function (input) {
             input.addEventListener('input', function (e) {
-                var unitId = parseInt(e.target.dataset.unitId);
-                var max = parseInt(e.target.max);
-                var val = parseInt(e.target.value) || 0;
+                const unitId = parseInt(e.target.dataset.unitId);
+                const max = parseInt(e.target.max);
+                let val = parseInt(e.target.value) || 0;
                 if (val > max) { val = max; e.target.value = max; }
                 if (val < 0) { val = 0; e.target.value = 0; }
                 sendUnitQuantities[unitId] = val;
@@ -115,7 +115,7 @@
      * Step 3→4: Player confirmed unit selection. Now load target regions and enter map selection mode.
      */
     async function enterSendTargetSelection() {
-        var hasSelection = Object.values(sendUnitQuantities).some(function (qty) { return qty > 0; });
+        const hasSelection = Object.values(sendUnitQuantities).some(function (qty) { return qty > 0; });
         if (!hasSelection) {
             showNotification('Select at least one unit to send!', 'error');
             return;
@@ -125,8 +125,8 @@
         showNotification('Loading target regions...', 'info');
 
         try {
-            var response = await fetch('/game/api/world/region/send-units-targets/' + sendSourceRegion.id);
-            var result = await response.json();
+            const response = await fetch('/game/api/world/region/send-units-targets/' + sendSourceRegion.id);
+            const result = await response.json();
 
             if (!result.success) {
                 showNotification(result.message || 'Failed to load targets', 'error');
@@ -144,7 +144,7 @@
             // Enter send mode — highlight eligible regions on the map
             sendMode = true;
 
-            var worldMap = WorldApp.worldMap;
+            const worldMap = WorldApp.worldMap;
             worldMap.sectors.forEach(function (region) {
                 if (region.id === sendSourceRegion.id) {
                     region._sendSource = true;
@@ -190,7 +190,7 @@
         showNotification('Sending units...', 'info');
 
         try {
-            var response = await fetch('/game/api/world/region/send-units/' + sendSourceRegion.id, {
+            const response = await fetch('/game/api/world/region/send-units/' + sendSourceRegion.id, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -199,13 +199,13 @@
                 })
             });
 
-            var result = await response.json();
+            const result = await response.json();
 
             if (result.success) {
                 cancelSendMode();
 
                 // Add fleet to the map and start ETA countdown
-                var newFleet = result.fleet;
+                const newFleet = result.fleet;
                 newFleet.id = Date.now();
                 WorldApp.worldMap.fleetManager.fleets.push(newFleet);
                 WorldApp.worldMap.fleetManager.startETACountdown();
@@ -231,7 +231,7 @@
         sendTargetData = [];
         sendUnitQuantities = {};
 
-        var worldMap = WorldApp.worldMap;
+        const worldMap = WorldApp.worldMap;
         worldMap.sectors.forEach(function (region) {
             delete region._attackEligible;
             delete region._attackTarget;

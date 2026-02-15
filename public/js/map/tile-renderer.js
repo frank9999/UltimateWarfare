@@ -22,7 +22,7 @@ class TileRenderer {
                 this.config.tileHeight
             );
 
-            // Draw fog of war if region is not visible
+            // Draw fog of war if a region is not visible
             if (region.isVisible === false) {
                 this.renderFogOfWar(
                     iso.x,
@@ -88,7 +88,7 @@ class TileRenderer {
     }
 
     /**
-     * Render ownership overlay as diamond shape
+     * Render ownership overlay as a diamond shape
      */
     renderOwnershipOverlay(region, iso) {
         this.ctx.save();
@@ -142,7 +142,7 @@ class TileRenderer {
      * Render hover highlight with diamond shape and info
      */
     renderHoverHighlight(region, iso) {
-        // Draw diamond-shaped outline
+        // Draw a diamond-shaped outline
         this.ctx.save();
         this.ctx.strokeStyle = '#ffffff';
         this.ctx.lineWidth = 3;
@@ -210,7 +210,7 @@ class TileRenderer {
         // Save context state
         this.ctx.save();
 
-        // Create diamond shape clipping path
+        // Create a diamond shape clipping path
         this.ctx.beginPath();
         this.ctx.moveTo(isoX, isoY - tileHeight / 2);
         this.ctx.lineTo(isoX + tileWidth / 2, isoY);
@@ -257,7 +257,7 @@ class TileRenderer {
             );
         }
 
-        // Add question mark in center for unknown territory (50% transparent)
+        // Add a question mark in the center for unknown territory (50% transparent)
         this.ctx.fillStyle = 'rgba(160, 160, 180, 0.5)';
         this.ctx.font = 'bold 28px Arial';
         this.ctx.textAlign = 'center';

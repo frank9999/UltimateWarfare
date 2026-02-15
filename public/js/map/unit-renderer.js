@@ -22,9 +22,6 @@ class UnitRenderer {
             case 'defences':
                 this.drawShieldIcon(x, y, size);
                 break;
-            case 'units':
-                this.drawTankIcon(x, y, size);
-                break;
             case 'special':
                 this.drawStarIcon(x, y, size);
                 break;
@@ -33,7 +30,6 @@ class UnitRenderer {
                 break;
             case 'troops':
                 this.drawTankIcon(x, y, size);
-                //this.drawSoldierIcon(x, y, size);
                 break;
             case 'airUnits':
                 this.drawPlaneIcon(x, y, size);
@@ -125,47 +121,6 @@ class UnitRenderer {
         this.ctx.closePath();
         this.ctx.fill();
         this.ctx.stroke();
-    }
-
-    drawSoldierIcon(x, y, size) {
-        const ctx = this.ctx;
-        const fillStyle = ctx.fillStyle;
-        
-        // Head
-        ctx.beginPath();
-        ctx.arc(x, y - size * 0.35, size * 0.2, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.stroke();
-        
-        // Body
-        ctx.beginPath();
-        ctx.rect(x - size * 0.15, y - size * 0.15, size * 0.3, size * 0.4);
-        ctx.fill();
-        ctx.stroke();
-        
-        // Arms
-        ctx.beginPath();
-        ctx.moveTo(x - size * 0.15, y - size * 0.1);
-        ctx.lineTo(x - size * 0.4, y + size * 0.05);
-        ctx.stroke();
-        
-        ctx.beginPath();
-        ctx.moveTo(x + size * 0.15, y - size * 0.1);
-        ctx.lineTo(x + size * 0.4, y + size * 0.05);
-        ctx.stroke();
-        
-        // Legs
-        ctx.beginPath();
-        ctx.moveTo(x, y + size * 0.25);
-        ctx.lineTo(x - size * 0.2, y + size * 0.5);
-        ctx.stroke();
-        
-        ctx.beginPath();
-        ctx.moveTo(x, y + size * 0.25);
-        ctx.lineTo(x + size * 0.2, y + size * 0.5);
-        ctx.stroke();
-        
-        ctx.fillStyle = fillStyle;
     }
 
     drawPlaneIcon(x, y, size) {
@@ -335,7 +290,6 @@ class UnitRenderer {
         if (units.navalUnits > 0) activeTypes.push({ type: 'navalUnits', count: units.navalUnits, color: '#4a7ba7', label: 'Naval Units' });
         if (units.airUnits > 0) activeTypes.push({ type: 'airUnits', count: units.airUnits, color: '#87ceeb', label: 'Air Units' });
         if (units.missiles > 0) activeTypes.push({ type: 'missiles', count: units.missiles, color: '#d64545', label: 'Missiles' });
-        if (units.units > 0) activeTypes.push({ type: 'units', count: units.units, color: '#6b8e6b', label: 'Units' });
 
         if (activeTypes.length === 0) {
             return;

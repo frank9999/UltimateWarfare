@@ -3,21 +3,21 @@
  * Depends on: notifications.js, WorldApp config, WorldBuild, WorldAttack
  */
 (function () {
-    var imgBase = WorldApp.imageBasePath;
+    const imgBase = WorldApp.imageBasePath;
 
     // ===== Buy Region Modal =====
-    var modal = document.getElementById('buyRegionModal');
-    var closeModal = document.getElementById('closeModal');
-    var cancelBtn = document.getElementById('cancelBtn');
-    var confirmBuyBtn = document.getElementById('confirmBuyBtn');
-    var selectedRegion = null;
-    var isBuyingRegion = false;
-    var currentRegionPrice = WorldApp.regionPrice;
+    const modal = document.getElementById('buyRegionModal');
+    const closeModal = document.getElementById('closeModal');
+    const cancelBtn = document.getElementById('cancelBtn');
+    const confirmBuyBtn = document.getElementById('confirmBuyBtn');
+    let selectedRegion = null;
+    let isBuyingRegion = false;
+    let currentRegionPrice = WorldApp.regionPrice;
 
     function showBuyRegionModal(region) {
         selectedRegion = region;
-        var modalBody = document.getElementById('modalBody');
-        var imageUrl = imgBase + '/map/' + region.image;
+        const modalBody = document.getElementById('modalBody');
+        const imageUrl = imgBase + '/map/' + region.image;
 
         modalBody.innerHTML =
             '<div class="region-info"><div class="region-image"><img src="' + imageUrl + '" alt="' + region.type + '"></div>' +
@@ -41,15 +41,15 @@
         confirmBuyBtn.textContent = 'Buying...';
 
         try {
-            var response = await fetch('/game/api/world/region/buy/' + selectedRegion.id, {
+            const response = await fetch('/game/api/world/region/buy/' + selectedRegion.id, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' }
             });
-            var result = await response.json();
+            const result = await response.json();
 
             if (result.success) {
-                var worldMap = WorldApp.worldMap;
-                var regionIndex = worldMap.sectors.findIndex(function (r) { return r.id === selectedRegion.id; });
+                const worldMap = WorldApp.worldMap;
+                const regionIndex = worldMap.sectors.findIndex(function (r) { return r.id === selectedRegion.id; });
                 if (regionIndex !== -1) {
                     worldMap.sectors[regionIndex].hasOwner = true;
                     worldMap.sectors[regionIndex].isYours = true;
@@ -57,7 +57,7 @@
                 }
 
                 if (result.newCash !== undefined) {
-                    var cashElements = document.querySelectorAll('.resource-amount');
+                    const cashElements = document.querySelectorAll('.resource-amount');
                     if (cashElements.length > 0) cashElements[0].textContent = result.newCash.toLocaleString('en-US');
                 }
 
@@ -83,14 +83,14 @@
     };
 
     // ===== Enemy Region Modal =====
-    var enemyModal = document.getElementById('enemyRegionModal');
-    var closeEnemyModal = document.getElementById('closeEnemyModal');
-    var selectedEnemyRegion = null;
+    const enemyModal = document.getElementById('enemyRegionModal');
+    const closeEnemyModal = document.getElementById('closeEnemyModal');
+    let selectedEnemyRegion = null;
 
     function showEnemyRegionModal(region) {
         selectedEnemyRegion = region;
-        var enemyModalBody = document.getElementById('enemyModalBody');
-        var imageUrl = imgBase + '/map/' + region.image;
+        const enemyModalBody = document.getElementById('enemyModalBody');
+        const imageUrl = imgBase + '/map/' + region.image;
 
         enemyModalBody.innerHTML =
             '<div class="region-info"><div class="region-image"><img src="' + imageUrl + '" alt="' + region.type + '"></div>' +
@@ -114,14 +114,14 @@
     };
 
     // ===== Your Region Modal =====
-    var yourModal = document.getElementById('yourRegionModal');
-    var closeYourModal = document.getElementById('closeYourModal');
-    var selectedYourRegion = null;
+    const yourModal = document.getElementById('yourRegionModal');
+    const closeYourModal = document.getElementById('closeYourModal');
+    let selectedYourRegion = null;
 
     function showYourRegionModal(region) {
         selectedYourRegion = region;
-        var yourModalBody = document.getElementById('yourModalBody');
-        var imageUrl = imgBase + '/map/' + region.image;
+        const yourModalBody = document.getElementById('yourModalBody');
+        const imageUrl = imgBase + '/map/' + region.image;
 
         yourModalBody.innerHTML =
             '<div class="region-info"><div class="region-image"><img src="' + imageUrl + '" alt="' + region.type + '"></div>' +
@@ -148,7 +148,7 @@
     };
 
     // ===== Headquarter Modal =====
-    var hqModal = document.getElementById('headquarterModal');
+    const hqModal = document.getElementById('headquarterModal');
     document.getElementById('closeHqModal').onclick = function () { hqModal.style.display = 'none'; };
     document.getElementById('headquarterBtn').addEventListener('click', function () { hqModal.style.display = 'block'; });
     document.getElementById('hqOldInterfaceBtn').onclick = function () { window.location.href = '/game/headquarter'; };
