@@ -51,6 +51,10 @@ final class ConstructionActionService
         GameUnitCategory $gameUnitCategory,
         array $constructionData
     ): void {
+        $this->validateCategoryAllowed($region, $gameUnitCategory);
+
+        $regionBuildingIndex = $this->getRegionBuildingIndex($region);
+
         $priceCash = 0;
         $priceWood = 0;
         $priceSteel = 0;
@@ -71,6 +75,8 @@ final class ConstructionActionService
             if ($gameUnit->getGameUnitCategory() !== $gameUnitCategory) {
                 continue;
             }
+
+            $this->validateUnitAllowed($gameUnit, $region, $regionBuildingIndex);
 
             $behavior = $this->behaviorFactory->create($gameUnit);
             if (!$behavior->canBuild($region, $player)) {
@@ -127,8 +133,81 @@ final class ConstructionActionService
         foreach ($constructions as $construction) {
             $this->constructionRepository->save($construction);
 
-            $behavior->onBuild($region, $amount);
+            $behavior = $this->behaviorFactory->create($construction->getGameUnit());
+            $behavior->onBuild($region, $construction->getNumber());
         }
+    }
+
+    /**
+     * Validate that the given game unit category is allowed to be built on this region.
+     */
+    private function validateCategoryAllowed(WorldRegion $region, GameUnitCategory $gameUnitCategory): void
+    {
+        $buildingIndex = $this->getRegionBuildingIndex($region);
+
+        match ($gameUnitCategory) {
+            GameUnitCategory::TROOPS,
+            GameUnitCategory::SPECIAL_UNITS => $this->requireBuilding($buildingIndex, 'barrack', 'a Barrack'),
+            GameUnitCategory::AIR_UNITS => $this->requireBuilding($buildingIndex, 'airport', 'an Airport'),
+            GameUnitCategory::NAVAL_UNITS => $this->requireBuilding($buildingIndex, 'harbor', 'a Harbor'),
+            GameUnitCategory::MISSILES => $this->requireBuilding($buildingIndex, 'missile_silo', 'a Missile Silo'),
+            GameUnitCategory::BUILDINGS,
+            GameUnitCategory::DEFENSE_BUILDINGS,
+            GameUnitCategory::SPECIAL_BUILDINGS => null, // Always allowed at category level
+        };
+    }
+
+    /**
+     * Validate that a specific game unit is allowed to be built on this region.
+     */
+    private function validateUnitAllowed(GameUnit $gameUnit, WorldRegion $region, array $buildingIndex): void
+    {
+        $rowName = $gameUnit->getRowName();
+        $regionType = $region->getType();
+
+        // Tanks require a Factory on this region
+        if ($rowName === 'tank') {
+            $this->requireBuilding($buildingIndex, 'factory', 'a Factory');
+        }
+
+        // Harbor can only be built on beach regions
+        if ($rowName === 'harbor' && $regionType !== WorldRegion::TYPE_BEACH) {
+            throw new RuntimeException("Cannot build {$gameUnit->getName()}: requires a beach region.");
+        }
+
+        // Sea mines can only be built on beach or water regions
+        if ($rowName === 'sea_mine' && !in_array($regionType, [WorldRegion::TYPE_BEACH, WorldRegion::TYPE_WATER], true)) {
+            throw new RuntimeException("Cannot build {$gameUnit->getName()}: requires a beach or water region.");
+        }
+    }
+
+    /**
+     * Check that a building with the given row_name exists (built or in construction) on the region.
+     *
+     * @param array<string, int> $buildingIndex
+     */
+    private function requireBuilding(array $buildingIndex, string $rowName, string $readableName): void
+    {
+        if (($buildingIndex[$rowName] ?? 0) < 1) {
+            throw new RuntimeException("This region requires $readableName before you can build this.");
+        }
+    }
+
+    /**
+     * Build an index of building row_names => total amounts for a region.
+     *
+     * @return array<string, int>
+     */
+    private function getRegionBuildingIndex(WorldRegion $region): array
+    {
+        $index = [];
+
+        foreach ($region->getWorldRegionUnits() as $worldRegionUnit) {
+            $rowName = $worldRegionUnit->getGameUnit()->getRowName();
+            $index[$rowName] = ($index[$rowName] ?? 0) + $worldRegionUnit->getAmount();
+        }
+
+        return $index;
     }
 
     /**
