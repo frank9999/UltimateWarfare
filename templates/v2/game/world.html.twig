@@ -433,6 +433,38 @@
                 text-align: center;
             }
 
+            /* Attack mode banner */
+            .attack-mode-banner {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                padding: 12px 20px;
+                background: rgba(200, 50, 50, 0.95);
+                color: #fff;
+                font-weight: bold;
+                text-align: center;
+                z-index: 10001;
+                font-size: 14px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            }
+
+            .attack-mode-banner button {
+                margin-left: 20px;
+                padding: 5px 15px;
+                background: #fff;
+                color: #c44;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+                font-weight: bold;
+            }
+
+            .attack-mode-banner button:hover {
+                background: #eee;
+            }
+
             /* Build Modal styles */
             .build-modal-content {
                 max-width: 900px;
@@ -814,6 +846,12 @@
                 </div>
             </div>
         </div>
+    </div>
+
+    <!-- Attack Mode Banner -->
+    <div id="attackModeBanner" class="attack-mode-banner">
+        <span id="attackModeText">Select a region to attack from...</span>
+        <button type="button" id="cancelAttackModeBtn">Cancel</button>
     </div>
 
     <!-- Buy Region Modal -->
@@ -1696,7 +1734,7 @@
         
         closeEnemyModal.onclick = () => { enemyModal.style.display = 'none'; selectedEnemyRegion = null; };
         sendMessageBtn.onclick = () => { if (selectedEnemyRegion) window.location.href = '/game/message/new/' + encodeURIComponent(selectedEnemyRegion.ownerName); };
-        attackBtn.onclick = () => { if (selectedEnemyRegion) window.location.href = '/game/world/region/attack/' + selectedEnemyRegion.id; };
+        attackBtn.onclick = () => { if (selectedEnemyRegion) startAttackFromSelection(selectedEnemyRegion); };
         operationBtn.onclick = () => { if (selectedEnemyRegion) window.location.href = '/game/world/region/select-operation/' + selectedEnemyRegion.id; };
 
         closeYourModal.onclick = () => { yourModal.style.display = 'none'; selectedYourRegion = null; };
@@ -1775,6 +1813,19 @@
             imageBasePath: '{{ asset('images') }}',
             overlaysEnabled: false,
             onTileClick: function(region) {
+                // If in attack mode, handle source selection
+                if (attackMode) {
+                    if (region.isYours && attackEligibleRegionIds.has(region.id)) {
+                        // Navigate to the unit selection page for this attack
+                        window.location.href = '/game/world/region/attack/' + attackTargetRegion.id + '/' + region.id;
+                    } else if (region.isYours) {
+                        showNotification('This region is not in range or has no suitable units to attack from.', 'error');
+                    } else {
+                        showNotification('You must select one of YOUR highlighted regions.', 'error');
+                    }
+                    return;
+                }
+
                 if (!region.hasOwner) {
                     showBuyRegionModal(region);
                 } else if (region.isYours) {
@@ -1879,6 +1930,98 @@
         
         worldMap.canvas.addEventListener('mouseleave', function() {
             unitTooltip.style.display = 'none';
+        });
+
+        // ===== ATTACK FROM SELECTION MODE =====
+        let attackMode = false;
+        let attackTargetRegion = null;
+        let attackEligibleRegionIds = new Set();
+
+        async function startAttackFromSelection(enemyRegion) {
+            enemyModal.style.display = 'none';
+            showNotification('Loading eligible regions...', 'info');
+
+            try {
+                const response = await fetch(`/game/api/world/region/attack-from/${enemyRegion.id}`);
+                const result = await response.json();
+
+                if (!result.success) {
+                    showNotification(result.message || 'Failed to load attack data', 'error');
+                    return;
+                }
+
+                if (result.eligibleRegions.length === 0) {
+                    showNotification('You have no regions in range to attack from! Move troops closer first.', 'error');
+                    return;
+                }
+
+                // Enter attack selection mode
+                attackMode = true;
+                attackTargetRegion = enemyRegion;
+                attackEligibleRegionIds = new Set(result.eligibleRegions.map(r => r.regionId));
+
+                // Mark regions with eligibility info for the renderer
+                worldMap.sectors.forEach(region => {
+                    region._attackEligible = attackEligibleRegionIds.has(region.id);
+                    region._attackTarget = (region.id === enemyRegion.id);
+                });
+
+                // Override tile click handler
+                worldMap.config.onTileClick = function(region) {
+                    if (region._attackEligible) {
+                        // Selected a valid attack-from region — go to unit selection page
+                        window.location.href = `/game/world/region/attack/${attackTargetRegion.id}/${region.id}`;
+                    } else if (region._attackTarget) {
+                        // Clicked the target again — cancel
+                        cancelAttackMode();
+                    } else {
+                        showNotification('This region cannot attack the target. Select a highlighted region.', 'error');
+                    }
+                };
+
+                worldMap.render();
+                showNotification(
+                    `Select one of your ${result.eligibleRegions.length} highlighted region(s) to attack from. Click the target or press Escape to cancel.`,
+                    'info'
+                );
+
+            } catch (error) {
+                console.error('Error loading attack-from regions:', error);
+                showNotification('An error occurred. Please try again.', 'error');
+            }
+        }
+
+        function cancelAttackMode() {
+            attackMode = false;
+            attackTargetRegion = null;
+            attackEligibleRegionIds.clear();
+
+            // Clear eligibility markers
+            worldMap.sectors.forEach(region => {
+                delete region._attackEligible;
+                delete region._attackTarget;
+            });
+
+            // Restore normal click handler
+            worldMap.config.onTileClick = function(region) {
+                if (!region.hasOwner) {
+                    showBuyRegionModal(region);
+                } else if (region.isYours) {
+                    showYourRegionModal(region);
+                } else {
+                    showEnemyRegionModal(region);
+                }
+            };
+
+            worldMap.render();
+            showNotification('Attack cancelled.', 'info');
+        }
+
+        // Cancel attack mode on Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && attackMode) {
+                cancelAttackMode();
+            }
         });
     </script>
 

@@ -39,6 +39,31 @@ class TileRenderer {
                 this.renderOwnershipOverlay(region, iso);
             }
 
+            // Attack mode highlighting
+            if (region._attackTarget) {
+                this.ctx.save();
+                this.ctx.strokeStyle = '#ff0000';
+                this.ctx.lineWidth = 3;
+                this.drawDiamond(iso);
+                this.ctx.stroke();
+                this.ctx.restore();
+            } else if (region._attackEligible) {
+                this.ctx.save();
+                this.ctx.fillStyle = 'rgba(0, 255, 100, 0.35)';
+                this.drawDiamond(iso);
+                this.ctx.fill();
+                this.ctx.strokeStyle = '#00ff64';
+                this.ctx.lineWidth = 2;
+                this.ctx.stroke();
+                this.ctx.restore();
+            } else if (typeof region._attackEligible !== 'undefined' && !region._attackEligible) {
+                this.ctx.save();
+                this.ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+                this.drawDiamond(iso);
+                this.ctx.fill();
+                this.ctx.restore();
+            }
+
             // Draw coordinates and owner name
             this.renderTileLabels(region, iso);
 

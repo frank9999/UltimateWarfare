@@ -596,6 +596,13 @@ Game/World/Region/Attack:
     requirements:
         regionId: '\d+'
 
+Game/World/Region/Attack/Api:
+    path:      /game/api/world/region/attack-from/{regionId}
+    controller: FrankProjects\UltimateWarfare\Controller\Game\AttackController::attackFromRegionsApi
+    methods: [GET]
+    requirements:
+        regionId: '\d+'
+
 Game/World/Region/AttackSelectGameUnits:
     path:      /game/world/region/attack/{regionId}/{playerRegionId}
     controller: FrankProjects\UltimateWarfare\Controller\Game\AttackController::attackSelectGameUnits

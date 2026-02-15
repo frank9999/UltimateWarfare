@@ -23,6 +23,8 @@ class IsometricMap {
         this.images = new Map();
         this.imagesLoaded = false;
         this.hoveredTile = null;
+        this.highlightedRegionIds = null;  // Set of region IDs to highlight
+        this.attackTargetRegionId = null;  // The target region being attacked
 
         // Initialize modules
         this.cameraController = new CameraController(this.canvas, {
@@ -97,6 +99,16 @@ class IsometricMap {
 
     setFleets(fleets) {
         this.fleetManager.setFleets(fleets);
+    }
+
+    setHighlightedRegions(regionIds, targetRegionId) {
+        this.highlightedRegionIds = regionIds;
+        this.attackTargetRegionId = targetRegionId;
+    }
+
+    clearHighlightedRegions() {
+        this.highlightedRegionIds = null;
+        this.attackTargetRegionId = null;
     }
 
     // ===== Coordinate Conversion =====
