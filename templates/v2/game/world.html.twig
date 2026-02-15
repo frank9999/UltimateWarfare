@@ -1269,16 +1269,42 @@
             { id: 9, name: 'Missiles' }
         ];
 
-        function showBuildModal(region) {
+        let availableCategories = [];
+
+        async function showBuildModal(region) {
             selectedBuildRegion = region;
             buildQuantities = {};
-            selectedGameUnitCategoryId = 1;
             document.getElementById('buildRegionCoords').textContent = `${region.x}, ${region.y}`;
             buildModal.style.display = 'block';
 
+            const container = document.getElementById('buildUnitsContainer');
+            container.innerHTML = '<div class="build-loading">Loading...</div>';
+
             const tabsContainer = document.getElementById('buildTabs');
             tabsContainer.innerHTML = '';
-            gameUnitCategories.forEach((type, index) => {
+
+            try {
+                const response = await fetch(`/game/api/world/region/available-categories/${region.id}`);
+                const result = await response.json();
+
+                if (result.success) {
+                    availableCategories = result.categories;
+                } else {
+                    availableCategories = gameUnitCategories;
+                }
+            } catch (error) {
+                console.error('Error loading available categories:', error);
+                availableCategories = gameUnitCategories;
+            }
+
+            if (availableCategories.length === 0) {
+                container.innerHTML = '<div class="build-loading">No build options available for this region.</div>';
+                return;
+            }
+
+            selectedGameUnitCategoryId = availableCategories[0].id;
+
+            availableCategories.forEach((type, index) => {
                 const tab = document.createElement('div');
                 tab.className = 'build-tab' + (index === 0 ? ' active' : '');
                 tab.textContent = type.name;
@@ -1287,7 +1313,7 @@
                     selectedGameUnitCategoryId = categoryId;
                     const tabs = document.querySelectorAll('#buildTabs .build-tab');
                     tabs.forEach((t, i) => {
-                        t.classList.toggle('active', gameUnitCategories[i].id === categoryId);
+                        t.classList.toggle('active', availableCategories[i].id === categoryId);
                     });
                     loadBuildData(categoryId);
                 });
@@ -1296,7 +1322,7 @@
 
             loadBuildData(selectedGameUnitCategoryId);
         }
-
+        
         async function loadBuildData(gameUnitCategoryId) {
             const container = document.getElementById('buildUnitsContainer');
             container.innerHTML = '<div class="build-loading">Loading units...</div>';

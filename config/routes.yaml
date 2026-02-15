@@ -680,6 +680,11 @@ Game/Story/Chapter1:
     requirements:
         page: '\d+'
 
+Game/Api/Region/AvailableCategories:
+    path:      /game/api/world/region/available-categories/{regionId}
+    controller: FrankProjects\UltimateWarfare\Controller\Game\ConstructionController::getAvailableCategoriesApi
+    methods:   [GET]
+
 Guide:
     path:      /guide
     controller: FrankProjects\UltimateWarfare\Controller\Site\GuideController::index
