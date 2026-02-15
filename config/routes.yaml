@@ -603,6 +603,22 @@ Game/World/Region/Attack/Api:
     requirements:
         regionId: '\d+'
 
+Game/World/Region/Attack/Units/Api:
+    path:      /game/api/world/region/attack-units/{regionId}/{playerRegionId}
+    controller: FrankProjects\UltimateWarfare\Controller\Game\AttackController::attackUnitsApi
+    methods: [GET]
+    requirements:
+        regionId: '\d+'
+        playerRegionId: '\d+'
+
+Game/World/Region/Attack/Send/Api:
+    path:      /game/api/world/region/attack-send/{regionId}/{playerRegionId}
+    controller: FrankProjects\UltimateWarfare\Controller\Game\AttackController::attackSendApi
+    methods: [POST]
+    requirements:
+        regionId: '\d+'
+        playerRegionId: '\d+'
+
 Game/World/Region/AttackSelectGameUnits:
     path:      /game/world/region/attack/{regionId}/{playerRegionId}
     controller: FrankProjects\UltimateWarfare\Controller\Game\AttackController::attackSelectGameUnits

@@ -127,6 +127,244 @@ final class AttackController extends BaseGameController
     }
 
     /**
+     * API: Get the list of eligible game units from a player region to attack a target region.
+     * Only returns units that satisfy range + terrain rules.
+     */
+    public function attackUnitsApi(int $regionId, int $playerRegionId): JsonResponse
+    {
+        $player = $this->getPlayer();
+
+        try {
+            $targetRegion = $this->regionActionService->getWorldRegionByIdAndWorld($regionId, $player->getWorld());
+            $playerRegion = $this->regionActionService->getWorldRegionByIdAndPlayer($playerRegionId, $player);
+        } catch (WorldRegionNotFoundException $e) {
+            return new JsonResponse(['success' => false, 'message' => $e->getMessage()], 404);
+        }
+
+        if ($targetRegion->getPlayer() === null) {
+            return new JsonResponse(['success' => false, 'message' => 'Cannot attack region without owner!'], 400);
+        }
+
+        if ($targetRegion->getPlayer()->getId() === $player->getId()) {
+            return new JsonResponse(['success' => false, 'message' => 'Cannot attack your own region!'], 400);
+        }
+
+        $distance = $this->calculateTileDistance(
+            $playerRegion->getX(),
+            $playerRegion->getY(),
+            $targetRegion->getX(),
+            $targetRegion->getY()
+        );
+
+        $regionsByCoord = [];
+        foreach ($player->getWorld()->getWorldRegions() as $wr) {
+            $regionsByCoord[$wr->getX() . ',' . $wr->getY()] = $wr;
+        }
+
+        $targetIsCoastal = $this->isCoastalOrWater($targetRegion, $regionsByCoord);
+        $sourceIsCoastal = $this->isCoastalOrWater($playerRegion, $regionsByCoord);
+
+        $units = [];
+        foreach ($playerRegion->getWorldRegionUnits() as $worldRegionUnit) {
+            if ($worldRegionUnit->getAmount() <= 0) {
+                continue;
+            }
+
+            $gameUnit = $worldRegionUnit->getGameUnit();
+            $category = $gameUnit->getGameUnitCategory();
+            $rowName = $gameUnit->getRowName();
+
+            $unitRange = $this->getUnitRange($category, $rowName, $sourceIsCoastal, $targetIsCoastal);
+
+            if ($unitRange <= 0 || $distance > $unitRange) {
+                continue;
+            }
+
+            // Only include combat unit categories
+            if (!in_array($category, [
+                GameUnitCategory::TROOPS,
+                GameUnitCategory::AIR_UNITS,
+                GameUnitCategory::NAVAL_UNITS,
+            ])) {
+                continue;
+            }
+
+            $units[] = [
+                'gameUnitId' => $gameUnit->getId(),
+                'name' => $gameUnit->getName(),
+                'image' => $gameUnit->getImage(),
+                'imageDir' => $category->getImageDir(),
+                'amount' => $worldRegionUnit->getAmount(),
+                'category' => $category->getLabel(),
+            ];
+        }
+
+        return new JsonResponse([
+            'success' => true,
+            'units' => $units,
+            'sourceRegion' => [
+                'id' => $playerRegion->getId(),
+                'x' => $playerRegion->getX(),
+                'y' => $playerRegion->getY(),
+            ],
+            'targetRegion' => [
+                'id' => $targetRegion->getId(),
+                'x' => $targetRegion->getX(),
+                'y' => $targetRegion->getY(),
+                'ownerName' => $targetRegion->getPlayer()?->getName(),
+            ],
+        ]);
+    }
+
+    /**
+     * API: Send attack fleet from player region to target region.
+     */
+    public function attackSendApi(Request $request, int $regionId, int $playerRegionId): JsonResponse
+    {
+        $player = $this->getPlayer();
+
+        try {
+            $targetRegion = $this->regionActionService->getWorldRegionByIdAndWorld($regionId, $player->getWorld());
+            $playerRegion = $this->regionActionService->getWorldRegionByIdAndPlayer($playerRegionId, $player);
+        } catch (WorldRegionNotFoundException $e) {
+            return new JsonResponse(['success' => false, 'message' => $e->getMessage()], 404);
+        }
+
+        if ($targetRegion->getPlayer() === null) {
+            return new JsonResponse(['success' => false, 'message' => 'Cannot attack region without owner!'], 400);
+        }
+
+        if ($targetRegion->getPlayer()->getId() === $player->getId()) {
+            return new JsonResponse(['success' => false, 'message' => 'Cannot attack your own region!'], 400);
+        }
+
+        $data = json_decode($request->getContent(), true);
+        $unitData = $data['units'] ?? [];
+
+        if (empty($unitData)) {
+            return new JsonResponse(['success' => false, 'message' => 'No units selected!'], 400);
+        }
+
+        // Validate that all selected units are within range
+        $distance = $this->calculateTileDistance(
+            $playerRegion->getX(),
+            $playerRegion->getY(),
+            $targetRegion->getX(),
+            $targetRegion->getY()
+        );
+
+        $regionsByCoord = [];
+        foreach ($player->getWorld()->getWorldRegions() as $wr) {
+            $regionsByCoord[$wr->getX() . ',' . $wr->getY()] = $wr;
+        }
+
+        $targetIsCoastal = $this->isCoastalOrWater($targetRegion, $regionsByCoord);
+        $sourceIsCoastal = $this->isCoastalOrWater($playerRegion, $regionsByCoord);
+
+        // Build lookup of valid unit IDs for this attack
+        $validUnitIds = [];
+        foreach ($playerRegion->getWorldRegionUnits() as $worldRegionUnit) {
+            if ($worldRegionUnit->getAmount() <= 0) {
+                continue;
+            }
+            $gameUnit = $worldRegionUnit->getGameUnit();
+            $unitRange = $this->getUnitRange(
+                $gameUnit->getGameUnitCategory(),
+                $gameUnit->getRowName(),
+                $sourceIsCoastal,
+                $targetIsCoastal
+            );
+            if ($unitRange > 0 && $distance <= $unitRange) {
+                $validUnitIds[$gameUnit->getId()] = true;
+            }
+        }
+
+        // Filter out any units the player tried to send that aren't valid
+        $filteredUnits = [];
+        foreach ($unitData as $gameUnitId => $amount) {
+            $amount = (int) $amount;
+            if ($amount > 0 && isset($validUnitIds[(int) $gameUnitId])) {
+                $filteredUnits[(int) $gameUnitId] = (string) $amount;
+            }
+        }
+
+        if (empty($filteredUnits)) {
+            return new JsonResponse(['success' => false, 'message' => 'None of the selected units can reach the target!'], 400);
+        }
+
+        try {
+            $this->fleetActionService->sendGameUnits(
+                $playerRegion,
+                $targetRegion,
+                $player,
+                $filteredUnits
+            );
+        } catch (Throwable $e) {
+            return new JsonResponse(['success' => false, 'message' => $e->getMessage()], 400);
+        }
+
+        // Calculate travel time for the ETA
+        $travelTime = $this->distanceCalculator->calculateDistanceTravelTime(
+            $targetRegion->getX(),
+            $targetRegion->getY(),
+            $playerRegion->getX(),
+            $playerRegion->getY()
+        );
+
+        // Build unit list for frontend
+        $sentUnits = [];
+        $totalUnitCount = 0;
+        foreach ($filteredUnits as $gameUnitId => $amount) {
+            $gameUnit = $this->gameUnitRepository->find($gameUnitId);
+            if ($gameUnit !== null) {
+                $sentUnits[] = [
+                    'name' => $gameUnit->getName(),
+                    'amount' => (int) $amount,
+                ];
+                $totalUnitCount += (int) $amount;
+            }
+        }
+
+        return new JsonResponse([
+            'success' => true,
+            'message' => 'Attack fleet dispatched!',
+            'fleet' => [
+                'sourceX' => $playerRegion->getX(),
+                'sourceY' => $playerRegion->getY(),
+                'targetX' => $targetRegion->getX(),
+                'targetY' => $targetRegion->getY(),
+                'targetRegionId' => $targetRegion->getId(),
+                'targetIsYours' => false,
+                'timestampArrive' => time() + $travelTime,
+                'hasArrived' => false,
+                'eta' => $travelTime,
+                'unitCount' => $totalUnitCount,
+                'units' => $sentUnits,
+            ],
+        ]);
+    }
+
+    /**
+     * Get the attack range for a specific unit type.
+     */
+    private function getUnitRange(
+        GameUnitCategory $category,
+        string $rowName,
+        bool $sourceIsCoastal,
+        bool $targetIsCoastal
+    ): int {
+        return match (true) {
+            $category === GameUnitCategory::TROOPS && in_array($rowName, ['soldier', 'sniper', 'minesweeper'], true) => 1,
+            $category === GameUnitCategory::TROOPS && in_array($rowName, ['tank', 'artillery'], true) => 2,
+            $category === GameUnitCategory::AIR_UNITS && $rowName === 'fighter' => 3,
+            $category === GameUnitCategory::AIR_UNITS && $rowName === 'bomber' => 5,
+            $category === GameUnitCategory::AIR_UNITS && $rowName === 'strategic_bomber' => 7,
+            $category === GameUnitCategory::NAVAL_UNITS => ($sourceIsCoastal && $targetIsCoastal) ? 1 : 0,
+            default => 0,
+        };
+    }
+
+    /**
      * Calculate Chebyshev distance (tiles away) between two coordinates.
      * This counts diagonal movement as 1 tile.
      */
@@ -251,22 +489,12 @@ final class AttackController extends BaseGameController
             }
 
             $gameUnit = $worldRegionUnit->getGameUnit();
-            $category = $gameUnit->getGameUnitCategory();
-            $rowName = $gameUnit->getRowName();
-
-            $unitRange = match (true) {
-                // Infantry troops: range 1
-                $category === GameUnitCategory::TROOPS && in_array($rowName, ['soldier', 'sniper', 'minesweeper'], true) => 1,
-                // Tanks and artillery: range 2
-                $category === GameUnitCategory::TROOPS && in_array($rowName, ['tank', 'artillery'], true) => 2,
-                // Air units by type
-                $category === GameUnitCategory::AIR_UNITS && $rowName === 'fighter' => 3,
-                $category === GameUnitCategory::AIR_UNITS && $rowName === 'bomber' => 5,
-                $category === GameUnitCategory::AIR_UNITS && $rowName === 'strategic_bomber' => 7,
-                // Naval units: only if source is coastal AND target is coastal
-                $category === GameUnitCategory::NAVAL_UNITS => ($sourceIsCoastal && $targetIsCoastal) ? 1 : 0,
-                default => 0,
-            };
+            $unitRange = $this->getUnitRange(
+                $gameUnit->getGameUnitCategory(),
+                $gameUnit->getRowName(),
+                $sourceIsCoastal,
+                $targetIsCoastal
+            );
 
             $maxRange = max($maxRange, $unitRange);
         }
