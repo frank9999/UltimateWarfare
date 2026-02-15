@@ -1,0 +1,138 @@
+{# Attack Mode Banner #}
+<div id="attackModeBanner" class="attack-mode-banner">
+    <span id="attackModeText">Select a region to attack from...</span>
+    <button type="button" id="cancelAttackModeBtn">Cancel</button>
+</div>
+
+{# Buy Region Modal #}
+<div id="buyRegionModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span class="modal-title">Buy World Region</span>
+            <span class="close" id="closeModal">&times;</span>
+        </div>
+        <div class="modal-body" id="modalBody"></div>
+        <div class="modal-footer">
+            <button type="button" id="cancelBtn">Cancel</button>
+            <button type="button" id="confirmBuyBtn">Buy Region</button>
+        </div>
+    </div>
+</div>
+
+{# Enemy Region Modal #}
+<div id="enemyRegionModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span class="modal-title">Enemy Region</span>
+            <span class="close" id="closeEnemyModal">&times;</span>
+        </div>
+        <div class="modal-body" id="enemyModalBody"></div>
+        <div class="modal-footer">
+            <button type="button" id="sendMessageBtn">Send Message</button>
+            <button type="button" id="attackBtn">Attack</button>
+            <button type="button" id="operationBtn">Launch Operation</button>
+        </div>
+    </div>
+</div>
+
+{# Your Region Modal #}
+<div id="yourRegionModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span class="modal-title">Your Region</span>
+            <span class="close" id="closeYourModal">&times;</span>
+        </div>
+        <div class="modal-body" id="yourModalBody"></div>
+        <div class="modal-footer">
+            <button type="button" id="buildBtn">Build</button>
+            <button type="button" id="sendUnitsBtn">Send Units</button>
+        </div>
+    </div>
+</div>
+
+{# Headquarter Modal #}
+<div id="headquarterModal" class="modal">
+    <div class="modal-content modal-lg">
+        <div class="modal-header">
+            <span class="modal-title">Headquarter</span>
+            <span class="close" id="closeHqModal">&times;</span>
+        </div>
+        <div class="modal-body">
+            <p style="text-align: center;">Select an action:</p>
+        </div>
+        <div class="modal-footer hq-buttons">
+            <button type="button" id="hqOldInterfaceBtn">Old Interface</button>
+            <button type="button" id="hqMarketBtn">Market</button>
+            <button type="button" id="hqFederationBtn">Federation</button>
+            <button type="button" id="hqResearchBtn">Research</button>
+            <button type="button" id="hqRegionsBtn">Regions</button>
+            <button type="button" id="hqFleetsBtn">Fleets</button>
+            <button type="button" id="hqConstructionBtn">Construction</button>
+        </div>
+    </div>
+</div>
+
+{# Build Modal #}
+<div id="buildModal" class="modal">
+    <div class="modal-content build-modal-content">
+        <div class="modal-header">
+            <span class="modal-title">Build Units - Region <span id="buildRegionCoords"></span></span>
+            <span class="close" id="closeBuildModal">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div class="build-tabs" id="buildTabs"></div>
+            <div id="buildSpaceInfo" class="build-space-info" style="display: none;"></div>
+            <div id="buildUnitsContainer" class="build-units-container">
+                <div class="build-loading">Loading units...</div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" id="closeBuildBtn">Cancel</button>
+            <button type="button" id="confirmBuildBtn">Build Selected</button>
+        </div>
+    </div>
+</div>
+
+{# Reports Modal #}
+<div id="reportsModal" class="modal">
+    <div class="modal-content modal-lg">
+        <div class="modal-header">
+            <span class="modal-title">Reports</span>
+            <span class="close" id="closeReportsModal">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div class="build-tabs" id="reportsTabs"></div>
+            <div id="reportsContainer" style="max-height: 400px; overflow-y: auto;">
+                <div class="build-loading">Loading reports...</div>
+            </div>
+            <div id="reportsPagination" style="margin-top: 15px; text-align: center; display: none;">
+                <button type="button" id="reportsPrevBtn" class="legend-toggle" style="margin-right: 10px;">← Previous</button>
+                <span id="reportsPageInfo" style="color: #f3e6c1;"></span>
+                <button type="button" id="reportsNextBtn" class="legend-toggle" style="margin-left: 10px;">Next →</button>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" id="closeReportsBtn">Close</button>
+        </div>
+    </div>
+</div>
+
+{# Attack Unit Selection Modal #}
+<div id="attackUnitsModal" class="modal">
+    <div class="modal-content build-modal-content">
+        <div class="modal-header">
+            <span class="modal-title">Select Units to Attack — <span id="attackUnitsTarget"></span></span>
+            <span class="close" id="closeAttackUnitsModal">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div id="attackUnitsInfo" style="margin-bottom: 15px; font-size: 13px;"></div>
+            <div id="attackUnitsContainer" class="build-units-container">
+                <div class="build-loading">Loading units...</div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" id="cancelAttackUnitsBtn">Cancel</button>
+            <button type="button" id="confirmAttackUnitsBtn" style="background: #c44;">⚔ Send Attack</button>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,18 @@
+<div class="map-controls">
+    <button type="button" id="headquarterBtn">Headquarter</button>
+    <button type="button" id="reportsBtn">Reports</button>
+    <div style="float: right;">
+        <button type="button" id="zoomInBtn">Zoom In (+)</button>
+        <button type="button" id="zoomOutBtn">Zoom Out (-)</button>
+        <button type="button" id="resetViewBtn">Reset View</button>
+        <div class="profile-dropdown">
+            <button type="button" class="profile-icon" id="profileDropdownBtn">👤</button>
+            <div class="dropdown-content" id="profileDropdown">
+                <a href="{{ path('Game/Profile', {'playerName': player.name}) }}">Profile</a>
+                <a href="{{ path('Guide') }}">Help/FAQ</a>
+                <a href="{{ path('Game/Message/Inbox') }}">Messages</a>
+                <a href="{{ path('Site/Logout') }}">Log Off</a>
+            </div>
+        </div>
+    </div>
+</div>
