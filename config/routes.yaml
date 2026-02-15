@@ -675,6 +675,27 @@ Game/World/Region/SendUnits:
     requirements:
         regionId: '\d+'
 
+Game/World/Region/SendUnits/Data/Api:
+    path:      /game/api/world/region/send-units-data/{regionId}
+    controller: FrankProjects\UltimateWarfare\Controller\Game\FleetController::sendUnitsDataApi
+    methods: [GET]
+    requirements:
+        regionId: '\d+'
+
+Game/World/Region/SendUnits/Targets/Api:
+    path:      /game/api/world/region/send-units-targets/{regionId}
+    controller: FrankProjects\UltimateWarfare\Controller\Game\FleetController::sendUnitsTargetsApi
+    methods: [GET]
+    requirements:
+        regionId: '\d+'
+
+Game/World/Region/SendUnits/Send/Api:
+    path:      /game/api/world/region/send-units/{regionId}
+    controller: FrankProjects\UltimateWarfare\Controller\Game\FleetController::sendUnitsApi
+    methods: [POST]
+    requirements:
+        regionId: '\d+'
+
 Game/World/Sector:
     path:      /game/world/sector/{sectorId}
     controller: FrankProjects\UltimateWarfare\Controller\Game\SectorController::sector

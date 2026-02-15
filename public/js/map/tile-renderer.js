@@ -47,6 +47,13 @@ class TileRenderer {
                 this.drawDiamond(iso);
                 this.ctx.stroke();
                 this.ctx.restore();
+            } else if (region._sendSource) {
+                this.ctx.save();
+                this.ctx.strokeStyle = '#2196F3';
+                this.ctx.lineWidth = 3;
+                this.drawDiamond(iso);
+                this.ctx.stroke();
+                this.ctx.restore();
             } else if (region._attackEligible) {
                 this.ctx.save();
                 this.ctx.fillStyle = 'rgba(0, 255, 100, 0.35)';

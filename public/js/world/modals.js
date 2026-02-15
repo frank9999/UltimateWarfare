@@ -141,7 +141,10 @@
         }
     };
     document.getElementById('sendUnitsBtn').onclick = function () {
-        if (selectedYourRegion) window.location.href = '/game/world/region/send-units/' + selectedYourRegion.id;
+        if (selectedYourRegion) {
+            yourModal.style.display = 'none';
+            WorldSendUnits.startSendUnits(selectedYourRegion);
+        }
     };
 
     // ===== Headquarter Modal =====
@@ -164,6 +167,7 @@
         if (event.target === hqModal) { hqModal.style.display = 'none'; }
         if (event.target === WorldBuild.modal) { WorldBuild.modal.style.display = 'none'; }
         if (event.target === WorldReports.modal) { WorldReports.modal.style.display = 'none'; }
+        if (event.target === WorldSendUnits.modal) { WorldSendUnits.modal.style.display = 'none'; }
     };
 
     // ===== Default tile click handler =====

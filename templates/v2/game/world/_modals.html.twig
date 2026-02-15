@@ -136,3 +136,23 @@
         </div>
     </div>
 </div>
+
+{# Send Units Modal - Step 1: Select units #}
+<div id="sendUnitsModal" class="modal">
+    <div class="modal-content build-modal-content">
+        <div class="modal-header">
+            <span class="modal-title">Send Units — From <span id="sendUnitsSource"></span></span>
+            <span class="close" id="closeSendUnitsModal">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div id="sendUnitsInfo" style="margin-bottom: 15px; font-size: 13px;"></div>
+            <div id="sendUnitsContainer" class="build-units-container">
+                <div class="build-loading">Loading available units...</div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" id="cancelSendUnitsBtn">Cancel</button>
+            <button type="button" id="confirmSendUnitsBtn" style="background: #2196F3;">🚀 Select Target</button>
+        </div>
+    </div>
+</div>
