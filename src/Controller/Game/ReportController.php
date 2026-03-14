@@ -64,7 +64,8 @@ final class ReportController extends BaseGameController
         $type = null;
         if ($typeParam !== null && $typeParam !== '' && $typeParam !== 'all') {
             $type = (int) $typeParam;
-            if (!in_array($type, [Report::TYPE_ATTACKED, Report::TYPE_GENERAL, Report::TYPE_MARKET, Report::TYPE_AID], true)) {
+            $validTypes = [Report::TYPE_ATTACKED, Report::TYPE_GENERAL, Report::TYPE_MARKET, Report::TYPE_AID];
+            if (!in_array($type, $validTypes, true)) {
                 $type = null;
             }
         }

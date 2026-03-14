@@ -33,7 +33,8 @@ final class RegisterController extends AbstractController
                 $this->registerActionService->register($user);
                 $this->addFlash(
                     'success',
-                    "You successfully created an account! An e-mail has been sent to {$user->getEmail()} with your activation code..."
+                    "You successfully created an account!"
+                    . " An e-mail has been sent to {$user->getEmail()} with your activation code..."
                 );
             } catch (Throwable $e) {
                 $this->addFlash('error', $e->getMessage());

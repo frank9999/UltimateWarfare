@@ -296,7 +296,10 @@ final class AttackController extends BaseGameController
         }
 
         if ($filteredUnits === []) {
-            return new JsonResponse(['success' => false, 'message' => 'None of the selected units can reach the target!'], 400);
+            return new JsonResponse(
+                ['success' => false, 'message' => 'None of the selected units can reach the target!'],
+                400
+            );
         }
 
         try {
@@ -361,7 +364,8 @@ final class AttackController extends BaseGameController
         bool $targetIsCoastal
     ): int {
         return match (true) {
-            $category === GameUnitCategory::TROOPS && in_array($rowName, ['soldier', 'sniper', 'minesweeper'], true) => 1,
+            $category === GameUnitCategory::TROOPS
+                && in_array($rowName, ['soldier', 'sniper', 'minesweeper'], true) => 1,
             $category === GameUnitCategory::TROOPS && in_array($rowName, ['tank', 'artillery'], true) => 2,
             $category === GameUnitCategory::AIR_UNITS && $rowName === 'fighter' => 3,
             $category === GameUnitCategory::AIR_UNITS && $rowName === 'bomber' => 5,

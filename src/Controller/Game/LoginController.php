@@ -33,8 +33,11 @@ final class LoginController extends BaseGameController
         return $this->redirectToRoute('Game/Headquarter');
     }
 
-    public function loginForPlayer(RequestStack $requestStack, int $playerId, PlayerRepository $playerRepository): RedirectResponse
-    {
+    public function loginForPlayer(
+        RequestStack $requestStack,
+        int $playerId,
+        PlayerRepository $playerRepository
+    ): RedirectResponse {
         try {
             $user = $this->getLoginUser();
         } catch (Throwable $e) {

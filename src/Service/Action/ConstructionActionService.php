@@ -178,7 +178,10 @@ final class ConstructionActionService
         }
 
         // Sea mines can only be built on beach or water regions
-        if ($rowName === 'sea_mine' && !in_array($regionType, [WorldRegion::TYPE_BEACH, WorldRegion::TYPE_WATER], true)) {
+        if (
+            $rowName === 'sea_mine'
+            && !in_array($regionType, [WorldRegion::TYPE_BEACH, WorldRegion::TYPE_WATER], true)
+        ) {
             throw new RuntimeException("Cannot build {$gameUnit->getName()}: requires a beach or water region.");
         }
     }
@@ -277,7 +280,10 @@ final class ConstructionActionService
 
     public function getCountGameUnitsInConstruction(WorldRegion $worldRegion, GameUnitCategory $gameUnitCategory): int
     {
-        return $this->constructionRepository->getGameUnitConstructionSumByWorldRegionAndCategory($worldRegion, $gameUnitCategory);
+        return $this->constructionRepository->getGameUnitConstructionSumByWorldRegionAndCategory(
+            $worldRegion,
+            $gameUnitCategory
+        );
     }
 
     public function getCountGameUnitsInWorldRegion(WorldRegion $worldRegion, GameUnitCategory $gameUnitCategory): int

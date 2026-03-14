@@ -95,7 +95,12 @@ class TopicController extends BaseForumController
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid() && $this->getGameUser() !== null) {
             try {
-                $this->topicActionService->create($topic, $category, $this->getGameUser(), (string) $request->getClientIp());
+                $this->topicActionService->create(
+                    $topic,
+                    $category,
+                    $this->getGameUser(),
+                    (string) $request->getClientIp()
+                );
                 $this->addFlash('success', 'Successfully created topic');
             } catch (Throwable $e) {
                 $this->addFlash('error', $e->getMessage());

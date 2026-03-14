@@ -16,7 +16,10 @@ final class AdvancedSpy2 extends OperationProcessor
         $guards = $this->getGuards();
         $total_units = $this->amount + $guards + 1;
 
-        return (3 * $this->amount / (2 * $total_units)) - (3 * $guards / (2 * $total_units)) - $this->operation->getDifficulty() + $this->getRandomChance();
+        return (3 * $this->amount / (2 * $total_units))
+            - (3 * $guards / (2 * $total_units))
+            - $this->operation->getDifficulty()
+            + $this->getRandomChance();
     }
 
     public function processPreOperation(): void
@@ -48,7 +51,8 @@ final class AdvancedSpy2 extends OperationProcessor
             }
         }
 
-        $reportText = "{$this->getPlayerRegionPlayer()->getName()} tried to spy on region {$this->region->getX()}, {$this->region->getY()} but failed.";
+        $reportText = "{$this->getPlayerRegionPlayer()->getName()} tried to spy"
+            . " on region {$this->region->getX()}, {$this->region->getY()} but failed.";
         $this->reportCreator->createReport($this->getTargetRegionPlayer(), time(), $reportText, Report::TYPE_GENERAL);
 
         $this->addToOperationLog("We failed to spy and lost {$spiesLost} spies");

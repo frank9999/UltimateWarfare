@@ -273,7 +273,10 @@ class WorldRegion
     }
 
     /**
-     * @return array{id: int, x: int, y: int, z: int, type: string, owner: string, units: array<int, WorldRegionUnit>, structures: array<never>}
+     * @return array{
+     *   id: int, x: int, y: int, z: int, type: string, owner: string,
+     *   units: array<int, WorldRegionUnit>, structures: array<never>
+     * }
      */
     public function toArray(): array
     {

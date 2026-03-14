@@ -18,7 +18,10 @@ final class SubmarineAttack extends OperationProcessor
         $guards = $this->getGuards();
         $total_units = $specialOps + $guards + 1;
 
-        return (3 * $specialOps / (2 * $total_units)) - (3 * $guards / (2 * $total_units)) - $this->operation->getDifficulty() + $this->getRandomChance();
+        return (3 * $specialOps / (2 * $total_units))
+            - (3 * $guards / (2 * $total_units))
+            - $this->operation->getDifficulty()
+            + $this->getRandomChance();
     }
 
     public function processPreOperation(): void
@@ -44,7 +47,8 @@ final class SubmarineAttack extends OperationProcessor
             }
 
             $this->addToOperationLog("You sunk all ships!");
-            $reportText = "Somebody launched a Submarine attack against region {$this->region->getX()}, {$this->region->getY()} and sunk all ships.";
+            $reportText = "Somebody launched a Submarine attack"
+                . " against region {$this->region->getX()}, {$this->region->getY()} and sunk all ships.";
             $this->reportCreator->createReport($this->getTargetRegionPlayer(), time(), $reportText);
         } else {
             $shipsDestroyed = $this->amount * self::SHIPS_KILLED_PER_SUBMARINE;
@@ -58,7 +62,9 @@ final class SubmarineAttack extends OperationProcessor
                 }
             }
 
-            $reportText = "Somebody launched a Submarine attack against region {$this->region->getX()}, {$this->region->getY()} and sunk {$shipsDestroyed} ships.";
+            $reportText = "Somebody launched a Submarine attack"
+                . " against region {$this->region->getX()}, {$this->region->getY()}"
+                . " and sunk {$shipsDestroyed} ships.";
             $this->reportCreator->createReport($this->getTargetRegionPlayer(), time(), $reportText);
         }
     }
@@ -80,7 +86,8 @@ final class SubmarineAttack extends OperationProcessor
             }
         }
 
-        $reportText = "{$this->getPlayerRegionPlayer()->getName()} tried to launch a Submarine attack against region {$this->region->getX()}, {$this->region->getY()} but failed.";
+        $reportText = "{$this->getPlayerRegionPlayer()->getName()} tried to launch a Submarine attack"
+            . " against region {$this->region->getX()}, {$this->region->getY()} but failed.";
         $this->reportCreator->createReport($this->getTargetRegionPlayer(), time(), $reportText);
 
         $this->addToOperationLog(

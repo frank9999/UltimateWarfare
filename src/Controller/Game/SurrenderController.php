@@ -28,7 +28,10 @@ final class SurrenderController extends BaseGameController
 
             if ($passwordHasher->isPasswordValid($user, $plainPassword)) {
                 if ($player->getFederation() !== null && $player->getFederation()->getFounder() === $player) {
-                    $this->addFlash('error', 'You can not surrender if you are a Federation founder, please disband Federation first.');
+                    $this->addFlash(
+                        'error',
+                        'You can not surrender if you are a Federation founder, please disband Federation first.'
+                    );
                 } else {
                     $playerRepository->remove($player);
                     $this->addFlash('success', "You have surrendered your empire...");

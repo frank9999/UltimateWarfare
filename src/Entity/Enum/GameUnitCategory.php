@@ -92,7 +92,8 @@ enum GameUnitCategory: int
     public function getConstructionAction(): string
     {
         return match ($this) {
-            self::BUILDINGS, self::DEFENSE_BUILDINGS, self::SPECIAL_BUILDINGS, self::NAVAL_UNITS, self::AIR_UNITS, self::MISSILES => 'built',
+            self::BUILDINGS, self::DEFENSE_BUILDINGS, self::SPECIAL_BUILDINGS,
+            self::NAVAL_UNITS, self::AIR_UNITS, self::MISSILES => 'built',
             self::SPECIAL_UNITS, self::TROOPS => 'trained'
         };
     }
@@ -100,7 +101,8 @@ enum GameUnitCategory: int
     public function getRemoveGameUnitActionDescription(): string
     {
         return match ($this) {
-            self::BUILDINGS, self::DEFENSE_BUILDINGS, self::SPECIAL_BUILDINGS, self::NAVAL_UNITS, self::AIR_UNITS, self::MISSILES => 'destroyed',
+            self::BUILDINGS, self::DEFENSE_BUILDINGS, self::SPECIAL_BUILDINGS,
+            self::NAVAL_UNITS, self::AIR_UNITS, self::MISSILES => 'destroyed',
             self::SPECIAL_UNITS, self::TROOPS => 'disbanded'
         };
     }

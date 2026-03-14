@@ -21,7 +21,10 @@ final class DestroyCash extends OperationProcessor
         $guards = $this->getGuards();
         $total_units = $specialOps + $guards + 1;
 
-        return (3 * $specialOps / (2 * $total_units)) - (3 * $guards / (2 * $total_units)) - $this->operation->getDifficulty() + $this->getRandomChance();
+        return (3 * $specialOps / (2 * $total_units))
+            - (3 * $guards / (2 * $total_units))
+            - $this->operation->getDifficulty()
+            + $this->getRandomChance();
     }
 
     public function processPreOperation(): void
@@ -60,7 +63,8 @@ final class DestroyCash extends OperationProcessor
         $this->playerRepository->save($player);
 
         $this->addToOperationLog("You destroyed {$percentageDestroyed}% of the cash, {$cashDestroyed} in total!");
-        $reportText = "{$this->getPlayerRegionPlayer()->getName()} destroyed {$cashDestroyed} cash on region {$this->region->getX()}, {$this->region->getY()}.";
+        $reportText = "{$this->getPlayerRegionPlayer()->getName()} destroyed {$cashDestroyed} cash"
+            . " on region {$this->region->getX()}, {$this->region->getY()}.";
         $this->reportCreator->createReport($this->getTargetRegionPlayer(), time(), $reportText);
     }
 
@@ -75,7 +79,8 @@ final class DestroyCash extends OperationProcessor
             }
         }
 
-        $reportText = "{$this->getPlayerRegionPlayer()->getName()} tried to destroy cash on region {$this->region->getX()}, {$this->region->getY()} but failed.";
+        $reportText = "{$this->getPlayerRegionPlayer()->getName()} tried to destroy cash"
+            . " on region {$this->region->getX()}, {$this->region->getY()} but failed.";
         $this->reportCreator->createReport($this->getTargetRegionPlayer(), time(), $reportText);
 
         $this->addToOperationLog("We failed to destroy cash and lost {$specialOpsLost} Special Ops");

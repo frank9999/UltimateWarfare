@@ -66,7 +66,10 @@ final class ConstructionController extends BaseGameController
             );
         }
 
-        $constructions = $this->constructionRepository->findByPlayerAndGameUnitCategory($this->getPlayer(), $gameUnitCategory);
+        $constructions = $this->constructionRepository->findByPlayerAndGameUnitCategory(
+            $this->getPlayer(),
+            $gameUnitCategory
+        );
 
         return $this->render(
             'game/construction.html.twig',
@@ -135,7 +138,10 @@ final class ConstructionController extends BaseGameController
 
     private function addConstructGameUnitsFlash(GameUnitCategory $gameUnitCategory): void
     {
-        $this->addFlash('success', "New {$gameUnitCategory->getLabel()} are now being {$gameUnitCategory->getConstructionAction()}!");
+        $this->addFlash(
+            'success',
+            "New {$gameUnitCategory->getLabel()} are now being {$gameUnitCategory->getConstructionAction()}!"
+        );
     }
 
     public function removeGameUnits(Request $request, int $regionId, int $gameUnitCategoryId): Response
@@ -185,7 +191,10 @@ final class ConstructionController extends BaseGameController
 
     private function addRemoveGameUnitsFlash(GameUnitCategory $gameUnitCategory): void
     {
-        $this->addFlash('success', "You have {$gameUnitCategory->getRemoveGameUnitActionDescription()} {$gameUnitCategory->getLabel()}!");
+        $this->addFlash(
+            'success',
+            "You have {$gameUnitCategory->getRemoveGameUnitActionDescription()} {$gameUnitCategory->getLabel()}!"
+        );
     }
 
     public function cancel(int $constructionId): RedirectResponse
@@ -223,7 +232,9 @@ final class ConstructionController extends BaseGameController
             /** @var array<string, mixed>|null $data */
             $data = json_decode($request->getContent(), true);
             /** @var array<int, string> $construct */
-            $construct = is_array($data) && isset($data['construct']) && is_array($data['construct']) ? $data['construct'] : [];
+            $construct = is_array($data) && isset($data['construct']) && is_array($data['construct'])
+                ? $data['construct']
+                : [];
 
             $this->constructionActionService->constructGameUnits(
                 $worldRegion,
@@ -233,7 +244,8 @@ final class ConstructionController extends BaseGameController
             );
 
             $player = $this->getPlayer();
-            $message = "New {$gameUnitCategory->getLabel()} are now being {$gameUnitCategory->getConstructionAction()}!";
+            $message = "New {$gameUnitCategory->getLabel()}"
+                . " are now being {$gameUnitCategory->getConstructionAction()}!";
 
             return new JsonResponse([
                 'success' => true,
@@ -311,10 +323,16 @@ final class ConstructionController extends BaseGameController
         $categories[] = ['id' => GameUnitCategory::BUILDINGS->value, 'name' => GameUnitCategory::BUILDINGS->getLabel()];
 
         // Defense Buildings - always visible, but sea mines filtered per-unit by behavior
-        $categories[] = ['id' => GameUnitCategory::DEFENSE_BUILDINGS->value, 'name' => GameUnitCategory::DEFENSE_BUILDINGS->getLabel()];
+        $categories[] = [
+            'id' => GameUnitCategory::DEFENSE_BUILDINGS->value,
+            'name' => GameUnitCategory::DEFENSE_BUILDINGS->getLabel(),
+        ];
 
         // Special Buildings - always visible, but harbor filtered per-unit by behavior
-        $categories[] = ['id' => GameUnitCategory::SPECIAL_BUILDINGS->value, 'name' => GameUnitCategory::SPECIAL_BUILDINGS->getLabel()];
+        $categories[] = [
+            'id' => GameUnitCategory::SPECIAL_BUILDINGS->value,
+            'name' => GameUnitCategory::SPECIAL_BUILDINGS->getLabel(),
+        ];
 
         // Troops - only when barrack exists (tanks further filtered by factory via behavior)
         if ($hasBarrack) {
@@ -323,22 +341,34 @@ final class ConstructionController extends BaseGameController
 
         // Elite Units - only when barrack exists
         if ($hasBarrack) {
-            $categories[] = ['id' => GameUnitCategory::SPECIAL_UNITS->value, 'name' => GameUnitCategory::SPECIAL_UNITS->getLabel()];
+            $categories[] = [
+                'id' => GameUnitCategory::SPECIAL_UNITS->value,
+                'name' => GameUnitCategory::SPECIAL_UNITS->getLabel(),
+            ];
         }
 
         // Air Units - only when airport exists
         if ($hasAirport) {
-            $categories[] = ['id' => GameUnitCategory::AIR_UNITS->value, 'name' => GameUnitCategory::AIR_UNITS->getLabel()];
+            $categories[] = [
+                'id' => GameUnitCategory::AIR_UNITS->value,
+                'name' => GameUnitCategory::AIR_UNITS->getLabel(),
+            ];
         }
 
         // Naval Units - only when harbor exists
         if ($hasHarbor) {
-            $categories[] = ['id' => GameUnitCategory::NAVAL_UNITS->value, 'name' => GameUnitCategory::NAVAL_UNITS->getLabel()];
+            $categories[] = [
+                'id' => GameUnitCategory::NAVAL_UNITS->value,
+                'name' => GameUnitCategory::NAVAL_UNITS->getLabel(),
+            ];
         }
 
         // Missiles - only when missile silo exists
         if ($hasMissileSilo) {
-            $categories[] = ['id' => GameUnitCategory::MISSILES->value, 'name' => GameUnitCategory::MISSILES->getLabel()];
+            $categories[] = [
+                'id' => GameUnitCategory::MISSILES->value,
+                'name' => GameUnitCategory::MISSILES->getLabel(),
+            ];
         }
 
         return new JsonResponse([
@@ -404,7 +434,11 @@ final class ConstructionController extends BaseGameController
             }
 
             // Filter sea mines from defense buildings when region is not beach or water
-            if ($gameUnitCategory === GameUnitCategory::DEFENSE_BUILDINGS && $rowName === 'sea_mine' && !$isBeachOrWater) {
+            if (
+                $gameUnitCategory === GameUnitCategory::DEFENSE_BUILDINGS
+                && $rowName === 'sea_mine'
+                && !$isBeachOrWater
+            ) {
                 continue;
             }
 
@@ -438,7 +472,11 @@ final class ConstructionController extends BaseGameController
                 'netWorth' => $gameUnit->getNetWorth(),
                 'timestamp' => $gameUnit->getTimestamp(),
                 'canBuild' => $canBuild,
-                'buildRequirement' => $canBuild ? '' : ($gameUnitCategory === GameUnitCategory::TROOPS && $rowName === 'tank' && !$hasFactory ? 'Requires a Factory' : $behavior->getBuildRequirementDescription()),
+                'buildRequirement' => $canBuild ? '' : (
+                    $gameUnitCategory === GameUnitCategory::TROOPS && $rowName === 'tank' && !$hasFactory
+                        ? 'Requires a Factory'
+                        : $behavior->getBuildRequirementDescription()
+                ),
                 'owned' => $gameUnitData[$gameUnit->getId()] ?? 0,
                 'inConstruction' => $constructionData[$gameUnit->getId()] ?? 0
             ];

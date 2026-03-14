@@ -14,7 +14,10 @@ final class NuclearMissileAttack extends OperationProcessor
         $guards = $this->getGuards();
         $total_units = $specialOps + $guards + 1;
 
-        return (3 * $specialOps / (2 * $total_units)) - (3 * $guards / (2 * $total_units)) - $this->operation->getDifficulty() + $this->getRandomChance();
+        return (3 * $specialOps / (2 * $total_units))
+            - (3 * $guards / (2 * $total_units))
+            - $this->operation->getDifficulty()
+            + $this->getRandomChance();
     }
 
     public function processPreOperation(): void
@@ -41,11 +44,13 @@ final class NuclearMissileAttack extends OperationProcessor
         $this->region->setPlayer(null);
         $this->worldRegionRepository->save($this->region);
 
-        $reportText = "{$this->getPlayerRegionPlayer()->getName()} launched a nuclear missile attack against region {$this->region->getX()}, {$this->region->getY()} and destroyed everything.";
+        $reportText = "{$this->getPlayerRegionPlayer()->getName()} launched a nuclear missile attack"
+            . " against region {$this->region->getX()}, {$this->region->getY()} and destroyed everything.";
         $this->reportCreator->createReport($this->getTargetRegionPlayer(), time(), $reportText);
 
         $this->addToOperationLog(
-            "The region is fully destroyed, a high amount of toxic radiation will make the region unliveable for an unknown amount of time!"
+            "The region is fully destroyed, a high amount of toxic radiation"
+            . " will make the region unliveable for an unknown amount of time!"
         );
     }
 
@@ -60,7 +65,8 @@ final class NuclearMissileAttack extends OperationProcessor
             }
         }
 
-        $reportText = "{$this->getPlayerRegionPlayer()->getName()} tried to launch a nuclear missile attack on region {$this->region->getX()}, {$this->region->getY()} but failed.";
+        $reportText = "{$this->getPlayerRegionPlayer()->getName()} tried to launch a nuclear missile attack"
+            . " on region {$this->region->getX()}, {$this->region->getY()} but failed.";
         $this->reportCreator->createReport($this->getTargetRegionPlayer(), time(), $reportText);
 
         $this->addToOperationLog("We failed to our nuclear missile attack and lost {$specialOpsLost} Special Ops");

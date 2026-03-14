@@ -149,7 +149,15 @@ final class WorldController extends BaseGameController
     }
 
     /**
-     * @return list<array{x: int, y: int, id: int, type: string, image: string, hasOwner: bool, isYours: bool, ownerName: string|null, isVisible: bool, units: array{buildings: int, defences: int, special: int, specialUnits: int, troops: int, navalUnits: int, airUnits: int, missiles: int, details: array<string, list<array{name: string, amount: int}>>}|array{}}>
+     * @return list<array{
+     *   x: int, y: int, id: int, type: string, image: string, hasOwner: bool,
+     *   isYours: bool, ownerName: string|null, isVisible: bool,
+     *   units: array{
+     *     buildings: int, defences: int, special: int, specialUnits: int,
+     *     troops: int, navalUnits: int, airUnits: int, missiles: int,
+     *     details: array<string, list<array{name: string, amount: int}>>
+     *   }|array{}
+     * }>
      */
     private function getWorldRegionsData(World $world, Player $player): array
     {
@@ -228,11 +236,20 @@ final class WorldController extends BaseGameController
     /**
      * Get a summary of units in a region grouped by type
      *
-     * @return array{buildings: int, defences: int, special: int, specialUnits: int, troops: int, navalUnits: int, airUnits: int, missiles: int, details: array<string, list<array{name: string, amount: int}>>}
+     * @return array{
+     *   buildings: int, defences: int, special: int, specialUnits: int,
+     *   troops: int, navalUnits: int, airUnits: int, missiles: int,
+     *   details: array<string, list<array{name: string, amount: int}>>
+     * }
      */
     private function getUnitSummary(WorldRegion $region): array
     {
-        /** @var array{buildings: int, defences: int, special: int, specialUnits: int, troops: int, navalUnits: int, airUnits: int, missiles: int, details: array<string, list<array{name: string, amount: int}>>} $summary */
+        /** @var array{
+         *   buildings: int, defences: int, special: int, specialUnits: int,
+         *   troops: int, navalUnits: int, airUnits: int, missiles: int,
+         *   details: array<string, list<array{name: string, amount: int}>>
+         * } $summary
+         */
         $summary = [
             'buildings' => 0,
             'defences' => 0,
@@ -261,9 +278,11 @@ final class WorldController extends BaseGameController
 
             match ($gameUnitCategory) {
                 GameUnitCategory::BUILDINGS => $this->addUnitToSummary($summary, 'buildings', $unitName, $amount),
-                GameUnitCategory::DEFENSE_BUILDINGS => $this->addUnitToSummary($summary, 'defences', $unitName, $amount),
+                GameUnitCategory::DEFENSE_BUILDINGS =>
+                    $this->addUnitToSummary($summary, 'defences', $unitName, $amount),
                 GameUnitCategory::SPECIAL_BUILDINGS => $this->addUnitToSummary($summary, 'special', $unitName, $amount),
-                GameUnitCategory::SPECIAL_UNITS => $this->addUnitToSummary($summary, 'specialUnits', $unitName, $amount),
+                GameUnitCategory::SPECIAL_UNITS =>
+                    $this->addUnitToSummary($summary, 'specialUnits', $unitName, $amount),
                 GameUnitCategory::TROOPS => $this->addUnitToSummary($summary, 'troops', $unitName, $amount),
                 GameUnitCategory::NAVAL_UNITS => $this->addUnitToSummary($summary, 'navalUnits', $unitName, $amount),
                 GameUnitCategory::AIR_UNITS => $this->addUnitToSummary($summary, 'airUnits', $unitName, $amount),
@@ -271,7 +290,12 @@ final class WorldController extends BaseGameController
             };
         }
 
-        /** @var array{buildings: int, defences: int, special: int, specialUnits: int, troops: int, navalUnits: int, airUnits: int, missiles: int, details: array<string, list<array{name: string, amount: int}>>} $summary */
+        /** @var array{
+         *   buildings: int, defences: int, special: int, specialUnits: int,
+         *   troops: int, navalUnits: int, airUnits: int, missiles: int,
+         *   details: array<string, list<array{name: string, amount: int}>>
+         * } $summary
+         */
         return $summary;
     }
 

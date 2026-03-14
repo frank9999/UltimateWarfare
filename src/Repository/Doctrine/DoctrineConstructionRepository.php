@@ -63,8 +63,10 @@ final class DoctrineConstructionRepository implements ConstructionRepository
         return $gameUnits;
     }
 
-    public function getGameUnitConstructionSumByWorldRegionAndCategory(WorldRegion $worldRegion, GameUnitCategory $gameUnitCategory): int
-    {
+    public function getGameUnitConstructionSumByWorldRegionAndCategory(
+        WorldRegion $worldRegion,
+        GameUnitCategory $gameUnitCategory
+    ): int {
         $results = $this->entityManager
             ->createQuery(
                 'SELECT gu.id, sum(c.number) as total

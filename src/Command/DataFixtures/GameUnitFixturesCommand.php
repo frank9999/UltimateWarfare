@@ -290,7 +290,19 @@ class GameUnitFixturesCommand extends Command
     }
 
     /**
-     * @param array{id: int, game_unit_category: int, name: string, name_multi: string, row_name: string, image: string, net_worth: int, timestamp: int, description: string, battle_stats: array{health: int, armor: int, travel_speed: int, air_attack: int, air_attack_speed: int, air_defence: int, air_defence_speed: int, sea_attack: int, sea_attack_speed: int, sea_defence: int, sea_defence_speed: int, ground_attack: int, ground_attack_speed: int, ground_defence: int, ground_defence_speed: int}, cost: array{cash: int, steel: int, wood: int, food: int}, income: array{cash: int, steel: int, wood: int, food: int}, upkeep: array{cash: int, steel: int, wood: int, food: int}} $data
+     * @param array{
+     *   id: int, game_unit_category: int, name: string, name_multi: string, row_name: string,
+     *   image: string, net_worth: int, timestamp: int, description: string,
+     *   battle_stats: array{
+     *     health: int, armor: int, travel_speed: int,
+     *     air_attack: int, air_attack_speed: int, air_defence: int, air_defence_speed: int,
+     *     sea_attack: int, sea_attack_speed: int, sea_defence: int, sea_defence_speed: int,
+     *     ground_attack: int, ground_attack_speed: int, ground_defence: int, ground_defence_speed: int
+     *   },
+     *   cost: array{cash: int, steel: int, wood: int, food: int},
+     *   income: array{cash: int, steel: int, wood: int, food: int},
+     *   upkeep: array{cash: int, steel: int, wood: int, food: int}
+     * } $data
      * @return array<string, array{old: int|string, new: int|string}>
      */
     private function detectDifferences(GameUnit $gameUnit, array $data): array
@@ -342,7 +354,10 @@ class GameUnitFixturesCommand extends Command
 
         $travelSpeedValue = $this->getIntReflectionValue($battleStats, 'travelSpeed');
         if ($travelSpeedValue !== $data['battle_stats']['travel_speed']) {
-            $differences['battle_stats.travel_speed'] = ['old' => $travelSpeedValue, 'new' => $data['battle_stats']['travel_speed']];
+            $differences['battle_stats.travel_speed'] = [
+                'old' => $travelSpeedValue,
+                'new' => $data['battle_stats']['travel_speed'],
+            ];
         }
 
         // Check air battle stats
@@ -350,22 +365,34 @@ class GameUnitFixturesCommand extends Command
 
         $airAttack = $this->getIntReflectionValue($airStats, 'attack');
         if ($airAttack !== $data['battle_stats']['air_attack']) {
-            $differences['battle_stats.air_attack'] = ['old' => $airAttack, 'new' => $data['battle_stats']['air_attack']];
+            $differences['battle_stats.air_attack'] = [
+                'old' => $airAttack,
+                'new' => $data['battle_stats']['air_attack'],
+            ];
         }
 
         $airAttackSpeed = $this->getIntReflectionValue($airStats, 'attackSpeed');
         if ($airAttackSpeed !== $data['battle_stats']['air_attack_speed']) {
-            $differences['battle_stats.air_attack_speed'] = ['old' => $airAttackSpeed, 'new' => $data['battle_stats']['air_attack_speed']];
+            $differences['battle_stats.air_attack_speed'] = [
+                'old' => $airAttackSpeed,
+                'new' => $data['battle_stats']['air_attack_speed'],
+            ];
         }
 
         $airDefence = $this->getIntReflectionValue($airStats, 'defence');
         if ($airDefence !== $data['battle_stats']['air_defence']) {
-            $differences['battle_stats.air_defence'] = ['old' => $airDefence, 'new' => $data['battle_stats']['air_defence']];
+            $differences['battle_stats.air_defence'] = [
+                'old' => $airDefence,
+                'new' => $data['battle_stats']['air_defence'],
+            ];
         }
 
         $airDefenceSpeed = $this->getIntReflectionValue($airStats, 'defenceSpeed');
         if ($airDefenceSpeed !== $data['battle_stats']['air_defence_speed']) {
-            $differences['battle_stats.air_defence_speed'] = ['old' => $airDefenceSpeed, 'new' => $data['battle_stats']['air_defence_speed']];
+            $differences['battle_stats.air_defence_speed'] = [
+                'old' => $airDefenceSpeed,
+                'new' => $data['battle_stats']['air_defence_speed'],
+            ];
         }
 
         // Check sea battle stats
@@ -373,22 +400,34 @@ class GameUnitFixturesCommand extends Command
 
         $seaAttack = $this->getIntReflectionValue($seaStats, 'attack');
         if ($seaAttack !== $data['battle_stats']['sea_attack']) {
-            $differences['battle_stats.sea_attack'] = ['old' => $seaAttack, 'new' => $data['battle_stats']['sea_attack']];
+            $differences['battle_stats.sea_attack'] = [
+                'old' => $seaAttack,
+                'new' => $data['battle_stats']['sea_attack'],
+            ];
         }
 
         $seaAttackSpeed = $this->getIntReflectionValue($seaStats, 'attackSpeed');
         if ($seaAttackSpeed !== $data['battle_stats']['sea_attack_speed']) {
-            $differences['battle_stats.sea_attack_speed'] = ['old' => $seaAttackSpeed, 'new' => $data['battle_stats']['sea_attack_speed']];
+            $differences['battle_stats.sea_attack_speed'] = [
+                'old' => $seaAttackSpeed,
+                'new' => $data['battle_stats']['sea_attack_speed'],
+            ];
         }
 
         $seaDefence = $this->getIntReflectionValue($seaStats, 'defence');
         if ($seaDefence !== $data['battle_stats']['sea_defence']) {
-            $differences['battle_stats.sea_defence'] = ['old' => $seaDefence, 'new' => $data['battle_stats']['sea_defence']];
+            $differences['battle_stats.sea_defence'] = [
+                'old' => $seaDefence,
+                'new' => $data['battle_stats']['sea_defence'],
+            ];
         }
 
         $seaDefenceSpeed = $this->getIntReflectionValue($seaStats, 'defenceSpeed');
         if ($seaDefenceSpeed !== $data['battle_stats']['sea_defence_speed']) {
-            $differences['battle_stats.sea_defence_speed'] = ['old' => $seaDefenceSpeed, 'new' => $data['battle_stats']['sea_defence_speed']];
+            $differences['battle_stats.sea_defence_speed'] = [
+                'old' => $seaDefenceSpeed,
+                'new' => $data['battle_stats']['sea_defence_speed'],
+            ];
         }
 
         // Check ground battle stats
@@ -396,22 +435,34 @@ class GameUnitFixturesCommand extends Command
 
         $groundAttack = $this->getIntReflectionValue($groundStats, 'attack');
         if ($groundAttack !== $data['battle_stats']['ground_attack']) {
-            $differences['battle_stats.ground_attack'] = ['old' => $groundAttack, 'new' => $data['battle_stats']['ground_attack']];
+            $differences['battle_stats.ground_attack'] = [
+                'old' => $groundAttack,
+                'new' => $data['battle_stats']['ground_attack'],
+            ];
         }
 
         $groundAttackSpeed = $this->getIntReflectionValue($groundStats, 'attackSpeed');
         if ($groundAttackSpeed !== $data['battle_stats']['ground_attack_speed']) {
-            $differences['battle_stats.ground_attack_speed'] = ['old' => $groundAttackSpeed, 'new' => $data['battle_stats']['ground_attack_speed']];
+            $differences['battle_stats.ground_attack_speed'] = [
+                'old' => $groundAttackSpeed,
+                'new' => $data['battle_stats']['ground_attack_speed'],
+            ];
         }
 
         $groundDefence = $this->getIntReflectionValue($groundStats, 'defence');
         if ($groundDefence !== $data['battle_stats']['ground_defence']) {
-            $differences['battle_stats.ground_defence'] = ['old' => $groundDefence, 'new' => $data['battle_stats']['ground_defence']];
+            $differences['battle_stats.ground_defence'] = [
+                'old' => $groundDefence,
+                'new' => $data['battle_stats']['ground_defence'],
+            ];
         }
 
         $groundDefenceSpeed = $this->getIntReflectionValue($groundStats, 'defenceSpeed');
         if ($groundDefenceSpeed !== $data['battle_stats']['ground_defence_speed']) {
-            $differences['battle_stats.ground_defence_speed'] = ['old' => $groundDefenceSpeed, 'new' => $data['battle_stats']['ground_defence_speed']];
+            $differences['battle_stats.ground_defence_speed'] = [
+                'old' => $groundDefenceSpeed,
+                'new' => $data['battle_stats']['ground_defence_speed'],
+            ];
         }
 
         // Check cost
@@ -480,7 +531,19 @@ class GameUnitFixturesCommand extends Command
     }
 
     /**
-     * @param array{id: int, game_unit_category: int, name: string, name_multi: string, row_name: string, image: string, net_worth: int, timestamp: int, description: string, battle_stats: array{health: int, armor: int, travel_speed: int, air_attack: int, air_attack_speed: int, air_defence: int, air_defence_speed: int, sea_attack: int, sea_attack_speed: int, sea_defence: int, sea_defence_speed: int, ground_attack: int, ground_attack_speed: int, ground_defence: int, ground_defence_speed: int}, cost: array{cash: int, steel: int, wood: int, food: int}, income: array{cash: int, steel: int, wood: int, food: int}, upkeep: array{cash: int, steel: int, wood: int, food: int}} $data
+     * @param array{
+     *   id: int, game_unit_category: int, name: string, name_multi: string, row_name: string,
+     *   image: string, net_worth: int, timestamp: int, description: string,
+     *   battle_stats: array{
+     *     health: int, armor: int, travel_speed: int,
+     *     air_attack: int, air_attack_speed: int, air_defence: int, air_defence_speed: int,
+     *     sea_attack: int, sea_attack_speed: int, sea_defence: int, sea_defence_speed: int,
+     *     ground_attack: int, ground_attack_speed: int, ground_defence: int, ground_defence_speed: int
+     *   },
+     *   cost: array{cash: int, steel: int, wood: int, food: int},
+     *   income: array{cash: int, steel: int, wood: int, food: int},
+     *   upkeep: array{cash: int, steel: int, wood: int, food: int}
+     * } $data
      */
     private function displayNewUnit(SymfonyStyle $io, array $data): void
     {
@@ -512,7 +575,19 @@ class GameUnitFixturesCommand extends Command
     }
 
     /**
-     * @param array{id: int, game_unit_category: int, name: string, name_multi: string, row_name: string, image: string, net_worth: int, timestamp: int, description: string, battle_stats: array{health: int, armor: int, travel_speed: int, air_attack: int, air_attack_speed: int, air_defence: int, air_defence_speed: int, sea_attack: int, sea_attack_speed: int, sea_defence: int, sea_defence_speed: int, ground_attack: int, ground_attack_speed: int, ground_defence: int, ground_defence_speed: int}, cost: array{cash: int, steel: int, wood: int, food: int}, income: array{cash: int, steel: int, wood: int, food: int}, upkeep: array{cash: int, steel: int, wood: int, food: int}} $data
+     * @param array{
+     *   id: int, game_unit_category: int, name: string, name_multi: string, row_name: string,
+     *   image: string, net_worth: int, timestamp: int, description: string,
+     *   battle_stats: array{
+     *     health: int, armor: int, travel_speed: int,
+     *     air_attack: int, air_attack_speed: int, air_defence: int, air_defence_speed: int,
+     *     sea_attack: int, sea_attack_speed: int, sea_defence: int, sea_defence_speed: int,
+     *     ground_attack: int, ground_attack_speed: int, ground_defence: int, ground_defence_speed: int
+     *   },
+     *   cost: array{cash: int, steel: int, wood: int, food: int},
+     *   income: array{cash: int, steel: int, wood: int, food: int},
+     *   upkeep: array{cash: int, steel: int, wood: int, food: int}
+     * } $data
      */
     private function applyGameUnitData(GameUnit $gameUnit, array $data): void
     {
@@ -610,7 +685,19 @@ class GameUnitFixturesCommand extends Command
     }
 
     /**
-     * @return list<array{id: int, game_unit_category: int, name: string, name_multi: string, row_name: string, image: string, net_worth: int, timestamp: int, description: string, battle_stats: array{health: int, armor: int, travel_speed: int, air_attack: int, air_attack_speed: int, air_defence: int, air_defence_speed: int, sea_attack: int, sea_attack_speed: int, sea_defence: int, sea_defence_speed: int, ground_attack: int, ground_attack_speed: int, ground_defence: int, ground_defence_speed: int}, cost: array{cash: int, steel: int, wood: int, food: int}, income: array{cash: int, steel: int, wood: int, food: int}, upkeep: array{cash: int, steel: int, wood: int, food: int}}>
+     * @return list<array{
+     *   id: int, game_unit_category: int, name: string, name_multi: string, row_name: string,
+     *   image: string, net_worth: int, timestamp: int, description: string,
+     *   battle_stats: array{
+     *     health: int, armor: int, travel_speed: int,
+     *     air_attack: int, air_attack_speed: int, air_defence: int, air_defence_speed: int,
+     *     sea_attack: int, sea_attack_speed: int, sea_defence: int, sea_defence_speed: int,
+     *     ground_attack: int, ground_attack_speed: int, ground_defence: int, ground_defence_speed: int
+     *   },
+     *   cost: array{cash: int, steel: int, wood: int, food: int},
+     *   income: array{cash: int, steel: int, wood: int, food: int},
+     *   upkeep: array{cash: int, steel: int, wood: int, food: int}
+     * }>
      */
     private function getGameUnitsData(): array
     {
@@ -630,7 +717,8 @@ class GameUnitFixturesCommand extends Command
                     'health' => 0, 'armor' => 0, 'travel_speed' => 0,
                     'air_attack' => 0, 'air_attack_speed' => 0, 'air_defence' => 0, 'air_defence_speed' => 0,
                     'sea_attack' => 0, 'sea_attack_speed' => 0, 'sea_defence' => 0, 'sea_defence_speed' => 0,
-                    'ground_attack' => 0, 'ground_attack_speed' => 0, 'ground_defence' => 0, 'ground_defence_speed' => 0,
+                    'ground_attack' => 0, 'ground_attack_speed' => 0,
+                    'ground_defence' => 0, 'ground_defence_speed' => 0,
                 ],
                 'cost' => ['cash' => 100, 'steel' => 1, 'wood' => 5, 'food' => 0],
                 'income' => ['cash' => 15, 'steel' => 0, 'wood' => 0, 'food' => 0],
@@ -650,7 +738,8 @@ class GameUnitFixturesCommand extends Command
                     'health' => 0, 'armor' => 0, 'travel_speed' => 0,
                     'air_attack' => 0, 'air_attack_speed' => 0, 'air_defence' => 0, 'air_defence_speed' => 0,
                     'sea_attack' => 0, 'sea_attack_speed' => 0, 'sea_defence' => 0, 'sea_defence_speed' => 0,
-                    'ground_attack' => 0, 'ground_attack_speed' => 0, 'ground_defence' => 0, 'ground_defence_speed' => 0,
+                    'ground_attack' => 0, 'ground_attack_speed' => 0,
+                    'ground_defence' => 0, 'ground_defence_speed' => 0,
                 ],
                 'cost' => ['cash' => 300, 'steel' => 5, 'wood' => 15, 'food' => 0],
                 'income' => ['cash' => 0, 'steel' => 0, 'wood' => 0, 'food' => 50],
@@ -670,7 +759,8 @@ class GameUnitFixturesCommand extends Command
                     'health' => 0, 'armor' => 0, 'travel_speed' => 0,
                     'air_attack' => 0, 'air_attack_speed' => 0, 'air_defence' => 0, 'air_defence_speed' => 0,
                     'sea_attack' => 0, 'sea_attack_speed' => 0, 'sea_defence' => 0, 'sea_defence_speed' => 0,
-                    'ground_attack' => 0, 'ground_attack_speed' => 0, 'ground_defence' => 0, 'ground_defence_speed' => 0,
+                    'ground_attack' => 0, 'ground_attack_speed' => 0,
+                    'ground_defence' => 0, 'ground_defence_speed' => 0,
                 ],
                 'cost' => ['cash' => 1500, 'steel' => 0, 'wood' => 50, 'food' => 0],
                 'income' => ['cash' => 0, 'steel' => 1, 'wood' => 0, 'food' => 0],
@@ -690,7 +780,8 @@ class GameUnitFixturesCommand extends Command
                     'health' => 0, 'armor' => 0, 'travel_speed' => 0,
                     'air_attack' => 0, 'air_attack_speed' => 0, 'air_defence' => 0, 'air_defence_speed' => 0,
                     'sea_attack' => 0, 'sea_attack_speed' => 0, 'sea_defence' => 0, 'sea_defence_speed' => 0,
-                    'ground_attack' => 0, 'ground_attack_speed' => 0, 'ground_defence' => 0, 'ground_defence_speed' => 0,
+                    'ground_attack' => 0, 'ground_attack_speed' => 0,
+                    'ground_defence' => 0, 'ground_defence_speed' => 0,
                 ],
                 'cost' => ['cash' => 600, 'steel' => 2, 'wood' => 0, 'food' => 0],
                 'income' => ['cash' => 0, 'steel' => 0, 'wood' => 1, 'food' => 0],
@@ -710,7 +801,8 @@ class GameUnitFixturesCommand extends Command
                     'health' => 0, 'armor' => 0, 'travel_speed' => 0,
                     'air_attack' => 0, 'air_attack_speed' => 0, 'air_defence' => 0, 'air_defence_speed' => 0,
                     'sea_attack' => 0, 'sea_attack_speed' => 0, 'sea_defence' => 0, 'sea_defence_speed' => 0,
-                    'ground_attack' => 0, 'ground_attack_speed' => 0, 'ground_defence' => 0, 'ground_defence_speed' => 0,
+                    'ground_attack' => 0, 'ground_attack_speed' => 0,
+                    'ground_defence' => 0, 'ground_defence_speed' => 0,
                 ],
                 'cost' => ['cash' => 150, 'steel' => 1, 'wood' => 5, 'food' => 50],
                 'income' => ['cash' => 0, 'steel' => 0, 'wood' => 0, 'food' => 0],
@@ -732,7 +824,8 @@ class GameUnitFixturesCommand extends Command
                     'health' => 10, 'armor' => 1, 'travel_speed' => 0,
                     'air_attack' => 0, 'air_attack_speed' => 0, 'air_defence' => 0, 'air_defence_speed' => 0,
                     'sea_attack' => 0, 'sea_attack_speed' => 0, 'sea_defence' => 5, 'sea_defence_speed' => 500,
-                    'ground_attack' => 0, 'ground_attack_speed' => 0, 'ground_defence' => 0, 'ground_defence_speed' => 0,
+                    'ground_attack' => 0, 'ground_attack_speed' => 0,
+                    'ground_defence' => 0, 'ground_defence_speed' => 0,
                 ],
                 'cost' => ['cash' => 3500, 'steel' => 1, 'wood' => 0, 'food' => 0],
                 'income' => ['cash' => 0, 'steel' => 0, 'wood' => 0, 'food' => 0],
@@ -752,7 +845,8 @@ class GameUnitFixturesCommand extends Command
                     'health' => 10, 'armor' => 1, 'travel_speed' => 0,
                     'air_attack' => 0, 'air_attack_speed' => 0, 'air_defence' => 0, 'air_defence_speed' => 0,
                     'sea_attack' => 0, 'sea_attack_speed' => 0, 'sea_defence' => 0, 'sea_defence_speed' => 0,
-                    'ground_attack' => 0, 'ground_attack_speed' => 0, 'ground_defence' => 5, 'ground_defence_speed' => 500,
+                    'ground_attack' => 0, 'ground_attack_speed' => 0,
+                    'ground_defence' => 5, 'ground_defence_speed' => 500,
                 ],
                 'cost' => ['cash' => 5500, 'steel' => 1, 'wood' => 0, 'food' => 0],
                 'income' => ['cash' => 0, 'steel' => 0, 'wood' => 0, 'food' => 0],
@@ -772,7 +866,8 @@ class GameUnitFixturesCommand extends Command
                     'health' => 4000, 'armor' => 35, 'travel_speed' => 0,
                     'air_attack' => 0, 'air_attack_speed' => 0, 'air_defence' => 0, 'air_defence_speed' => 0,
                     'sea_attack' => 0, 'sea_attack_speed' => 0, 'sea_defence' => 0, 'sea_defence_speed' => 0,
-                    'ground_attack' => 0, 'ground_attack_speed' => 0, 'ground_defence' => 1, 'ground_defence_speed' => 0,
+                    'ground_attack' => 0, 'ground_attack_speed' => 0,
+                    'ground_defence' => 1, 'ground_defence_speed' => 0,
                 ],
                 'cost' => ['cash' => 8500, 'steel' => 150, 'wood' => 150, 'food' => 50],
                 'income' => ['cash' => 0, 'steel' => 0, 'wood' => 0, 'food' => 0],
@@ -790,9 +885,11 @@ class GameUnitFixturesCommand extends Command
                 'description' => 'Anti Air Missile have 1% chance of taking an enemy aircraft down.',
                 'battle_stats' => [
                     'health' => 1500, 'armor' => 2, 'travel_speed' => 0,
-                    'air_attack' => 0, 'air_attack_speed' => 0, 'air_defence' => 130, 'air_defence_speed' => 900,
+                    'air_attack' => 0, 'air_attack_speed' => 0,
+                    'air_defence' => 130, 'air_defence_speed' => 900,
                     'sea_attack' => 0, 'sea_attack_speed' => 0, 'sea_defence' => 80, 'sea_defence_speed' => 70,
-                    'ground_attack' => 0, 'ground_attack_speed' => 0, 'ground_defence' => 70, 'ground_defence_speed' => 40,
+                    'ground_attack' => 0, 'ground_attack_speed' => 0,
+                    'ground_defence' => 70, 'ground_defence_speed' => 40,
                 ],
                 'cost' => ['cash' => 25000, 'steel' => 350, 'wood' => 150, 'food' => 0],
                 'income' => ['cash' => 0, 'steel' => 0, 'wood' => 0, 'food' => 0],
@@ -809,12 +906,14 @@ class GameUnitFixturesCommand extends Command
                 'image' => 'airport.gif',
                 'net_worth' => 20,
                 'timestamp' => 14400,
-                'description' => 'An airport can send 10 planes to your neighbour countries and help them defending when they are under attack.',
+                'description' => 'An airport can send 10 planes to your neighbour countries'
+                    . ' and help them defending when they are under attack.',
                 'battle_stats' => [
                     'health' => 0, 'armor' => 0, 'travel_speed' => 0,
                     'air_attack' => 0, 'air_attack_speed' => 0, 'air_defence' => 0, 'air_defence_speed' => 0,
                     'sea_attack' => 0, 'sea_attack_speed' => 0, 'sea_defence' => 0, 'sea_defence_speed' => 0,
-                    'ground_attack' => 0, 'ground_attack_speed' => 0, 'ground_defence' => 0, 'ground_defence_speed' => 0,
+                    'ground_attack' => 0, 'ground_attack_speed' => 0,
+                    'ground_defence' => 0, 'ground_defence_speed' => 0,
                 ],
                 'cost' => ['cash' => 15000, 'steel' => 75, 'wood' => 50, 'food' => 0],
                 'income' => ['cash' => 0, 'steel' => 0, 'wood' => 0, 'food' => 0],
@@ -829,12 +928,14 @@ class GameUnitFixturesCommand extends Command
                 'image' => 'harbor.gif',
                 'net_worth' => 15,
                 'timestamp' => 28800,
-                'description' => 'An harbor can send 1 ship to your neighbour countries and help them defending when they are under attack.',
+                'description' => 'An harbor can send 1 ship to your neighbour countries'
+                    . ' and help them defending when they are under attack.',
                 'battle_stats' => [
                     'health' => 0, 'armor' => 0, 'travel_speed' => 0,
                     'air_attack' => 0, 'air_attack_speed' => 0, 'air_defence' => 0, 'air_defence_speed' => 0,
                     'sea_attack' => 0, 'sea_attack_speed' => 0, 'sea_defence' => 0, 'sea_defence_speed' => 0,
-                    'ground_attack' => 0, 'ground_attack_speed' => 0, 'ground_defence' => 0, 'ground_defence_speed' => 0,
+                    'ground_attack' => 0, 'ground_attack_speed' => 0,
+                    'ground_defence' => 0, 'ground_defence_speed' => 0,
                 ],
                 'cost' => ['cash' => 25000, 'steel' => 150, 'wood' => 600, 'food' => 0],
                 'income' => ['cash' => 0, 'steel' => 0, 'wood' => 0, 'food' => 0],
@@ -849,12 +950,14 @@ class GameUnitFixturesCommand extends Command
                 'image' => 'station.gif',
                 'net_worth' => 10,
                 'timestamp' => 10800,
-                'description' => 'An Train station can send 25 soldiers and 1 tank to your neighbour countries and help them defending when they are under attack.',
+                'description' => 'An Train station can send 25 soldiers and 1 tank to your neighbour countries'
+                    . ' and help them defending when they are under attack.',
                 'battle_stats' => [
                     'health' => 0, 'armor' => 0, 'travel_speed' => 0,
                     'air_attack' => 0, 'air_attack_speed' => 0, 'air_defence' => 0, 'air_defence_speed' => 0,
                     'sea_attack' => 0, 'sea_attack_speed' => 0, 'sea_defence' => 0, 'sea_defence_speed' => 0,
-                    'ground_attack' => 0, 'ground_attack_speed' => 0, 'ground_defence' => 0, 'ground_defence_speed' => 0,
+                    'ground_attack' => 0, 'ground_attack_speed' => 0,
+                    'ground_defence' => 0, 'ground_defence_speed' => 0,
                 ],
                 'cost' => ['cash' => 10000, 'steel' => 750, 'wood' => 500, 'food' => 0],
                 'income' => ['cash' => 0, 'steel' => 0, 'wood' => 0, 'food' => 0],
@@ -874,7 +977,8 @@ class GameUnitFixturesCommand extends Command
                     'health' => 0, 'armor' => 0, 'travel_speed' => 0,
                     'air_attack' => 0, 'air_attack_speed' => 0, 'air_defence' => 0, 'air_defence_speed' => 0,
                     'sea_attack' => 0, 'sea_attack_speed' => 0, 'sea_defence' => 0, 'sea_defence_speed' => 0,
-                    'ground_attack' => 0, 'ground_attack_speed' => 0, 'ground_defence' => 0, 'ground_defence_speed' => 0,
+                    'ground_attack' => 0, 'ground_attack_speed' => 0,
+                    'ground_defence' => 0, 'ground_defence_speed' => 0,
                 ],
                 'cost' => ['cash' => 2000, 'steel' => 250, 'wood' => 100, 'food' => 0],
                 'income' => ['cash' => 0, 'steel' => 0, 'wood' => 0, 'food' => 0],
@@ -894,7 +998,8 @@ class GameUnitFixturesCommand extends Command
                     'health' => 0, 'armor' => 0, 'travel_speed' => 0,
                     'air_attack' => 0, 'air_attack_speed' => 0, 'air_defence' => 0, 'air_defence_speed' => 0,
                     'sea_attack' => 0, 'sea_attack_speed' => 0, 'sea_defence' => 0, 'sea_defence_speed' => 0,
-                    'ground_attack' => 0, 'ground_attack_speed' => 0, 'ground_defence' => 0, 'ground_defence_speed' => 0,
+                    'ground_attack' => 0, 'ground_attack_speed' => 0,
+                    'ground_defence' => 0, 'ground_defence_speed' => 0,
                 ],
                 'cost' => ['cash' => 10000, 'steel' => 750, 'wood' => 500, 'food' => 0],
                 'income' => ['cash' => 0, 'steel' => 0, 'wood' => 0, 'food' => 0],
@@ -914,7 +1019,8 @@ class GameUnitFixturesCommand extends Command
                     'health' => 0, 'armor' => 0, 'travel_speed' => 0,
                     'air_attack' => 0, 'air_attack_speed' => 0, 'air_defence' => 0, 'air_defence_speed' => 0,
                     'sea_attack' => 0, 'sea_attack_speed' => 0, 'sea_defence' => 0, 'sea_defence_speed' => 0,
-                    'ground_attack' => 0, 'ground_attack_speed' => 0, 'ground_defence' => 0, 'ground_defence_speed' => 0,
+                    'ground_attack' => 0, 'ground_attack_speed' => 0,
+                    'ground_defence' => 0, 'ground_defence_speed' => 0,
                 ],
                 'cost' => ['cash' => 50000, 'steel' => 5000, 'wood' => 2500, 'food' => 0],
                 'income' => ['cash' => 0, 'steel' => 0, 'wood' => 0, 'food' => 0],
@@ -934,7 +1040,8 @@ class GameUnitFixturesCommand extends Command
                     'health' => 0, 'armor' => 0, 'travel_speed' => 0,
                     'air_attack' => 0, 'air_attack_speed' => 0, 'air_defence' => 0, 'air_defence_speed' => 0,
                     'sea_attack' => 0, 'sea_attack_speed' => 0, 'sea_defence' => 0, 'sea_defence_speed' => 0,
-                    'ground_attack' => 0, 'ground_attack_speed' => 0, 'ground_defence' => 0, 'ground_defence_speed' => 0,
+                    'ground_attack' => 0, 'ground_attack_speed' => 0,
+                    'ground_defence' => 0, 'ground_defence_speed' => 0,
                 ],
                 'cost' => ['cash' => 50000, 'steel' => 5000, 'wood' => 2500, 'food' => 0],
                 'income' => ['cash' => 0, 'steel' => 0, 'wood' => 0, 'food' => 0],
@@ -960,7 +1067,8 @@ class GameUnitFixturesCommand extends Command
                     'health' => 0, 'armor' => 0, 'travel_speed' => 0,
                     'air_attack' => 0, 'air_attack_speed' => 0, 'air_defence' => 0, 'air_defence_speed' => 0,
                     'sea_attack' => 0, 'sea_attack_speed' => 0, 'sea_defence' => 0, 'sea_defence_speed' => 0,
-                    'ground_attack' => 0, 'ground_attack_speed' => 0, 'ground_defence' => 0, 'ground_defence_speed' => 0,
+                    'ground_attack' => 0, 'ground_attack_speed' => 0,
+                    'ground_defence' => 0, 'ground_defence_speed' => 0,
                 ],
                 'cost' => ['cash' => 500, 'steel' => 2, 'wood' => 1, 'food' => 0],
                 'income' => ['cash' => 0, 'steel' => 0, 'wood' => 0, 'food' => 0],
@@ -975,12 +1083,14 @@ class GameUnitFixturesCommand extends Command
                 'image' => 'sp_op.gif',
                 'net_worth' => 1,
                 'timestamp' => 900,
-                'description' => 'This are your offensive special operation units. They can be used to sabotage buildings, destroy cash and much more.',
+                'description' => 'This are your offensive special operation units.'
+                    . ' They can be used to sabotage buildings, destroy cash and much more.',
                 'battle_stats' => [
                     'health' => 0, 'armor' => 0, 'travel_speed' => 0,
                     'air_attack' => 0, 'air_attack_speed' => 0, 'air_defence' => 0, 'air_defence_speed' => 0,
                     'sea_attack' => 0, 'sea_attack_speed' => 0, 'sea_defence' => 0, 'sea_defence_speed' => 0,
-                    'ground_attack' => 0, 'ground_attack_speed' => 0, 'ground_defence' => 0, 'ground_defence_speed' => 0,
+                    'ground_attack' => 0, 'ground_attack_speed' => 0,
+                    'ground_defence' => 0, 'ground_defence_speed' => 0,
                 ],
                 'cost' => ['cash' => 1500, 'steel' => 5, 'wood' => 1, 'food' => 0],
                 'income' => ['cash' => 0, 'steel' => 0, 'wood' => 0, 'food' => 0],
@@ -995,12 +1105,14 @@ class GameUnitFixturesCommand extends Command
                 'image' => 'spy.gif',
                 'net_worth' => 1,
                 'timestamp' => 1800,
-                'description' => 'Spies can be used to spy on enemy countries. The more spies you send, the more information you gain',
+                'description' => 'Spies can be used to spy on enemy countries.'
+                    . ' The more spies you send, the more information you gain',
                 'battle_stats' => [
                     'health' => 0, 'armor' => 0, 'travel_speed' => 0,
                     'air_attack' => 0, 'air_attack_speed' => 0, 'air_defence' => 0, 'air_defence_speed' => 0,
                     'sea_attack' => 0, 'sea_attack_speed' => 0, 'sea_defence' => 0, 'sea_defence_speed' => 0,
-                    'ground_attack' => 0, 'ground_attack_speed' => 0, 'ground_defence' => 0, 'ground_defence_speed' => 0,
+                    'ground_attack' => 0, 'ground_attack_speed' => 0,
+                    'ground_defence' => 0, 'ground_defence_speed' => 0,
                 ],
                 'cost' => ['cash' => 2500, 'steel' => 5, 'wood' => 1, 'food' => 0],
                 'income' => ['cash' => 0, 'steel' => 0, 'wood' => 0, 'food' => 0],
@@ -1024,7 +1136,8 @@ class GameUnitFixturesCommand extends Command
                     'health' => 50, 'armor' => 1, 'travel_speed' => 100,
                     'air_attack' => 0, 'air_attack_speed' => 0, 'air_defence' => 0, 'air_defence_speed' => 0,
                     'sea_attack' => 0, 'sea_attack_speed' => 0, 'sea_defence' => 0, 'sea_defence_speed' => 0,
-                    'ground_attack' => 10, 'ground_attack_speed' => 100, 'ground_defence' => 12, 'ground_defence_speed' => 110,
+                    'ground_attack' => 10, 'ground_attack_speed' => 100,
+                    'ground_defence' => 12, 'ground_defence_speed' => 110,
                 ],
                 'cost' => ['cash' => 500, 'steel' => 5, 'wood' => 1, 'food' => 50],
                 'income' => ['cash' => 0, 'steel' => 0, 'wood' => 0, 'food' => 0],
@@ -1044,7 +1157,8 @@ class GameUnitFixturesCommand extends Command
                     'health' => 0, 'armor' => 0, 'travel_speed' => 0,
                     'air_attack' => 0, 'air_attack_speed' => 0, 'air_defence' => 0, 'air_defence_speed' => 0,
                     'sea_attack' => 0, 'sea_attack_speed' => 0, 'sea_defence' => 0, 'sea_defence_speed' => 0,
-                    'ground_attack' => 0, 'ground_attack_speed' => 0, 'ground_defence' => 0, 'ground_defence_speed' => 0,
+                    'ground_attack' => 0, 'ground_attack_speed' => 0,
+                    'ground_defence' => 0, 'ground_defence_speed' => 0,
                 ],
                 'cost' => ['cash' => 2500, 'steel' => 5, 'wood' => 1, 'food' => 0],
                 'income' => ['cash' => 0, 'steel' => 0, 'wood' => 0, 'food' => 0],
@@ -1064,7 +1178,8 @@ class GameUnitFixturesCommand extends Command
                     'health' => 1500, 'armor' => 10, 'travel_speed' => 200,
                     'air_attack' => 0, 'air_attack_speed' => 0, 'air_defence' => 0, 'air_defence_speed' => 0,
                     'sea_attack' => 0, 'sea_attack_speed' => 0, 'sea_defence' => 0, 'sea_defence_speed' => 0,
-                    'ground_attack' => 50, 'ground_attack_speed' => 130, 'ground_defence' => 55, 'ground_defence_speed' => 135,
+                    'ground_attack' => 50, 'ground_attack_speed' => 130,
+                    'ground_defence' => 55, 'ground_defence_speed' => 135,
                 ],
                 'cost' => ['cash' => 5000, 'steel' => 55, 'wood' => 20, 'food' => 1000],
                 'income' => ['cash' => 0, 'steel' => 0, 'wood' => 0, 'food' => 0],
@@ -1084,7 +1199,8 @@ class GameUnitFixturesCommand extends Command
                     'health' => 1500, 'armor' => 10, 'travel_speed' => 200,
                     'air_attack' => 0, 'air_attack_speed' => 0, 'air_defence' => 0, 'air_defence_speed' => 0,
                     'sea_attack' => 0, 'sea_attack_speed' => 0, 'sea_defence' => 0, 'sea_defence_speed' => 0,
-                    'ground_attack' => 50, 'ground_attack_speed' => 130, 'ground_defence' => 55, 'ground_defence_speed' => 135,
+                    'ground_attack' => 50, 'ground_attack_speed' => 130,
+                    'ground_defence' => 55, 'ground_defence_speed' => 135,
                 ],
                 'cost' => ['cash' => 5000, 'steel' => 55, 'wood' => 20, 'food' => 1000],
                 'income' => ['cash' => 0, 'steel' => 0, 'wood' => 0, 'food' => 0],
@@ -1104,7 +1220,8 @@ class GameUnitFixturesCommand extends Command
                     'health' => 150, 'armor' => 1, 'travel_speed' => 200,
                     'air_attack' => 0, 'air_attack_speed' => 0, 'air_defence' => 0, 'air_defence_speed' => 0,
                     'sea_attack' => 0, 'sea_attack_speed' => 0, 'sea_defence' => 0, 'sea_defence_speed' => 0,
-                    'ground_attack' => 15, 'ground_attack_speed' => 100, 'ground_defence' => 10, 'ground_defence_speed' => 100,
+                    'ground_attack' => 15, 'ground_attack_speed' => 100,
+                    'ground_defence' => 10, 'ground_defence_speed' => 100,
                 ],
                 'cost' => ['cash' => 1500, 'steel' => 15, 'wood' => 2, 'food' => 75],
                 'income' => ['cash' => 0, 'steel' => 0, 'wood' => 0, 'food' => 0],
@@ -1129,7 +1246,8 @@ class GameUnitFixturesCommand extends Command
                     'health' => 2500, 'armor' => 25, 'travel_speed' => 100,
                     'air_attack' => 0, 'air_attack_speed' => 0, 'air_defence' => 100, 'air_defence_speed' => 50,
                     'sea_attack' => 200, 'sea_attack_speed' => 150, 'sea_defence' => 230, 'sea_defence_speed' => 160,
-                    'ground_attack' => 160, 'ground_attack_speed' => 40, 'ground_defence' => 0, 'ground_defence_speed' => 0,
+                    'ground_attack' => 160, 'ground_attack_speed' => 40,
+                    'ground_defence' => 0, 'ground_defence_speed' => 0,
                 ],
                 'cost' => ['cash' => 100000, 'steel' => 300, 'wood' => 250, 'food' => 20000],
                 'income' => ['cash' => 0, 'steel' => 0, 'wood' => 0, 'food' => 0],
@@ -1149,7 +1267,8 @@ class GameUnitFixturesCommand extends Command
                     'health' => 2500, 'armor' => 25, 'travel_speed' => 100,
                     'air_attack' => 0, 'air_attack_speed' => 0, 'air_defence' => 100, 'air_defence_speed' => 50,
                     'sea_attack' => 200, 'sea_attack_speed' => 150, 'sea_defence' => 230, 'sea_defence_speed' => 160,
-                    'ground_attack' => 160, 'ground_attack_speed' => 40, 'ground_defence' => 0, 'ground_defence_speed' => 0,
+                    'ground_attack' => 160, 'ground_attack_speed' => 40,
+                    'ground_defence' => 0, 'ground_defence_speed' => 0,
                 ],
                 'cost' => ['cash' => 100000, 'steel' => 300, 'wood' => 250, 'food' => 20000],
                 'income' => ['cash' => 0, 'steel' => 0, 'wood' => 0, 'food' => 0],
@@ -1169,7 +1288,8 @@ class GameUnitFixturesCommand extends Command
                     'health' => 2500, 'armor' => 25, 'travel_speed' => 100,
                     'air_attack' => 0, 'air_attack_speed' => 0, 'air_defence' => 100, 'air_defence_speed' => 50,
                     'sea_attack' => 200, 'sea_attack_speed' => 150, 'sea_defence' => 230, 'sea_defence_speed' => 160,
-                    'ground_attack' => 160, 'ground_attack_speed' => 40, 'ground_defence' => 0, 'ground_defence_speed' => 0,
+                    'ground_attack' => 160, 'ground_attack_speed' => 40,
+                    'ground_defence' => 0, 'ground_defence_speed' => 0,
                 ],
                 'cost' => ['cash' => 100000, 'steel' => 300, 'wood' => 250, 'food' => 20000],
                 'income' => ['cash' => 0, 'steel' => 0, 'wood' => 0, 'food' => 0],
@@ -1189,7 +1309,8 @@ class GameUnitFixturesCommand extends Command
                     'health' => 2500, 'armor' => 25, 'travel_speed' => 100,
                     'air_attack' => 0, 'air_attack_speed' => 0, 'air_defence' => 100, 'air_defence_speed' => 50,
                     'sea_attack' => 200, 'sea_attack_speed' => 150, 'sea_defence' => 230, 'sea_defence_speed' => 160,
-                    'ground_attack' => 160, 'ground_attack_speed' => 40, 'ground_defence' => 0, 'ground_defence_speed' => 0,
+                    'ground_attack' => 160, 'ground_attack_speed' => 40,
+                    'ground_defence' => 0, 'ground_defence_speed' => 0,
                 ],
                 'cost' => ['cash' => 100000, 'steel' => 300, 'wood' => 250, 'food' => 20000],
                 'income' => ['cash' => 0, 'steel' => 0, 'wood' => 0, 'food' => 0],
@@ -1209,7 +1330,8 @@ class GameUnitFixturesCommand extends Command
                     'health' => 2500, 'armor' => 25, 'travel_speed' => 100,
                     'air_attack' => 0, 'air_attack_speed' => 0, 'air_defence' => 100, 'air_defence_speed' => 50,
                     'sea_attack' => 200, 'sea_attack_speed' => 150, 'sea_defence' => 230, 'sea_defence_speed' => 160,
-                    'ground_attack' => 160, 'ground_attack_speed' => 40, 'ground_defence' => 0, 'ground_defence_speed' => 0,
+                    'ground_attack' => 160, 'ground_attack_speed' => 40,
+                    'ground_defence' => 0, 'ground_defence_speed' => 0,
                 ],
                 'cost' => ['cash' => 100000, 'steel' => 300, 'wood' => 250, 'food' => 20000],
                 'income' => ['cash' => 0, 'steel' => 0, 'wood' => 0, 'food' => 0],
@@ -1233,7 +1355,8 @@ class GameUnitFixturesCommand extends Command
                     'health' => 1000, 'armor' => 2, 'travel_speed' => 500,
                     'air_attack' => 75, 'air_attack_speed' => 300, 'air_defence' => 80, 'air_defence_speed' => 310,
                     'sea_attack' => 0, 'sea_attack_speed' => 0, 'sea_defence' => 0, 'sea_defence_speed' => 0,
-                    'ground_attack' => 20, 'ground_attack_speed' => 100, 'ground_defence' => 0, 'ground_defence_speed' => 0,
+                    'ground_attack' => 20, 'ground_attack_speed' => 100,
+                    'ground_defence' => 0, 'ground_defence_speed' => 0,
                 ],
                 'cost' => ['cash' => 25000, 'steel' => 50, 'wood' => 100, 'food' => 1000],
                 'income' => ['cash' => 0, 'steel' => 0, 'wood' => 0, 'food' => 0],
@@ -1253,7 +1376,8 @@ class GameUnitFixturesCommand extends Command
                     'health' => 1000, 'armor' => 2, 'travel_speed' => 500,
                     'air_attack' => 75, 'air_attack_speed' => 300, 'air_defence' => 80, 'air_defence_speed' => 310,
                     'sea_attack' => 0, 'sea_attack_speed' => 0, 'sea_defence' => 0, 'sea_defence_speed' => 0,
-                    'ground_attack' => 20, 'ground_attack_speed' => 100, 'ground_defence' => 0, 'ground_defence_speed' => 0,
+                    'ground_attack' => 20, 'ground_attack_speed' => 100,
+                    'ground_defence' => 0, 'ground_defence_speed' => 0,
                 ],
                 'cost' => ['cash' => 25000, 'steel' => 50, 'wood' => 100, 'food' => 1000],
                 'income' => ['cash' => 0, 'steel' => 0, 'wood' => 0, 'food' => 0],
@@ -1273,7 +1397,8 @@ class GameUnitFixturesCommand extends Command
                     'health' => 1000, 'armor' => 2, 'travel_speed' => 500,
                     'air_attack' => 75, 'air_attack_speed' => 300, 'air_defence' => 80, 'air_defence_speed' => 310,
                     'sea_attack' => 0, 'sea_attack_speed' => 0, 'sea_defence' => 0, 'sea_defence_speed' => 0,
-                    'ground_attack' => 20, 'ground_attack_speed' => 100, 'ground_defence' => 0, 'ground_defence_speed' => 0,
+                    'ground_attack' => 20, 'ground_attack_speed' => 100,
+                    'ground_defence' => 0, 'ground_defence_speed' => 0,
                 ],
                 'cost' => ['cash' => 25000, 'steel' => 50, 'wood' => 100, 'food' => 1000],
                 'income' => ['cash' => 0, 'steel' => 0, 'wood' => 0, 'food' => 0],
@@ -1297,7 +1422,8 @@ class GameUnitFixturesCommand extends Command
                     'health' => 0, 'armor' => 0, 'travel_speed' => 0,
                     'air_attack' => 0, 'air_attack_speed' => 0, 'air_defence' => 0, 'air_defence_speed' => 0,
                     'sea_attack' => 0, 'sea_attack_speed' => 0, 'sea_defence' => 0, 'sea_defence_speed' => 0,
-                    'ground_attack' => 0, 'ground_attack_speed' => 0, 'ground_defence' => 0, 'ground_defence_speed' => 0,
+                    'ground_attack' => 0, 'ground_attack_speed' => 0,
+                    'ground_defence' => 0, 'ground_defence_speed' => 0,
                 ],
                 'cost' => ['cash' => 100, 'steel' => 5, 'wood' => 1, 'food' => 0],
                 'income' => ['cash' => 0, 'steel' => 0, 'wood' => 0, 'food' => 0],
@@ -1317,7 +1443,8 @@ class GameUnitFixturesCommand extends Command
                     'health' => 0, 'armor' => 0, 'travel_speed' => 0,
                     'air_attack' => 0, 'air_attack_speed' => 0, 'air_defence' => 0, 'air_defence_speed' => 0,
                     'sea_attack' => 0, 'sea_attack_speed' => 0, 'sea_defence' => 0, 'sea_defence_speed' => 0,
-                    'ground_attack' => 0, 'ground_attack_speed' => 0, 'ground_defence' => 0, 'ground_defence_speed' => 0,
+                    'ground_attack' => 0, 'ground_attack_speed' => 0,
+                    'ground_defence' => 0, 'ground_defence_speed' => 0,
                 ],
                 'cost' => ['cash' => 250, 'steel' => 5, 'wood' => 1, 'food' => 0],
                 'income' => ['cash' => 0, 'steel' => 0, 'wood' => 0, 'food' => 0],
@@ -1337,7 +1464,8 @@ class GameUnitFixturesCommand extends Command
                     'health' => 0, 'armor' => 0, 'travel_speed' => 0,
                     'air_attack' => 0, 'air_attack_speed' => 0, 'air_defence' => 0, 'air_defence_speed' => 0,
                     'sea_attack' => 0, 'sea_attack_speed' => 0, 'sea_defence' => 0, 'sea_defence_speed' => 0,
-                    'ground_attack' => 0, 'ground_attack_speed' => 0, 'ground_defence' => 0, 'ground_defence_speed' => 0,
+                    'ground_attack' => 0, 'ground_attack_speed' => 0,
+                    'ground_defence' => 0, 'ground_defence_speed' => 0,
                 ],
                 'cost' => ['cash' => 1000000, 'steel' => 0, 'wood' => 0, 'food' => 0],
                 'income' => ['cash' => 0, 'steel' => 0, 'wood' => 0, 'food' => 0],

@@ -19,7 +19,10 @@ final class SniperAttack extends OperationProcessor
         $guards = $this->getGuards();
         $total_units = $specialOps + $guards + 1;
 
-        return (3 * $specialOps / (2 * $total_units)) - (3 * $guards / (2 * $total_units)) - $this->operation->getDifficulty() + $this->getRandomChance();
+        return (3 * $specialOps / (2 * $total_units))
+            - (3 * $guards / (2 * $total_units))
+            - $this->operation->getDifficulty()
+            + $this->getRandomChance();
     }
 
     public function processPreOperation(): void
@@ -47,7 +50,8 @@ final class SniperAttack extends OperationProcessor
             }
 
             $this->addToOperationLog("You killed all soldiers!");
-            $reportText = "Somebody launched a Sniper attack against region {$this->region->getX()}, {$this->region->getY()} and killed all soldiers.";
+            $reportText = "Somebody launched a Sniper attack"
+                . " against region {$this->region->getX()}, {$this->region->getY()} and killed all soldiers.";
             $this->reportCreator->createReport($this->getTargetRegionPlayer(), time(), $reportText);
         } else {
             $soldiersKilled = $this->amount * self::SOLDIERS_KILLED_PER_SNIPER;
@@ -61,7 +65,9 @@ final class SniperAttack extends OperationProcessor
                 }
             }
 
-            $reportText = "Somebody launched a Sniper attack against region {$this->region->getX()}, {$this->region->getY()} and killed {$soldiersKilled} soldiers.";
+            $reportText = "Somebody launched a Sniper attack"
+                . " against region {$this->region->getX()}, {$this->region->getY()}"
+                . " and killed {$soldiersKilled} soldiers.";
             $this->reportCreator->createReport($this->getTargetRegionPlayer(), time(), $reportText);
         }
     }
@@ -83,7 +89,8 @@ final class SniperAttack extends OperationProcessor
             }
         }
 
-        $reportText = "{$this->getPlayerRegionPlayer()->getName()} tried to launch a Sniper attack against region {$this->region->getX()}, {$this->region->getY()} but failed.";
+        $reportText = "{$this->getPlayerRegionPlayer()->getName()} tried to launch a Sniper attack"
+            . " against region {$this->region->getX()}, {$this->region->getY()} but failed.";
         $this->reportCreator->createReport($this->getTargetRegionPlayer(), time(), $reportText);
 
         $this->addToOperationLog(
