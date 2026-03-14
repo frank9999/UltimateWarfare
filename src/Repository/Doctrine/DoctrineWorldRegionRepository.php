@@ -116,29 +116,49 @@ final class DoctrineWorldRegionRepository implements WorldRegionRepository
     }
 
     /**
+     * Find 6 hex neighbors (pointy-top, odd-r offset)
      * @return WorldRegion[]
      */
     public function findAdjacentRegions(int $x, int $y, World $world): array
     {
-        return $this->entityManager
-            ->createQuery(
-                'SELECT wr FROM ' . WorldRegion::class . ' wr
-                 WHERE wr.world = :world
-                 AND (
-                     (wr.x = :xm1 AND wr.y = :y) OR
-                     (wr.x = :xp1 AND wr.y = :y) OR
-                     (wr.x = :x AND wr.y = :ym1) OR
-                     (wr.x = :x AND wr.y = :yp1)
-                 )'
-            )
-            ->setParameter('world', $world)
-            ->setParameter('x', $x)
-            ->setParameter('xm1', $x - 1)
-            ->setParameter('xp1', $x + 1)
-            ->setParameter('y', $y)
-            ->setParameter('ym1', $y - 1)
-            ->setParameter('yp1', $y + 1)
-            ->getResult();
+        // Hex neighbors differ based on even/odd row
+        if ($y % 2 === 0) {
+            // Even row neighbors
+            $neighbors = [
+                [$x - 1, $y], [$x + 1, $y],
+                [$x - 1, $y - 1], [$x, $y - 1],
+                [$x - 1, $y + 1], [$x, $y + 1],
+            ];
+        } else {
+            // Odd row neighbors (shifted right)
+            $neighbors = [
+                [$x - 1, $y], [$x + 1, $y],
+                [$x, $y - 1], [$x + 1, $y - 1],
+                [$x, $y + 1], [$x + 1, $y + 1],
+            ];
+        }
+
+        $conditions = [];
+        $parameters = ['world' => $world];
+        foreach ($neighbors as $i => [$nx, $ny]) {
+            $conditions[] = "(wr.x = :x{$i} AND wr.y = :y{$i})";
+            $parameters["x{$i}"] = $nx;
+            $parameters["y{$i}"] = $ny;
+        }
+
+        $dql = 'SELECT wr FROM ' . WorldRegion::class . ' wr'
+            . ' WHERE wr.world = :world'
+            . ' AND (' . implode(' OR ', $conditions) . ')';
+
+        $query = $this->entityManager->createQuery($dql);
+        foreach ($parameters as $key => $value) {
+            $query->setParameter($key, $value);
+        }
+
+        /** @var WorldRegion[] $result */
+        $result = $query->getResult();
+
+        return $result;
     }
 
     public function save(WorldRegion $worldRegion): void

@@ -87,7 +87,7 @@ class FleetManager {
     /**
      * Render fleet lines on the canvas
      */
-    renderFleetLines(ctx, cartesianToIsometric) {
+    renderFleetLines(ctx, coordToPixel) {
         if (!this.fleets || this.fleets.length === 0) {
             return;
         }
@@ -95,8 +95,8 @@ class FleetManager {
         ctx.save();
 
         this.fleets.forEach(fleet => {
-            const sourceIso = cartesianToIsometric(fleet.sourceX, fleet.sourceY);
-            const targetIso = cartesianToIsometric(fleet.targetX, fleet.targetY);
+            const sourceIso = coordToPixel(fleet.sourceX, fleet.sourceY);
+            const targetIso = coordToPixel(fleet.targetX, fleet.targetY);
 
             // Draw line with arrow for direction
             ctx.beginPath();
@@ -197,7 +197,7 @@ class FleetManager {
     /**
      * Render fleet UI elements (attack buttons, ETA labels) as HTML overlays
      */
-    renderFleetUIElements(canvas, camera, cartesianToIsometric) {
+    renderFleetUIElements(canvas, camera, coordToPixel) {
         // Remove existing fleet UI elements
         this.fleetUIElements.forEach(el => el.remove());
         this.fleetUIElements = [];
@@ -214,7 +214,7 @@ class FleetManager {
         const offsetY = canvasRect.top - containerRect.top;
 
         this.fleets.forEach(fleet => {
-            const targetIso = cartesianToIsometric(fleet.targetX, fleet.targetY);
+            const targetIso = coordToPixel(fleet.targetX, fleet.targetY);
             
             const screenX = (targetIso.x * camera.zoom) + camera.x + canvas.width / 2;
             const screenY = (targetIso.y * camera.zoom) + camera.y + canvas.height / 2;

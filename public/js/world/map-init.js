@@ -8,9 +8,8 @@
 
     console.log('Loading ' + worldRegions.length + ' world regions...');
 
-    const worldMap = new IsometricMap('worldMap', {
-        tileWidth: 128,
-        tileHeight: 64,
+    const worldMap = new HexMap('worldMap', {
+        hexSize: 40,
         imageBasePath: WorldApp.imageBasePath,
         overlaysEnabled: false,
         onTileClick: WorldApp.defaultTileClick

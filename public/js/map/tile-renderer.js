@@ -1,5 +1,6 @@
 /**
- * TileRenderer - Handles rendering of map tiles with game-specific features
+ * TileRenderer - Handles rendering of hex map tiles with game-specific features
+ * Uses pointy-top hexagons
  */
 class TileRenderer {
     constructor(ctx, config) {
@@ -11,102 +12,122 @@ class TileRenderer {
     /**
      * Render a tile with all game-specific features
      */
-    renderTile(region, iso, img, hoveredTile, images) {
+    renderTile(region, pos, img, hoveredTile, images) {
         if (img) {
-            // Draw the base terrain tile
+            // Clip terrain image to hex shape
+            this.ctx.save();
+            this.drawHex(pos);
+            this.ctx.clip();
+
+            // Draw the terrain image scaled to fill the hex bounding box
             this.ctx.drawImage(
                 img,
-                iso.x - this.config.tileWidth / 2,
-                iso.y - this.config.tileHeight / 2,
-                this.config.tileWidth,
-                this.config.tileHeight
+                pos.x - this.config.hexWidth / 2,
+                pos.y - this.config.hexHeight / 2,
+                this.config.hexWidth,
+                this.config.hexHeight
             );
+            this.ctx.restore();
 
-            // Draw fog of war if a region is not visible
+            // Draw subtle hex border
+            this.ctx.save();
+            this.ctx.strokeStyle = 'rgba(0, 0, 0, 0.3)';
+            this.ctx.lineWidth = 1;
+            this.drawHex(pos);
+            this.ctx.stroke();
+            this.ctx.restore();
+
+            // Draw fog of war if region is not visible
             if (region.isVisible === false) {
-                this.renderFogOfWar(
-                    iso.x,
-                    iso.y,
-                    this.config.tileWidth,
-                    this.config.tileHeight,
-                    region.x,
-                    region.y
-                );
+                this.renderFogOfWar(pos, region.x, region.y);
             }
 
             // Add ownership overlay if enabled
             if (this.config.overlaysEnabled) {
-                this.renderOwnershipOverlay(region, iso);
+                this.renderOwnershipOverlay(region, pos);
             }
 
             // Attack mode highlighting
-            if (region._attackTarget) {
-                this.ctx.save();
-                this.ctx.strokeStyle = '#ff0000';
-                this.ctx.lineWidth = 3;
-                this.drawDiamond(iso);
-                this.ctx.stroke();
-                this.ctx.restore();
-            } else if (region._sendSource) {
-                this.ctx.save();
-                this.ctx.strokeStyle = '#2196F3';
-                this.ctx.lineWidth = 3;
-                this.drawDiamond(iso);
-                this.ctx.stroke();
-                this.ctx.restore();
-            } else if (region._attackEligible) {
-                this.ctx.save();
-                this.ctx.fillStyle = 'rgba(0, 255, 100, 0.35)';
-                this.drawDiamond(iso);
-                this.ctx.fill();
-                this.ctx.strokeStyle = '#00ff64';
-                this.ctx.lineWidth = 2;
-                this.ctx.stroke();
-                this.ctx.restore();
-            } else if (typeof region._attackEligible !== 'undefined' && !region._attackEligible) {
-                this.ctx.save();
-                this.ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
-                this.drawDiamond(iso);
-                this.ctx.fill();
-                this.ctx.restore();
-            }
+            this.renderModeHighlights(region, pos);
 
             // Draw coordinates and owner name
-            this.renderTileLabels(region, iso);
+            this.renderTileLabels(region, pos);
 
             // Render unit indicators for your regions
-            this.unitRenderer.renderUnitIndicators(region, iso.x, iso.y, this.config.tileHeight);
+            this.unitRenderer.renderUnitIndicators(
+                region, pos.x, pos.y, this.config.hexHeight
+            );
 
             // Highlight hovered tile
-            if (hoveredTile && hoveredTile.x === region.x && hoveredTile.y === region.y) {
-                this.renderHoverHighlight(region, iso);
+            if (
+                hoveredTile
+                && hoveredTile.x === region.x
+                && hoveredTile.y === region.y
+            ) {
+                this.renderHoverHighlight(region, pos);
             }
         } else {
-            // Fallback if image not loaded - draw colored diamond
-            this.renderFallbackTile(region, iso);
+            // Fallback if image not loaded - draw colored hex
+            this.renderFallbackTile(region, pos);
         }
     }
 
     /**
-     * Render ownership overlay as a diamond shape
+     * Render attack/send mode highlights on a tile
      */
-    renderOwnershipOverlay(region, iso) {
+    renderModeHighlights(region, pos) {
+        if (region._attackTarget) {
+            this.ctx.save();
+            this.ctx.strokeStyle = '#ff0000';
+            this.ctx.lineWidth = 3;
+            this.drawHex(pos);
+            this.ctx.stroke();
+            this.ctx.restore();
+        } else if (region._sendSource) {
+            this.ctx.save();
+            this.ctx.strokeStyle = '#2196F3';
+            this.ctx.lineWidth = 3;
+            this.drawHex(pos);
+            this.ctx.stroke();
+            this.ctx.restore();
+        } else if (region._attackEligible) {
+            this.ctx.save();
+            this.ctx.fillStyle = 'rgba(0, 255, 100, 0.35)';
+            this.drawHex(pos);
+            this.ctx.fill();
+            this.ctx.strokeStyle = '#00ff64';
+            this.ctx.lineWidth = 2;
+            this.ctx.stroke();
+            this.ctx.restore();
+        } else if (
+            typeof region._attackEligible !== 'undefined'
+            && !region._attackEligible
+        ) {
+            this.ctx.save();
+            this.ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+            this.drawHex(pos);
+            this.ctx.fill();
+            this.ctx.restore();
+        }
+    }
+
+    /**
+     * Render ownership overlay as a hex shape
+     */
+    renderOwnershipOverlay(region, pos) {
         this.ctx.save();
-        
+
         if (region.hasOwner) {
             if (region.isYours) {
-                // Blue tint for your regions
                 this.ctx.fillStyle = 'rgba(74, 90, 124, 0.9)';
             } else {
-                // Red tint for enemy regions
                 this.ctx.fillStyle = 'rgba(124, 74, 74, 0.9)';
             }
         } else {
-            // Green tint for free regions
             this.ctx.fillStyle = 'rgba(74, 124, 89, 0.9)';
         }
 
-        this.drawDiamond(iso);
+        this.drawHex(pos);
         this.ctx.fill();
         this.ctx.restore();
     }
@@ -114,7 +135,7 @@ class TileRenderer {
     /**
      * Render coordinates and owner name labels
      */
-    renderTileLabels(region, iso) {
+    renderTileLabels(region, pos) {
         this.ctx.save();
         this.ctx.fillStyle = '#ffffff';
         this.ctx.font = '9px Arial';
@@ -122,36 +143,35 @@ class TileRenderer {
         this.ctx.strokeStyle = '#000000';
         this.ctx.lineWidth = 2;
 
-        // Coordinates
-        const coordText = `${region.x},${region.y}`;
-        this.ctx.strokeText(coordText, iso.x, iso.y - 8);
-        this.ctx.fillText(coordText, iso.x, iso.y - 8);
+        var coordText = region.x + ',' + region.y;
+        this.ctx.strokeText(coordText, pos.x, pos.y - 8);
+        this.ctx.fillText(coordText, pos.x, pos.y - 8);
 
-        // Owner name if applicable
         if (region.hasOwner && region.ownerName) {
-            this.ctx.fillStyle = region.isYours ? 'rgba(100, 150, 255, 0.95)' : 'rgba(255, 100, 100, 0.95)';
+            this.ctx.fillStyle = region.isYours
+                ? 'rgba(100, 150, 255, 0.95)'
+                : 'rgba(255, 100, 100, 0.95)';
             this.ctx.font = '10px Arial';
-            this.ctx.strokeText(region.ownerName, iso.x, iso.y + 2);
-            this.ctx.fillText(region.ownerName, iso.x, iso.y + 2);
+            this.ctx.strokeText(region.ownerName, pos.x, pos.y + 2);
+            this.ctx.fillText(region.ownerName, pos.x, pos.y + 2);
         }
 
         this.ctx.restore();
     }
 
     /**
-     * Render hover highlight with diamond shape and info
+     * Render hover highlight with hex outline and coordinate info
      */
-    renderHoverHighlight(region, iso) {
-        // Draw a diamond-shaped outline
+    renderHoverHighlight(region, pos) {
+        // Draw hex outline
         this.ctx.save();
         this.ctx.strokeStyle = '#ffffff';
         this.ctx.lineWidth = 3;
-        
-        this.drawDiamond(iso);
+        this.drawHex(pos);
         this.ctx.stroke();
         this.ctx.restore();
 
-        // Draw enhanced region info on hover
+        // Draw enhanced region info above the tile
         this.ctx.save();
         this.ctx.fillStyle = '#ffffff';
         this.ctx.font = 'bold 12px Arial';
@@ -159,9 +179,10 @@ class TileRenderer {
         this.ctx.strokeStyle = '#000000';
         this.ctx.lineWidth = 3;
 
-        const hoverText = `${region.x}, ${region.y}`;
-        this.ctx.strokeText(hoverText, iso.x, iso.y - 20);
-        this.ctx.fillText(hoverText, iso.x, iso.y - 20);
+        var hoverText = region.x + ', ' + region.y;
+        var labelY = pos.y - this.config.hexSize - 5;
+        this.ctx.strokeText(hoverText, pos.x, labelY);
+        this.ctx.fillText(hoverText, pos.x, labelY);
 
         this.ctx.restore();
     }
@@ -169,104 +190,108 @@ class TileRenderer {
     /**
      * Render fallback tile when image not loaded
      */
-    renderFallbackTile(region, iso) {
+    renderFallbackTile(region, pos) {
         this.ctx.save();
-        
+
         if (region.hasOwner) {
-            this.ctx.fillStyle = region.isYours ? '#4a5a7c' : '#7c4a4a';
+            this.ctx.fillStyle = region.isYours
+                ? '#4a5a7c'
+                : '#7c4a4a';
         } else {
             this.ctx.fillStyle = '#4a7c59';
         }
-        
-        this.drawDiamond(iso);
+
+        this.drawHex(pos);
         this.ctx.fill();
         this.ctx.restore();
     }
 
     /**
-     * Draw a diamond shape at the given isometric position
+     * Draw a pointy-top hexagon centered at pos
+     * 6 vertices at 60-degree intervals starting at -30 degrees
      */
-    drawDiamond(iso) {
+    drawHex(pos) {
+        var size = this.config.hexSize;
         this.ctx.beginPath();
-        this.ctx.moveTo(iso.x, iso.y - this.config.tileHeight / 2); // Top
-        this.ctx.lineTo(iso.x + this.config.tileWidth / 2, iso.y);   // Right
-        this.ctx.lineTo(iso.x, iso.y + this.config.tileHeight / 2); // Bottom
-        this.ctx.lineTo(iso.x - this.config.tileWidth / 2, iso.y);   // Left
+
+        for (var i = 0; i < 6; i++) {
+            var angle = (Math.PI / 180) * (60 * i - 30);
+            var vx = pos.x + size * Math.cos(angle);
+            var vy = pos.y + size * Math.sin(angle);
+
+            if (i === 0) {
+                this.ctx.moveTo(vx, vy);
+            } else {
+                this.ctx.lineTo(vx, vy);
+            }
+        }
+
         this.ctx.closePath();
     }
 
     /**
      * Proxy to unit renderer for external access
      */
-    renderUnitIndicators(region, isoX, isoY) {
-        this.unitRenderer.renderUnitIndicators(region, isoX, isoY, this.config.tileHeight);
+    renderUnitIndicators(region, posX, posY) {
+        this.unitRenderer.renderUnitIndicators(
+            region, posX, posY, this.config.hexHeight
+        );
     }
 
     /**
-     * Render fog of war as a semi-transparent cloud overlay
-     * Highly optimized for performance with static shapes
+     * Render fog of war as a semi-transparent overlay clipped to hex
      */
-    renderFogOfWar(isoX, isoY, tileWidth, tileHeight, tileX, tileY) {
-        // Save context state
+    renderFogOfWar(pos, tileX, tileY) {
         this.ctx.save();
 
-        // Create a diamond shape clipping path
-        this.ctx.beginPath();
-        this.ctx.moveTo(isoX, isoY - tileHeight / 2);
-        this.ctx.lineTo(isoX + tileWidth / 2, isoY);
-        this.ctx.lineTo(isoX, isoY + tileHeight / 2);
-        this.ctx.lineTo(isoX - tileWidth / 2, isoY);
-        this.ctx.closePath();
+        // Hex clipping path
+        this.drawHex(pos);
         this.ctx.clip();
 
-        // Base dark overlay with subtle gradient (50% transparent)
-        const baseGradient = this.ctx.createRadialGradient(
-            isoX, isoY, 0,
-            isoX, isoY, tileWidth / 2
+        // Dark overlay with radial gradient
+        var gradient = this.ctx.createRadialGradient(
+            pos.x, pos.y, 0,
+            pos.x, pos.y, this.config.hexSize
         );
-        baseGradient.addColorStop(0, 'rgba(25, 25, 35, 0.45)');
-        baseGradient.addColorStop(1, 'rgba(15, 15, 25, 0.5)');
-        this.ctx.fillStyle = baseGradient;
+        gradient.addColorStop(0, 'rgba(25, 25, 35, 0.45)');
+        gradient.addColorStop(1, 'rgba(15, 15, 25, 0.5)');
+        this.ctx.fillStyle = gradient;
         this.ctx.fill();
 
-        // Add static cloud effect (cheap to render)
-        // Using deterministic positions based on tile coordinates for consistency
-        const seed = tileX * 73 + tileY * 37;
-        const numClouds = 2; // Keep minimal for performance
+        // Static cloud effects (deterministic positions)
+        var seed = tileX * 73 + tileY * 37;
+        for (var i = 0; i < 2; i++) {
+            var angle = ((seed + i * 100) % 360) * Math.PI / 180;
+            var offsetX = Math.cos(angle) * 12;
+            var offsetY = Math.sin(angle) * 8;
+            var radius = 25 + ((seed + i * 50) % 10);
 
-        for (let i = 0; i < numClouds; i++) {
-            const angle = ((seed + i * 100) % 360) * Math.PI / 180;
-            const offsetX = Math.cos(angle) * 12;
-            const offsetY = Math.sin(angle) * 8;
-            const radius = 25 + ((seed + i * 50) % 10);
-
-            const gradient = this.ctx.createRadialGradient(
-                isoX + offsetX, isoY + offsetY, 0,
-                isoX + offsetX, isoY + offsetY, radius
+            var cloudGrad = this.ctx.createRadialGradient(
+                pos.x + offsetX, pos.y + offsetY, 0,
+                pos.x + offsetX, pos.y + offsetY, radius
             );
-            gradient.addColorStop(0, 'rgba(50, 50, 70, 0.25)');
-            gradient.addColorStop(0.5, 'rgba(40, 40, 60, 0.15)');
-            gradient.addColorStop(1, 'rgba(30, 30, 50, 0)');
+            cloudGrad.addColorStop(0, 'rgba(50, 50, 70, 0.25)');
+            cloudGrad.addColorStop(0.5, 'rgba(40, 40, 60, 0.15)');
+            cloudGrad.addColorStop(1, 'rgba(30, 30, 50, 0)');
 
-            this.ctx.fillStyle = gradient;
+            this.ctx.fillStyle = cloudGrad;
             this.ctx.fillRect(
-                isoX - tileWidth / 2,
-                isoY - tileHeight / 2,
-                tileWidth,
-                tileHeight
+                pos.x - this.config.hexWidth / 2,
+                pos.y - this.config.hexHeight / 2,
+                this.config.hexWidth,
+                this.config.hexHeight
             );
         }
 
-        // Add a question mark in the center for unknown territory (50% transparent)
+        // Question mark for unknown territory
         this.ctx.fillStyle = 'rgba(160, 160, 180, 0.5)';
         this.ctx.font = 'bold 28px Arial';
         this.ctx.textAlign = 'center';
         this.ctx.textBaseline = 'middle';
         this.ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
         this.ctx.shadowBlur = 4;
-        this.ctx.fillText('?', isoX, isoY);
+        this.ctx.fillText('?', pos.x, pos.y);
 
-        // Restore context state (removes clipping and shadow)
         this.ctx.restore();
     }
 }

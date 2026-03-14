@@ -209,7 +209,8 @@ final class WorldController extends BaseGameController
     }
 
     /**
-     * Calculate which regions are visible (owned + directly adjacent)
+     * Calculate which regions are visible (owned + 6 hex neighbors)
+     * Uses odd-r offset hex grid: odd rows are shifted right
      * @param array<string, true> $playerRegions
      * @return array<string, true>
      */
@@ -217,17 +218,28 @@ final class WorldController extends BaseGameController
     {
         $visibleRegions = $playerRegions;
 
-        // For each owned region, add all 4 adjacent regions
         foreach (array_keys($playerRegions) as $coordString) {
             [$x, $y] = explode(',', $coordString);
             $x = (int)$x;
             $y = (int)$y;
 
-            // Add 4 adjacent tiles (up, down, left, right in isometric grid)
-            $visibleRegions[($x - 1) . ',' . $y] = true;  // Left
-            $visibleRegions[($x + 1) . ',' . $y] = true;  // Right
-            $visibleRegions[$x . ',' . ($y - 1)] = true;  // Up
-            $visibleRegions[$x . ',' . ($y + 1)] = true;  // Down
+            // 6 hex neighbors (pointy-top, odd-r offset)
+            $visibleRegions[($x - 1) . ',' . $y] = true;
+            $visibleRegions[($x + 1) . ',' . $y] = true;
+
+            if ($y % 2 === 0) {
+                // Even row
+                $visibleRegions[($x - 1) . ',' . ($y - 1)] = true;
+                $visibleRegions[$x . ',' . ($y - 1)] = true;
+                $visibleRegions[($x - 1) . ',' . ($y + 1)] = true;
+                $visibleRegions[$x . ',' . ($y + 1)] = true;
+            } else {
+                // Odd row (shifted right)
+                $visibleRegions[$x . ',' . ($y - 1)] = true;
+                $visibleRegions[($x + 1) . ',' . ($y - 1)] = true;
+                $visibleRegions[$x . ',' . ($y + 1)] = true;
+                $visibleRegions[($x + 1) . ',' . ($y + 1)] = true;
+            }
         }
 
         return $visibleRegions;
