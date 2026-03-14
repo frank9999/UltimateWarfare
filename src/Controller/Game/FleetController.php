@@ -105,12 +105,14 @@ final class FleetController extends BaseGameController
             }
 
             // Only movable unit categories
-            if (!in_array($category, [
+            if (
+                !in_array($category, [
                 GameUnitCategory::TROOPS,
                 GameUnitCategory::AIR_UNITS,
                 GameUnitCategory::NAVAL_UNITS,
                 GameUnitCategory::SPECIAL_UNITS,
-            ])) {
+                ], true)
+            ) {
                 continue;
             }
 
@@ -189,11 +191,14 @@ final class FleetController extends BaseGameController
             return new JsonResponse(['success' => false, 'message' => $e->getMessage()], 404);
         }
 
+        /** @var array<string, mixed>|null $data */
         $data = json_decode($request->getContent(), true);
-        $targetRegionId = (int) ($data['targetRegionId'] ?? 0);
-        $unitData = $data['units'] ?? [];
+        $rawTargetId = is_array($data) ? ($data['targetRegionId'] ?? null) : null;
+        $targetRegionId = is_numeric($rawTargetId) ? (int) $rawTargetId : 0;
+        /** @var array<string, int|string> $unitData */
+        $unitData = is_array($data) && isset($data['units']) && is_array($data['units']) ? $data['units'] : [];
 
-        if (empty($unitData)) {
+        if ($unitData === []) {
             return new JsonResponse(['success' => false, 'message' => 'No units selected!'], 400);
         }
 
@@ -210,13 +215,16 @@ final class FleetController extends BaseGameController
         // Convert unit data to string values expected by FleetActionService
         $filteredUnits = [];
         foreach ($unitData as $gameUnitId => $amount) {
-            $amount = (int) $amount;
-            if ($amount > 0) {
-                $filteredUnits[(int) $gameUnitId] = (string) $amount;
+            if (!is_numeric($amount)) {
+                continue;
+            }
+            $amountInt = (int) $amount;
+            if ($amountInt > 0) {
+                $filteredUnits[(int) $gameUnitId] = (string) $amountInt;
             }
         }
 
-        if (empty($filteredUnits)) {
+        if ($filteredUnits === []) {
             return new JsonResponse(['success' => false, 'message' => 'No valid units selected!'], 400);
         }
 

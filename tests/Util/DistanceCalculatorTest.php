@@ -25,7 +25,7 @@ class DistanceCalculatorTest extends TestCase
     public function testCalculateDistanceTravelTime(): void
     {
         $calculator = new DistanceCalculator(0);
-        
+
         $result = $calculator->calculateDistanceTravelTime(1, 1, 1, 1);
         self::assertEquals(0, $result); // 0 distance * 100
 
@@ -39,7 +39,7 @@ class DistanceCalculatorTest extends TestCase
     public function testCalculateDistanceTravelTimeWithOverride(): void
     {
         $calculator = new DistanceCalculator(1);
-        
+
         // When override is set, travel time should always be 1
         $result = $calculator->calculateDistanceTravelTime(1, 1, 1, 1);
         self::assertEquals(1, $result);

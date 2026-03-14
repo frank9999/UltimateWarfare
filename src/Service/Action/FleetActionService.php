@@ -49,15 +49,15 @@ final class FleetActionService
     {
         // Begin transaction for atomic operation
         $this->entityManager->beginTransaction();
-        
+
         try {
             // Get and lock the fleet to prevent race conditions
             $fleet = $this->entityManager->find(
-                Fleet::class, 
-                $fleetId, 
+                Fleet::class,
+                $fleetId,
                 LockMode::PESSIMISTIC_WRITE
             );
-            
+
             if ($fleet === null || $fleet->getPlayer()->getId() !== $player->getId()) {
                 throw new RuntimeException('Fleet does not exist!');
             }
@@ -68,9 +68,9 @@ final class FleetActionService
             }
 
             $this->addFleetUnitsToWorldRegion($fleet, $fleet->getWorldRegion());
-            
+
             $this->entityManager->commit();
-            
+
             return true;
         } catch (\Exception $e) {
             $this->entityManager->rollback();
@@ -82,15 +82,15 @@ final class FleetActionService
     {
         // Begin transaction for atomic operation
         $this->entityManager->beginTransaction();
-        
+
         try {
             // Get and lock the fleet to prevent race conditions
             $fleet = $this->entityManager->find(
-                Fleet::class, 
-                $fleetId, 
+                Fleet::class,
+                $fleetId,
                 LockMode::PESSIMISTIC_WRITE
             );
-            
+
             if ($fleet === null || $fleet->getPlayer()->getId() !== $player->getId()) {
                 throw new RuntimeException('Fleet does not exist!');
             }
@@ -102,7 +102,7 @@ final class FleetActionService
             }
 
             $this->addFleetUnitsToWorldRegion($fleet, $fleet->getTargetWorldRegion());
-            
+
             $this->entityManager->commit();
 
             return true;
@@ -161,17 +161,6 @@ final class FleetActionService
         foreach ($gameUnitsToSend as $gameUnitData) {
             $this->addFleetUnitToFleet($region, $gameUnitData['gameUnit'], $gameUnitData['amount'], $fleet);
         }
-    }
-
-    private function getFleetByIdAndPlayer(int $fleetId, Player $player): Fleet
-    {
-        $fleet = $this->fleetRepository->findByIdAndPlayer($fleetId, $player);
-
-        if ($fleet === null) {
-            throw new RuntimeException('Fleet does not exist!');
-        }
-
-        return $fleet;
     }
 
     private function addFleetUnitsToWorldRegion(Fleet $fleet, WorldRegion $worldRegion): void

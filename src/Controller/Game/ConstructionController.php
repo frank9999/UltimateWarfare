@@ -220,8 +220,10 @@ final class ConstructionController extends BaseGameController
         }
 
         try {
+            /** @var array<string, mixed>|null $data */
             $data = json_decode($request->getContent(), true);
-            $construct = $data['construct'] ?? [];
+            /** @var array<int, string> $construct */
+            $construct = is_array($data) && isset($data['construct']) && is_array($data['construct']) ? $data['construct'] : [];
 
             $this->constructionActionService->constructGameUnits(
                 $worldRegion,

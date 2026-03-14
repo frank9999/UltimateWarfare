@@ -181,11 +181,13 @@ final class AttackController extends BaseGameController
             }
 
             // Only include combat unit categories
-            if (!in_array($category, [
+            if (
+                !in_array($category, [
                 GameUnitCategory::TROOPS,
                 GameUnitCategory::AIR_UNITS,
                 GameUnitCategory::NAVAL_UNITS,
-            ])) {
+                ], true)
+            ) {
                 continue;
             }
 
@@ -211,7 +213,7 @@ final class AttackController extends BaseGameController
                 'id' => $targetRegion->getId(),
                 'x' => $targetRegion->getX(),
                 'y' => $targetRegion->getY(),
-                'ownerName' => $targetRegion->getPlayer()?->getName(),
+                'ownerName' => $targetRegion->getPlayer()->getName(),
             ],
         ]);
     }
@@ -238,10 +240,12 @@ final class AttackController extends BaseGameController
             return new JsonResponse(['success' => false, 'message' => 'Cannot attack your own region!'], 400);
         }
 
+        /** @var array<string, mixed>|null $data */
         $data = json_decode($request->getContent(), true);
-        $unitData = $data['units'] ?? [];
+        /** @var array<string, int|string> $unitData */
+        $unitData = is_array($data) && isset($data['units']) && is_array($data['units']) ? $data['units'] : [];
 
-        if (empty($unitData)) {
+        if ($unitData === []) {
             return new JsonResponse(['success' => false, 'message' => 'No units selected!'], 400);
         }
 
@@ -282,13 +286,16 @@ final class AttackController extends BaseGameController
         // Filter out any units the player tried to send that aren't valid
         $filteredUnits = [];
         foreach ($unitData as $gameUnitId => $amount) {
-            $amount = (int) $amount;
-            if ($amount > 0 && isset($validUnitIds[(int) $gameUnitId])) {
-                $filteredUnits[(int) $gameUnitId] = (string) $amount;
+            if (!is_numeric($amount)) {
+                continue;
+            }
+            $amountInt = (int) $amount;
+            if ($amountInt > 0 && isset($validUnitIds[(int) $gameUnitId])) {
+                $filteredUnits[(int) $gameUnitId] = (string) $amountInt;
             }
         }
 
-        if (empty($filteredUnits)) {
+        if ($filteredUnits === []) {
             return new JsonResponse(['success' => false, 'message' => 'None of the selected units can reach the target!'], 400);
         }
 

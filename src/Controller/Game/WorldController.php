@@ -148,18 +148,21 @@ final class WorldController extends BaseGameController
         );
     }
 
+    /**
+     * @return list<array{x: int, y: int, id: int, type: string, image: string, hasOwner: bool, isYours: bool, ownerName: string|null, isVisible: bool, units: array{buildings: int, defences: int, special: int, specialUnits: int, troops: int, navalUnits: int, airUnits: int, missiles: int, details: array<string, list<array{name: string, amount: int}>>}|array{}}>
+     */
     private function getWorldRegionsData(World $world, Player $player): array
     {
         $playerRegions = $this->getPlayerRegionCoordinates($player);
         $visibleRegions = $this->calculateVisibleRegions($playerRegions);
-        
+
         $regions = [];
         foreach ($world->getWorldRegions() as $region) {
             $isYours = $region->getPlayer() !== null && $region->getPlayer()->getId() === $player->getId();
             $coordinates = $region->getX() . ',' . $region->getY();
             // If player has no regions, make everything visible (no fog of war yet)
-            $isVisible = empty($playerRegions) || isset($visibleRegions[$coordinates]);
-            
+            $isVisible = $playerRegions === [] || isset($visibleRegions[$coordinates]);
+
             $regionData = [
                 'x' => $region->getX(),
                 'y' => $region->getY(),
@@ -205,29 +208,31 @@ final class WorldController extends BaseGameController
     private function calculateVisibleRegions(array $playerRegions): array
     {
         $visibleRegions = $playerRegions;
-        
+
         // For each owned region, add all 4 adjacent regions
         foreach (array_keys($playerRegions) as $coordString) {
             [$x, $y] = explode(',', $coordString);
             $x = (int)$x;
             $y = (int)$y;
-            
+
             // Add 4 adjacent tiles (up, down, left, right in isometric grid)
             $visibleRegions[($x - 1) . ',' . $y] = true;  // Left
             $visibleRegions[($x + 1) . ',' . $y] = true;  // Right
             $visibleRegions[$x . ',' . ($y - 1)] = true;  // Up
             $visibleRegions[$x . ',' . ($y + 1)] = true;  // Down
         }
-        
+
         return $visibleRegions;
     }
 
     /**
      * Get a summary of units in a region grouped by type
-     * @return array<string, int|array>
+     *
+     * @return array{buildings: int, defences: int, special: int, specialUnits: int, troops: int, navalUnits: int, airUnits: int, missiles: int, details: array<string, list<array{name: string, amount: int}>>}
      */
     private function getUnitSummary(WorldRegion $region): array
     {
+        /** @var array{buildings: int, defences: int, special: int, specialUnits: int, troops: int, navalUnits: int, airUnits: int, missiles: int, details: array<string, list<array{name: string, amount: int}>>} $summary */
         $summary = [
             'buildings' => 0,
             'defences' => 0,
@@ -266,16 +271,20 @@ final class WorldController extends BaseGameController
             };
         }
 
+        /** @var array{buildings: int, defences: int, special: int, specialUnits: int, troops: int, navalUnits: int, airUnits: int, missiles: int, details: array<string, list<array{name: string, amount: int}>>} $summary */
         return $summary;
     }
 
+    /**
+     * @param array<string, mixed> $summary
+     */
     private function addUnitToSummary(array &$summary, string $type, string $unitName, int $amount): void
     {
-        $summary[$type] += $amount;
-        $summary['details'][$type][] = [
-            'name' => $unitName,
-            'amount' => $amount,
-        ];
+        $summary[$type] = (is_int($summary[$type]) ? $summary[$type] : 0) + $amount;
+        /** @var array<string, list<array{name: string, amount: int}>> $details */
+        $details = is_array($summary['details']) ? $summary['details'] : [];
+        $details[$type][] = ['name' => $unitName, 'amount' => $amount];
+        $summary['details'] = $details;
     }
 
     /**

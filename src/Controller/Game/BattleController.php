@@ -53,7 +53,7 @@ final class BattleController extends BaseGameController
     {
         $player = $this->getPlayer();
         $fleet = $this->fleetRepository->findByIdAndPlayer($fleetId, $player);
-        
+
         if ($fleet === null) {
             return new JsonResponse([
                 'success' => false,
@@ -63,7 +63,7 @@ final class BattleController extends BaseGameController
 
         try {
             $battleResults = $this->battleEngine->battle($fleet);
-            
+
             // Collect battle log from all phases
             $battleLog = [];
             foreach ($battleResults->getBattlePhases() as $battlePhase) {
@@ -71,7 +71,7 @@ final class BattleController extends BaseGameController
                     $battleLog[] = $line;
                 }
             }
-            
+
             return new JsonResponse([
                 'success' => true,
                 'hasWon' => $battleResults->hasWon(),

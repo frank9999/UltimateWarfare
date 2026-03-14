@@ -60,7 +60,7 @@ final class ReportController extends BaseGameController
         $player = $this->getPlayer();
         $page = max(1, $request->query->getInt('page', 1));
         $typeParam = $request->query->get('type');
-        
+
         $type = null;
         if ($typeParam !== null && $typeParam !== '' && $typeParam !== 'all') {
             $type = (int) $typeParam;

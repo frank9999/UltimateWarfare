@@ -26,8 +26,7 @@ class GameUnitFixturesCommand extends Command
 {
     public function __construct(
         private EntityManagerInterface $entityManager
-    )
-    {
+    ) {
         parent::__construct();
     }
 
@@ -51,8 +50,8 @@ class GameUnitFixturesCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
-        $commit = $input->getOption('commit');
-        $removeObsolete = $input->getOption('remove-obsolete');
+        $commit = (bool) $input->getOption('commit');
+        $removeObsolete = (bool) $input->getOption('remove-obsolete');
 
         if (!$commit) {
             $io->warning('Running in DRY-RUN mode. Use --commit to apply changes.');
@@ -118,7 +117,7 @@ class GameUnitFixturesCommand extends Command
             } else {
                 $differences = $this->detectDifferences($gameUnit, $data);
 
-                if (empty($differences)) {
+                if ($differences === []) {
                     $unchanged++;
                     continue;
                 }
@@ -141,22 +140,22 @@ class GameUnitFixturesCommand extends Command
             // Don't clear before this operation - we need managed entities
             /** @var GameUnit[] $allGameUnits */
             $allGameUnits = $this->entityManager->getRepository(GameUnit::class)->findAll();
-            
+
             $obsoleteUnits = [];
             foreach ($allGameUnits as $gameUnit) {
                 if (!in_array($gameUnit->getId(), $fixtureIds, true)) {
                     $obsoleteUnits[] = $gameUnit->getId(); // Store ID instead of entity
                 }
             }
-            
+
             // Now process removals with fresh entities
             foreach ($obsoleteUnits as $gameUnitId) {
                 // Re-fetch the entity to ensure it's managed
                 $gameUnit = $this->entityManager->getRepository(GameUnit::class)->find($gameUnitId);
-                
+
                 if ($gameUnit !== null) {
                     $io->section("Removing obsolete GameUnit: {$gameUnit->getName()} (ID: {$gameUnitId})");
-                    
+
                     if ($commit) {
                         $this->removeGameUnitWithDependencies($io, $gameUnit);
                     } else {
@@ -198,7 +197,7 @@ class GameUnitFixturesCommand extends Command
         $worldRegionUnits = $this->entityManager->getRepository(WorldRegionUnit::class)
             ->findBy(['gameUnit' => $gameUnit]);
 
-        if (!empty($worldRegionUnits)) {
+        if ($worldRegionUnits !== []) {
             $io->text(sprintf('  Removing %d WorldRegionUnit(s)...', count($worldRegionUnits)));
             foreach ($worldRegionUnits as $worldRegionUnit) {
                 $this->entityManager->remove($worldRegionUnit);
@@ -209,7 +208,7 @@ class GameUnitFixturesCommand extends Command
         $fleetUnits = $this->entityManager->getRepository(FleetUnit::class)
             ->findBy(['gameUnit' => $gameUnit]);
 
-        if (!empty($fleetUnits)) {
+        if ($fleetUnits !== []) {
             $io->text(sprintf('  Removing %d FleetUnit(s)...', count($fleetUnits)));
             foreach ($fleetUnits as $fleetUnit) {
                 $this->entityManager->remove($fleetUnit);
@@ -220,7 +219,7 @@ class GameUnitFixturesCommand extends Command
         $constructions = $this->entityManager->getRepository(Construction::class)
             ->findBy(['gameUnit' => $gameUnit]);
 
-        if (!empty($constructions)) {
+        if ($constructions !== []) {
             $io->text(sprintf('  Removing %d Construction(s)...', count($constructions)));
             foreach ($constructions as $construction) {
                 $this->entityManager->remove($construction);
@@ -231,13 +230,15 @@ class GameUnitFixturesCommand extends Command
         $operations = $this->entityManager->getRepository(Operation::class)
             ->findBy(['gameUnit' => $gameUnit]);
 
-        if (!empty($operations)) {
+        if ($operations !== []) {
             $backupGameUnit = $this->entityManager->getRepository(GameUnit::class)
                 ->find(401);
 
             $io->text(sprintf('  Removing %d Construction(s)...', count($constructions)));
             foreach ($operations as $operation) {
-                $operation->setGameUnit($backupGameUnit);
+                if ($backupGameUnit !== null) {
+                    $operation->setGameUnit($backupGameUnit);
+                }
                 $this->entityManager->persist($operation);
             }
         }
@@ -280,7 +281,7 @@ class GameUnitFixturesCommand extends Command
             $dependencies[] = sprintf('%d Construction(s)', $constructionsCount);
         }
 
-        if (!empty($dependencies)) {
+        if ($dependencies !== []) {
             $io->warning('This unit has dependencies that will be removed:');
             $io->listing($dependencies);
         } else {
@@ -288,8 +289,13 @@ class GameUnitFixturesCommand extends Command
         }
     }
 
+    /**
+     * @param array{id: int, game_unit_category: int, name: string, name_multi: string, row_name: string, image: string, net_worth: int, timestamp: int, description: string, battle_stats: array{health: int, armor: int, travel_speed: int, air_attack: int, air_attack_speed: int, air_defence: int, air_defence_speed: int, sea_attack: int, sea_attack_speed: int, sea_defence: int, sea_defence_speed: int, ground_attack: int, ground_attack_speed: int, ground_defence: int, ground_defence_speed: int}, cost: array{cash: int, steel: int, wood: int, food: int}, income: array{cash: int, steel: int, wood: int, food: int}, upkeep: array{cash: int, steel: int, wood: int, food: int}} $data
+     * @return array<string, array{old: int|string, new: int|string}>
+     */
     private function detectDifferences(GameUnit $gameUnit, array $data): array
     {
+        /** @var array<string, array{old: int|string, new: int|string}> $differences */
         $differences = [];
 
         // Check basic properties
@@ -323,91 +329,87 @@ class GameUnitFixturesCommand extends Command
 
         // Check battle stats
         $battleStats = $gameUnit->getBattleStats();
-        $battleStatsReflection = new \ReflectionClass($battleStats);
 
-        $healthValue = $battleStatsReflection->getProperty('health')->getValue($battleStats);
+        $healthValue = $this->getIntReflectionValue($battleStats, 'health');
         if ($healthValue !== $data['battle_stats']['health']) {
             $differences['battle_stats.health'] = ['old' => $healthValue, 'new' => $data['battle_stats']['health']];
         }
 
-        $armorValue = $battleStatsReflection->getProperty('armor')->getValue($battleStats);
+        $armorValue = $this->getIntReflectionValue($battleStats, 'armor');
         if ($armorValue !== $data['battle_stats']['armor']) {
             $differences['battle_stats.armor'] = ['old' => $armorValue, 'new' => $data['battle_stats']['armor']];
         }
 
-        $travelSpeedValue = $battleStatsReflection->getProperty('travelSpeed')->getValue($battleStats);
+        $travelSpeedValue = $this->getIntReflectionValue($battleStats, 'travelSpeed');
         if ($travelSpeedValue !== $data['battle_stats']['travel_speed']) {
             $differences['battle_stats.travel_speed'] = ['old' => $travelSpeedValue, 'new' => $data['battle_stats']['travel_speed']];
         }
 
         // Check air battle stats
         $airStats = $battleStats->getAirBattleStats();
-        $airReflection = new \ReflectionClass($airStats);
 
-        $airAttack = $airReflection->getProperty('attack')->getValue($airStats);
+        $airAttack = $this->getIntReflectionValue($airStats, 'attack');
         if ($airAttack !== $data['battle_stats']['air_attack']) {
             $differences['battle_stats.air_attack'] = ['old' => $airAttack, 'new' => $data['battle_stats']['air_attack']];
         }
 
-        $airAttackSpeed = $airReflection->getProperty('attackSpeed')->getValue($airStats);
+        $airAttackSpeed = $this->getIntReflectionValue($airStats, 'attackSpeed');
         if ($airAttackSpeed !== $data['battle_stats']['air_attack_speed']) {
             $differences['battle_stats.air_attack_speed'] = ['old' => $airAttackSpeed, 'new' => $data['battle_stats']['air_attack_speed']];
         }
 
-        $airDefence = $airReflection->getProperty('defence')->getValue($airStats);
+        $airDefence = $this->getIntReflectionValue($airStats, 'defence');
         if ($airDefence !== $data['battle_stats']['air_defence']) {
             $differences['battle_stats.air_defence'] = ['old' => $airDefence, 'new' => $data['battle_stats']['air_defence']];
         }
 
-        $airDefenceSpeed = $airReflection->getProperty('defenceSpeed')->getValue($airStats);
+        $airDefenceSpeed = $this->getIntReflectionValue($airStats, 'defenceSpeed');
         if ($airDefenceSpeed !== $data['battle_stats']['air_defence_speed']) {
             $differences['battle_stats.air_defence_speed'] = ['old' => $airDefenceSpeed, 'new' => $data['battle_stats']['air_defence_speed']];
         }
 
         // Check sea battle stats
         $seaStats = $battleStats->getSeaBattleStats();
-        $seaReflection = new \ReflectionClass($seaStats);
 
-        $seaAttack = $seaReflection->getProperty('attack')->getValue($seaStats);
+        $seaAttack = $this->getIntReflectionValue($seaStats, 'attack');
         if ($seaAttack !== $data['battle_stats']['sea_attack']) {
             $differences['battle_stats.sea_attack'] = ['old' => $seaAttack, 'new' => $data['battle_stats']['sea_attack']];
         }
 
-        $seaAttackSpeed = $seaReflection->getProperty('attackSpeed')->getValue($seaStats);
+        $seaAttackSpeed = $this->getIntReflectionValue($seaStats, 'attackSpeed');
         if ($seaAttackSpeed !== $data['battle_stats']['sea_attack_speed']) {
             $differences['battle_stats.sea_attack_speed'] = ['old' => $seaAttackSpeed, 'new' => $data['battle_stats']['sea_attack_speed']];
         }
 
-        $seaDefence = $seaReflection->getProperty('defence')->getValue($seaStats);
+        $seaDefence = $this->getIntReflectionValue($seaStats, 'defence');
         if ($seaDefence !== $data['battle_stats']['sea_defence']) {
             $differences['battle_stats.sea_defence'] = ['old' => $seaDefence, 'new' => $data['battle_stats']['sea_defence']];
         }
 
-        $seaDefenceSpeed = $seaReflection->getProperty('defenceSpeed')->getValue($seaStats);
+        $seaDefenceSpeed = $this->getIntReflectionValue($seaStats, 'defenceSpeed');
         if ($seaDefenceSpeed !== $data['battle_stats']['sea_defence_speed']) {
             $differences['battle_stats.sea_defence_speed'] = ['old' => $seaDefenceSpeed, 'new' => $data['battle_stats']['sea_defence_speed']];
         }
 
         // Check ground battle stats
         $groundStats = $battleStats->getGroundBattleStats();
-        $groundReflection = new \ReflectionClass($groundStats);
 
-        $groundAttack = $groundReflection->getProperty('attack')->getValue($groundStats);
+        $groundAttack = $this->getIntReflectionValue($groundStats, 'attack');
         if ($groundAttack !== $data['battle_stats']['ground_attack']) {
             $differences['battle_stats.ground_attack'] = ['old' => $groundAttack, 'new' => $data['battle_stats']['ground_attack']];
         }
 
-        $groundAttackSpeed = $groundReflection->getProperty('attackSpeed')->getValue($groundStats);
+        $groundAttackSpeed = $this->getIntReflectionValue($groundStats, 'attackSpeed');
         if ($groundAttackSpeed !== $data['battle_stats']['ground_attack_speed']) {
             $differences['battle_stats.ground_attack_speed'] = ['old' => $groundAttackSpeed, 'new' => $data['battle_stats']['ground_attack_speed']];
         }
 
-        $groundDefence = $groundReflection->getProperty('defence')->getValue($groundStats);
+        $groundDefence = $this->getIntReflectionValue($groundStats, 'defence');
         if ($groundDefence !== $data['battle_stats']['ground_defence']) {
             $differences['battle_stats.ground_defence'] = ['old' => $groundDefence, 'new' => $data['battle_stats']['ground_defence']];
         }
 
-        $groundDefenceSpeed = $groundReflection->getProperty('defenceSpeed')->getValue($groundStats);
+        $groundDefenceSpeed = $this->getIntReflectionValue($groundStats, 'defenceSpeed');
         if ($groundDefenceSpeed !== $data['battle_stats']['ground_defence_speed']) {
             $differences['battle_stats.ground_defence_speed'] = ['old' => $groundDefenceSpeed, 'new' => $data['battle_stats']['ground_defence_speed']];
         }
@@ -460,6 +462,9 @@ class GameUnitFixturesCommand extends Command
         return $differences;
     }
 
+    /**
+     * @param array<string, array{old: int|string, new: int|string}> $differences
+     */
     private function displayDifferences(SymfonyStyle $io, array $differences): void
     {
         $rows = [];
@@ -474,6 +479,9 @@ class GameUnitFixturesCommand extends Command
         $io->table(['Field', 'Old Value', 'New Value'], $rows);
     }
 
+    /**
+     * @param array{id: int, game_unit_category: int, name: string, name_multi: string, row_name: string, image: string, net_worth: int, timestamp: int, description: string, battle_stats: array{health: int, armor: int, travel_speed: int, air_attack: int, air_attack_speed: int, air_defence: int, air_defence_speed: int, sea_attack: int, sea_attack_speed: int, sea_defence: int, sea_defence_speed: int, ground_attack: int, ground_attack_speed: int, ground_defence: int, ground_defence_speed: int}, cost: array{cash: int, steel: int, wood: int, food: int}, income: array{cash: int, steel: int, wood: int, food: int}, upkeep: array{cash: int, steel: int, wood: int, food: int}} $data
+     */
     private function displayNewUnit(SymfonyStyle $io, array $data): void
     {
         $io->listing([
@@ -486,14 +494,26 @@ class GameUnitFixturesCommand extends Command
         ]);
     }
 
+    private function getIntReflectionValue(object $object, string $property): int
+    {
+        $value = (new \ReflectionClass($object))->getProperty($property)->getValue($object);
+        return is_int($value) ? $value : 0;
+    }
+
     private function formatValue(mixed $value): string
     {
         if (is_string($value) && $value === '') {
             return '(empty)';
         }
-        return (string)$value;
+        if (is_scalar($value)) {
+            return (string) $value;
+        }
+        return '';
     }
 
+    /**
+     * @param array{id: int, game_unit_category: int, name: string, name_multi: string, row_name: string, image: string, net_worth: int, timestamp: int, description: string, battle_stats: array{health: int, armor: int, travel_speed: int, air_attack: int, air_attack_speed: int, air_defence: int, air_defence_speed: int, sea_attack: int, sea_attack_speed: int, sea_defence: int, sea_defence_speed: int, ground_attack: int, ground_attack_speed: int, ground_defence: int, ground_defence_speed: int}, cost: array{cash: int, steel: int, wood: int, food: int}, income: array{cash: int, steel: int, wood: int, food: int}, upkeep: array{cash: int, steel: int, wood: int, food: int}} $data
+     */
     private function applyGameUnitData(GameUnit $gameUnit, array $data): void
     {
         // Set basic properties
@@ -589,6 +609,9 @@ class GameUnitFixturesCommand extends Command
         $upkeep->setFood($data['upkeep']['food']);
     }
 
+    /**
+     * @return list<array{id: int, game_unit_category: int, name: string, name_multi: string, row_name: string, image: string, net_worth: int, timestamp: int, description: string, battle_stats: array{health: int, armor: int, travel_speed: int, air_attack: int, air_attack_speed: int, air_defence: int, air_defence_speed: int, sea_attack: int, sea_attack_speed: int, sea_defence: int, sea_defence_speed: int, ground_attack: int, ground_attack_speed: int, ground_defence: int, ground_defence_speed: int}, cost: array{cash: int, steel: int, wood: int, food: int}, income: array{cash: int, steel: int, wood: int, food: int}, upkeep: array{cash: int, steel: int, wood: int, food: int}}>
+     */
     private function getGameUnitsData(): array
     {
         return [

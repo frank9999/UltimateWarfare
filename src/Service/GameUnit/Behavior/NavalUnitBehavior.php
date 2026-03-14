@@ -15,7 +15,8 @@ class NavalUnitBehavior extends AbstractGameUnitBehavior
 
     public function __construct(
         private WorldRegionRepository $regionRepository
-    ) {}
+    ) {
+    }
 
     public function canBuild(WorldRegion $region, Player $player): bool
     {

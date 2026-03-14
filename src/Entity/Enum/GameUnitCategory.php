@@ -17,7 +17,7 @@ enum GameUnitCategory: int
 
     public function getImageDir(): string
     {
-        return match($this) {
+        return match ($this) {
             self::BUILDINGS => 'units/buildings/',
             self::DEFENSE_BUILDINGS => 'units/defense_buildings/',
             self::SPECIAL_BUILDINGS => 'units/special_buildings/',
@@ -27,7 +27,7 @@ enum GameUnitCategory: int
 
     public function getLabel(): string
     {
-        return match($this) {
+        return match ($this) {
             self::BUILDINGS => 'Buildings',
             self::DEFENSE_BUILDINGS => 'Defense Buildings',
             self::SPECIAL_BUILDINGS => 'Special Buildings',
@@ -61,6 +61,9 @@ enum GameUnitCategory: int
         return null;
     }
 
+    /**
+     * @return list<self>
+     */
     public static function getAll(): array
     {
         return [
@@ -83,12 +86,12 @@ enum GameUnitCategory: int
             self::NAVAL_UNITS,
             self::AIR_UNITS,
             self::MISSILES
-        ]);
+        ], true);
     }
 
     public function getConstructionAction(): string
     {
-        return match($this) {
+        return match ($this) {
             self::BUILDINGS, self::DEFENSE_BUILDINGS, self::SPECIAL_BUILDINGS, self::NAVAL_UNITS, self::AIR_UNITS, self::MISSILES => 'built',
             self::SPECIAL_UNITS, self::TROOPS => 'trained'
         };
@@ -96,7 +99,7 @@ enum GameUnitCategory: int
 
     public function getRemoveGameUnitActionDescription(): string
     {
-        return match($this) {
+        return match ($this) {
             self::BUILDINGS, self::DEFENSE_BUILDINGS, self::SPECIAL_BUILDINGS, self::NAVAL_UNITS, self::AIR_UNITS, self::MISSILES => 'destroyed',
             self::SPECIAL_UNITS, self::TROOPS => 'disbanded'
         };

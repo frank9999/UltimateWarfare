@@ -38,5 +38,10 @@ interface WorldRegionRepository
 
     public function getNextWorldRegionForPlayer(int $id, Player $player): ?WorldRegion;
 
+    /**
+     * @return WorldRegion[]
+     */
+    public function findAdjacentRegions(int $x, int $y, World $world): array;
+
     public function save(WorldRegion $worldRegion): void;
 }

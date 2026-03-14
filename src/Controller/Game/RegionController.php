@@ -69,7 +69,7 @@ final class RegionController extends BaseGameController
         try {
             $player = $this->getPlayer();
             $this->regionActionService->buyWorldRegion($regionId, $player);
-            
+
             return new JsonResponse([
                 'success' => true,
                 'message' => 'You have bought a Region!',

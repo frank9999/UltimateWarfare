@@ -159,6 +159,8 @@ final class ConstructionActionService
 
     /**
      * Validate that a specific game unit is allowed to be built on this region.
+     *
+     * @param array<string, int> $buildingIndex
      */
     private function validateUnitAllowed(GameUnit $gameUnit, WorldRegion $region, array $buildingIndex): void
     {

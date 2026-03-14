@@ -115,6 +115,32 @@ final class DoctrineWorldRegionRepository implements WorldRegionRepository
             ->getOneOrNullResult(AbstractQuery::HYDRATE_OBJECT);
     }
 
+    /**
+     * @return WorldRegion[]
+     */
+    public function findAdjacentRegions(int $x, int $y, World $world): array
+    {
+        return $this->entityManager
+            ->createQuery(
+                'SELECT wr FROM ' . WorldRegion::class . ' wr
+                 WHERE wr.world = :world
+                 AND (
+                     (wr.x = :xm1 AND wr.y = :y) OR
+                     (wr.x = :xp1 AND wr.y = :y) OR
+                     (wr.x = :x AND wr.y = :ym1) OR
+                     (wr.x = :x AND wr.y = :yp1)
+                 )'
+            )
+            ->setParameter('world', $world)
+            ->setParameter('x', $x)
+            ->setParameter('xm1', $x - 1)
+            ->setParameter('xp1', $x + 1)
+            ->setParameter('y', $y)
+            ->setParameter('ym1', $y - 1)
+            ->setParameter('yp1', $y + 1)
+            ->getResult();
+    }
+
     public function save(WorldRegion $worldRegion): void
     {
         $this->entityManager->persist($worldRegion);

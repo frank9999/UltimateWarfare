@@ -24,7 +24,6 @@ final class DoctrineResearchPlayerRepository implements ResearchPlayerRepository
     {
         $this->entityManager = $entityManager;
         $this->repository = $this->entityManager->getRepository(ResearchPlayer::class);
-
     }
 
     /**
