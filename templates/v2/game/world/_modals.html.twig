@@ -137,6 +137,32 @@
     </div>
 </div>
 
+{# Send Message Modal #}
+<div id="sendMessageModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span class="modal-title">Send Message to <span id="sendMessageRecipient"></span></span>
+            <span class="close" id="closeSendMessageModal">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div class="message-form">
+                <div class="message-form-group">
+                    <label for="messageSubject">Subject</label>
+                    <input type="text" id="messageSubject" maxlength="255" placeholder="Enter subject...">
+                </div>
+                <div class="message-form-group">
+                    <label for="messageBody">Message</label>
+                    <textarea id="messageBody" rows="5" placeholder="Type your message..."></textarea>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" id="cancelSendMessageBtn">Cancel</button>
+            <button type="button" id="confirmSendMessageBtn">Send Message</button>
+        </div>
+    </div>
+</div>
+
 {# Send Units Modal - Step 1: Select units #}
 <div id="sendUnitsModal" class="modal">
     <div class="modal-content build-modal-content">

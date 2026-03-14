@@ -299,6 +299,42 @@
     border-radius: 4px;
 }
 
+/* ===== Send Message Form ===== */
+.message-form-group {
+    margin-bottom: 12px;
+}
+
+.message-form-group label {
+    display: block;
+    color: #f3e6c1;
+    font-weight: bold;
+    margin-bottom: 4px;
+    font-size: 13px;
+}
+
+.message-form-group input,
+.message-form-group textarea {
+    width: 100%;
+    padding: 8px 10px;
+    background: #1a1a1a;
+    border: 1px solid #8B7355;
+    border-radius: 4px;
+    color: #f3e6c1;
+    font-size: 14px;
+    font-family: inherit;
+    box-sizing: border-box;
+}
+
+.message-form-group input:focus,
+.message-form-group textarea:focus {
+    outline: none;
+    border-color: #a08365;
+}
+
+.message-form-group textarea {
+    resize: vertical;
+}
+
 /* ===== Unit Tooltip ===== */
 #unitTooltip {
     display: none;

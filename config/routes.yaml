@@ -462,6 +462,11 @@ Game/Message/Inbox/Read:
     requirements:
         messageId: '\d+'
 
+Game/Message/Send/Api:
+    path:      /game/api/message/send
+    controller: FrankProjects\UltimateWarfare\Controller\Game\MessageController::sendMessageApi
+    methods: [POST]
+
 Game/Message/New:
     path:      /game/message/new/{playerName}
     controller: FrankProjects\UltimateWarfare\Controller\Game\MessageController::newMessage

@@ -7,6 +7,7 @@ namespace FrankProjects\UltimateWarfare\Controller\Game;
 use FrankProjects\UltimateWarfare\Entity\Message;
 use FrankProjects\UltimateWarfare\Repository\MessageRepository;
 use FrankProjects\UltimateWarfare\Service\Action\MessageActionService;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -182,6 +183,34 @@ final class MessageController extends BaseGameController
                 'message' => $request->request->getString('message')
             ]
         );
+    }
+
+    public function sendMessageApi(Request $request): JsonResponse
+    {
+        try {
+            $player = $this->getPlayer();
+
+            /** @var array{toPlayerName?: string, subject?: string, message?: string} $data */
+            $data = json_decode($request->getContent(), true) ?? [];
+
+            $this->messageActionService->sendMessage(
+                $player,
+                $data['subject'] ?? '',
+                $data['message'] ?? '',
+                $data['toPlayerName'] ?? '',
+                false
+            );
+
+            return new JsonResponse([
+                'success' => true,
+                'message' => 'Message sent!'
+            ]);
+        } catch (Throwable $e) {
+            return new JsonResponse([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 400);
+        }
     }
 
     /**

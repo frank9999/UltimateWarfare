@@ -103,8 +103,76 @@
     }
 
     closeEnemyModal.onclick = function () { enemyModal.style.display = 'none'; selectedEnemyRegion = null; };
+
+    // ===== Send Message Modal =====
+    const sendMessageModal = document.getElementById('sendMessageModal');
+    const messageSubject = document.getElementById('messageSubject');
+    const messageBody = document.getElementById('messageBody');
+    const confirmSendMessageBtn = document.getElementById('confirmSendMessageBtn');
+    let isSendingMessage = false;
+
+    function showSendMessageModal(playerName) {
+        document.getElementById('sendMessageRecipient').textContent = playerName;
+        messageSubject.value = '';
+        messageBody.value = '';
+        confirmSendMessageBtn.disabled = false;
+        confirmSendMessageBtn.textContent = 'Send Message';
+        sendMessageModal.style.display = 'block';
+    }
+
+    document.getElementById('closeSendMessageModal').onclick = function () { sendMessageModal.style.display = 'none'; };
+    document.getElementById('cancelSendMessageBtn').onclick = function () { sendMessageModal.style.display = 'none'; };
+
+    confirmSendMessageBtn.onclick = async function () {
+        if (isSendingMessage) return;
+
+        var subject = messageSubject.value.trim();
+        var message = messageBody.value.trim();
+
+        if (subject === '') {
+            showNotification('Please type a subject', 'error');
+            return;
+        }
+        if (message === '') {
+            showNotification('Please type a message', 'error');
+            return;
+        }
+
+        isSendingMessage = true;
+        confirmSendMessageBtn.disabled = true;
+        confirmSendMessageBtn.textContent = 'Sending...';
+
+        try {
+            var response = await fetch('/game/api/message/send', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    toPlayerName: selectedEnemyRegion.ownerName,
+                    subject: subject,
+                    message: message
+                })
+            });
+            var result = await response.json();
+
+            if (result.success) {
+                showNotification(result.message, 'success');
+                sendMessageModal.style.display = 'none';
+                enemyModal.style.display = 'none';
+            } else {
+                showNotification(result.message || 'Failed to send message', 'error');
+            }
+        } catch (error) {
+            console.error('Error sending message:', error);
+            showNotification('An error occurred while sending the message. Please try again.', 'error');
+        } finally {
+            isSendingMessage = false;
+            confirmSendMessageBtn.disabled = false;
+            confirmSendMessageBtn.textContent = 'Send Message';
+        }
+    };
+
     document.getElementById('sendMessageBtn').onclick = function () {
-        if (selectedEnemyRegion) window.location.href = '/game/message/new/' + encodeURIComponent(selectedEnemyRegion.ownerName);
+        if (selectedEnemyRegion) showSendMessageModal(selectedEnemyRegion.ownerName);
     };
     document.getElementById('attackBtn').onclick = function () {
         if (selectedEnemyRegion) WorldAttack.startAttackFromSelection(selectedEnemyRegion);
@@ -165,6 +233,7 @@
         if (event.target === enemyModal) { enemyModal.style.display = 'none'; selectedEnemyRegion = null; }
         if (event.target === yourModal) { yourModal.style.display = 'none'; selectedYourRegion = null; }
         if (event.target === hqModal) { hqModal.style.display = 'none'; }
+        if (event.target === sendMessageModal) { sendMessageModal.style.display = 'none'; }
         if (event.target === WorldBuild.modal) { WorldBuild.modal.style.display = 'none'; }
         if (event.target === WorldReports.modal) { WorldReports.modal.style.display = 'none'; }
         if (event.target === WorldSendUnits.modal) { WorldSendUnits.modal.style.display = 'none'; }
