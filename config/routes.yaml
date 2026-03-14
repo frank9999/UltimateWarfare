@@ -467,6 +467,44 @@ Game/Message/Send/Api:
     controller: FrankProjects\UltimateWarfare\Controller\Game\MessageController::sendMessageApi
     methods: [POST]
 
+Game/Message/Inbox/Api:
+    path:      /game/api/message/inbox
+    controller: FrankProjects\UltimateWarfare\Controller\Game\MessageController::inboxApi
+    methods: [GET]
+
+Game/Message/Outbox/Api:
+    path:      /game/api/message/outbox
+    controller: FrankProjects\UltimateWarfare\Controller\Game\MessageController::outboxApi
+    methods: [GET]
+
+Game/Message/Read/Api:
+    path:      /game/api/message/inbox/{messageId}
+    controller: FrankProjects\UltimateWarfare\Controller\Game\MessageController::readMessageApi
+    methods: [GET]
+    requirements:
+        messageId: '\d+'
+
+Game/Message/ReadOutbox/Api:
+    path:      /game/api/message/outbox/{messageId}
+    controller: FrankProjects\UltimateWarfare\Controller\Game\MessageController::readOutboxMessageApi
+    methods: [GET]
+    requirements:
+        messageId: '\d+'
+
+Game/Message/DeleteInbox/Api:
+    path:      /game/api/message/inbox/{messageId}
+    controller: FrankProjects\UltimateWarfare\Controller\Game\MessageController::deleteInboxMessageApi
+    methods: [DELETE]
+    requirements:
+        messageId: '\d+'
+
+Game/Message/DeleteOutbox/Api:
+    path:      /game/api/message/outbox/{messageId}
+    controller: FrankProjects\UltimateWarfare\Controller\Game\MessageController::deleteOutboxMessageApi
+    methods: [DELETE]
+    requirements:
+        messageId: '\d+'
+
 Game/Message/New:
     path:      /game/message/new/{playerName}
     controller: FrankProjects\UltimateWarfare\Controller\Game\MessageController::newMessage

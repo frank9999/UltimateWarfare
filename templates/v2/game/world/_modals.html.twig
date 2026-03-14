@@ -117,6 +117,25 @@
     </div>
 </div>
 
+{# Messages Modal #}
+<div id="messagesModal" class="modal">
+    <div class="modal-content modal-lg">
+        <div class="modal-header">
+            <span class="modal-title" id="messagesModalTitle">Messages</span>
+            <span class="close" id="closeMessagesModal">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div class="build-tabs" id="messagesTabs"></div>
+            <div id="messagesContainer" style="max-height: 400px; overflow-y: auto;">
+                <div class="build-loading">Loading messages...</div>
+            </div>
+        </div>
+        <div class="modal-footer" id="messagesFooter">
+            <button type="button" id="closeMessagesBtn">Close</button>
+        </div>
+    </div>
+</div>
+
 {# Attack Unit Selection Modal #}
 <div id="attackUnitsModal" class="modal">
     <div class="modal-content build-modal-content">

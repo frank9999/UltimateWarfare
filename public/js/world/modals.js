@@ -111,13 +111,23 @@
     const confirmSendMessageBtn = document.getElementById('confirmSendMessageBtn');
     let isSendingMessage = false;
 
-    function showSendMessageModal(playerName) {
+    let sendMessageToPlayer = null;
+
+    function showSendMessageModal(playerName, subject) {
+        sendMessageToPlayer = playerName;
         document.getElementById('sendMessageRecipient').textContent = playerName;
-        messageSubject.value = '';
+        messageSubject.value = subject || '';
         messageBody.value = '';
         confirmSendMessageBtn.disabled = false;
         confirmSendMessageBtn.textContent = 'Send Message';
         sendMessageModal.style.display = 'block';
+    }
+
+    // Allow messages.js to trigger reply
+    if (window.WorldMessages) {
+        window.WorldMessages.onReply = function (playerName, subject) {
+            showSendMessageModal(playerName, subject);
+        };
     }
 
     document.getElementById('closeSendMessageModal').onclick = function () { sendMessageModal.style.display = 'none'; };
@@ -147,7 +157,7 @@
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    toPlayerName: selectedEnemyRegion.ownerName,
+                    toPlayerName: sendMessageToPlayer,
                     subject: subject,
                     message: message
                 })
@@ -237,6 +247,7 @@
         if (event.target === WorldBuild.modal) { WorldBuild.modal.style.display = 'none'; }
         if (event.target === WorldReports.modal) { WorldReports.modal.style.display = 'none'; }
         if (event.target === WorldSendUnits.modal) { WorldSendUnits.modal.style.display = 'none'; }
+        if (event.target === WorldMessages.modal) { WorldMessages.modal.style.display = 'none'; }
     };
 
     // ===== Default tile click handler =====

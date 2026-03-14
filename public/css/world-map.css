@@ -335,6 +335,81 @@
     resize: vertical;
 }
 
+/* ===== Messages ===== */
+.messages-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.messages-table .messages-header th {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 2px solid #8B7355;
+}
+
+.messages-table tr {
+    border-bottom: 1px solid #555;
+}
+
+.messages-table td {
+    padding: 8px 10px;
+    font-size: 13px;
+}
+
+.messages-table .message-unread td {
+    font-weight: bold;
+    color: #fff;
+}
+
+.message-subject-link {
+    color: #6bafff;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.message-subject-link:hover {
+    color: #8fc8ff;
+    text-decoration: underline;
+}
+
+.message-delete-link {
+    color: #c44;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.message-delete-link:hover {
+    color: #f66;
+}
+
+.message-admin-tag {
+    background: #c44;
+    color: #fff;
+    font-size: 10px;
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-weight: bold;
+    vertical-align: middle;
+}
+
+.message-read-header {
+    border-bottom: 1px solid #8B7355;
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+}
+
+.message-read-header p {
+    margin: 4px 0;
+    font-size: 13px;
+}
+
+.message-read-body {
+    line-height: 1.6;
+    font-size: 14px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
 /* ===== Unit Tooltip ===== */
 #unitTooltip {
     display: none;
