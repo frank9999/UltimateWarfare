@@ -39,7 +39,7 @@ class MapConfigurationType extends AbstractType
                 RangeType::class,
                 [
                     'label' => 'label.deepWaterLevel',
-                    'attr' => ['min' => 0, 'max' => 1000],
+                    'attr' => ['min' => 100, 'max' => 250],
                 ]
             )
             ->add(
@@ -47,7 +47,7 @@ class MapConfigurationType extends AbstractType
                 RangeType::class,
                 [
                     'label' => 'label.waterLevel',
-                    'attr' => ['min' => 0, 'max' => 1000],
+                    'attr' => ['min' => 100, 'max' => 250],
                 ]
             )
             ->add(
@@ -55,7 +55,7 @@ class MapConfigurationType extends AbstractType
                 RangeType::class,
                 [
                     'label' => 'label.shallowWaterLevel',
-                    'attr' => ['min' => 0, 'max' => 1000],
+                    'attr' => ['min' => 100, 'max' => 250],
                 ]
             )
             ->add(
@@ -63,7 +63,7 @@ class MapConfigurationType extends AbstractType
                 RangeType::class,
                 [
                     'label' => 'label.sandLevel',
-                    'attr' => ['min' => 0, 'max' => 1000],
+                    'attr' => ['min' => 100, 'max' => 250],
                 ]
             )
             ->add(
@@ -71,7 +71,7 @@ class MapConfigurationType extends AbstractType
                 RangeType::class,
                 [
                     'label' => 'label.grasslandLevel',
-                    'attr' => ['min' => 0, 'max' => 1000],
+                    'attr' => ['min' => 100, 'max' => 250],
                 ]
             )
             ->add(
@@ -79,7 +79,7 @@ class MapConfigurationType extends AbstractType
                 RangeType::class,
                 [
                     'label' => 'label.forestLevel',
-                    'attr' => ['min' => 0, 'max' => 1000],
+                    'attr' => ['min' => 100, 'max' => 250],
                 ]
             )
             ->add(
@@ -87,7 +87,7 @@ class MapConfigurationType extends AbstractType
                 RangeType::class,
                 [
                     'label' => 'label.hillsLevel',
-                    'attr' => ['min' => 0, 'max' => 1000],
+                    'attr' => ['min' => 100, 'max' => 250],
                 ]
             )
             ->add(

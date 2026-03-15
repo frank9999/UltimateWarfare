@@ -115,6 +115,8 @@ final class WorldController extends AbstractController
 
     public function generate(Request $request, int $worldId, int $sector = 0): Response
     {
+        set_time_limit(300);
+
         $world = $this->worldRepository->find($worldId);
         if ($world === null) {
             $this->addFlash('error', 'World does not exist');
