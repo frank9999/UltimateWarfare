@@ -41,13 +41,33 @@ function drawCircle(GdImage $img, int $cx, int $cy, int $r, int $color): void
 }
 
 /**
- * Add noise/texture to an area with scattered pixels
+ * Check if a point is inside a pointy-top hexagon centered at (cx, cy)
+ */
+function isInsideHex(int $px, int $py, int $cx, int $cy, int $size): bool
+{
+    $dx = abs($px - $cx);
+    $dy = abs($py - $cy);
+    // Pointy-top hex: width = sqrt(3)*size, height = 2*size
+    $hexW = sqrt(3) * $size / 2;
+    if ($dx > $hexW || $dy > $size) {
+        return false;
+    }
+    // Sloped edge check
+    return $size * $hexW - $size * $dx - $hexW / 2 * $dy >= 0;
+}
+
+/**
+ * Add noise/texture to an area with scattered pixels, constrained to hex
  */
 function addNoise(GdImage $img, int $x1, int $y1, int $x2, int $y2, int $color, float $density = 0.05): void
 {
+    $cx = (int)(imagesx($img) / 2);
+    $cy = (int)(imagesy($img) / 2);
+    $size = hexSize(imagesx($img), imagesy($img)) - 2;
+
     for ($y = $y1; $y < $y2; $y++) {
         for ($x = $x1; $x < $x2; $x++) {
-            if (mt_rand(0, 1000) / 1000.0 < $density) {
+            if (isInsideHex($x, $y, $cx, $cy, $size) && mt_rand(0, 1000) / 1000.0 < $density) {
                 imagesetpixel($img, $x, $y, $color);
             }
         }
@@ -124,8 +144,7 @@ function drawHill(GdImage $img, int $cx, int $cy, int $w, int $h, int $color, in
 {
     imagefilledellipse($img, $cx, $cy, $w, $h, $color);
     // Highlight on top
-    imagefilledellipse($img, $cx - (int)($w * 0.1), $cy - (int)($h * 0.15), (int)($w * 0.6), (int)($h * 0.5), $hig
-hlight);
+    imagefilledellipse($img, $cx - (int)($w * 0.1), $cy - (int)($h * 0.15), (int)($w * 0.6), (int)($h * 0.5), $highlight);
 }
 
 /**
@@ -133,16 +152,33 @@ hlight);
  */
 function drawWaves(GdImage $img, int $cx, int $cy, int $w, int $h, int $color, int $count = 3): void
 {
+    $imgCx = (int)(imagesx($img) / 2);
+    $imgCy = (int)(imagesy($img) / 2);
+    $size = hexSize(imagesx($img), imagesy($img)) - 2;
+
     for ($i = 0; $i < $count; $i++) {
         $waveY = $cy - (int)($h * 0.3) + $i * (int)($h * 0.25);
         $waveX = $cx - (int)($w * 0.3) + $i * 5;
 
         for ($px = -15; $px < 15; $px++) {
             $py = (int)(sin($px * 0.4 + $i) * 3);
-            imagesetpixel($img, $waveX + $px, $waveY + $py, $color);
-            imagesetpixel($img, $waveX + $px, $waveY + $py + 1, $color);
+            $drawX = $waveX + $px;
+            $drawY = $waveY + $py;
+            if (isInsideHex($drawX, $drawY, $imgCx, $imgCy, $size)) {
+                imagesetpixel($img, $drawX, $drawY, $color);
+                imagesetpixel($img, $drawX, $drawY + 1, $color);
+            }
         }
     }
+}
+
+function hexSize(int $w, int $h): int
+{
+    // Pointy-top hex: width = sqrt(3)*size, height = 2*size
+    // Fit to image with 2px border on each side
+    $fromWidth = (int)(($w - 4) / sqrt(3));
+    $fromHeight = (int)(($h - 4) / 2);
+    return min($fromWidth, $fromHeight);
 }
 
 // ========== TILE GENERATORS ==========
@@ -155,7 +191,7 @@ function generateDeepWater(int $w, int $h): GdImage
 
     $cx = (int)($w / 2);
     $cy = (int)($h / 2);
-    $size = (int)(min($w, $h) / 2) - 2;
+    $size = hexSize($w, $h);
 
     // Deep ocean blue base
     $baseColor = imagecolorallocate($img, 20, 50, 120);
@@ -168,7 +204,6 @@ function generateDeepWater(int $w, int $h): GdImage
     drawCircle($img, $cx + 20, $cy + 20, 25, $dark2);
     drawCircle($img, $cx + 10, $cy - 30, 20, $dark1);
 
-    // Re-clip to hex
     drawHexClip($img, $cx, $cy, $size);
 
     // Subtle wave highlights
@@ -179,6 +214,7 @@ function generateDeepWater(int $w, int $h): GdImage
     $sparkle = imagecolorallocate($img, 60, 90, 170);
     addNoise($img, 20, 20, $w - 20, $h - 20, $sparkle, 0.01);
 
+    drawHexClip($img, $cx, $cy, $size);
     return $img;
 }
 
@@ -190,7 +226,7 @@ function generateWater(int $w, int $h): GdImage
 
     $cx = (int)($w / 2);
     $cy = (int)($h / 2);
-    $size = (int)(min($w, $h) / 2) - 2;
+    $size = hexSize($w, $h);
 
     // Medium ocean blue
     $baseColor = imagecolorallocate($img, 35, 80, 165);
@@ -212,6 +248,7 @@ function generateWater(int $w, int $h): GdImage
     $sparkle = imagecolorallocate($img, 90, 140, 220);
     addNoise($img, 20, 20, $w - 20, $h - 20, $sparkle, 0.02);
 
+    drawHexClip($img, $cx, $cy, $size);
     return $img;
 }
 
@@ -223,7 +260,7 @@ function generateShallowWater(int $w, int $h): GdImage
 
     $cx = (int)($w / 2);
     $cy = (int)($h / 2);
-    $size = (int)(min($w, $h) / 2) - 2;
+    $size = hexSize($w, $h);
 
     // Light blue-teal
     $baseColor = imagecolorallocate($img, 70, 150, 195);
@@ -245,6 +282,7 @@ function generateShallowWater(int $w, int $h): GdImage
     $sparkle = imagecolorallocate($img, 140, 210, 240);
     addNoise($img, 20, 20, $w - 20, $h - 20, $sparkle, 0.03);
 
+    drawHexClip($img, $cx, $cy, $size);
     return $img;
 }
 
@@ -256,7 +294,7 @@ function generateSand(int $w, int $h): GdImage
 
     $cx = (int)($w / 2);
     $cy = (int)($h / 2);
-    $size = (int)(min($w, $h) / 2) - 2;
+    $size = hexSize($w, $h);
 
     // Sandy yellow base
     $baseColor = imagecolorallocate($img, 210, 190, 140);
@@ -289,6 +327,7 @@ function generateSand(int $w, int $h): GdImage
         }
     }
 
+    drawHexClip($img, $cx, $cy, $size);
     return $img;
 }
 
@@ -300,7 +339,7 @@ function generateGrassland(int $w, int $h): GdImage
 
     $cx = (int)($w / 2);
     $cy = (int)($h / 2);
-    $size = (int)(min($w, $h) / 2) - 2;
+    $size = hexSize($w, $h);
 
     // Green base
     $baseColor = imagecolorallocate($img, 75, 140, 60);
@@ -330,6 +369,7 @@ function generateGrassland(int $w, int $h): GdImage
     addNoise($img, 30, 30, $w - 30, $h - 30, $flower1, 0.005);
     addNoise($img, 30, 30, $w - 30, $h - 30, $flower2, 0.003);
 
+    drawHexClip($img, $cx, $cy, $size);
     return $img;
 }
 
@@ -341,7 +381,7 @@ function generateForest(int $w, int $h): GdImage
 
     $cx = (int)($w / 2);
     $cy = (int)($h / 2);
-    $size = (int)(min($w, $h) / 2) - 2;
+    $size = hexSize($w, $h);
 
     // Dark green base
     $baseColor = imagecolorallocate($img, 35, 85, 35);
@@ -380,6 +420,7 @@ function generateForest(int $w, int $h): GdImage
     $under = imagecolorallocate($img, 20, 70, 20);
     addNoise($img, 20, 20, $w - 20, $h - 20, $under, 0.03);
 
+    drawHexClip($img, $cx, $cy, $size);
     return $img;
 }
 
@@ -391,7 +432,7 @@ function generateHills(int $w, int $h): GdImage
 
     $cx = (int)($w / 2);
     $cy = (int)($h / 2);
-    $size = (int)(min($w, $h) / 2) - 2;
+    $size = hexSize($w, $h);
 
     // Green-brown base
     $baseColor = imagecolorallocate($img, 95, 130, 70);
@@ -421,6 +462,7 @@ function generateHills(int $w, int $h): GdImage
     $rock = imagecolorallocate($img, 140, 135, 120);
     addNoise($img, 30, 30, $w - 30, $h - 30, $rock, 0.008);
 
+    drawHexClip($img, $cx, $cy, $size);
     return $img;
 }
 
@@ -432,7 +474,7 @@ function generateMountains(int $w, int $h): GdImage
 
     $cx = (int)($w / 2);
     $cy = (int)($h / 2);
-    $size = (int)(min($w, $h) / 2) - 2;
+    $size = hexSize($w, $h);
 
     // Rocky gray-brown base
     $baseColor = imagecolorallocate($img, 100, 95, 85);
@@ -444,17 +486,17 @@ function generateMountains(int $w, int $h): GdImage
     $rock1 = imagecolorallocate($img, 120, 115, 100);
     $rock2 = imagecolorallocate($img, 90, 85, 75);
     $rock3 = imagecolorallocate($img, 110, 105, 90);
-    $snow = imagecolorallocate($img, 230, 235, 240);
-    $snowShadow = imagecolorallocate($img, 200, 210, 220);
+    $peak = imagecolorallocate($img, 160, 158, 152);
+    $peakShadow = imagecolorallocate($img, 140, 138, 130);
 
     // Background mountain
-    drawMountain($img, $cx + 30, $cy + 20, 50, 50, $rock2, $snowShadow);
-    drawMountain($img, $cx - 25, $cy + 15, 45, 45, $rock2, $snowShadow);
+    drawMountain($img, $cx + 30, $cy + 20, 50, 50, $rock2, $peakShadow);
+    drawMountain($img, $cx - 25, $cy + 15, 45, 45, $rock2, $peakShadow);
 
     // Main peaks
-    drawMountain($img, $cx, $cy - 5, 65, 70, $rock1, $snow);
-    drawMountain($img, $cx - 30, $cy + 5, 50, 55, $rock3, $snow);
-    drawMountain($img, $cx + 25, $cy, 45, 50, $rock1, $snow);
+    drawMountain($img, $cx, $cy - 5, 65, 70, $rock1, $peak);
+    drawMountain($img, $cx - 30, $cy + 5, 50, 55, $rock3, $peak);
+    drawMountain($img, $cx + 25, $cy, 45, 50, $rock1, $peak);
 
     // Rock texture
     $rockTex = imagecolorallocate($img, 80, 75, 65);
@@ -464,6 +506,7 @@ function generateMountains(int $w, int $h): GdImage
     $shadow = imagecolorallocate($img, 70, 65, 55);
     addNoise($img, 20, 20, $w - 20, $h - 20, $shadow, 0.02);
 
+    drawHexClip($img, $cx, $cy, $size);
     return $img;
 }
 
@@ -475,8 +518,9 @@ function drawHexClip(GdImage $img, int $cx, int $cy, int $size): void
     $w = imagesx($img);
     $h = imagesy($img);
 
-    // Create mask
+    // Create mask - use a 1px smaller hex to ensure clean edges with no stray pixels
     $mask = imagecreatetruecolor($w, $h);
+    imageantialias($mask, false);
     $black = imagecolorallocate($mask, 0, 0, 0);
     $white = imagecolorallocate($mask, 255, 255, 255);
     imagefill($mask, 0, 0, $black);
@@ -487,7 +531,8 @@ function drawHexClip(GdImage $img, int $cx, int $cy, int $size): void
     for ($y = 0; $y < $h; $y++) {
         for ($x = 0; $x < $w; $x++) {
             $maskPixel = imagecolorat($mask, $x, $y);
-            if ($maskPixel === $black) {
+            $r = ($maskPixel >> 16) & 0xFF;
+            if ($r < 128) {
                 imagesetpixel($img, $x, $y, $transparent);
             }
         }
