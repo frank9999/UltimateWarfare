@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace FrankProjects\UltimateWarfare\Controller\Game;
 
+use FrankProjects\UltimateWarfare\Form\DTO\BankTransactionFormDTO;
+use FrankProjects\UltimateWarfare\Form\Game\BankTransactionType;
 use FrankProjects\UltimateWarfare\Service\Action\FederationBankActionService;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -32,16 +34,19 @@ final class FederationBankController extends BaseGameController
             );
         }
 
-        try {
-            // XXX TODO: Rewrite to form isSubmitted && isValid
-            if ($request->isMethod(Request::METHOD_POST)) {
-                /** @var array<string, string> $resources */
-                $resources = $request->request->all('resources');
-                $this->federationBankActionService->deposit($player, $resources);
+        $bankTransaction = new BankTransactionFormDTO();
+        $form = $this->createForm(BankTransactionType::class, $bankTransaction, [
+            'submit_label' => 'Deposit',
+        ]);
+
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            try {
+                $this->federationBankActionService->deposit($player, $bankTransaction->toResourceArray());
                 $this->addFlash('success', 'You successfully made a deposit!');
+            } catch (Throwable $e) {
+                $this->addFlash('error', $e->getMessage());
             }
-        } catch (Throwable $e) {
-            $this->addFlash('error', $e->getMessage());
         }
 
         return $this->render(
@@ -49,6 +54,7 @@ final class FederationBankController extends BaseGameController
             [
                 'player' => $player,
                 'federationResources' => $federation->getResources(),
+                'form' => $form->createView(),
             ]
         );
     }
@@ -66,16 +72,19 @@ final class FederationBankController extends BaseGameController
             );
         }
 
-        try {
-            // XXX TODO: Rewrite to form isSubmitted && isValid
-            if ($request->isMethod(Request::METHOD_POST)) {
-                /** @var array<string, string> $resources */
-                $resources = $request->request->all('resources');
-                $this->federationBankActionService->withdraw($player, $resources);
+        $bankTransaction = new BankTransactionFormDTO();
+        $form = $this->createForm(BankTransactionType::class, $bankTransaction, [
+            'submit_label' => 'Withdraw',
+        ]);
+
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+            try {
+                $this->federationBankActionService->withdraw($player, $bankTransaction->toResourceArray());
                 $this->addFlash('success', 'You successfully made a withdrawal!');
+            } catch (Throwable $e) {
+                $this->addFlash('error', $e->getMessage());
             }
-        } catch (Throwable $e) {
-            $this->addFlash('error', $e->getMessage());
         }
 
         return $this->render(
@@ -83,6 +92,7 @@ final class FederationBankController extends BaseGameController
             [
                 'player' => $player,
                 'federationResources' => $federation->getResources(),
+                'form' => $form->createView(),
             ]
         );
     }
