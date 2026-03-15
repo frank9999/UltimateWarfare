@@ -14,8 +14,8 @@ class MapConfiguration
     private int $shallowWaterLevel = 160;
     private int $sandLevel = 168;
     private int $grasslandLevel = 200;
-    private int $forestLevel = 230;
-    private int $hillsLevel = 250;
+    private int $forestLevel = 220;
+    private int $hillsLevel = 225;
 
     public function getSize(): int
     {

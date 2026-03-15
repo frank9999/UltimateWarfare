@@ -202,8 +202,6 @@ class TileRenderer {
             forest: '#235523',
             hills: '#6e914b',
             mountain: '#645f55',
-            beach: '#d2be8c',
-            forrest: '#235523'
         };
 
         if (region.hasOwner) {

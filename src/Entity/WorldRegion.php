@@ -19,10 +19,6 @@ class WorldRegion
     public const string TYPE_HILLS = 'hills';
     public const string TYPE_MOUNTAIN = 'mountain';
 
-    /** @deprecated Use TYPE_SAND */
-    public const string TYPE_BEACH = 'beach';
-    /** @deprecated Use TYPE_FOREST */
-    public const string TYPE_FORREST = 'forrest';
 
     private int $id;
     private int $x;
@@ -124,8 +120,6 @@ class WorldRegion
             self::TYPE_FOREST,
             self::TYPE_HILLS,
             self::TYPE_MOUNTAIN,
-            self::TYPE_BEACH,
-            self::TYPE_FORREST,
         ];
     }
 

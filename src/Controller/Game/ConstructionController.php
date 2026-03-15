@@ -314,7 +314,7 @@ final class ConstructionController extends BaseGameController
             };
         }
 
-        $isBeach = $regionType === 'beach';
+        $isSand = $regionType === 'sand';
         $isWater = $regionType === 'water';
 
         $categories = [];
@@ -402,8 +402,9 @@ final class ConstructionController extends BaseGameController
         $spaceLeft = $this->constructionActionService->getBuildingSpaceLeft($gameUnitCategory, $worldRegion);
 
         $regionType = $worldRegion->getType();
-        $isBeachOrWater = in_array($regionType, ['beach', 'water'], true);
-        $isBeach = $regionType === 'beach';
+        $waterTypes = ['deep_water', 'water', 'shallow_water', 'sand'];
+        $isSandOrWater = in_array($regionType, $waterTypes, true);
+        $isSand = $regionType === 'sand';
 
         // Check if factory exists in this region (for tank filtering in troops tab)
         $hasFactory = false;
@@ -428,16 +429,16 @@ final class ConstructionController extends BaseGameController
         foreach ($gameUnits as $gameUnit) {
             $rowName = $gameUnit->getRowName();
 
-            // Filter harbor from special buildings when region is not beach
-            if ($gameUnitCategory === GameUnitCategory::SPECIAL_BUILDINGS && $rowName === 'harbor' && !$isBeach) {
+            // Filter harbor from special buildings when region is not sand
+            if ($gameUnitCategory === GameUnitCategory::SPECIAL_BUILDINGS && $rowName === 'harbor' && !$isSand) {
                 continue;
             }
 
-            // Filter sea mines from defense buildings when region is not beach or water
+            // Filter sea mines from defense buildings when region is not sand or water
             if (
                 $gameUnitCategory === GameUnitCategory::DEFENSE_BUILDINGS
                 && $rowName === 'sea_mine'
-                && !$isBeachOrWater
+                && !$isSandOrWater
             ) {
                 continue;
             }

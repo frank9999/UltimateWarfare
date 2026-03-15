@@ -172,20 +172,18 @@ final class ConstructionActionService
             $this->requireBuilding($buildingIndex, 'factory', 'a Factory');
         }
 
-        // Harbor can only be built on sand/beach regions
-        $sandTypes = [WorldRegion::TYPE_SAND, WorldRegion::TYPE_BEACH];
-        if ($rowName === 'harbor' && !in_array($regionType, $sandTypes, true)) {
-            throw new RuntimeException("Cannot build {$gameUnit->getName()}: requires a beach region.");
+        // Harbor can only be built on sand regions
+        if ($rowName === 'harbor' && $regionType !== WorldRegion::TYPE_SAND) {
+            throw new RuntimeException("Cannot build {$gameUnit->getName()}: requires a sand region.");
         }
 
         // Sea mines can only be built on coastal or water regions
         $waterTypes = [
             WorldRegion::TYPE_DEEP_WATER, WorldRegion::TYPE_WATER,
             WorldRegion::TYPE_SHALLOW_WATER, WorldRegion::TYPE_SAND,
-            WorldRegion::TYPE_BEACH,
         ];
         if ($rowName === 'sea_mine' && !in_array($regionType, $waterTypes, true)) {
-            throw new RuntimeException("Cannot build {$gameUnit->getName()}: requires a beach or water region.");
+            throw new RuntimeException("Cannot build {$gameUnit->getName()}: requires a sand or water region.");
         }
     }
 

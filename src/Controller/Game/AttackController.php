@@ -93,7 +93,7 @@ final class AttackController extends BaseGameController
         $targetX = $targetRegion->getX();
         $targetY = $targetRegion->getY();
 
-        // Check if target region is water/beach or adjacent to water/beach (for naval rule)
+        // Check if target region is water/sand or adjacent to water/sand (for naval rule)
         $targetIsCoastal = $this->isCoastalOrWater($targetRegion, $regionsByCoord);
 
         $eligibleRegions = [];
@@ -385,7 +385,7 @@ final class AttackController extends BaseGameController
     }
 
     /**
-     * Check if a region is water/beach or directly adjacent to a water/beach region.
+     * Check if a region is water/sand or directly adjacent to a water/sand region.
      *
      * @param WorldRegion $region
      * @param array<string, WorldRegion> $regionsByCoord
@@ -395,7 +395,6 @@ final class AttackController extends BaseGameController
         $waterTypes = [
             WorldRegion::TYPE_DEEP_WATER, WorldRegion::TYPE_WATER,
             WorldRegion::TYPE_SHALLOW_WATER, WorldRegion::TYPE_SAND,
-            WorldRegion::TYPE_BEACH,
         ];
 
         if (in_array($region->getType(), $waterTypes, true)) {

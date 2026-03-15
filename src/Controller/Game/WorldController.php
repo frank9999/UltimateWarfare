@@ -375,10 +375,6 @@ final class WorldController extends BaseGameController
 
     private function getRegionImage(string $type): string
     {
-        return match ($type) {
-            'beach' => 'sand.png',
-            'forrest' => 'forest.png',
-            default => $type . '.png',
-        };
+        return $type . '.png';
     }
 }

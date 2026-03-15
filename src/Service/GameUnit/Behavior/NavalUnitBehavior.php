@@ -71,7 +71,6 @@ class NavalUnitBehavior extends AbstractGameUnitBehavior
         $navalTypes = [
             WorldRegion::TYPE_DEEP_WATER, WorldRegion::TYPE_WATER,
             WorldRegion::TYPE_SHALLOW_WATER, WorldRegion::TYPE_SAND,
-            WorldRegion::TYPE_BEACH,
         ];
         return in_array($to->getType(), $navalTypes, true);
     }

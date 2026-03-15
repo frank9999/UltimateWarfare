@@ -72,9 +72,6 @@ abstract class AbstractImageBuilder
             WorldRegion::TYPE_FOREST => [self::COLOR_RED => 35, self::COLOR_GREEN => 85, self::COLOR_BLUE => 35],
             WorldRegion::TYPE_HILLS => [self::COLOR_RED => 110, self::COLOR_GREEN => 145, self::COLOR_BLUE => 75],
             WorldRegion::TYPE_MOUNTAIN => [self::COLOR_RED => 128, self::COLOR_GREEN => 128, self::COLOR_BLUE => 128],
-            // Legacy types
-            WorldRegion::TYPE_BEACH => [self::COLOR_RED => 210, self::COLOR_GREEN => 190, self::COLOR_BLUE => 140],
-            WorldRegion::TYPE_FORREST => [self::COLOR_RED => 35, self::COLOR_GREEN => 85, self::COLOR_BLUE => 35],
         ];
     }
 
