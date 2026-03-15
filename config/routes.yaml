@@ -560,6 +560,39 @@ Game/Operation/SelectWorldRegion:
         regionId: '\d+'
         operationId: '\d+'
 
+Game/Operation/List/Api:
+    path:      /game/api/operation/list/{regionId}
+    controller: FrankProjects\UltimateWarfare\Controller\Game\OperationController::operationsApi
+    methods: [GET]
+    requirements:
+        regionId: '\d+'
+
+Game/Operation/EligibleRegions/Api:
+    path:      /game/api/operation/eligible-regions/{regionId}/{operationId}
+    controller: FrankProjects\UltimateWarfare\Controller\Game\OperationController::operationEligibleRegionsApi
+    methods: [GET]
+    requirements:
+        regionId: '\d+'
+        operationId: '\d+'
+
+Game/Operation/Units/Api:
+    path:      /game/api/operation/units/{regionId}/{operationId}/{playerRegionId}
+    controller: FrankProjects\UltimateWarfare\Controller\Game\OperationController::operationUnitsApi
+    methods: [GET]
+    requirements:
+        regionId: '\d+'
+        operationId: '\d+'
+        playerRegionId: '\d+'
+
+Game/Operation/Execute/Api:
+    path:      /game/api/operation/execute/{regionId}/{operationId}/{playerRegionId}
+    controller: FrankProjects\UltimateWarfare\Controller\Game\OperationController::executeOperationApi
+    methods: [POST]
+    requirements:
+        regionId: '\d+'
+        operationId: '\d+'
+        playerRegionId: '\d+'
+
 Game/Profile:
     path:      /game/profile/{playerName}
     controller: FrankProjects\UltimateWarfare\Controller\Game\ProfileController::profile

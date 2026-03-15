@@ -117,6 +117,66 @@
     </div>
 </div>
 
+{# Select Operation Modal #}
+<div id="selectOperationModal" class="modal">
+    <div class="modal-content modal-lg">
+        <div class="modal-header">
+            <span class="modal-title">Select Operation — Target <span id="operationTargetInfo"></span></span>
+            <span class="close" id="closeSelectOperationModal">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div id="operationsContainer" style="max-height: 400px; overflow-y: auto;">
+                <div class="build-loading">Loading operations...</div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" id="cancelSelectOperationBtn">Cancel</button>
+        </div>
+    </div>
+</div>
+
+{# Operation Mode Banner #}
+<div id="operationModeBanner" class="attack-mode-banner" style="display: none;">
+    <span id="operationModeText">Select a region to launch operation from...</span>
+    <button type="button" id="cancelOperationModeBtn">Cancel</button>
+</div>
+
+{# Operation Units Modal #}
+<div id="operationUnitsModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span class="modal-title">Launch Operation — <span id="operationUnitsName"></span></span>
+            <span class="close" id="closeOperationUnitsModal">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div id="operationUnitsInfo" style="margin-bottom: 15px; font-size: 13px;"></div>
+            <div id="operationUnitsContainer">
+                <div class="build-loading">Loading...</div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" id="cancelOperationUnitsBtn">Cancel</button>
+            <button type="button" id="confirmOperationBtn" style="background: #9c27b0;">Launch Operation</button>
+        </div>
+    </div>
+</div>
+
+{# Operation Results Modal #}
+<div id="operationResultsModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span class="modal-title">Operation Results</span>
+            <span class="close" id="closeOperationResultsModal">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div id="operationResultsContainer"></div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" id="closeOperationResultsBtn">Close</button>
+        </div>
+    </div>
+</div>
+
 {# Messages Modal #}
 <div id="messagesModal" class="modal">
     <div class="modal-content modal-lg">

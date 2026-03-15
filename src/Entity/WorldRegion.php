@@ -10,10 +10,19 @@ use RuntimeException;
 
 class WorldRegion
 {
+    public const string TYPE_DEEP_WATER = 'deep_water';
     public const string TYPE_WATER = 'water';
-    public const string TYPE_BEACH = 'beach';
-    public const string TYPE_FORREST = 'forrest';
+    public const string TYPE_SHALLOW_WATER = 'shallow_water';
+    public const string TYPE_SAND = 'sand';
+    public const string TYPE_GRASSLAND = 'grassland';
+    public const string TYPE_FOREST = 'forest';
+    public const string TYPE_HILLS = 'hills';
     public const string TYPE_MOUNTAIN = 'mountain';
+
+    /** @deprecated Use TYPE_SAND */
+    public const string TYPE_BEACH = 'beach';
+    /** @deprecated Use TYPE_FOREST */
+    public const string TYPE_FORREST = 'forrest';
 
     private int $id;
     private int $x;
@@ -107,10 +116,16 @@ class WorldRegion
     public static function getAllTypes(): array
     {
         return [
+            self::TYPE_DEEP_WATER,
             self::TYPE_WATER,
+            self::TYPE_SHALLOW_WATER,
+            self::TYPE_SAND,
+            self::TYPE_GRASSLAND,
+            self::TYPE_FOREST,
+            self::TYPE_HILLS,
+            self::TYPE_MOUNTAIN,
             self::TYPE_BEACH,
             self::TYPE_FORREST,
-            self::TYPE_MOUNTAIN
         ];
     }
 

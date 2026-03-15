@@ -392,8 +392,13 @@ final class AttackController extends BaseGameController
      */
     private function isCoastalOrWater(WorldRegion $region, array $regionsByCoord): bool
     {
-        $type = $region->getType();
-        if ($type === WorldRegion::TYPE_WATER || $type === WorldRegion::TYPE_BEACH) {
+        $waterTypes = [
+            WorldRegion::TYPE_DEEP_WATER, WorldRegion::TYPE_WATER,
+            WorldRegion::TYPE_SHALLOW_WATER, WorldRegion::TYPE_SAND,
+            WorldRegion::TYPE_BEACH,
+        ];
+
+        if (in_array($region->getType(), $waterTypes, true)) {
             return true;
         }
 
@@ -405,8 +410,7 @@ final class AttackController extends BaseGameController
         foreach ($adjacentOffsets as [$dx, $dy]) {
             $key = ($x + $dx) . ',' . ($y + $dy);
             if (isset($regionsByCoord[$key])) {
-                $adjType = $regionsByCoord[$key]->getType();
-                if ($adjType === WorldRegion::TYPE_WATER || $adjType === WorldRegion::TYPE_BEACH) {
+                if (in_array($regionsByCoord[$key]->getType(), $waterTypes, true)) {
                     return true;
                 }
             }

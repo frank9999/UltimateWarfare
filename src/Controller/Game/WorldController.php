@@ -176,7 +176,7 @@ final class WorldController extends BaseGameController
                 'y' => $region->getY(),
                 'id' => $region->getId(),
                 'type' => $region->getType(),
-                'image' => $region->getType() . '.png',
+                'image' => $this->getRegionImage($region->getType()),
                 'hasOwner' => $region->getPlayer() !== null,
                 'isYours' => $isYours,
                 'ownerName' => $region->getPlayer()?->getName(),
@@ -371,5 +371,14 @@ final class WorldController extends BaseGameController
         }
 
         return $fleets;
+    }
+
+    private function getRegionImage(string $type): string
+    {
+        return match ($type) {
+            'beach' => 'sand.png',
+            'forrest' => 'forest.png',
+            default => $type . '.png',
+        };
     }
 }

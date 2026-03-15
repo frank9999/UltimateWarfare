@@ -410,6 +410,69 @@
     word-wrap: break-word;
 }
 
+/* ===== Operations ===== */
+.operation-card {
+    background: #1a1a1a;
+    border: 1px solid #555;
+    border-radius: 6px;
+    padding: 12px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: border-color 0.2s;
+}
+
+.operation-card:hover {
+    border-color: #9c27b0;
+}
+
+.operation-card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.operation-card-name {
+    font-weight: bold;
+    font-size: 15px;
+    color: #f3e6c1;
+    margin-bottom: 3px;
+}
+
+.operation-card-desc {
+    font-size: 12px;
+    color: #aaa;
+}
+
+.operation-card-stats {
+    display: flex;
+    gap: 15px;
+    margin-top: 8px;
+    font-size: 12px;
+    color: #ccc;
+}
+
+.operation-card-stats span {
+    background: #2a2a2a;
+    padding: 2px 8px;
+    border-radius: 3px;
+}
+
+.operation-unit-select p {
+    margin: 4px 0;
+    font-size: 13px;
+}
+
+.operation-results-log {
+    line-height: 1.6;
+    font-size: 13px;
+}
+
+.operation-results-log p {
+    margin: 4px 0;
+    padding: 3px 0;
+    border-bottom: 1px solid #333;
+}
+
 /* ===== Unit Tooltip ===== */
 #unitTooltip {
     display: none;

@@ -193,12 +193,25 @@ class TileRenderer {
     renderFallbackTile(region, pos) {
         this.ctx.save();
 
+        var terrainColors = {
+            deep_water: '#143278',
+            water: '#2350a5',
+            shallow_water: '#4696c3',
+            sand: '#d2be8c',
+            grassland: '#4b8c3c',
+            forest: '#235523',
+            hills: '#6e914b',
+            mountain: '#645f55',
+            beach: '#d2be8c',
+            forrest: '#235523'
+        };
+
         if (region.hasOwner) {
             this.ctx.fillStyle = region.isYours
                 ? '#4a5a7c'
                 : '#7c4a4a';
         } else {
-            this.ctx.fillStyle = '#4a7c59';
+            this.ctx.fillStyle = terrainColors[region.type] || '#4a7c59';
         }
 
         this.drawHex(pos);

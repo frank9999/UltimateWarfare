@@ -188,7 +188,7 @@
         if (selectedEnemyRegion) WorldAttack.startAttackFromSelection(selectedEnemyRegion);
     };
     document.getElementById('operationBtn').onclick = function () {
-        if (selectedEnemyRegion) window.location.href = '/game/world/region/select-operation/' + selectedEnemyRegion.id;
+        if (selectedEnemyRegion) WorldOperations.startOperation(selectedEnemyRegion);
     };
 
     // ===== Your Region Modal =====
@@ -248,6 +248,9 @@
         if (event.target === WorldReports.modal) { WorldReports.modal.style.display = 'none'; }
         if (event.target === WorldSendUnits.modal) { WorldSendUnits.modal.style.display = 'none'; }
         if (event.target === WorldMessages.modal) { WorldMessages.modal.style.display = 'none'; }
+        if (event.target === WorldOperations.selectOperationModal) { WorldOperations.selectOperationModal.style.display = 'none'; }
+        if (event.target === WorldOperations.operationUnitsModal) { WorldOperations.operationUnitsModal.style.display = 'none'; }
+        if (event.target === WorldOperations.operationResultsModal) { WorldOperations.operationResultsModal.style.display = 'none'; }
     };
 
     // ===== Default tile click handler =====
