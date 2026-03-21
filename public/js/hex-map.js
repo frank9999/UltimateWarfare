@@ -97,7 +97,8 @@ class HexMap {
                     resolve();
                 };
                 img.onerror = () => {
-                    reject(new Error('Failed to load image: ' + url));
+                    console.warn('Failed to load tile image: ' + url);
+                    resolve();
                 };
                 img.src = url;
             });
