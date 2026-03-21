@@ -28,7 +28,7 @@ class GameUnitBehaviorFactory
     {
         $behaviorClass = $gameUnit->getBehaviorClass();
 
-        if ($behaviorClass === null) {
+        if ($behaviorClass === null || $behaviorClass === '') {
             return $this->behaviors[DefaultUnitBehavior::class];
         }
 

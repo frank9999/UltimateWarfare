@@ -7,6 +7,8 @@ namespace FrankProjects\UltimateWarfare\Command\DataFixtures;
 use Doctrine\ORM\EntityManagerInterface;
 use FrankProjects\UltimateWarfare\Entity\GameUnit;
 use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitCategory;
+use FrankProjects\UltimateWarfare\Service\GameUnit\Behavior\AirUnitBehavior;
+use FrankProjects\UltimateWarfare\Service\GameUnit\Behavior\NavalUnitBehavior;
 use FrankProjects\UltimateWarfare\Entity\Operation;
 use FrankProjects\UltimateWarfare\Entity\WorldRegionUnit;
 use FrankProjects\UltimateWarfare\Entity\FleetUnit;
@@ -303,12 +305,24 @@ class GameUnitFixturesCommand extends Command
      *   income: array{cash: int, steel: int, wood: int, food: int},
      *   upkeep: array{cash: int, steel: int, wood: int, food: int}
      * } $data
-     * @return array<string, array{old: int|string, new: int|string}>
+     * @return array<string, array{old: int|string|null, new: int|string|null}>
      */
     private function detectDifferences(GameUnit $gameUnit, array $data): array
     {
-        /** @var array<string, array{old: int|string, new: int|string}> $differences */
+        /** @var array<string, array{old: int|string|null, new: int|string|null}> $differences */
         $differences = [];
+
+        // Check behavior class
+        $expectedBehaviorClass = $this->getBehaviorClassForCategory(
+            GameUnitCategory::from($data['game_unit_category'])
+        );
+        $currentBehaviorClass = $gameUnit->getBehaviorClass();
+        if ($currentBehaviorClass !== $expectedBehaviorClass) {
+            $differences['behavior_class'] = [
+                'old' => $currentBehaviorClass,
+                'new' => $expectedBehaviorClass,
+            ];
+        }
 
         // Check basic properties
         if ($gameUnit->getName() !== $data['name']) {
@@ -514,7 +528,7 @@ class GameUnitFixturesCommand extends Command
     }
 
     /**
-     * @param array<string, array{old: int|string, new: int|string}> $differences
+     * @param array<string, array{old: int|string|null, new: int|string|null}> $differences
      */
     private function displayDifferences(SymfonyStyle $io, array $differences): void
     {
@@ -565,6 +579,9 @@ class GameUnitFixturesCommand extends Command
 
     private function formatValue(mixed $value): string
     {
+        if ($value === null) {
+            return '(null)';
+        }
         if (is_string($value) && $value === '') {
             return '(empty)';
         }
@@ -599,7 +616,9 @@ class GameUnitFixturesCommand extends Command
         $gameUnit->setNetWorth($data['net_worth']);
         $gameUnit->setTimestamp($data['timestamp']);
         $gameUnit->setDescription($data['description']);
-        $gameUnit->setGameUnitCategory(GameUnitCategory::from($data['game_unit_category']));
+        $category = GameUnitCategory::from($data['game_unit_category']);
+        $gameUnit->setGameUnitCategory($category);
+        $gameUnit->setBehaviorClass($this->getBehaviorClassForCategory($category));
 
         // Set battle stats
         $battleStats = $gameUnit->getBattleStats();
@@ -682,6 +701,15 @@ class GameUnitFixturesCommand extends Command
         $upkeep->setSteel($data['upkeep']['steel']);
         $upkeep->setWood($data['upkeep']['wood']);
         $upkeep->setFood($data['upkeep']['food']);
+    }
+
+    private function getBehaviorClassForCategory(GameUnitCategory $category): ?string
+    {
+        return match ($category) {
+            GameUnitCategory::NAVAL_UNITS => NavalUnitBehavior::class,
+            GameUnitCategory::AIR_UNITS => AirUnitBehavior::class,
+            default => null,
+        };
     }
 
     /**

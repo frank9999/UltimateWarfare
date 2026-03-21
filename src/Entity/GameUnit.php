@@ -224,6 +224,11 @@ class GameUnit
         return $this->behaviorClass;
     }
 
+    public function setBehaviorClass(?string $behaviorClass): void
+    {
+        $this->behaviorClass = $behaviorClass;
+    }
+
     public function getGameUnitCategory(): GameUnitCategory
     {
         return $this->gameUnitCategory;
