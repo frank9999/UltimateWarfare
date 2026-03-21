@@ -46,5 +46,10 @@ interface UserRepository
 
     public function loadUserByUsername(string $username): ?User;
 
+    /**
+     * @return User[]
+     */
+    public function findByLastIp(string $lastIp): array;
+
     public function save(User $user): void;
 }

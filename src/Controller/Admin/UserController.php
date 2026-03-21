@@ -143,10 +143,21 @@ final class UserController extends AbstractController
 
     public function read(int $userId): Response
     {
+        $user = $this->getUserObject($userId);
+
+        $sameIpUsers = [];
+        if ($user->getLastIp() !== null) {
+            $sameIpUsers = array_filter(
+                $this->userRepository->findByLastIp($user->getLastIp()),
+                static fn (User $other): bool => $other->getId() !== $user->getId()
+            );
+        }
+
         return $this->render(
             'admin/user/read.html.twig',
             [
-                'user' => $this->userRepository->find($userId)
+                'user' => $user,
+                'sameIpUsers' => $sameIpUsers,
             ]
         );
     }

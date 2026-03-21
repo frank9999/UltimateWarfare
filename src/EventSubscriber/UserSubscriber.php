@@ -41,6 +41,7 @@ final class UserSubscriber extends AbstractUserSubscriber implements EventSubscr
 
         try {
             $user->setLastLogin(new \DateTime());
+            $user->setLastIp($event->getRequest()->getClientIp());
             $this->userRepository->save($user);
         } catch (\Exception $e) {
         }

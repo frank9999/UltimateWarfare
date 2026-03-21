@@ -26,6 +26,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Equatab
     private string $password = '';
     private string $plainPassword = '';
     private ?DateTime $lastLogin = null;
+    private ?string $lastIp = null;
     /** Random string sent to the user email address to verify it */
     private ?string $confirmationToken = null;
     private ?DateTime $passwordRequestedAt = null;
@@ -227,6 +228,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Equatab
     public function setLastLogin(DateTime $lastLogin): void
     {
         $this->lastLogin = $lastLogin;
+    }
+
+    public function getLastIp(): ?string
+    {
+        return $this->lastIp;
+    }
+
+    public function setLastIp(?string $lastIp): void
+    {
+        $this->lastIp = $lastIp;
     }
 
     public function getConfirmationToken(): ?string

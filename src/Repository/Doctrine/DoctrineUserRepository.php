@@ -102,6 +102,14 @@ final class DoctrineUserRepository implements UserRepository
             ->getOneOrNullResult(AbstractQuery::HYDRATE_OBJECT);
     }
 
+    /**
+     * @return User[]
+     */
+    public function findByLastIp(string $lastIp): array
+    {
+        return $this->repository->findBy(['lastIp' => $lastIp]);
+    }
+
     public function save(User $user): void
     {
         $this->entityManager->persist($user);

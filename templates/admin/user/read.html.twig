@@ -90,15 +90,15 @@
                         <a class="btn btn-danger" href="{{ path('Admin/User/Enable', {'userId': user.id}) }}">Enable account</a>
                     </p>
                 {% endif %}
-                <p>
-                    <a class="btn btn-danger" href="{{ path('Admin/User/MakeAdmin', {'userId': user.id}) }}">Make Admin</a>
-                </p>
-                <p>
-                    <a class="btn btn-danger" href="{{ path('Admin/User/RemoveAdmin', {'userId': user.id}) }}">Remove Admin</a>
-                </p>
-                <p>
-                    XXX TODO: Check IP against other users
-                </p>
+                {% if 'ROLE_ADMIN' not in user.roles %}
+                    <p>
+                        <a class="btn btn-danger" href="{{ path('Admin/User/MakeAdmin', {'userId': user.id}) }}">Make Admin</a>
+                    </p>
+                {% else %}
+                    <p>
+                        <a class="btn btn-danger" href="{{ path('Admin/User/RemoveAdmin', {'userId': user.id}) }}">Remove Admin</a>
+                    </p>
+                {% endif %}
             </td>
         </tr>
     </table>
@@ -117,6 +117,42 @@
                 <td>{{ player.world.name }}</td>
             </tr>
         {% endfor %}
+    </table>
+
+    <table class="table text-center">
+        <tr class="tabletop">
+            <td colspan="4"><b>Possible multi accounts (same IP: {{ user.lastIp ?? 'Unknown' }})</b></td>
+        </tr>
+        {% if sameIpUsers|length > 0 %}
+            <tr>
+                <td>Username</td>
+                <td>Email</td>
+                <td>Last login</td>
+                <td>Status</td>
+            </tr>
+            {% for sameIpUser in sameIpUsers %}
+                <tr>
+                    <td><a href="{{ path('Admin/User/Read', {'userId': sameIpUser.id}) }}">{{ sameIpUser.username }}</a></td>
+                    <td>{{ sameIpUser.email }}</td>
+                    <td>
+                        {% if sameIpUser.lastLogin is not empty %}
+                            {{ sameIpUser.lastLogin|date("Y-m-d H:i:s") }}
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if sameIpUser.active == 1 %}
+                            <span class="good">Active</span>
+                        {% else %}
+                            <span class="bad">Banned</span>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        {% else %}
+            <tr>
+                <td colspan="4">No other users found with the same IP</td>
+            </tr>
+        {% endif %}
     </table>
 
 {% endblock %}

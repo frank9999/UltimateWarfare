@@ -14,6 +14,7 @@
     </field>
     <field name="password" column="password" length="255"/>
     <field name="lastLogin" type="datetime" column="last_login" nullable="true"/>
+    <field name="lastIp" column="last_ip" length="45" nullable="true"/>
     <field name="confirmationToken" column="confirmation_token" length="180" unique="true" nullable="true"/>
     <field name="passwordRequestedAt" type="datetime" column="password_requested_at" nullable="true"/>
     <field name="roles" type="json" column="roles">
