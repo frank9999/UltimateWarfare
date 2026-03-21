@@ -4,38 +4,28 @@ declare(strict_types=1);
 
 namespace FrankProjects\UltimateWarfare\Entity;
 
-class Operation
+abstract readonly class Operation
 {
-    private int $id;
-    private string $name;
-    private string $image;
-    private int $cost;
-    private string $description;
-    private bool $enabled = true;
-    private float $difficulty = 0.5;
-    private string $subclass;
-    private int $maxDistance;
-    private Research $research;
-    private GameUnit $gameUnit;
-
-    public function setId(int $id): void
-    {
-        $this->id = $id;
+    public function __construct(
+        private string $name,
+        private string $image,
+        private int $cost,
+        private string $description,
+        private bool $enabled,
+        private float $difficulty,
+        private int $maxDistance,
+        private int $researchId,
+        private int $gameUnitId,
+    ) {
     }
 
-    public function getId(): int
-    {
-        return $this->id;
-    }
+    abstract public function getSlug(): string;
+
+    abstract public function getProcessorClass(): string;
 
     public function getName(): string
     {
         return $this->name;
-    }
-
-    public function setName(string $name): void
-    {
-        $this->name = $name;
     }
 
     public function getImage(): string
@@ -43,19 +33,9 @@ class Operation
         return $this->image;
     }
 
-    public function setImage(string $image): void
-    {
-        $this->image = $image;
-    }
-
     public function getCost(): int
     {
         return $this->cost;
-    }
-
-    public function setCost(int $cost): void
-    {
-        $this->cost = $cost;
     }
 
     public function getDescription(): string
@@ -63,19 +43,9 @@ class Operation
         return $this->description;
     }
 
-    public function setDescription(string $description): void
-    {
-        $this->description = $description;
-    }
-
     public function isEnabled(): bool
     {
         return $this->enabled;
-    }
-
-    public function setEnabled(bool $enabled): void
-    {
-        $this->enabled = $enabled;
     }
 
     public function getDifficulty(): float
@@ -83,48 +53,18 @@ class Operation
         return $this->difficulty;
     }
 
-    public function setDifficulty(float $difficulty): void
-    {
-        $this->difficulty = $difficulty;
-    }
-
     public function getMaxDistance(): int
     {
         return $this->maxDistance;
     }
 
-    public function setMaxDistance(int $maxDistance): void
+    public function getResearchId(): int
     {
-        $this->maxDistance = $maxDistance;
+        return $this->researchId;
     }
 
-    public function getResearch(): Research
+    public function getGameUnitId(): int
     {
-        return $this->research;
-    }
-
-    public function setResearch(Research $research): void
-    {
-        $this->research = $research;
-    }
-
-    public function getGameUnit(): GameUnit
-    {
-        return $this->gameUnit;
-    }
-
-    public function setGameUnit(GameUnit $gameUnit): void
-    {
-        $this->gameUnit = $gameUnit;
-    }
-
-    public function getSubclass(): string
-    {
-        return $this->subclass;
-    }
-
-    public function setSubclass(string $subclass): void
-    {
-        $this->subclass = $subclass;
+        return $this->gameUnitId;
     }
 }

@@ -9,7 +9,6 @@ use FrankProjects\UltimateWarfare\Entity\GameUnit;
 use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitCategory;
 use FrankProjects\UltimateWarfare\Service\GameUnit\Behavior\AirUnitBehavior;
 use FrankProjects\UltimateWarfare\Service\GameUnit\Behavior\NavalUnitBehavior;
-use FrankProjects\UltimateWarfare\Entity\Operation;
 use FrankProjects\UltimateWarfare\Entity\WorldRegionUnit;
 use FrankProjects\UltimateWarfare\Entity\FleetUnit;
 use FrankProjects\UltimateWarfare\Entity\Construction;
@@ -225,23 +224,6 @@ class GameUnitFixturesCommand extends Command
             $io->text(sprintf('  Removing %d Construction(s)...', count($constructions)));
             foreach ($constructions as $construction) {
                 $this->entityManager->remove($construction);
-            }
-        }
-
-        // Unlink Operations
-        $operations = $this->entityManager->getRepository(Operation::class)
-            ->findBy(['gameUnit' => $gameUnit]);
-
-        if ($operations !== []) {
-            $backupGameUnit = $this->entityManager->getRepository(GameUnit::class)
-                ->find(401);
-
-            $io->text(sprintf('  Removing %d Construction(s)...', count($constructions)));
-            foreach ($operations as $operation) {
-                if ($backupGameUnit !== null) {
-                    $operation->setGameUnit($backupGameUnit);
-                }
-                $this->entityManager->persist($operation);
             }
         }
 

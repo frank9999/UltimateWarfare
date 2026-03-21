@@ -72,7 +72,7 @@
     function renderOperationsList(operations) {
         var html = '';
         operations.forEach(function (op) {
-            html += '<div class="operation-card" data-operation-id="' + op.id + '">';
+            html += '<div class="operation-card" data-operation-slug="' + op.slug + '">';
             html += '<div class="operation-card-header">';
             html += '<div class="operation-card-info">';
             html += '<div class="operation-card-name">' + escapeHtml(op.name) + '</div>';
@@ -91,8 +91,8 @@
 
         operationsContainer.querySelectorAll('.operation-card').forEach(function (card) {
             card.onclick = function () {
-                var opId = parseInt(this.getAttribute('data-operation-id'));
-                var op = operations.find(function (o) { return o.id === opId; });
+                var opSlug = this.getAttribute('data-operation-slug');
+                var op = operations.find(function (o) { return o.slug === opSlug; });
                 if (op) selectOperationAndHighlight(op);
             };
         });
@@ -105,7 +105,7 @@
         showNotification('Loading eligible regions for ' + operation.name + '...', 'info');
 
         try {
-            var response = await fetch('/game/api/operation/eligible-regions/' + operationTargetRegion.id + '/' + operation.id);
+            var response = await fetch('/game/api/operation/eligible-regions/' + operationTargetRegion.id + '/' + operation.slug);
             var result = await response.json();
 
             if (!result.success) {
@@ -188,7 +188,7 @@
 
         try {
             var response = await fetch(
-                '/game/api/operation/units/' + operationTargetRegion.id + '/' + selectedOperation.id + '/' + sourceRegion.id
+                '/game/api/operation/units/' + operationTargetRegion.id + '/' + selectedOperation.slug + '/' + sourceRegion.id
             );
             var result = await response.json();
 
@@ -251,7 +251,7 @@
 
         try {
             var response = await fetch(
-                '/game/api/operation/execute/' + operationTargetRegion.id + '/' + selectedOperation.id + '/' + currentOperationSource.id,
+                '/game/api/operation/execute/' + operationTargetRegion.id + '/' + selectedOperation.slug + '/' + currentOperationSource.id,
                 {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },

@@ -532,19 +532,19 @@ Game/Notepad:
     controller: FrankProjects\UltimateWarfare\Controller\Game\NotepadController::notepad
 
 Game/Operation/ExecuteOperation:
-    path: /game/world/region/execute-operation/{regionId}/{operationId}/{playerRegionId}
+    path: /game/world/region/execute-operation/{regionId}/{operationSlug}/{playerRegionId}
     controller: FrankProjects\UltimateWarfare\Controller\Game\OperationController::executeOperation
     requirements:
         regionId: '\d+'
-        operationId: '\d+'
+        operationSlug: '[a-z0-9-]+'
         playerRegionId: '\d+'
 
 Game/Operation/SelectGameUnit:
-    path: /game/world/region/select-operation-units/{regionId}/{operationId}/{playerRegionId}
+    path: /game/world/region/select-operation-units/{regionId}/{operationSlug}/{playerRegionId}
     controller: FrankProjects\UltimateWarfare\Controller\Game\OperationController::selectGameUnits
     requirements:
         regionId: '\d+'
-        operationId: '\d+'
+        operationSlug: '[a-z0-9-]+'
         playerRegionId: '\d+'
 
 Game/Operation/SelectOperation:
@@ -554,11 +554,11 @@ Game/Operation/SelectOperation:
         regionId: '\d+'
 
 Game/Operation/SelectWorldRegion:
-    path: /game/world/region/select-operation-region/{regionId}/{operationId}
+    path: /game/world/region/select-operation-region/{regionId}/{operationSlug}
     controller: FrankProjects\UltimateWarfare\Controller\Game\OperationController::selectWorldRegion
     requirements:
         regionId: '\d+'
-        operationId: '\d+'
+        operationSlug: '[a-z0-9-]+'
 
 Game/Operation/List/Api:
     path:      /game/api/operation/list/{regionId}
@@ -568,29 +568,29 @@ Game/Operation/List/Api:
         regionId: '\d+'
 
 Game/Operation/EligibleRegions/Api:
-    path:      /game/api/operation/eligible-regions/{regionId}/{operationId}
+    path:      /game/api/operation/eligible-regions/{regionId}/{operationSlug}
     controller: FrankProjects\UltimateWarfare\Controller\Game\OperationController::operationEligibleRegionsApi
     methods: [GET]
     requirements:
         regionId: '\d+'
-        operationId: '\d+'
+        operationSlug: '[a-z0-9-]+'
 
 Game/Operation/Units/Api:
-    path:      /game/api/operation/units/{regionId}/{operationId}/{playerRegionId}
+    path:      /game/api/operation/units/{regionId}/{operationSlug}/{playerRegionId}
     controller: FrankProjects\UltimateWarfare\Controller\Game\OperationController::operationUnitsApi
     methods: [GET]
     requirements:
         regionId: '\d+'
-        operationId: '\d+'
+        operationSlug: '[a-z0-9-]+'
         playerRegionId: '\d+'
 
 Game/Operation/Execute/Api:
-    path:      /game/api/operation/execute/{regionId}/{operationId}/{playerRegionId}
+    path:      /game/api/operation/execute/{regionId}/{operationSlug}/{playerRegionId}
     controller: FrankProjects\UltimateWarfare\Controller\Game\OperationController::executeOperationApi
     methods: [POST]
     requirements:
         regionId: '\d+'
-        operationId: '\d+'
+        operationSlug: '[a-z0-9-]+'
         playerRegionId: '\d+'
 
 Game/Profile:

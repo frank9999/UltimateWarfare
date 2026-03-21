@@ -32,8 +32,6 @@ class GameUnit
     /** @var Collection<int, FleetUnit> */
     private Collection $fleetUnits;
 
-    /** @var Collection<int, Operation> */
-    private Collection $operations;
     private BattleStats $battleStats;
     private Cost $cost;
     private Income $income;
@@ -48,7 +46,6 @@ class GameUnit
         $this->worldRegionUnits = new ArrayCollection();
         $this->constructions = new ArrayCollection();
         $this->fleetUnits = new ArrayCollection();
-        $this->operations = new ArrayCollection();
         $this->battleStats = new BattleStats();
         $this->cost = new Cost();
         $this->income = new Income();
@@ -201,22 +198,6 @@ class GameUnit
     public function setFleetUnits(Collection $fleetUnits): void
     {
         $this->fleetUnits = $fleetUnits;
-    }
-
-    /**
-     * @return Collection<int, Operation>
-     */
-    public function getOperations(): Collection
-    {
-        return $this->operations;
-    }
-
-    /**
-     * @param Collection<int, Operation> $operations
-     */
-    public function setOperations(Collection $operations): void
-    {
-        $this->operations = $operations;
     }
 
     public function getBehaviorClass(): ?string

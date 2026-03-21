@@ -3,7 +3,7 @@
 {% block title %}Ultimate Warfare - Select units{% endblock title %}
 
 {% block content %}
-    <a class="B" href="{{ path('Game/Operation/SelectWorldRegion', {'regionId': region.id, 'operationId': operation.id}) }}">Back to region selection</a>
+    <a class="B" href="{{ path('Game/Operation/SelectWorldRegion', {'regionId': region.id, 'operationSlug': operation.slug}) }}">Back to region selection</a>
 
     <br />
     <br />
@@ -49,7 +49,7 @@
         </tr>
         <tr>
             <td width="300" align="center">Unit required:</td>
-            <td width="280" align="center">{{ operation.gameUnit.name }}</td>
+            <td width="280" align="center">{{ gameUnit.name }}</td>
         </tr>
         <tr>
             <td class="tabletop" colspan="3" align="center"><b>Launch operation from region</b></td>
@@ -68,7 +68,7 @@
     <br />
     <br />
 
-    <form action="{{ path('Game/Operation/ExecuteOperation', {'regionId': region.id, 'operationId': operation.id, 'playerRegionId': playerRegion.id}) }}" method="post">
+    <form action="{{ path('Game/Operation/ExecuteOperation', {'regionId': region.id, 'operationSlug': operation.slug, 'playerRegionId': playerRegion.id}) }}" method="post">
 
     <table class="table text">
         <tr>
@@ -84,14 +84,14 @@
         </tr>
         <tr>
             <td width="150">
-                <img src="{{ asset('images/' ~ operation.gameUnit.gameUnitCategory.imageDir ~ operation.gameUnit.image) }}" alt="{{ operation.gameUnit.name }}" width="150" height="130">
+                <img src="{{ asset('images/' ~ gameUnit.gameUnitCategory.imageDir ~ gameUnit.image) }}" alt="{{ gameUnit.name }}" width="150" height="130">
             </td>
             <td width="150" align="center">
-                <b>{{ operation.gameUnit.name }}</b>
+                <b>{{ gameUnit.name }}</b>
             </td>
             <td width="100" align="center">
                 {% for regionUnit in playerRegion.worldRegionUnits %}
-                {% if regionUnit.gameUnit.id == operation.gameUnit.id %}
+                {% if regionUnit.gameUnit.id == operation.gameUnitId %}
                     {% if regionUnit.amount > 1 %}
                         {{ regionUnit.amount }} {{ regionUnit.gameUnit.nameMulti }}<br />
                     {% else %}

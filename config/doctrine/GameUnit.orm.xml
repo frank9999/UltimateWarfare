@@ -56,6 +56,5 @@
     <one-to-many field="worldRegionUnits" target-entity="FrankProjects\UltimateWarfare\Entity\WorldRegionUnit" mapped-by="gameUnit"/>
     <one-to-many field="constructions" target-entity="FrankProjects\UltimateWarfare\Entity\Construction" mapped-by="gameUnit"/>
     <one-to-many field="fleetUnits" target-entity="FrankProjects\UltimateWarfare\Entity\FleetUnit" mapped-by="gameUnit"/>
-    <one-to-many field="operations" target-entity="FrankProjects\UltimateWarfare\Entity\Operation" mapped-by="gameUnit"/>
   </entity>
 </doctrine-mapping>

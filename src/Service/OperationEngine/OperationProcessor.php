@@ -67,21 +67,7 @@ abstract class OperationProcessor implements OperationInterface
         $this->constructionRepository = $constructionRepository;
     }
 
-    /**
-     * @param string $subclass
-     * @param WorldRegion $region
-     * @param Operation $operation
-     * @param WorldRegion $playerRegion
-     * @param int $amount
-     * @param ReportCreator $reportCreator
-     * @param PlayerRepository $playerRepository
-     * @param WorldRegionUnitRepository $worldRegionUnitRepository
-     * @param WorldRegionRepository $worldRegionRepository
-     * @param ConstructionRepository $constructionRepository
-     * @return OperationInterface
-     */
     public static function factory(
-        string $subclass,
         WorldRegion $region,
         Operation $operation,
         WorldRegion $playerRegion,
@@ -92,9 +78,9 @@ abstract class OperationProcessor implements OperationInterface
         WorldRegionRepository $worldRegionRepository,
         ConstructionRepository $constructionRepository
     ): OperationInterface {
-        $className = "FrankProjects\\UltimateWarfare\\Service\\OperationEngine\\OperationProcessor\\" . $subclass;
+        $className = $operation->getProcessorClass();
         if (!class_exists($className) || is_subclass_of($className, OperationInterface::class) === false) {
-            throw new RuntimeException("Unknown Operation {$subclass}");
+            throw new RuntimeException("Unknown Operation processor {$className}");
         }
 
         return new $className(

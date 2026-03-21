@@ -49,7 +49,7 @@
         </tr>
         <tr>
             <td width="300" align="center">Unit required:</td>
-            <td width="280" align="center">{{ operation.gameUnit.name }}</td>
+            <td width="280" align="center">{{ gameUnit.name }}</td>
         </tr>
     </table>
 
@@ -72,13 +72,13 @@
                     <li>Position: {{ playerRegion.region.x }}, {{ playerRegion.region.y }}</li>
                     <li>Distance to target: {{ playerRegion.distance }}</li>
                     <li>
-                        <a class="B" href="{{ path('Game/Operation/SelectGameUnit', {'regionId': region.id, 'operationId': operation.id, 'playerRegionId': playerRegion.region.id}) }}">Launch operation</a> with this region.
+                        <a class="B" href="{{ path('Game/Operation/SelectGameUnit', {'regionId': region.id, 'operationSlug': operation.slug, 'playerRegionId': playerRegion.region.id}) }}">Launch operation</a> with this region.
                     </li>
                 </ul>
             </td>
             <td class="text-start" width="210">
                 {% for regionUnit in playerRegion.region.worldRegionUnits %}
-                    {% if regionUnit.gameUnit.id == operation.gameUnit.id %}
+                    {% if regionUnit.gameUnit.id == operation.gameUnitId %}
                         {% if regionUnit.amount > 1 %}
                             {{ regionUnit.amount }} {{ regionUnit.gameUnit.nameMulti }}<br />
                         {% else %}

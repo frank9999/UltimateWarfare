@@ -62,7 +62,7 @@
                         <li>Difficulty: {{ operation.difficulty }}</li>
                         <li>Max Distance: {{ operation.maxDistance }}</li>
                     </ul>
-                    <a class="btn btn-primary" href="{{ path('Game/Operation/SelectWorldRegion', {'regionId': region.id, 'operationId': operation.id}) }}">Launch operation!</a>
+                    <a class="btn btn-primary" href="{{ path('Game/Operation/SelectWorldRegion', {'regionId': region.id, 'operationSlug': operation.slug}) }}">Launch operation!</a>
                 </td>
             </tr>
         {% endfor %}

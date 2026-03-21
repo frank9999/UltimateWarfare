@@ -23,7 +23,7 @@ final class NuclearMissileAttack extends OperationProcessor
     public function processPreOperation(): void
     {
         foreach ($this->playerRegion->getWorldRegionUnits() as $worldRegionUnit) {
-            if ($worldRegionUnit->getGameUnit()->getId() === $this->operation->getGameUnit()->getId()) {
+            if ($worldRegionUnit->getGameUnit()->getId() === $this->operation->getGameUnitId()) {
                 $worldRegionUnit->setAmount($worldRegionUnit->getAmount() - $this->amount);
                 $this->worldRegionUnitRepository->save($worldRegionUnit);
             }

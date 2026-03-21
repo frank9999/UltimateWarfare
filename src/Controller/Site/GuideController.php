@@ -7,7 +7,7 @@ namespace FrankProjects\UltimateWarfare\Controller\Site;
 use FrankProjects\UltimateWarfare\Controller\BaseController;
 use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitCategory;
 use FrankProjects\UltimateWarfare\Repository\GameUnitRepository;
-use FrankProjects\UltimateWarfare\Repository\OperationRepository;
+use FrankProjects\UltimateWarfare\Repository\OperationRegistry;
 use FrankProjects\UltimateWarfare\Repository\ResearchRepository;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -60,14 +60,26 @@ final class GuideController extends BaseController
         return $this->render('site/guide/index.html.twig');
     }
 
-    public function listOperations(OperationRepository $operationRepository): Response
-    {
-        $operations = $operationRepository->findEnabled();
+    public function listOperations(
+        OperationRegistry $operationRegistry,
+        ResearchRepository $researchRepository
+    ): Response {
+        $operations = $operationRegistry->findEnabled();
+
+        $researchNames = [];
+        foreach ($operations as $operation) {
+            $researchId = $operation->getResearchId();
+            if (!isset($researchNames[$researchId])) {
+                $research = $researchRepository->find($researchId);
+                $researchNames[$researchId] = $research !== null ? $research->getName() : '';
+            }
+        }
 
         return $this->render(
             'site/guide/listOperations.html.twig',
             [
-                'operations' => $operations
+                'operations' => $operations,
+                'researchNames' => $researchNames
             ]
         );
     }

@@ -63,7 +63,6 @@ final class OperationService
         $this->playerRepository->save($player);
 
         $operationProcessor = OperationProcessor::factory(
-            $operation->getSubclass(),
             $region,
             $operation,
             $playerRegion,
@@ -120,7 +119,7 @@ final class OperationService
 
         foreach ($playerRegion->getPlayer()->getPlayerResearch() as $playerResearch) {
             if (
-                $playerResearch->getResearch()->getId() === $operation->getResearch()->getId() &&
+                $playerResearch->getResearch()->getId() === $operation->getResearchId() &&
                 $playerResearch->getResearch()->getActive() === true
             ) {
                 return;
@@ -136,7 +135,7 @@ final class OperationService
         }
 
         foreach ($region->getWorldRegionUnits() as $regionUnit) {
-            if ($regionUnit->getGameUnit()->getId() === $operation->getGameUnit()->getId()) {
+            if ($regionUnit->getGameUnit()->getId() === $operation->getGameUnitId()) {
                 if ($regionUnit->getAmount() >= $amount) {
                     return;
                 }
