@@ -112,6 +112,23 @@ $ bin/console doctrine:schema:create
 $ bin/console doctrine:migrations:migrate
 ```
 
+
+##### Game unit data fixtures
+
+Game unit data (buildings, troops, naval units, air units, missiles, etc.) is managed through the fixture command:
+
+```bash
+# Preview changes (dry run, no database modifications)
+$ bin/console game:seed:game-units
+
+# Apply changes to the database
+$ bin/console game:seed:game-units --commit
+```
+
+The command compares the fixture data defined in `GameUnitFixturesCommand` against the database and reports differences. Without the `--commit` flag it only shows what would change, making it safe to run at any time.
+
+When adding or modifying game units, update the `getGameUnitsData()` method in `src/Command/DataFixtures/GameUnitFixturesCommand.php`. The command handles creating new units, updating existing ones, and removing units that are no longer in the fixture data.
+
 ### Directory structure
 
 ```
