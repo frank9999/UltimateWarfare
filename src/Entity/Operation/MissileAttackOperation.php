@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace FrankProjects\UltimateWarfare\Entity\Operation;
 
 use FrankProjects\UltimateWarfare\Entity\Operation;
+use FrankProjects\UltimateWarfare\Entity\Research\SpecialOperationsResearch;
 use FrankProjects\UltimateWarfare\Service\OperationEngine\OperationProcessor\MissileAttack;
 
 final readonly class MissileAttackOperation extends Operation
@@ -21,7 +22,7 @@ final readonly class MissileAttackOperation extends Operation
             enabled: true,
             difficulty: 0.5,
             maxDistance: 3,
-            researchSlug: 'special-operations',
+            researchClass: SpecialOperationsResearch::class,
             gameUnitId: 405,
         );
     }

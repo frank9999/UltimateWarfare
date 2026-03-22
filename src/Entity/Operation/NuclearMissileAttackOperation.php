@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace FrankProjects\UltimateWarfare\Entity\Operation;
 
 use FrankProjects\UltimateWarfare\Entity\Operation;
+use FrankProjects\UltimateWarfare\Entity\Research\NuclearTechnologyResearch;
 use FrankProjects\UltimateWarfare\Service\OperationEngine\OperationProcessor\NuclearMissileAttack;
 
 final readonly class NuclearMissileAttackOperation extends Operation
@@ -19,7 +20,7 @@ final readonly class NuclearMissileAttackOperation extends Operation
             enabled: true,
             difficulty: 0.9,
             maxDistance: 3,
-            researchSlug: 'nuclear-technology',
+            researchClass: NuclearTechnologyResearch::class,
             gameUnitId: 408,
         );
     }

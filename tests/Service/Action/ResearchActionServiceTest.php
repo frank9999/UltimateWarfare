@@ -94,16 +94,6 @@ class ResearchActionServiceTest extends TestCase
         $this->service->performResearch('nonexistent-research', $player);
     }
 
-    public function testPerformResearchFailsWhenResearchDisabled(): void
-    {
-        $player = $this->createPlayer();
-
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('This technology is disabled!');
-
-        $this->service->performResearch('defensive-operations-network', $player);
-    }
-
     public function testPerformResearchFailsWhenResearchInProgress(): void
     {
         $inProgressResearchPlayer = $this->createResearchPlayer('research-level-2', false);

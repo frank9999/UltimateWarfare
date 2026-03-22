@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace FrankProjects\UltimateWarfare\Entity\Operation;
 
 use FrankProjects\UltimateWarfare\Entity\Operation;
+use FrankProjects\UltimateWarfare\Entity\Research\AdvancedSpyTechnologyResearch;
 use FrankProjects\UltimateWarfare\Service\OperationEngine\OperationProcessor\AdvancedSpy;
 
 final readonly class AdvancedSpyOperation extends Operation
@@ -21,7 +22,7 @@ final readonly class AdvancedSpyOperation extends Operation
             enabled: true,
             difficulty: 0.3,
             maxDistance: 6,
-            researchSlug: 'advanced-spy-technology',
+            researchClass: AdvancedSpyTechnologyResearch::class,
             gameUnitId: 407,
         );
     }

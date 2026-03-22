@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace FrankProjects\UltimateWarfare\Entity\Operation;
 
 use FrankProjects\UltimateWarfare\Entity\Operation;
+use FrankProjects\UltimateWarfare\Entity\Research\SpecialOperationsResearch;
 use FrankProjects\UltimateWarfare\Service\OperationEngine\OperationProcessor\StealthBomberAttack;
 
 final readonly class StealthBomberAttackOperation extends Operation
@@ -23,7 +24,7 @@ final readonly class StealthBomberAttackOperation extends Operation
             enabled: true,
             difficulty: 0.5,
             maxDistance: 10,
-            researchSlug: 'special-operations',
+            researchClass: SpecialOperationsResearch::class,
             gameUnitId: 404,
         );
     }

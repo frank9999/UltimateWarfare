@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace FrankProjects\UltimateWarfare\Entity\Operation;
 
 use FrankProjects\UltimateWarfare\Entity\Operation;
+use FrankProjects\UltimateWarfare\Entity\Research\SpyTechnologyResearch;
 use FrankProjects\UltimateWarfare\Service\OperationEngine\OperationProcessor\Spy;
 
 final readonly class SpyOperation extends Operation
@@ -21,7 +22,7 @@ final readonly class SpyOperation extends Operation
             enabled: true,
             difficulty: 0.1,
             maxDistance: 3,
-            researchSlug: 'spy-technology',
+            researchClass: SpyTechnologyResearch::class,
             gameUnitId: 407,
         );
     }

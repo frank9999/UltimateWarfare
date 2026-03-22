@@ -6,6 +6,9 @@ namespace FrankProjects\UltimateWarfare\Entity;
 
 abstract readonly class Operation
 {
+    /**
+     * @param class-string<Research> $researchClass
+     */
     public function __construct(
         private string $name,
         private string $image,
@@ -14,7 +17,7 @@ abstract readonly class Operation
         private bool $enabled,
         private float $difficulty,
         private int $maxDistance,
-        private string $researchSlug,
+        private string $researchClass,
         private int $gameUnitId,
     ) {
     }
@@ -58,9 +61,22 @@ abstract readonly class Operation
         return $this->maxDistance;
     }
 
+    /**
+     * @return class-string<Research>
+     */
+    public function getResearchClass(): string
+    {
+        return $this->researchClass;
+    }
+
     public function getResearchSlug(): string
     {
-        return $this->researchSlug;
+        return (new $this->researchClass())->getSlug();
+    }
+
+    public function getResearchName(): string
+    {
+        return (new $this->researchClass())->getName();
     }
 
     public function getGameUnitId(): int

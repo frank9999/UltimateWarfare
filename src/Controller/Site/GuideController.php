@@ -60,26 +60,12 @@ final class GuideController extends BaseController
         return $this->render('site/guide/index.html.twig');
     }
 
-    public function listOperations(
-        OperationRegistry $operationRegistry,
-        ResearchRegistry $researchRegistry
-    ): Response {
-        $operations = $operationRegistry->findEnabled();
-
-        $researchNames = [];
-        foreach ($operations as $operation) {
-            $slug = $operation->getResearchSlug();
-            if (!isset($researchNames[$slug])) {
-                $research = $researchRegistry->find($slug);
-                $researchNames[$slug] = $research !== null ? $research->getName() : '';
-            }
-        }
-
+    public function listOperations(OperationRegistry $operationRegistry): Response
+    {
         return $this->render(
             'site/guide/listOperations.html.twig',
             [
-                'operations' => $operations,
-                'researchNames' => $researchNames
+                'operations' => $operationRegistry->findEnabled(),
             ]
         );
     }
