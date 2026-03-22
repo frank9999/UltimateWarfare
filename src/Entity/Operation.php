@@ -14,7 +14,7 @@ abstract readonly class Operation
         private bool $enabled,
         private float $difficulty,
         private int $maxDistance,
-        private int $researchId,
+        private string $researchSlug,
         private int $gameUnitId,
     ) {
     }
@@ -58,9 +58,9 @@ abstract readonly class Operation
         return $this->maxDistance;
     }
 
-    public function getResearchId(): int
+    public function getResearchSlug(): string
     {
-        return $this->researchId;
+        return $this->researchSlug;
     }
 
     public function getGameUnitId(): int

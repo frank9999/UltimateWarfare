@@ -22,7 +22,7 @@ final readonly class SubmarineAttackOperation extends Operation
             enabled: true,
             difficulty: 0.5,
             maxDistance: 4,
-            researchId: 100,
+            researchSlug: 'special-operations',
             gameUnitId: 403,
         );
     }

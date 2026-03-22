@@ -22,7 +22,7 @@ final readonly class SniperAttackOperation extends Operation
             enabled: true,
             difficulty: 0.5,
             maxDistance: 2,
-            researchId: 100,
+            researchSlug: 'special-operations',
             gameUnitId: 402,
         );
     }

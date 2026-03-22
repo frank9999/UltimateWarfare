@@ -9,35 +9,36 @@ use FrankProjects\UltimateWarfare\Entity\Research;
 use FrankProjects\UltimateWarfare\Entity\ResearchPlayer;
 use FrankProjects\UltimateWarfare\Repository\PlayerRepository;
 use FrankProjects\UltimateWarfare\Repository\ResearchPlayerRepository;
-use FrankProjects\UltimateWarfare\Repository\ResearchRepository;
+use FrankProjects\UltimateWarfare\Repository\ResearchRegistry;
 use RuntimeException;
 
 final class ResearchActionService
 {
-    private PlayerRepository $playerRepository;
-    private ResearchRepository $researchRepository;
+    private ResearchRegistry $researchRegistry;
     private ResearchPlayerRepository $researchPlayerRepository;
+    private PlayerRepository $playerRepository;
 
     public function __construct(
-        ResearchRepository $researchRepository,
+        ResearchRegistry $researchRegistry,
         ResearchPlayerRepository $researchPlayerRepository,
         PlayerRepository $playerRepository
     ) {
-        $this->researchRepository = $researchRepository;
+        $this->researchRegistry = $researchRegistry;
         $this->researchPlayerRepository = $researchPlayerRepository;
         $this->playerRepository = $playerRepository;
     }
 
-    public function performResearch(int $researchId, Player $player): void
+    public function performResearch(string $researchSlug, Player $player): void
     {
-        $research = $this->getResearchById($researchId);
+        $research = $this->getResearchBySlug($researchSlug);
 
         $this->ensureCanResearch($research, $player);
 
         $researchPlayer = new ResearchPlayer();
         $researchPlayer->setPlayer($player);
-        $researchPlayer->setResearch($research);
+        $researchPlayer->setResearchSlug($research->getSlug());
         $researchPlayer->setTimestamp(time());
+        $researchPlayer->setCompletionTimestamp(time() + $research->getTimestamp());
 
         $resources = $player->getResources();
         $resources->setCash($resources->getCash() - $research->getCost());
@@ -47,13 +48,13 @@ final class ResearchActionService
         $this->researchPlayerRepository->save($researchPlayer);
     }
 
-    public function performCancel(int $researchId, Player $player): void
+    public function performCancel(string $researchSlug, Player $player): void
     {
-        $research = $this->getResearchById($researchId);
+        $this->getResearchBySlug($researchSlug);
 
         /** @var ResearchPlayer $playerResearch */
         foreach ($player->getPlayerResearch() as $playerResearch) {
-            if ($playerResearch->getResearch()->getId() !== $research->getId()) {
+            if ($playerResearch->getResearchSlug() !== $researchSlug) {
                 continue;
             }
 
@@ -65,15 +66,15 @@ final class ResearchActionService
         }
     }
 
-    private function getResearchById(int $researchId): Research
+    private function getResearchBySlug(string $researchSlug): Research
     {
-        $research = $this->researchRepository->find($researchId);
+        $research = $this->researchRegistry->find($researchSlug);
 
         if ($research === null) {
             throw new RuntimeException('This technology does not exist!');
         }
 
-        if (!$research->getActive()) {
+        if (!$research->isEnabled()) {
             throw new RuntimeException('This technology is disabled!');
         }
 
@@ -82,7 +83,7 @@ final class ResearchActionService
 
     private function ensureCanResearch(Research $research, Player $player): void
     {
-        $researchArray = [];
+        $completedSlugs = [];
 
         /** @var ResearchPlayer $playerResearch */
         foreach ($player->getPlayerResearch() as $playerResearch) {
@@ -90,15 +91,15 @@ final class ResearchActionService
                 throw new RuntimeException('You can only research 1 technology at a time!');
             }
 
-            if ($playerResearch->getResearch()->getId() === $research->getId()) {
+            if ($playerResearch->getResearchSlug() === $research->getSlug()) {
                 throw new RuntimeException('This technology has already been researched!');
             }
 
-            $researchArray[$playerResearch->getResearch()->getId()] = $playerResearch->getResearch();
+            $completedSlugs[] = $playerResearch->getResearchSlug();
         }
 
-        foreach ($research->getResearchNeeds() as $researchNeed) {
-            if (!isset($researchArray[$researchNeed->getRequiredResearch()->getId()])) {
+        foreach ($research->getPrerequisiteSlugs() as $prerequisiteSlug) {
+            if (!in_array($prerequisiteSlug, $completedSlugs, true)) {
                 throw new RuntimeException('You do not have all required technologies!');
             }
         }

@@ -144,14 +144,14 @@ abstract class OperationProcessor implements OperationInterface
         return 0;
     }
 
-    protected function hasResearched(int $researchId): bool
+    protected function hasResearched(string $researchSlug): bool
     {
         foreach ($this->getPlayerRegionPlayer()->getPlayerResearch() as $playerResearch) {
             if ($playerResearch->getActive() === false) {
                 continue;
             }
 
-            if ($playerResearch->getResearch()->getId() === $researchId) {
+            if ($playerResearch->getResearchSlug() === $researchSlug) {
                 return true;
             }
         }

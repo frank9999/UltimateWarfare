@@ -17,12 +17,12 @@
             <td><b>Finished at</b></td>
             <td><b>Option</b></td>
         </tr>
-        {% for researchPlayer in ongoingResearch %}
-            {% set finish = researchPlayer.timestamp + researchPlayer.research.timestamp %}
+        {% for entry in ongoingResearch %}
+            {% set finish = entry.researchPlayer.completionTimestamp %}
             {% set timeLeft = finish - date().timestamp %}
 
             <tr>
-                <td>{{ researchPlayer.research.name }}</td>
+                <td>{{ entry.research.name }}</td>
                 <td>
                     <span class="timer">
                         {% set days = (timeLeft / (24 * 60 * 60))|round(0, 'floor') %}
@@ -35,7 +35,7 @@
                     </span>
                 </td>
                 <td>{{ finish|date }}</td>
-                <td><a class="B" href="{{ path('Game/Research/Cancel', {'researchId': researchPlayer.research.id}) }}">Cancel</a></td>
+                <td><a class="B" href="{{ path('Game/Research/Cancel', {'researchSlug': entry.research.slug}) }}">Cancel</a></td>
             </tr>
         {% else %}
             <tr>
@@ -71,12 +71,12 @@
                         {% if hours > 0 %}{{ hours }} hours {% endif %}
                         {% if minutes > 0 %}{{ minutes }} minutes{% endif %}
                     </div>
-                    <a class="btn btn-primary" href="{{ path('Game/Research/Perform', {'researchId': research.id}) }}"><b>Research</b></a>
+                    <a class="btn btn-primary" href="{{ path('Game/Research/Perform', {'researchSlug': research.slug}) }}"><b>Research</b></a>
                 </td>
                 <td valign="top">
                     <b>Requirements:</b><br />
-                    {% for researchNeed in research.researchNeeds %}
-                        <div class="good">{{ researchNeed.requiredResearch.name }}</div>
+                    {% for name in research.prerequisiteNames %}
+                        <div class="good">{{ name }}</div>
                     {% endfor %}
                 </td>
             </tr>

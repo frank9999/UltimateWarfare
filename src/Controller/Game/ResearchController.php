@@ -5,26 +5,24 @@ declare(strict_types=1);
 namespace FrankProjects\UltimateWarfare\Controller\Game;
 
 use FrankProjects\UltimateWarfare\Entity\Player;
-use FrankProjects\UltimateWarfare\Entity\Research;
-use FrankProjects\UltimateWarfare\Entity\ResearchNeeds;
 use FrankProjects\UltimateWarfare\Repository\ResearchPlayerRepository;
-use FrankProjects\UltimateWarfare\Repository\ResearchRepository;
+use FrankProjects\UltimateWarfare\Repository\ResearchRegistry;
 use FrankProjects\UltimateWarfare\Service\Action\ResearchActionService;
 use Symfony\Component\HttpFoundation\Response;
 use Throwable;
 
 final class ResearchController extends BaseGameController
 {
-    private ResearchRepository $researchRepository;
+    private ResearchRegistry $researchRegistry;
     private ResearchPlayerRepository $researchPlayerRepository;
     private ResearchActionService $researchActionService;
 
     public function __construct(
-        ResearchRepository $researchRepository,
+        ResearchRegistry $researchRegistry,
         ResearchPlayerRepository $researchPlayerRepository,
         ResearchActionService $researchActionService
     ) {
-        $this->researchRepository = $researchRepository;
+        $this->researchRegistry = $researchRegistry;
         $this->researchPlayerRepository = $researchPlayerRepository;
         $this->researchActionService = $researchActionService;
     }
@@ -32,11 +30,26 @@ final class ResearchController extends BaseGameController
     public function research(): Response
     {
         $player = $this->getPlayer();
-        $ongoingResearch = $this->researchRepository->findOngoingByPlayer($player);
-        $notResearched = $this->researchRepository->findNotResearchedByPlayer($player);
+        $ongoingResearchPlayers = $this->researchPlayerRepository->findOngoingByPlayer($player);
 
-        $completedResearchIds = $this->getCompletedResearchIds($player);
-        $availableResearch = $this->filterAvailableResearch($notResearched, $completedResearchIds);
+        $completedSlugs = $this->getCompletedResearchSlugs($player);
+        $ongoingSlugs = [];
+        foreach ($ongoingResearchPlayers as $rp) {
+            $ongoingSlugs[] = $rp->getResearchSlug();
+        }
+        $allPlayerSlugs = array_merge($completedSlugs, $ongoingSlugs);
+        $availableResearch = $this->researchRegistry->findAvailableForPlayer($allPlayerSlugs);
+
+        $ongoingResearch = [];
+        foreach ($ongoingResearchPlayers as $rp) {
+            $research = $this->researchRegistry->find($rp->getResearchSlug());
+            if ($research !== null) {
+                $ongoingResearch[] = [
+                    'researchPlayer' => $rp,
+                    'research' => $research,
+                ];
+            }
+        }
 
         return $this->render(
             'game/research.html.twig',
@@ -49,59 +62,36 @@ final class ResearchController extends BaseGameController
     }
 
     /**
-     * Get IDs of all completed research for the player
-     *
-     * @return array<int>
+     * @return string[]
      */
-    private function getCompletedResearchIds(Player $player): array
+    private function getCompletedResearchSlugs(Player $player): array
     {
-        $completedIds = [];
+        $completedSlugs = [];
 
         foreach ($player->getPlayerResearch() as $researchPlayer) {
             if ($researchPlayer->getActive()) {
-                $completedIds[] = $researchPlayer->getResearch()->getId();
+                $completedSlugs[] = $researchPlayer->getResearchSlug();
             }
         }
 
-        return $completedIds;
-    }
-
-    /**
-     * Filter research to only include those with all prerequisites met
-     *
-     * @param array<Research> $notResearched
-     * @param array<int> $completedResearchIds
-     * @return array<Research>
-     */
-    private function filterAvailableResearch(array $notResearched, array $completedResearchIds): array
-    {
-        $availableResearch = [];
-
-        foreach ($notResearched as $research) {
-            $isAvailable = true;
-            foreach ($research->getResearchNeeds() as $researchNeed) {
-                $requiredResearchId = $researchNeed->getRequiredResearch()->getId();
-
-                if (in_array($requiredResearchId, $completedResearchIds, true)) {
-                    // Do nothing
-                } else {
-                    $isAvailable = false;
-                }
-            }
-
-            // Only include research where all prerequisites are met
-            if ($isAvailable === true) {
-                $availableResearch[] = $research;
-            }
-        }
-
-        return $availableResearch;
+        return $completedSlugs;
     }
 
     public function history(): Response
     {
         $player = $this->getPlayer();
-        $finishedResearch = $this->researchPlayerRepository->findFinishedByPlayer($player);
+        $finishedResearchPlayers = $this->researchPlayerRepository->findFinishedByPlayer($player);
+
+        $finishedResearch = [];
+        foreach ($finishedResearchPlayers as $rp) {
+            $research = $this->researchRegistry->find($rp->getResearchSlug());
+            if ($research !== null) {
+                $finishedResearch[] = [
+                    'researchPlayer' => $rp,
+                    'research' => $research,
+                ];
+            }
+        }
 
         return $this->render(
             'game/researchHistory.html.twig',
@@ -112,10 +102,10 @@ final class ResearchController extends BaseGameController
         );
     }
 
-    public function performResearch(int $researchId): Response
+    public function performResearch(string $researchSlug): Response
     {
         try {
-            $this->researchActionService->performResearch($researchId, $this->getPlayer());
+            $this->researchActionService->performResearch($researchSlug, $this->getPlayer());
             $this->addFlash('success', 'Successfully started a new research project!');
         } catch (Throwable $e) {
             $this->addFlash('error', $e->getMessage());
@@ -124,10 +114,10 @@ final class ResearchController extends BaseGameController
         return $this->redirectToRoute('Game/Research');
     }
 
-    public function performCancel(int $researchId): Response
+    public function performCancel(string $researchSlug): Response
     {
         try {
-            $this->researchActionService->performCancel($researchId, $this->getPlayer());
+            $this->researchActionService->performCancel($researchSlug, $this->getPlayer());
             $this->addFlash('success', 'Successfully cancelled your research project!');
         } catch (Throwable $e) {
             $this->addFlash('error', $e->getMessage());

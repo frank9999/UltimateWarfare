@@ -21,7 +21,7 @@ final readonly class SpyOperation extends Operation
             enabled: true,
             difficulty: 0.1,
             maxDistance: 3,
-            researchId: 104,
+            researchSlug: 'spy-technology',
             gameUnitId: 407,
         );
     }

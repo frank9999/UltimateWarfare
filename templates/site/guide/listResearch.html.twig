@@ -17,8 +17,8 @@
 
                     <b>Requirements:</b><br />
 
-                    {% for researchNeeds in research.researchNeeds %}
-                        - {{ researchNeeds.requiredResearch.name }}<br />
+                    {% for name in research.prerequisiteNames %}
+                        - {{ name }}<br />
                     {% endfor %}
                 </td>
         {% endfor %}

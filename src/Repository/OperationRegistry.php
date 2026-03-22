@@ -67,10 +67,10 @@ final class OperationRegistry
      */
     public function findAvailableForPlayer(Player $player): array
     {
-        $activeResearchIds = [];
+        $activeResearchSlugs = [];
         foreach ($player->getPlayerResearch() as $playerResearch) {
             if ($playerResearch->getActive() === true) {
-                $activeResearchIds[] = $playerResearch->getResearch()->getId();
+                $activeResearchSlugs[] = $playerResearch->getResearchSlug();
             }
         }
 
@@ -78,7 +78,7 @@ final class OperationRegistry
             array_filter(
                 $this->operations,
                 static fn (Operation $o): bool => $o->isEnabled()
-                    && in_array($o->getResearchId(), $activeResearchIds, true)
+                    && in_array($o->getResearchSlug(), $activeResearchSlugs, true)
             )
         );
     }

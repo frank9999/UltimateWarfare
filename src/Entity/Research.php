@@ -4,49 +4,23 @@ declare(strict_types=1);
 
 namespace FrankProjects\UltimateWarfare\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
-
-class Research
+abstract readonly class Research
 {
-    private int $id;
-    private string $name;
-    private string $image;
-    private int $cost;
-    private int $timestamp;
-    private string $description;
-    private bool $active = false;
-
-    /** @var Collection<int, ResearchPlayer> */
-    private Collection $researchPlayers;
-
-    /** @var Collection<int, ResearchNeeds> */
-    private Collection $researchNeeds;
-
-    /** @var Collection<int, ResearchNeeds> */
-    private Collection $requiredResearch;
-
-    public function __construct()
-    {
-        $this->researchPlayers = new ArrayCollection();
-        $this->researchNeeds = new ArrayCollection();
-        $this->requiredResearch = new ArrayCollection();
+    /**
+     * @param array<class-string<Research>> $prerequisites
+     */
+    public function __construct(
+        private string $name,
+        private string $image,
+        private int $cost,
+        private int $timestamp,
+        private string $description,
+        private bool $enabled,
+        private array $prerequisites = [],
+    ) {
     }
 
-    public function setId(int $id): void
-    {
-        $this->id = $id;
-    }
-
-    public function getId(): int
-    {
-        return $this->id;
-    }
-
-    public function setName(string $name): void
-    {
-        $this->name = $name;
-    }
+    abstract public function getSlug(): string;
 
     public function getName(): string
     {
@@ -58,24 +32,9 @@ class Research
         return $this->image;
     }
 
-    public function setImage(string $image): void
-    {
-        $this->image = $image;
-    }
-
-    public function setCost(int $cost): void
-    {
-        $this->cost = $cost;
-    }
-
     public function getCost(): int
     {
         return $this->cost;
-    }
-
-    public function setTimestamp(int $timestamp): void
-    {
-        $this->timestamp = $timestamp;
     }
 
     public function getTimestamp(): int
@@ -83,71 +42,49 @@ class Research
         return $this->timestamp;
     }
 
-    public function setDescription(string $description): void
-    {
-        $this->description = $description;
-    }
-
     public function getDescription(): string
     {
         return $this->description;
     }
 
-    public function setActive(bool $active): void
+    public function isEnabled(): bool
     {
-        $this->active = $active;
-    }
-
-    public function getActive(): bool
-    {
-        return $this->active;
+        return $this->enabled;
     }
 
     /**
-     * @return Collection<int, ResearchNeeds>
+     * @return array<class-string<Research>>
      */
-    public function getResearchNeeds(): Collection
+    public function getPrerequisites(): array
     {
-        return $this->researchNeeds;
+        return $this->prerequisites;
     }
 
     /**
-     * @param Collection<int, ResearchNeeds> $researchNeeds
+     * @return string[]
      */
-    public function setResearchNeeds(Collection $researchNeeds): void
+    public function getPrerequisiteNames(): array
     {
-        $this->researchNeeds = $researchNeeds;
+        $names = [];
+        foreach ($this->prerequisites as $prerequisiteClass) {
+            $prerequisite = new $prerequisiteClass();
+            $names[] = $prerequisite->getName();
+        }
+
+        return $names;
     }
 
     /**
-     * @return Collection<int, ResearchNeeds>
+     * @return string[]
      */
-    public function getRequiredResearch(): Collection
+    public function getPrerequisiteSlugs(): array
     {
-        return $this->requiredResearch;
-    }
+        $slugs = [];
+        foreach ($this->prerequisites as $prerequisiteClass) {
+            $prerequisite = new $prerequisiteClass();
+            $slugs[] = $prerequisite->getSlug();
+        }
 
-    /**
-     * @param Collection<int, ResearchNeeds> $requiredResearch
-     */
-    public function setRequiredResearch(Collection $requiredResearch): void
-    {
-        $this->requiredResearch = $requiredResearch;
-    }
-
-    /**
-     * @return Collection<int, ResearchPlayer>
-     */
-    public function getResearchPlayers(): Collection
-    {
-        return $this->researchPlayers;
-    }
-
-    /**
-     * @param Collection<int, ResearchPlayer> $researchPlayers
-     */
-    public function setResearchPlayers(Collection $researchPlayers): void
-    {
-        $this->researchPlayers = $researchPlayers;
+        return $slugs;
     }
 }

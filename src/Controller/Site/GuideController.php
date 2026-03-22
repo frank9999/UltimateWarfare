@@ -8,7 +8,7 @@ use FrankProjects\UltimateWarfare\Controller\BaseController;
 use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitCategory;
 use FrankProjects\UltimateWarfare\Repository\GameUnitRepository;
 use FrankProjects\UltimateWarfare\Repository\OperationRegistry;
-use FrankProjects\UltimateWarfare\Repository\ResearchRepository;
+use FrankProjects\UltimateWarfare\Repository\ResearchRegistry;
 use Symfony\Component\HttpFoundation\Response;
 
 final class GuideController extends BaseController
@@ -62,16 +62,16 @@ final class GuideController extends BaseController
 
     public function listOperations(
         OperationRegistry $operationRegistry,
-        ResearchRepository $researchRepository
+        ResearchRegistry $researchRegistry
     ): Response {
         $operations = $operationRegistry->findEnabled();
 
         $researchNames = [];
         foreach ($operations as $operation) {
-            $researchId = $operation->getResearchId();
-            if (!isset($researchNames[$researchId])) {
-                $research = $researchRepository->find($researchId);
-                $researchNames[$researchId] = $research !== null ? $research->getName() : '';
+            $slug = $operation->getResearchSlug();
+            if (!isset($researchNames[$slug])) {
+                $research = $researchRegistry->find($slug);
+                $researchNames[$slug] = $research !== null ? $research->getName() : '';
             }
         }
 
@@ -84,9 +84,9 @@ final class GuideController extends BaseController
         );
     }
 
-    public function listResearch(ResearchRepository $researchRepository): Response
+    public function listResearch(ResearchRegistry $researchRegistry): Response
     {
-        $researches = $researchRepository->findAll();
+        $researches = $researchRegistry->findEnabled();
 
         return $this->render(
             'site/guide/listResearch.html.twig',

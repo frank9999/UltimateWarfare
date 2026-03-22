@@ -7,7 +7,6 @@ namespace FrankProjects\UltimateWarfare\Repository\Doctrine;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use FrankProjects\UltimateWarfare\Entity\Player;
-use FrankProjects\UltimateWarfare\Entity\Research;
 use FrankProjects\UltimateWarfare\Entity\ResearchPlayer;
 use FrankProjects\UltimateWarfare\Repository\ResearchPlayerRepository;
 
@@ -35,8 +34,7 @@ final class DoctrineResearchPlayerRepository implements ResearchPlayerRepository
         return $this->entityManager->createQuery(
             'SELECT rp
               FROM ' . ResearchPlayer::class . ' rp
-              JOIN ' . Research::class . ' r ON rp.research = r
-              WHERE rp.active = 0 AND (rp.timestamp + r.timestamp) < :timestamp'
+              WHERE rp.active = 0 AND rp.completionTimestamp < :timestamp'
         )->setParameter(
             'timestamp',
             $timestamp
@@ -62,6 +60,22 @@ final class DoctrineResearchPlayerRepository implements ResearchPlayerRepository
               FROM ' . ResearchPlayer::class . ' rp
               WHERE rp.player = :player AND rp.active = 1
               ORDER BY rp.timestamp DESC'
+        )->setParameter(
+            'player',
+            $player
+        )->getResult();
+    }
+
+    /**
+     * @param Player $player
+     * @return ResearchPlayer[]
+     */
+    public function findOngoingByPlayer(Player $player): array
+    {
+        return $this->entityManager->createQuery(
+            'SELECT rp
+              FROM ' . ResearchPlayer::class . ' rp
+              WHERE rp.player = :player AND rp.active = 0'
         )->setParameter(
             'player',
             $player

@@ -23,7 +23,7 @@ final readonly class StealthBomberAttackOperation extends Operation
             enabled: true,
             difficulty: 0.5,
             maxDistance: 10,
-            researchId: 100,
+            researchSlug: 'special-operations',
             gameUnitId: 404,
         );
     }

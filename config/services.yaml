@@ -41,6 +41,7 @@ services:
 
     FrankProjects\UltimateWarfare\Service\GameEngine\Processor\ResearchProcessor:
         arguments:
+            $researchRegistry: '@FrankProjects\UltimateWarfare\Repository\ResearchRegistry'
             $researchTimeOverride: '%app.uw_research_time_override%'
 
     ReCaptcha\ReCaptcha:

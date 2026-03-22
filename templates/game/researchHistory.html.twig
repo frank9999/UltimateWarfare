@@ -11,15 +11,15 @@
         <tr class="tabletop">
             <td colspan="2"><b>Research History</b></td>
         </tr>
-        {% for researchPlayer in finishedResearch %}
+        {% for entry in finishedResearch %}
             <tr>
                 <td width="150">
-                    <img src="{{ asset('images/research/' ~ researchPlayer.research.image ) }}" alt="{{ researchPlayer.research.name }}" width="150" height="130">
+                    <img src="{{ asset('images/research/' ~ entry.research.image ) }}" alt="{{ entry.research.name }}" width="150" height="130">
                 </td>
                 <td class="text-start" width="550">
-                    <div><b>Name:</b> {{ researchPlayer.research.name }}</div>
-                    <div><b>Finished at:</b> {{ researchPlayer.timestamp|date("m/d/Y H:i:s") }}</div>
-                    <div>{{ researchPlayer.research.description }}</div>
+                    <div><b>Name:</b> {{ entry.research.name }}</div>
+                    <div><b>Finished at:</b> {{ entry.researchPlayer.timestamp|date("m/d/Y H:i:s") }}</div>
+                    <div>{{ entry.research.description }}</div>
                 </td>
             </tr>
         {% else %}

@@ -21,7 +21,7 @@ final readonly class AdvancedSpy2Operation extends Operation
             enabled: true,
             difficulty: 0.5,
             maxDistance: 9,
-            researchId: 105,
+            researchSlug: 'advanced-spy-technology',
             gameUnitId: 407,
         );
     }

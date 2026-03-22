@@ -21,7 +21,7 @@ final readonly class MissileAttackOperation extends Operation
             enabled: true,
             difficulty: 0.5,
             maxDistance: 3,
-            researchId: 100,
+            researchSlug: 'special-operations',
             gameUnitId: 405,
         );
     }

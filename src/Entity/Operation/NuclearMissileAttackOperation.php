@@ -19,7 +19,7 @@ final readonly class NuclearMissileAttackOperation extends Operation
             enabled: true,
             difficulty: 0.9,
             maxDistance: 3,
-            researchId: 110,
+            researchSlug: 'nuclear-technology',
             gameUnitId: 408,
         );
     }
