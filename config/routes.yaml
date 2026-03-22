@@ -164,22 +164,6 @@ Forum/Category:
     requirements:
         categoryId: '\d+'
 
-Forum/Category/Create:
-    path:      /forum/category/create/
-    controller: FrankProjects\UltimateWarfare\Controller\Forum\CategoryController::create
-
-Forum/Category/Edit:
-    path:      /forum/category/edit/{categoryId}
-    controller: FrankProjects\UltimateWarfare\Controller\Forum\CategoryController::edit
-    requirements:
-        categoryId: '\d+'
-
-Forum/Category/Remove:
-    path:      /forum/category/remove/{categoryId}
-    controller: FrankProjects\UltimateWarfare\Controller\Forum\CategoryController::remove
-    requirements:
-        categoryId: '\d+'
-
 Forum/Post/Edit:
     path:      /forum/post/edit/{postId}
     controller: FrankProjects\UltimateWarfare\Controller\Forum\PostController::edit

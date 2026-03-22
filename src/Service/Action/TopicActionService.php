@@ -32,11 +32,10 @@ final class TopicActionService
     {
         $this->forumHelper->ensureNotBanned($user);
         $this->forumHelper->ensureNoMassPost($user);
-        $dateTime = $this->forumHelper->getCurrentDateTime();
 
         $topic->setCategory($category);
         $topic->setPosterIp($ipAddress);
-        $topic->setCreateDateTime($dateTime);
+        $topic->setCreateDateTime($this->forumHelper->getCurrentDateTime());
         $topic->setUser($user);
 
         $this->topicRepository->save($topic);

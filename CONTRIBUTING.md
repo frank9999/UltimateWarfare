@@ -106,13 +106,6 @@ $ bin/console doctrine:schema:create
 ```
 
 
-##### Load database data
-
-```bash
-$ bin/console doctrine:migrations:migrate
-```
-
-
 ##### Game unit data fixtures
 
 Game unit data (buildings, troops, naval units, air units, missiles, etc.) is managed through the fixture command:

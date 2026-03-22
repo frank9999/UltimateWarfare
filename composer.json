@@ -10,7 +10,6 @@
         "ext-json": "*",
         "doctrine/common": "^3.5",
         "doctrine/doctrine-bundle": "^3.2",
-        "doctrine/doctrine-migrations-bundle": "^4",
         "doctrine/orm": "^3.6",
         "google/recaptcha": "^1.3",
         "symfony/asset": "^8.0",
