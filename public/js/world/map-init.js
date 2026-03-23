@@ -81,54 +81,59 @@
 
     // ===== Unit Tooltip =====
     var unitTooltip = document.getElementById('unitTooltip');
+    var tooltipRAF = null;
 
     worldMap.canvas.addEventListener('mousemove', function (e) {
-        var rect = worldMap.canvas.getBoundingClientRect();
-        var mouseX = e.clientX - rect.left;
-        var mouseY = e.clientY - rect.top;
+        if (tooltipRAF) return;
+        var evt = e;
+        tooltipRAF = requestAnimationFrame(function () {
+            tooltipRAF = null;
 
-        var worldPos = worldMap.cameraController.screenToWorld(mouseX, mouseY);
-        var foundIcon = null;
+            var rect = worldMap.canvas.getBoundingClientRect();
+            var mouseX = evt.clientX - rect.left;
+            var mouseY = evt.clientY - rect.top;
 
-        for (var i = 0; i < worldMap.sectors.length; i++) {
-            var region = worldMap.sectors[i];
-            if (!region.iconPositions) continue;
+            // O(1) tile lookup instead of iterating all sectors
+            var hoveredRegion = worldMap.getTileAtScreenPos(mouseX, mouseY);
+            var foundIcon = null;
 
-            for (var j = 0; j < region.iconPositions.length; j++) {
-                var icon = region.iconPositions[j];
-                var dx = worldPos.x - icon.x;
-                var dy = worldPos.y - icon.y;
-                var distance = Math.sqrt(dx * dx + dy * dy);
+            if (hoveredRegion && hoveredRegion.iconPositions) {
+                var worldPos = worldMap.cameraController.screenToWorld(mouseX, mouseY);
+                for (var j = 0; j < hoveredRegion.iconPositions.length; j++) {
+                    var icon = hoveredRegion.iconPositions[j];
+                    var dx = worldPos.x - icon.x;
+                    var dy = worldPos.y - icon.y;
+                    var distance = Math.sqrt(dx * dx + dy * dy);
 
-                if (distance <= icon.size) {
-                    foundIcon = { icon: icon, region: region };
-                    break;
+                    if (distance <= icon.size) {
+                        foundIcon = { icon: icon, region: hoveredRegion };
+                        break;
+                    }
                 }
             }
-            if (foundIcon) break;
-        }
 
-        if (foundIcon) {
-            var fi = foundIcon.icon;
-            var tooltipHtml = '<div class="tooltip-title" style="color: ' + fi.color + '">' + fi.label + '</div>';
+            if (foundIcon) {
+                var fi = foundIcon.icon;
+                var tooltipHtml = '<div class="tooltip-title" style="color: ' + fi.color + '">' + fi.label + '</div>';
 
-            if (fi.details && fi.details.length > 0) {
-                fi.details.forEach(function (unit) {
-                    tooltipHtml += '<div class="tooltip-item">' +
-                        '<span class="unit-name">' + unit.name + '</span>' +
-                        '<span class="unit-count">' + unit.amount + '</span></div>';
-                });
+                if (fi.details && fi.details.length > 0) {
+                    fi.details.forEach(function (unit) {
+                        tooltipHtml += '<div class="tooltip-item">' +
+                            '<span class="unit-name">' + unit.name + '</span>' +
+                            '<span class="unit-count">' + unit.amount + '</span></div>';
+                    });
+                }
+
+                tooltipHtml += '<div class="tooltip-total">Total: ' + fi.count + '</div>';
+
+                unitTooltip.innerHTML = tooltipHtml;
+                unitTooltip.style.display = 'block';
+                unitTooltip.style.left = (evt.clientX + 15) + 'px';
+                unitTooltip.style.top = (evt.clientY + 10) + 'px';
+            } else {
+                unitTooltip.style.display = 'none';
             }
-
-            tooltipHtml += '<div class="tooltip-total">Total: ' + fi.count + '</div>';
-
-            unitTooltip.innerHTML = tooltipHtml;
-            unitTooltip.style.display = 'block';
-            unitTooltip.style.left = (e.clientX + 15) + 'px';
-            unitTooltip.style.top = (e.clientY + 10) + 'px';
-        } else {
-            unitTooltip.style.display = 'none';
-        }
+        });
     });
 
     worldMap.canvas.addEventListener('mouseleave', function () {

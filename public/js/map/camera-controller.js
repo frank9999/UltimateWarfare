@@ -206,6 +206,20 @@ class CameraController {
     }
 
     /**
+     * Get world-space bounding rectangle of the current viewport
+     */
+    getVisibleBounds() {
+        var halfW = this.canvas.width / 2;
+        var halfH = this.canvas.height / 2;
+        return {
+            minX: (-halfW - this.camera.x) / this.camera.zoom,
+            maxX: (halfW - this.camera.x) / this.camera.zoom,
+            minY: (-halfH - this.camera.y) / this.camera.zoom,
+            maxY: (halfH - this.camera.y) / this.camera.zoom
+        };
+    }
+
+    /**
      * Convert screen position to world position
      */
     screenToWorld(screenX, screenY) {

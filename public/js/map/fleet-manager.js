@@ -5,13 +5,13 @@ class FleetManager {
     constructor(mapInstance) {
         this.map = mapInstance;
         this.fleets = [];
-        this.fleetUIElements = [];
-        
+        this.fleetUIMap = new Map();
+
         // Animation state
         this.animationOffset = 0;
         this.lastAnimationTime = Date.now();
         this.etaUpdateInterval = null;
-        
+
         // Callbacks for UI events
         this.onFleetAction = null;
     }
@@ -29,7 +29,7 @@ class FleetManager {
      */
     startETACountdown() {
         this.stopETACountdown();
-        
+
         if (this.fleets && this.fleets.some(f => !f.hasArrived)) {
             this.etaUpdateInterval = setInterval(() => {
                 // Update animation offset for fleet line
@@ -37,10 +37,10 @@ class FleetManager {
                 const deltaTime = currentTime - this.lastAnimationTime;
                 this.animationOffset = (this.animationOffset + deltaTime * 0.05) % 28;
                 this.lastAnimationTime = currentTime;
-                
+
                 // Update fleet ETAs
                 this.updateFleetETAs();
-                
+
                 // Request map re-render
                 this.map.render();
             }, 1000);
@@ -62,14 +62,14 @@ class FleetManager {
      */
     updateFleetETAs() {
         if (!this.fleets) return;
-        
+
         const now = Math.floor(Date.now() / 1000);
         let hasInTransitFleets = false;
-        
+
         this.fleets.forEach(fleet => {
             if (!fleet.hasArrived) {
                 fleet.eta = Math.max(0, fleet.timestampArrive - now);
-                
+
                 if (fleet.eta <= 0) {
                     fleet.hasArrived = true;
                     console.log(`Fleet ${fleet.id} has arrived!`);
@@ -78,7 +78,7 @@ class FleetManager {
                 }
             }
         });
-        
+
         if (!hasInTransitFleets) {
             this.stopETACountdown();
         }
@@ -100,7 +100,7 @@ class FleetManager {
 
             // Draw line with arrow for direction
             ctx.beginPath();
-            
+
             if (fleet.hasArrived) {
                 ctx.setLineDash([8, 6]);
                 ctx.strokeStyle = '#ff6b6b';
@@ -109,7 +109,7 @@ class FleetManager {
                 ctx.lineDashOffset = -this.animationOffset;
                 ctx.strokeStyle = '#ffcc00';
             }
-            
+
             ctx.lineWidth = 3;
             ctx.moveTo(sourceIso.x, sourceIso.y);
             ctx.lineTo(targetIso.x, targetIso.y);
@@ -137,15 +137,15 @@ class FleetManager {
         const arrowSize = 15;
         const arrowX = targetIso.x - Math.cos(angle) * 20;
         const arrowY = targetIso.y - Math.sin(angle) * 20;
-        
+
         ctx.save();
         ctx.translate(arrowX, arrowY);
         ctx.rotate(angle);
-        
+
         ctx.fillStyle = '#ffcc00';
         ctx.strokeStyle = '#000';
         ctx.lineWidth = 1.5;
-        
+
         ctx.beginPath();
         ctx.moveTo(arrowSize, 0);
         ctx.lineTo(-arrowSize / 2, -arrowSize / 2);
@@ -153,7 +153,7 @@ class FleetManager {
         ctx.closePath();
         ctx.fill();
         ctx.stroke();
-        
+
         ctx.restore();
     }
 
@@ -162,7 +162,7 @@ class FleetManager {
      */
     drawFleetMarker(ctx, fleet, sourceIso, targetIso) {
         let fleetIconX, fleetIconY;
-        
+
         if (fleet.hasArrived) {
             fleetIconX = targetIso.x;
             fleetIconY = targetIso.y;
@@ -171,7 +171,7 @@ class FleetManager {
             const totalTime = fleet.timestampArrive - (fleet.timestampArrive - fleet.eta);
             const elapsed = totalTime - fleet.eta;
             const progress = Math.min(1, elapsed / totalTime);
-            
+
             fleetIconX = sourceIso.x + (targetIso.x - sourceIso.x) * progress;
             fleetIconY = sourceIso.y + (targetIso.y - sourceIso.y) * progress;
         }
@@ -196,40 +196,82 @@ class FleetManager {
 
     /**
      * Render fleet UI elements (attack buttons, ETA labels) as HTML overlays
+     * Uses DOM pooling to update in place instead of destroy/recreate each frame
      */
     renderFleetUIElements(canvas, camera, coordToPixel) {
-        // Remove existing fleet UI elements
-        this.fleetUIElements.forEach(el => el.remove());
-        this.fleetUIElements = [];
-
         if (!this.fleets || this.fleets.length === 0) {
+            this.fleetUIMap.forEach(function (el) { el.remove(); });
+            this.fleetUIMap.clear();
             return;
         }
 
         const container = canvas.parentElement;
         const canvasRect = canvas.getBoundingClientRect();
         const containerRect = container.getBoundingClientRect();
-        
+
         const offsetX = canvasRect.left - containerRect.left;
         const offsetY = canvasRect.top - containerRect.top;
 
+        var activeFleetIds = new Set();
+
         this.fleets.forEach(fleet => {
             const targetIso = coordToPixel(fleet.targetX, fleet.targetY);
-            
+
             const screenX = (targetIso.x * camera.zoom) + camera.x + canvas.width / 2;
             const screenY = (targetIso.y * camera.zoom) + camera.y + canvas.height / 2;
 
             if (screenX < 0 || screenX > canvas.width || screenY < 0 || screenY > canvas.height) {
+                // Off-screen: hide existing element if any
+                var offEl = this.fleetUIMap.get(fleet.id);
+                if (offEl) {
+                    offEl.style.display = 'none';
+                }
+                activeFleetIds.add(fleet.id);
                 return;
             }
 
             const posX = screenX + offsetX;
             const posY = screenY + offsetY;
+            activeFleetIds.add(fleet.id);
+
+            var existing = this.fleetUIMap.get(fleet.id);
 
             if (fleet.hasArrived) {
-                this.createArrivedFleetWidget(container, fleet, posX, posY);
+                if (existing && existing.dataset.fleetState === 'arrived') {
+                    // Update position only
+                    existing.style.display = '';
+                    existing.style.left = posX + 'px';
+                    existing.style.top = posY + 'px';
+                } else {
+                    // State changed or new — create widget
+                    if (existing) existing.remove();
+                    var widget = this.createArrivedFleetWidget(container, fleet, posX, posY);
+                    widget.dataset.fleetState = 'arrived';
+                    this.fleetUIMap.set(fleet.id, widget);
+                }
             } else {
-                this.createETALabel(container, fleet, posX, posY);
+                if (existing && existing.dataset.fleetState === 'transit') {
+                    // Update position and ETA text only
+                    existing.style.display = '';
+                    existing.style.left = posX + 'px';
+                    existing.style.top = posY + 'px';
+                    existing.textContent = '\uD83D\uDD50 ETA: ' + this.formatETA(fleet.eta);
+                } else {
+                    // New in-transit fleet
+                    if (existing) existing.remove();
+                    var label = this.createETALabel(container, fleet, posX, posY);
+                    label.dataset.fleetState = 'transit';
+                    this.fleetUIMap.set(fleet.id, label);
+                }
+            }
+        });
+
+        // Remove elements for fleets that no longer exist
+        var self = this;
+        this.fleetUIMap.forEach(function (el, fleetId) {
+            if (!activeFleetIds.has(fleetId)) {
+                el.remove();
+                self.fleetUIMap.delete(fleetId);
             }
         });
     }
@@ -240,15 +282,15 @@ class FleetManager {
     createArrivedFleetWidget(container, fleet, posX, posY) {
         const widget = document.createElement('div');
         widget.className = 'fleet-widget';
-        
+
         // Determine if this is a friendly reinforcement or an attack
         const isReinforcement = fleet.targetIsYours === true;
-        const actionButton = isReinforcement 
+        const actionButton = isReinforcement
             ? `<button class="fleet-widget-btn reinforce" data-fleet-id="${fleet.id}" data-action="reinforce">Reinforce</button>`
             : `<button class="fleet-widget-btn attack" data-fleet-id="${fleet.id}" data-action="attack">Attack</button>`;
-        
+
         const title = isReinforcement ? '🛡 Fleet Arrived' : '⚔ Fleet Arrived';
-        
+
         // Build unit details HTML
         let unitsHtml = '';
         if (fleet.units && fleet.units.length > 0) {
@@ -258,7 +300,7 @@ class FleetManager {
             });
             unitsHtml += '</div>';
         }
-        
+
         widget.innerHTML = `
             <div class="fleet-widget-title">${title}</div>
             ${unitsHtml}
@@ -268,12 +310,11 @@ class FleetManager {
             </div>
         `;
         container.appendChild(widget);
-        
-        const widgetWidth = widget.offsetWidth;
-        const widgetHeight = widget.offsetHeight;
-        widget.style.left = (posX - widgetWidth / 2) + 'px';
-        widget.style.top = (posY - widgetHeight - 30) + 'px';
-        
+
+        widget.style.left = posX + 'px';
+        widget.style.top = posY + 'px';
+        widget.style.transform = 'translate(-50%, -100%) translateY(-30px)';
+
         // Attach event listeners based on button type
         if (isReinforcement) {
             widget.querySelector('.fleet-widget-btn.reinforce').addEventListener('click', (e) => {
@@ -292,7 +333,7 @@ class FleetManager {
                 this.handleAttack(fleet, widget);
             });
         }
-        
+
         // Recall button - async call
         widget.querySelector('.fleet-widget-btn.recall').addEventListener('click', (e) => {
             e.stopPropagation();
@@ -301,8 +342,8 @@ class FleetManager {
             button.disabled = true;
             this.handleRecall(fleet, widget);
         });
-        
-        this.fleetUIElements.push(widget);
+
+        return widget;
     }
 
     /**
@@ -310,10 +351,10 @@ class FleetManager {
      */
     async handleRecall(fleet, widget) {
         const buttonsDiv = widget.querySelector('.fleet-widget-buttons');
-        
+
         // Disable buttons and show loading
         buttonsDiv.innerHTML = '<div style="color: #ffcc00;">🔄 Recalling...</div>';
-        
+
         try {
             const response = await fetch(`/game/api/fleet/recall/${fleet.id}`, {
                 method: 'POST',
@@ -321,16 +362,16 @@ class FleetManager {
                     'Content-Type': 'application/json',
                 }
             });
-            
+
             const result = await response.json();
-            
+
             if (result.success) {
                 // Remove fleet from list
                 this.removeFleet(fleet.id);
-                
+
                 // Show success message
                 this.showNotification(result.message, 'success');
-                
+
                 // Re-render map
                 this.map.render();
             } else {
@@ -354,10 +395,10 @@ class FleetManager {
      */
     async handleReinforce(fleet, widget) {
         const buttonsDiv = widget.querySelector('.fleet-widget-buttons');
-        
+
         // Disable buttons and show loading
         buttonsDiv.innerHTML = '<div style="color: #4CAF50;">🛡 Reinforcing...</div>';
-        
+
         try {
             const response = await fetch(`/game/api/fleet/reinforce/${fleet.id}`, {
                 method: 'POST',
@@ -365,16 +406,16 @@ class FleetManager {
                     'Content-Type': 'application/json',
                 }
             });
-            
+
             const result = await response.json();
-            
+
             if (result.success) {
                 // Remove fleet from list
                 this.removeFleet(fleet.id);
-                
+
                 // Show success message
                 this.showNotification(result.message, 'success');
-                
+
                 // Re-render map
                 this.map.render();
             } else {
@@ -405,10 +446,10 @@ class FleetManager {
      */
     async handleAttack(fleet, widget) {
         const buttonsDiv = widget.querySelector('.fleet-widget-buttons');
-        
+
         // Disable buttons and show loading
         buttonsDiv.innerHTML = '<div style="color: #ffcc00;">⚔ Attacking...</div>';
-        
+
         try {
             const response = await fetch(`/game/api/fleet/attack/${fleet.id}`, {
                 method: 'POST',
@@ -416,13 +457,13 @@ class FleetManager {
                     'Content-Type': 'application/json',
                 }
             });
-            
+
             const result = await response.json();
-            
+
             if (result.success) {
                 // Remove fleet from list
                 this.removeFleet(fleet.id);
-                
+
                 // Show battle report in modal
                 this.showBattleReportModal(result);
             } else {
@@ -465,14 +506,14 @@ class FleetManager {
                 </div>
             `;
             document.body.appendChild(modal);
-            
+
             // Add close handlers
-            modal.querySelector('#closeBattleModal').onclick = () => { 
-                modal.style.display = 'none'; 
+            modal.querySelector('#closeBattleModal').onclick = () => {
+                modal.style.display = 'none';
                 this.map.render();
             };
-            modal.querySelector('#closeBattleBtn').onclick = () => { 
-                modal.style.display = 'none'; 
+            modal.querySelector('#closeBattleBtn').onclick = () => {
+                modal.style.display = 'none';
                 this.map.render();
             };
             modal.onclick = (e) => {
@@ -482,11 +523,11 @@ class FleetManager {
                 }
             };
         }
-        
+
         // Build battle report content
         const resultClass = result.hasWon ? 'color: #4CAF50;' : 'color: #f44336;';
         const resultIcon = result.hasWon ? '🏆' : '💀';
-        
+
         let battleLogHtml = '';
         if (result.battleLog && result.battleLog.length > 0) {
             battleLogHtml = '<div style="max-height: 300px; overflow-y: auto; background: #1a1a1a; padding: 10px; border-radius: 4px; margin-top: 10px;">';
@@ -495,7 +536,7 @@ class FleetManager {
             });
             battleLogHtml += '</div>';
         }
-        
+
         const body = modal.querySelector('#battleReportBody');
         body.innerHTML = `
             <div style="text-align: center; margin-bottom: 15px;">
@@ -505,7 +546,7 @@ class FleetManager {
             </div>
             ${battleLogHtml}
         `;
-        
+
         // Show modal
         modal.style.display = 'block';
     }
@@ -531,9 +572,9 @@ class FleetManager {
             animation: slideIn 0.3s ease;
             background: ${type === 'success' ? '#4CAF50' : (type === 'error' ? '#f44336' : '#2196F3')};
         `;
-        
+
         document.body.appendChild(notification);
-        
+
         // Auto-remove after 3 seconds
         setTimeout(() => {
             notification.style.animation = 'slideOut 0.3s ease';
@@ -565,13 +606,12 @@ class FleetManager {
             pointer-events: none;
         `;
         container.appendChild(label);
-        
-        const labelWidth = label.offsetWidth;
-        const labelHeight = label.offsetHeight;
-        label.style.left = (posX - labelWidth / 2) + 'px';
-        label.style.top = (posY - labelHeight - 35) + 'px';
-        
-        this.fleetUIElements.push(label);
+
+        label.style.left = posX + 'px';
+        label.style.top = posY + 'px';
+        label.style.transform = 'translate(-50%, -100%) translateY(-35px)';
+
+        return label;
     }
 
     /**
@@ -579,7 +619,7 @@ class FleetManager {
      */
     formatETA(seconds) {
         if (seconds <= 0) return 'Arrived';
-        
+
         const hours = Math.floor(seconds / 3600);
         const minutes = Math.floor((seconds % 3600) / 60);
         const secs = seconds % 60;
@@ -605,8 +645,8 @@ class FleetManager {
      */
     destroy() {
         this.stopETACountdown();
-        this.fleetUIElements.forEach(el => el.remove());
-        this.fleetUIElements = [];
+        this.fleetUIMap.forEach(function (el) { el.remove(); });
+        this.fleetUIMap.clear();
     }
 }
 

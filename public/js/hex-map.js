@@ -235,14 +235,23 @@ class HexMap {
         this.ctx.save();
         this.cameraController.applyTransform(this.ctx);
 
-        // Render tiles row by row (no depth sorting needed for hex)
-        var sortedSectors = this.sectors.slice().sort(function (a, b) {
-            return (a.y - b.y) || (a.x - b.x);
-        });
+        // Render only visible tiles (view frustum culling)
         var self = this;
-        sortedSectors.forEach(function (sector) {
-            self.renderTile(sector);
-        });
+        var bounds = this.cameraController.getVisibleBounds();
+        var margin = this.config.hexWidth;
+        var minRow = Math.floor((bounds.minY - margin) / this.config.rowStepY) - 1;
+        var maxRow = Math.ceil((bounds.maxY + margin) / this.config.rowStepY) + 1;
+        var minCol = Math.floor((bounds.minX - margin) / this.config.hexWidth) - 1;
+        var maxCol = Math.ceil((bounds.maxX + margin) / this.config.hexWidth) + 1;
+
+        for (var row = minRow; row <= maxRow; row++) {
+            for (var col = minCol; col <= maxCol; col++) {
+                var sector = this.sectorLookup.get(col + ',' + row);
+                if (sector) {
+                    this.renderTile(sector);
+                }
+            }
+        }
 
         // Render fleet lines
         this.fleetManager.renderFleetLines(

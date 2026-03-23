@@ -7,6 +7,17 @@ class TileRenderer {
         this.ctx = ctx;
         this.config = config;
         this.unitRenderer = new UnitRenderer(ctx);
+        this.fogCache = new Map();
+
+        // Pre-compute hex vertex offsets (pointy-top, 6 vertices at 60° intervals from -30°)
+        this.hexVertices = [];
+        for (var i = 0; i < 6; i++) {
+            var angle = (Math.PI / 180) * (60 * i - 30);
+            this.hexVertices.push({
+                dx: config.hexSize * Math.cos(angle),
+                dy: config.hexSize * Math.sin(angle)
+            });
+        }
     }
 
     /**
@@ -222,21 +233,14 @@ class TileRenderer {
      * 6 vertices at 60-degree intervals starting at -30 degrees
      */
     drawHex(pos) {
-        var size = this.config.hexSize;
+        var verts = this.hexVertices;
         this.ctx.beginPath();
-
-        for (var i = 0; i < 6; i++) {
-            var angle = (Math.PI / 180) * (60 * i - 30);
-            var vx = pos.x + size * Math.cos(angle);
-            var vy = pos.y + size * Math.sin(angle);
-
-            if (i === 0) {
-                this.ctx.moveTo(vx, vy);
-            } else {
-                this.ctx.lineTo(vx, vy);
-            }
-        }
-
+        this.ctx.moveTo(pos.x + verts[0].dx, pos.y + verts[0].dy);
+        this.ctx.lineTo(pos.x + verts[1].dx, pos.y + verts[1].dy);
+        this.ctx.lineTo(pos.x + verts[2].dx, pos.y + verts[2].dy);
+        this.ctx.lineTo(pos.x + verts[3].dx, pos.y + verts[3].dy);
+        this.ctx.lineTo(pos.x + verts[4].dx, pos.y + verts[4].dy);
+        this.ctx.lineTo(pos.x + verts[5].dx, pos.y + verts[5].dy);
         this.ctx.closePath();
     }
 
@@ -250,6 +254,66 @@ class TileRenderer {
     }
 
     /**
+     * Get or create a cached fog-of-war off-screen canvas for a given variant
+     */
+    getFogCanvas(variant) {
+        if (this.fogCache.has(variant)) {
+            return this.fogCache.get(variant);
+        }
+
+        var w = Math.ceil(this.config.hexWidth) + 2;
+        var h = Math.ceil(this.config.hexHeight) + 2;
+        var offscreen = document.createElement('canvas');
+        offscreen.width = w;
+        offscreen.height = h;
+        var offCtx = offscreen.getContext('2d');
+
+        // Draw centered at (w/2, h/2)
+        var cx = w / 2;
+        var cy = h / 2;
+        var size = this.config.hexSize;
+
+        // Dark overlay with radial gradient
+        var gradient = offCtx.createRadialGradient(cx, cy, 0, cx, cy, size);
+        gradient.addColorStop(0, 'rgba(25, 25, 35, 0.45)');
+        gradient.addColorStop(1, 'rgba(15, 15, 25, 0.5)');
+        offCtx.fillStyle = gradient;
+        offCtx.fillRect(0, 0, w, h);
+
+        // Static cloud effects (deterministic from variant)
+        var seed = variant * 137;
+        for (var i = 0; i < 2; i++) {
+            var angle = ((seed + i * 100) % 360) * Math.PI / 180;
+            var offsetX = Math.cos(angle) * 12;
+            var offsetY = Math.sin(angle) * 8;
+            var radius = 25 + ((seed + i * 50) % 10);
+
+            var cloudGrad = offCtx.createRadialGradient(
+                cx + offsetX, cy + offsetY, 0,
+                cx + offsetX, cy + offsetY, radius
+            );
+            cloudGrad.addColorStop(0, 'rgba(50, 50, 70, 0.25)');
+            cloudGrad.addColorStop(0.5, 'rgba(40, 40, 60, 0.15)');
+            cloudGrad.addColorStop(1, 'rgba(30, 30, 50, 0)');
+
+            offCtx.fillStyle = cloudGrad;
+            offCtx.fillRect(0, 0, w, h);
+        }
+
+        // Question mark for unknown territory
+        offCtx.fillStyle = 'rgba(160, 160, 180, 0.5)';
+        offCtx.font = 'bold 28px Arial';
+        offCtx.textAlign = 'center';
+        offCtx.textBaseline = 'middle';
+        offCtx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+        offCtx.shadowBlur = 4;
+        offCtx.fillText('?', cx, cy);
+
+        this.fogCache.set(variant, offscreen);
+        return offscreen;
+    }
+
+    /**
      * Render fog of war as a semi-transparent overlay clipped to hex
      */
     renderFogOfWar(pos, tileX, tileY) {
@@ -259,49 +323,15 @@ class TileRenderer {
         this.drawHex(pos);
         this.ctx.clip();
 
-        // Dark overlay with radial gradient
-        var gradient = this.ctx.createRadialGradient(
-            pos.x, pos.y, 0,
-            pos.x, pos.y, this.config.hexSize
-        );
-        gradient.addColorStop(0, 'rgba(25, 25, 35, 0.45)');
-        gradient.addColorStop(1, 'rgba(15, 15, 25, 0.5)');
-        this.ctx.fillStyle = gradient;
-        this.ctx.fill();
-
-        // Static cloud effects (deterministic positions)
+        // Blit cached fog variant
         var seed = tileX * 73 + tileY * 37;
-        for (var i = 0; i < 2; i++) {
-            var angle = ((seed + i * 100) % 360) * Math.PI / 180;
-            var offsetX = Math.cos(angle) * 12;
-            var offsetY = Math.sin(angle) * 8;
-            var radius = 25 + ((seed + i * 50) % 10);
-
-            var cloudGrad = this.ctx.createRadialGradient(
-                pos.x + offsetX, pos.y + offsetY, 0,
-                pos.x + offsetX, pos.y + offsetY, radius
-            );
-            cloudGrad.addColorStop(0, 'rgba(50, 50, 70, 0.25)');
-            cloudGrad.addColorStop(0.5, 'rgba(40, 40, 60, 0.15)');
-            cloudGrad.addColorStop(1, 'rgba(30, 30, 50, 0)');
-
-            this.ctx.fillStyle = cloudGrad;
-            this.ctx.fillRect(
-                pos.x - this.config.hexWidth / 2,
-                pos.y - this.config.hexHeight / 2,
-                this.config.hexWidth,
-                this.config.hexHeight
-            );
-        }
-
-        // Question mark for unknown territory
-        this.ctx.fillStyle = 'rgba(160, 160, 180, 0.5)';
-        this.ctx.font = 'bold 28px Arial';
-        this.ctx.textAlign = 'center';
-        this.ctx.textBaseline = 'middle';
-        this.ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
-        this.ctx.shadowBlur = 4;
-        this.ctx.fillText('?', pos.x, pos.y);
+        var variant = ((seed % 8) + 8) % 8;
+        var fogCanvas = this.getFogCanvas(variant);
+        this.ctx.drawImage(
+            fogCanvas,
+            pos.x - fogCanvas.width / 2,
+            pos.y - fogCanvas.height / 2
+        );
 
         this.ctx.restore();
     }
