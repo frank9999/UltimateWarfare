@@ -43,7 +43,7 @@ class FederationBankActionServiceTest extends TestCase
         int $steel = 200,
         int $food = 300,
         int $hierarchy = Player::FEDERATION_HIERARCHY_GENERAL
-    ): Player {
+    ): Player&MockObject {
         $world = $this->createMock(World::class);
         $world->method('getFederation')->willReturn(true);
 
