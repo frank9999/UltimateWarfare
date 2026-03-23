@@ -620,6 +620,21 @@ Game/Research/Perform:
     path:      /game/research/perform/{researchSlug}
     controller: FrankProjects\UltimateWarfare\Controller\Game\ResearchController::performResearch
 
+Game/Api/Research/Tree:
+    path:      /game/api/research/tree
+    controller: FrankProjects\UltimateWarfare\Controller\Game\ResearchController::researchTreeApi
+    methods: [GET]
+
+Game/Api/Research/Perform:
+    path:      /game/api/research/perform/{researchSlug}
+    controller: FrankProjects\UltimateWarfare\Controller\Game\ResearchController::performResearchApi
+    methods: [POST]
+
+Game/Api/Research/Cancel:
+    path:      /game/api/research/cancel/{researchSlug}
+    controller: FrankProjects\UltimateWarfare\Controller\Game\ResearchController::performCancelApi
+    methods: [POST]
+
 Game/Surrender:
     path:      /game/surrender
     controller: FrankProjects\UltimateWarfare\Controller\Game\SurrenderController::surrender

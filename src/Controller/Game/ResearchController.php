@@ -8,6 +8,7 @@ use FrankProjects\UltimateWarfare\Entity\Player;
 use FrankProjects\UltimateWarfare\Repository\ResearchPlayerRepository;
 use FrankProjects\UltimateWarfare\Repository\ResearchRegistry;
 use FrankProjects\UltimateWarfare\Service\Action\ResearchActionService;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Throwable;
 
@@ -100,6 +101,105 @@ final class ResearchController extends BaseGameController
                 'finishedResearch' => $finishedResearch
             ]
         );
+    }
+
+    public function researchTreeApi(): JsonResponse
+    {
+        $player = $this->getPlayer();
+        $completedSlugs = $this->getCompletedResearchSlugs($player);
+        $ongoingResearchPlayers = $this->researchPlayerRepository->findOngoingByPlayer($player);
+
+        $ongoingMap = [];
+        foreach ($ongoingResearchPlayers as $rp) {
+            $ongoingMap[$rp->getResearchSlug()] = $rp;
+        }
+
+        $allResearch = $this->researchRegistry->findEnabled();
+        $now = time();
+        $researchData = [];
+
+        foreach ($allResearch as $research) {
+            $slug = $research->getSlug();
+
+            if (in_array($slug, $completedSlugs, true)) {
+                $status = 'completed';
+            } elseif (isset($ongoingMap[$slug])) {
+                $status = 'researching';
+            } else {
+                $prerequisiteSlugs = $research->getPrerequisiteSlugs();
+                $allPrerequisitesMet = true;
+                foreach ($prerequisiteSlugs as $prereqSlug) {
+                    if (!in_array($prereqSlug, $completedSlugs, true)) {
+                        $allPrerequisitesMet = false;
+                        break;
+                    }
+                }
+                $status = $allPrerequisitesMet ? 'available' : 'locked';
+            }
+
+            $item = [
+                'slug' => $slug,
+                'name' => $research->getName(),
+                'description' => $research->getDescription(),
+                'image' => $research->getImage(),
+                'cost' => $research->getCost(),
+                'duration' => $research->getTimestamp(),
+                'status' => $status,
+                'prerequisites' => $research->getPrerequisiteSlugs(),
+                'completionTimestamp' => null,
+                'remainingSeconds' => null,
+            ];
+
+            if ($status === 'researching') {
+                $rp = $ongoingMap[$slug];
+                $item['completionTimestamp'] = $rp->getCompletionTimestamp();
+                $item['remainingSeconds'] = max(0, $rp->getCompletionTimestamp() - $now);
+            }
+
+            $researchData[] = $item;
+        }
+
+        return new JsonResponse([
+            'success' => true,
+            'research' => $researchData,
+            'playerCash' => $player->getResources()->getCash(),
+        ]);
+    }
+
+    public function performResearchApi(string $researchSlug): JsonResponse
+    {
+        try {
+            $player = $this->getPlayer();
+            $this->researchActionService->performResearch($researchSlug, $player);
+
+            return new JsonResponse([
+                'success' => true,
+                'message' => 'Successfully started a new research project!',
+                'newCash' => $player->getResources()->getCash(),
+            ]);
+        } catch (Throwable $e) {
+            return new JsonResponse([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    public function performCancelApi(string $researchSlug): JsonResponse
+    {
+        try {
+            $this->researchActionService->performCancel($researchSlug, $this->getPlayer());
+
+            return new JsonResponse([
+                'success' => true,
+                'message' => 'Successfully cancelled your research project!',
+            ]);
+        } catch (Throwable $e) {
+            return new JsonResponse([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ]);
+        }
     }
 
     public function performResearch(string $researchSlug): Response

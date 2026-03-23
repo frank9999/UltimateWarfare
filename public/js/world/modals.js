@@ -235,7 +235,7 @@
     document.getElementById('hqOldInterfaceBtn').onclick = function () { window.location.href = '/game/headquarter'; };
     document.getElementById('hqMarketBtn').onclick = function () { window.location.href = '/game/market'; };
     document.getElementById('hqFederationBtn').onclick = function () { window.location.href = '/game/federation'; };
-    document.getElementById('hqResearchBtn').onclick = function () { window.location.href = '/game/research'; };
+    document.getElementById('hqResearchBtn').onclick = function () { hqModal.style.display = 'none'; document.getElementById('researchBtn').click(); };
     document.getElementById('hqRegionsBtn').onclick = function () { window.location.href = '/game/region-list'; };
     document.getElementById('hqFleetsBtn').onclick = function () { window.location.href = '/game/fleets'; };
     document.getElementById('hqConstructionBtn').onclick = function () { window.location.href = '/game/construction'; };
@@ -254,6 +254,7 @@
         if (event.target === WorldOperations.selectOperationModal) { WorldOperations.selectOperationModal.style.display = 'none'; }
         if (event.target === WorldOperations.operationUnitsModal) { WorldOperations.operationUnitsModal.style.display = 'none'; }
         if (event.target === WorldOperations.operationResultsModal) { WorldOperations.operationResultsModal.style.display = 'none'; }
+        if (event.target === WorldResearch.modal) { WorldResearch.modal.style.display = 'none'; }
     };
 
     // ===== Default tile click handler =====
