@@ -14,16 +14,41 @@
     let buildQuantities = {};
     let availableCategories = [];
 
-    const gameUnitCategories = [
-        { id: 1, name: 'Buildings' },
-        { id: 2, name: 'Defense Buildings' },
-        { id: 3, name: 'Special Buildings' },
-        { id: 5, name: 'Elite Units' },
-        { id: 6, name: 'Troops' },
-        { id: 7, name: 'Naval Units' },
-        { id: 8, name: 'Air Units' },
-        { id: 9, name: 'Missiles' }
-    ];
+    // ===== Build data cache =====
+    var buildDataCache = {};
+    var CACHE_TTL_MS = 30000;
+
+    function getCachedData(regionId) {
+        var entry = buildDataCache[regionId];
+        if (!entry) return null;
+        return entry;
+    }
+
+    function isCacheFresh(regionId) {
+        var entry = buildDataCache[regionId];
+        if (!entry) return false;
+        return (Date.now() - entry.timestamp) < CACHE_TTL_MS;
+    }
+
+    function setCachedData(regionId, data) {
+        buildDataCache[regionId] = { data: data, timestamp: Date.now() };
+    }
+
+    async function fetchAllBuildData(regionId) {
+        var response = await fetch('/game/api/world/region/all-build-data/' + regionId);
+        return await response.json();
+    }
+
+    async function prefetchBuildData(regionId) {
+        try {
+            var result = await fetchAllBuildData(regionId);
+            if (result.success) {
+                setCachedData(regionId, result);
+            }
+        } catch (e) {
+            // Silent failure - next manual open will fetch fresh
+        }
+    }
 
     // ===== Unit Info Tooltip =====
     const unitInfoTooltip = document.getElementById('unitInfoTooltip');
@@ -140,44 +165,29 @@
     }
 
     // ===== Build Data =====
-    async function showBuildModal(region) {
-        selectedBuildRegion = region;
-        buildQuantities = {};
-        document.getElementById('buildRegionCoords').textContent = region.x + ', ' + region.y;
-        buildModal.style.display = 'block';
-
-        const container = document.getElementById('buildUnitsContainer');
-        container.innerHTML = '<div class="build-loading">Loading...</div>';
-
-        const tabsContainer = document.getElementById('buildTabs');
-        tabsContainer.innerHTML = '';
-
-        try {
-            const response = await fetch('/game/api/world/region/available-categories/' + region.id);
-            const result = await response.json();
-            availableCategories = result.success ? result.categories : gameUnitCategories;
-        } catch (error) {
-            console.error('Error loading available categories:', error);
-            availableCategories = gameUnitCategories;
-        }
+    function renderFromCache(result) {
+        availableCategories = result.categories;
 
         if (availableCategories.length === 0) {
+            var container = document.getElementById('buildUnitsContainer');
             container.innerHTML = '<div class="build-loading">No build options available for this region.</div>';
             return;
         }
 
         selectedGameUnitCategoryId = availableCategories[0].id;
 
-        availableCategories.forEach(function (type, index) {
-            const tab = document.createElement('div');
+        var tabsContainer = document.getElementById('buildTabs');
+        tabsContainer.innerHTML = '';
+        availableCategories.forEach(function (cat, index) {
+            var tab = document.createElement('div');
             tab.className = 'build-tab' + (index === 0 ? ' active' : '');
-            tab.textContent = type.name;
+            tab.textContent = cat.name;
             tab.addEventListener('click', function () {
-                selectedGameUnitCategoryId = type.id;
+                selectedGameUnitCategoryId = cat.id;
                 document.querySelectorAll('#buildTabs .build-tab').forEach(function (t, i) {
-                    t.classList.toggle('active', availableCategories[i].id === type.id);
+                    t.classList.toggle('active', availableCategories[i].id === cat.id);
                 });
-                loadBuildData(type.id);
+                loadBuildData(cat.id);
             });
             tabsContainer.appendChild(tab);
         });
@@ -185,24 +195,70 @@
         loadBuildData(selectedGameUnitCategoryId);
     }
 
-    async function loadBuildData(gameUnitCategoryId) {
-        const container = document.getElementById('buildUnitsContainer');
-        container.innerHTML = '<div class="build-loading">Loading units...</div>';
+    async function showBuildModal(region) {
+        selectedBuildRegion = region;
+        buildQuantities = {};
+        document.getElementById('buildRegionCoords').textContent = region.x + ', ' + region.y;
+        buildModal.style.display = 'block';
+
+        var container = document.getElementById('buildUnitsContainer');
+        var tabsContainer = document.getElementById('buildTabs');
+
+        var cached = getCachedData(region.id);
+        if (cached) {
+            // Render from cache immediately
+            renderFromCache(cached.data);
+
+            // If cache is stale, re-fetch in background and update if data changed
+            if (!isCacheFresh(region.id)) {
+                try {
+                    var result = await fetchAllBuildData(region.id);
+                    if (result.success) {
+                        setCachedData(region.id, result);
+                        // Re-render current tab if modal is still showing this region
+                        if (selectedBuildRegion && selectedBuildRegion.id === region.id) {
+                            loadBuildData(selectedGameUnitCategoryId);
+                        }
+                    }
+                } catch (e) {
+                    // Keep showing stale data
+                }
+            }
+            return;
+        }
+
+        // No cache - show loading and fetch
+        container.innerHTML = '<div class="build-loading">Loading...</div>';
+        tabsContainer.innerHTML = '';
 
         try {
-            const response = await fetch('/game/api/world/region/build-data/' + selectedBuildRegion.id + '/' + gameUnitCategoryId);
-            const result = await response.json();
-
+            var result = await fetchAllBuildData(region.id);
             if (result.success) {
-                currentBuildData = result;
-                renderBuildUnits(result);
+                setCachedData(region.id, result);
+                renderFromCache(result);
             } else {
                 container.innerHTML = '<div class="build-loading" style="color: #f44336;">' + result.message + '</div>';
             }
         } catch (error) {
             console.error('Error loading build data:', error);
-            container.innerHTML = '<div class="build-loading" style="color: #f44336;">Failed to load units</div>';
+            container.innerHTML = '<div class="build-loading" style="color: #f44336;">Failed to load build data</div>';
         }
+    }
+
+    function loadBuildData(gameUnitCategoryId) {
+        var cached = selectedBuildRegion ? getCachedData(selectedBuildRegion.id) : null;
+        if (!cached) return;
+
+        var category = cached.data.categories.find(function (c) { return c.id === gameUnitCategoryId; });
+        if (!category) return;
+
+        buildQuantities = {};
+        currentBuildData = {
+            gameUnitCategory: { id: category.id, name: category.name },
+            spaceLeft: cached.data.spaceLeft,
+            units: category.units
+        };
+        renderBuildUnits(currentBuildData);
     }
 
     function renderBuildUnits(data) {
@@ -298,6 +354,12 @@
 
                 showNotification(result.message, 'success');
                 buildModal.style.display = 'none';
+
+                // Invalidate cache and prefetch fresh data in background
+                var regionId = selectedBuildRegion.id;
+                delete buildDataCache[regionId];
+                prefetchBuildData(regionId);
+
                 selectedBuildRegion = null;
                 buildQuantities = {};
             } else {
@@ -319,6 +381,7 @@
     // Expose globally
     window.WorldBuild = {
         showBuildModal: showBuildModal,
+        prefetchBuildData: prefetchBuildData,
         modal: buildModal
     };
 })();

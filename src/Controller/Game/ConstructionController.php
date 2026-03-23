@@ -262,7 +262,7 @@ final class ConstructionController extends BaseGameController
         }
     }
 
-    public function getAvailableCategoriesApi(int $regionId): JsonResponse
+    public function getAllBuildDataApi(int $regionId): JsonResponse
     {
         try {
             $worldRegion = $this->regionActionService->getWorldRegionByIdAndPlayer($regionId, $this->getPlayer());
@@ -274,8 +274,11 @@ final class ConstructionController extends BaseGameController
         }
 
         $regionType = $worldRegion->getType();
+        $waterTypes = ['deep_water', 'water', 'shallow_water', 'sand'];
+        $isSandOrWater = in_array($regionType, $waterTypes, true);
+        $isSand = $regionType === 'sand';
 
-        // Count relevant buildings in this region
+        // Detect relevant buildings in this region (units + constructions in progress)
         $hasBarrack = false;
         $hasFactory = false;
         $hasAirport = false;
@@ -284,9 +287,7 @@ final class ConstructionController extends BaseGameController
 
         foreach ($worldRegion->getWorldRegionUnits() as $worldRegionUnit) {
             $unitName = $worldRegionUnit->getGameUnit()->getRowName();
-            $amount = $worldRegionUnit->getAmount();
-
-            if ($amount < 1) {
+            if ($worldRegionUnit->getAmount() < 1) {
                 continue;
             }
 
@@ -300,11 +301,8 @@ final class ConstructionController extends BaseGameController
             };
         }
 
-        // Also check constructions in progress
         foreach ($worldRegion->getConstructions() as $construction) {
-            $unitName = $construction->getGameUnit()->getRowName();
-
-            match ($unitName) {
+            match ($construction->getGameUnit()->getRowName()) {
                 'barrack' => $hasBarrack = true,
                 'factory' => $hasFactory = true,
                 'airport' => $hasAirport = true,
@@ -314,183 +312,106 @@ final class ConstructionController extends BaseGameController
             };
         }
 
-        $isSand = $regionType === 'sand';
-        $isWater = $regionType === 'water';
-
-        $categories = [];
-
-        // Buildings - always visible
-        $categories[] = ['id' => GameUnitCategory::BUILDINGS->value, 'name' => GameUnitCategory::BUILDINGS->getLabel()];
-
-        // Defense Buildings - always visible, but sea mines filtered per-unit by behavior
-        $categories[] = [
-            'id' => GameUnitCategory::DEFENSE_BUILDINGS->value,
-            'name' => GameUnitCategory::DEFENSE_BUILDINGS->getLabel(),
+        // Determine available categories based on buildings
+        $availableCategories = [
+            GameUnitCategory::BUILDINGS,
+            GameUnitCategory::DEFENSE_BUILDINGS,
+            GameUnitCategory::SPECIAL_BUILDINGS,
         ];
 
-        // Special Buildings - always visible, but harbor filtered per-unit by behavior
-        $categories[] = [
-            'id' => GameUnitCategory::SPECIAL_BUILDINGS->value,
-            'name' => GameUnitCategory::SPECIAL_BUILDINGS->getLabel(),
-        ];
-
-        // Troops - only when barrack exists (tanks further filtered by factory via behavior)
         if ($hasBarrack) {
-            $categories[] = ['id' => GameUnitCategory::TROOPS->value, 'name' => GameUnitCategory::TROOPS->getLabel()];
+            $availableCategories[] = GameUnitCategory::TROOPS;
+            $availableCategories[] = GameUnitCategory::SPECIAL_UNITS;
         }
-
-        // Elite Units - only when barrack exists
-        if ($hasBarrack) {
-            $categories[] = [
-                'id' => GameUnitCategory::SPECIAL_UNITS->value,
-                'name' => GameUnitCategory::SPECIAL_UNITS->getLabel(),
-            ];
-        }
-
-        // Air Units - only when airport exists
         if ($hasAirport) {
-            $categories[] = [
-                'id' => GameUnitCategory::AIR_UNITS->value,
-                'name' => GameUnitCategory::AIR_UNITS->getLabel(),
-            ];
+            $availableCategories[] = GameUnitCategory::AIR_UNITS;
         }
-
-        // Naval Units - only when harbor exists
         if ($hasHarbor) {
-            $categories[] = [
-                'id' => GameUnitCategory::NAVAL_UNITS->value,
-                'name' => GameUnitCategory::NAVAL_UNITS->getLabel(),
-            ];
+            $availableCategories[] = GameUnitCategory::NAVAL_UNITS;
         }
-
-        // Missiles - only when missile silo exists
         if ($hasMissileSilo) {
-            $categories[] = [
-                'id' => GameUnitCategory::MISSILES->value,
-                'name' => GameUnitCategory::MISSILES->getLabel(),
-            ];
+            $availableCategories[] = GameUnitCategory::MISSILES;
         }
 
-        return new JsonResponse([
-            'success' => true,
-            'categories' => $categories,
-            'regionType' => $regionType,
-        ]);
-    }
-
-    public function getBuildDataApi(int $regionId, int $gameUnitCategoryId): JsonResponse
-    {
-        try {
-            $worldRegion = $this->regionActionService->getWorldRegionByIdAndPlayer($regionId, $this->getPlayer());
-        } catch (WorldRegionNotFoundException $e) {
-            return new JsonResponse([
-                'success' => false,
-                'message' => $e->getMessage()
-            ], 400);
-        }
-
-        $gameUnitCategory = GameUnitCategory::fromInteger($gameUnitCategoryId);
-        if ($gameUnitCategory === null) {
-            return new JsonResponse([
-                'success' => false,
-                'message' => 'Unknown GameUnitCategory!'
-            ], 400);
-        }
-
+        // Query unit counts and construction counts once for the entire region
         $gameUnitData = $this->worldRegionRepository->getWorldGameUnitSumByWorldRegion($worldRegion);
         $constructionData = $this->constructionRepository->getGameUnitConstructionSumByWorldRegion($worldRegion);
-        $spaceLeft = $this->constructionActionService->getBuildingSpaceLeft($gameUnitCategory, $worldRegion);
+        $spaceLeft = $this->constructionActionService->getBuildingSpaceLeft(GameUnitCategory::BUILDINGS, $worldRegion);
+        $player = $this->getPlayer();
 
-        $regionType = $worldRegion->getType();
-        $waterTypes = ['deep_water', 'water', 'shallow_water', 'sand'];
-        $isSandOrWater = in_array($regionType, $waterTypes, true);
-        $isSand = $regionType === 'sand';
+        $categories = [];
+        foreach ($availableCategories as $gameUnitCategory) {
+            $gameUnits = $this->gameUnitRepository->findByGameUnitCategory($gameUnitCategory);
+            $units = [];
 
-        // Check if factory exists in this region (for tank filtering in troops tab)
-        $hasFactory = false;
-        foreach ($worldRegion->getWorldRegionUnits() as $worldRegionUnit) {
-            if ($worldRegionUnit->getGameUnit()->getRowName() === 'factory' && $worldRegionUnit->getAmount() >= 1) {
-                $hasFactory = true;
-                break;
-            }
-        }
+            foreach ($gameUnits as $gameUnit) {
+                $rowName = $gameUnit->getRowName();
 
-        if (!$hasFactory) {
-            foreach ($worldRegion->getConstructions() as $construction) {
-                if ($construction->getGameUnit()->getRowName() === 'factory') {
-                    $hasFactory = true;
-                    break;
+                // Filter harbor from special buildings when region is not sand
+                if ($gameUnitCategory === GameUnitCategory::SPECIAL_BUILDINGS && $rowName === 'harbor' && !$isSand) {
+                    continue;
                 }
+
+                // Filter sea mines from defense buildings when region is not sand or water
+                if (
+                    $gameUnitCategory === GameUnitCategory::DEFENSE_BUILDINGS
+                    && $rowName === 'sea_mine'
+                    && !$isSandOrWater
+                ) {
+                    continue;
+                }
+
+                $behavior = $this->behaviorFactory->create($gameUnit);
+                $canBuild = $behavior->canBuild($worldRegion, $player);
+
+                // Filter tanks from troops when no factory
+                if ($gameUnitCategory === GameUnitCategory::TROOPS && $rowName === 'tank' && !$hasFactory) {
+                    $canBuild = false;
+                }
+
+                $units[] = [
+                    'id' => $gameUnit->getId(),
+                    'name' => $gameUnit->getName(),
+                    'description' => $gameUnit->getDescription(),
+                    'image' => $gameUnit->getImage(),
+                    'imageDir' => $gameUnitCategory->getImageDir(),
+                    'costCash' => $gameUnit->getCost()->getCash(),
+                    'costWood' => $gameUnit->getCost()->getWood(),
+                    'costSteel' => $gameUnit->getCost()->getSteel(),
+                    'costFood' => $gameUnit->getCost()->getFood(),
+                    'incomeCash' => $gameUnit->getIncome()->getCash(),
+                    'incomeWood' => $gameUnit->getIncome()->getWood(),
+                    'incomeSteel' => $gameUnit->getIncome()->getSteel(),
+                    'incomeFood' => $gameUnit->getIncome()->getFood(),
+                    'upkeepCash' => $gameUnit->getUpkeep()->getCash(),
+                    'upkeepWood' => $gameUnit->getUpkeep()->getWood(),
+                    'upkeepSteel' => $gameUnit->getUpkeep()->getSteel(),
+                    'upkeepFood' => $gameUnit->getUpkeep()->getFood(),
+                    'netWorth' => $gameUnit->getNetWorth(),
+                    'timestamp' => $gameUnit->getTimestamp(),
+                    'canBuild' => $canBuild,
+                    'buildRequirement' => $canBuild ? '' : (
+                        $gameUnitCategory === GameUnitCategory::TROOPS && $rowName === 'tank' && !$hasFactory
+                            ? 'Requires a Factory'
+                            : $behavior->getBuildRequirementDescription()
+                    ),
+                    'owned' => $gameUnitData[$gameUnit->getId()] ?? 0,
+                    'inConstruction' => $constructionData[$gameUnit->getId()] ?? 0,
+                ];
             }
-        }
 
-        $gameUnits = $this->gameUnitRepository->findByGameUnitCategory($gameUnitCategory);
-        $units = [];
-        foreach ($gameUnits as $gameUnit) {
-            $rowName = $gameUnit->getRowName();
-
-            // Filter harbor from special buildings when region is not sand
-            if ($gameUnitCategory === GameUnitCategory::SPECIAL_BUILDINGS && $rowName === 'harbor' && !$isSand) {
-                continue;
-            }
-
-            // Filter sea mines from defense buildings when region is not sand or water
-            if (
-                $gameUnitCategory === GameUnitCategory::DEFENSE_BUILDINGS
-                && $rowName === 'sea_mine'
-                && !$isSandOrWater
-            ) {
-                continue;
-            }
-
-            // Check if unit can be built here
-            $behavior = $this->behaviorFactory->create($gameUnit);
-            $canBuild = $behavior->canBuild($worldRegion, $this->getPlayer());
-
-            // Filter tanks from troops when no factory
-            if ($gameUnitCategory === GameUnitCategory::TROOPS && $rowName === 'tank' && !$hasFactory) {
-                $canBuild = false;
-            }
-
-            $units[] = [
-                'id' => $gameUnit->getId(),
-                'name' => $gameUnit->getName(),
-                'description' => $gameUnit->getDescription(),
-                'image' => $gameUnit->getImage(),
-                'imageDir' => $gameUnitCategory->getImageDir(),
-                'costCash' => $gameUnit->getCost()->getCash(),
-                'costWood' => $gameUnit->getCost()->getWood(),
-                'costSteel' => $gameUnit->getCost()->getSteel(),
-                'costFood' => $gameUnit->getCost()->getFood(),
-                'incomeCash' => $gameUnit->getIncome()->getCash(),
-                'incomeWood' => $gameUnit->getIncome()->getWood(),
-                'incomeSteel' => $gameUnit->getIncome()->getSteel(),
-                'incomeFood' => $gameUnit->getIncome()->getFood(),
-                'upkeepCash' => $gameUnit->getUpkeep()->getCash(),
-                'upkeepWood' => $gameUnit->getUpkeep()->getWood(),
-                'upkeepSteel' => $gameUnit->getUpkeep()->getSteel(),
-                'upkeepFood' => $gameUnit->getUpkeep()->getFood(),
-                'netWorth' => $gameUnit->getNetWorth(),
-                'timestamp' => $gameUnit->getTimestamp(),
-                'canBuild' => $canBuild,
-                'buildRequirement' => $canBuild ? '' : (
-                    $gameUnitCategory === GameUnitCategory::TROOPS && $rowName === 'tank' && !$hasFactory
-                        ? 'Requires a Factory'
-                        : $behavior->getBuildRequirementDescription()
-                ),
-                'owned' => $gameUnitData[$gameUnit->getId()] ?? 0,
-                'inConstruction' => $constructionData[$gameUnit->getId()] ?? 0
+            $categories[] = [
+                'id' => $gameUnitCategory->value,
+                'name' => $gameUnitCategory->getLabel(),
+                'units' => $units,
             ];
         }
 
         return new JsonResponse([
             'success' => true,
-            'gameUnitCategory' => [
-                'id' => $gameUnitCategory->value,
-                'name' => $gameUnitCategory->getLabel()
-            ],
+            'regionType' => $regionType,
             'spaceLeft' => $spaceLeft,
-            'units' => $units
+            'categories' => $categories,
         ]);
     }
 }

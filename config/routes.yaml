@@ -697,13 +697,12 @@ Game/World/Region/Build/Api:
         regionId: '\d+'
         gameUnitCategoryId: '\d+'
 
-Game/World/Region/BuildData/Api:
-    path:      /game/api/world/region/build-data/{regionId}/{gameUnitCategoryId}
-    controller: FrankProjects\UltimateWarfare\Controller\Game\ConstructionController::getBuildDataApi
-    methods: [GET]
+Game/Api/Region/AllBuildData:
+    path:      /game/api/world/region/all-build-data/{regionId}
+    controller: FrankProjects\UltimateWarfare\Controller\Game\ConstructionController::getAllBuildDataApi
+    methods:   [GET]
     requirements:
         regionId: '\d+'
-        gameUnitCategoryId: '\d+'
 
 Game/World/Region/Buy:
     path:      /game/world/region/buy/{regionId}
@@ -780,10 +779,6 @@ Game/Story/Chapter1:
     requirements:
         page: '\d+'
 
-Game/Api/Region/AvailableCategories:
-    path:      /game/api/world/region/available-categories/{regionId}
-    controller: FrankProjects\UltimateWarfare\Controller\Game\ConstructionController::getAvailableCategoriesApi
-    methods:   [GET]
 
 Guide:
     path:      /guide

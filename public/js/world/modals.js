@@ -209,6 +209,9 @@
             '<p><strong>Owner:</strong> <span style="color: #6bafff;">You</span></p>' +
             '</div></div>';
         yourModal.style.display = 'block';
+
+        // Preload build data while user views region info
+        WorldBuild.prefetchBuildData(region.id);
     }
 
     closeYourModal.onclick = function () { yourModal.style.display = 'none'; selectedYourRegion = null; };
