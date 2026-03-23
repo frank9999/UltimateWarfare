@@ -3,13 +3,22 @@
  * Depends on: notifications.js, modals.js (WorldApp.defaultTileClick)
  */
 (function () {
-    const worldRegions = WorldApp.worldRegions;
-    const playerFleets = WorldApp.playerFleets;
-    const playerBombardments = WorldApp.playerBombardments || [];
+    var worldRegions = WorldApp.worldRegions;
+    var playerFleets = WorldApp.playerFleets;
+    var playerBombardments = WorldApp.playerBombardments || [];
+
+    // Find the player's first owned region for centering
+    var homeRegion = null;
+    for (var i = 0; i < worldRegions.length; i++) {
+        if (worldRegions[i].isYours) {
+            homeRegion = worldRegions[i];
+            break;
+        }
+    }
 
     console.log('Loading ' + worldRegions.length + ' world regions...');
 
-    const worldMap = new HexMap('worldMap', {
+    var worldMap = new HexMap('worldMap', {
         hexSize: 40,
         imageBasePath: WorldApp.imageBasePath,
         overlaysEnabled: false,
@@ -18,10 +27,19 @@
 
     WorldApp.worldMap = worldMap;
 
+    function centerOnHomeRegion() {
+        if (homeRegion) {
+            var pos = worldMap.hexToPixel(homeRegion.x, homeRegion.y);
+            worldMap.cameraController.resetView(pos.x, pos.y);
+        } else {
+            worldMap.cameraController.resetView();
+        }
+    }
+
     worldMap.setSectors(worldRegions).then(function () {
         worldMap.setFleets(playerFleets);
         worldMap.setBombardments(playerBombardments);
-        worldMap.render();
+        centerOnHomeRegion();
         console.log('World map loaded successfully with ' + worldRegions.length + ' regions!');
     }).catch(function (error) {
         console.error('Failed to load world map:', error);
@@ -29,14 +47,16 @@
     });
 
     // ===== UI Controls =====
+    var overlayLegend = document.getElementById('overlayLegend');
+
     document.getElementById('toggleOverlay').addEventListener('click', function () {
         worldMap.config.overlaysEnabled = !worldMap.config.overlaysEnabled;
-        this.textContent = worldMap.config.overlaysEnabled ? 'Hide Overlays' : 'Show Overlays';
+        overlayLegend.style.display = worldMap.config.overlaysEnabled ? 'flex' : 'none';
         worldMap.render();
     });
 
     document.getElementById('resetViewBtn').addEventListener('click', function () {
-        worldMap.cameraController.resetView();
+        centerOnHomeRegion();
     });
 
     document.getElementById('zoomInBtn').addEventListener('click', function () {
@@ -53,32 +73,32 @@
     });
 
     window.addEventListener('click', function () {
-        const dropdown = document.getElementById('profileDropdown');
+        var dropdown = document.getElementById('profileDropdown');
         if (dropdown && dropdown.classList.contains('show')) {
             dropdown.classList.remove('show');
         }
     });
 
     // ===== Unit Tooltip =====
-    const unitTooltip = document.getElementById('unitTooltip');
+    var unitTooltip = document.getElementById('unitTooltip');
 
     worldMap.canvas.addEventListener('mousemove', function (e) {
-        const rect = worldMap.canvas.getBoundingClientRect();
-        const mouseX = e.clientX - rect.left;
-        const mouseY = e.clientY - rect.top;
+        var rect = worldMap.canvas.getBoundingClientRect();
+        var mouseX = e.clientX - rect.left;
+        var mouseY = e.clientY - rect.top;
 
-        const worldPos = worldMap.cameraController.screenToWorld(mouseX, mouseY);
-        let foundIcon = null;
+        var worldPos = worldMap.cameraController.screenToWorld(mouseX, mouseY);
+        var foundIcon = null;
 
-        for (let i = 0; i < worldMap.sectors.length; i++) {
-            const region = worldMap.sectors[i];
+        for (var i = 0; i < worldMap.sectors.length; i++) {
+            var region = worldMap.sectors[i];
             if (!region.iconPositions) continue;
 
-            for (let j = 0; j < region.iconPositions.length; j++) {
-                const icon = region.iconPositions[j];
-                const dx = worldPos.x - icon.x;
-                const dy = worldPos.y - icon.y;
-                const distance = Math.sqrt(dx * dx + dy * dy);
+            for (var j = 0; j < region.iconPositions.length; j++) {
+                var icon = region.iconPositions[j];
+                var dx = worldPos.x - icon.x;
+                var dy = worldPos.y - icon.y;
+                var distance = Math.sqrt(dx * dx + dy * dy);
 
                 if (distance <= icon.size) {
                     foundIcon = { icon: icon, region: region };
@@ -89,8 +109,8 @@
         }
 
         if (foundIcon) {
-            const fi = foundIcon.icon;
-            let tooltipHtml = '<div class="tooltip-title" style="color: ' + fi.color + '">' + fi.label + '</div>';
+            var fi = foundIcon.icon;
+            var tooltipHtml = '<div class="tooltip-title" style="color: ' + fi.color + '">' + fi.label + '</div>';
 
             if (fi.details && fi.details.length > 0) {
                 fi.details.forEach(function (unit) {

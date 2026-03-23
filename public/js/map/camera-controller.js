@@ -169,9 +169,14 @@ class CameraController {
         this.camera.y = 0;
     }
 
-    resetView() {
+    resetView(worldX, worldY) {
         this.camera.zoom = 1.0;
-        this.centerCamera();
+        if (worldX !== undefined && worldY !== undefined) {
+            this.camera.x = -worldX;
+            this.camera.y = -worldY;
+        } else {
+            this.centerCamera();
+        }
         this.requestRender();
     }
 
