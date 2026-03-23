@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace FrankProjects\UltimateWarfare\Service;
 
+use FrankProjects\UltimateWarfare\Entity\BombardmentCooldown;
 use FrankProjects\UltimateWarfare\Entity\Operation;
 use FrankProjects\UltimateWarfare\Entity\WorldRegion;
+use FrankProjects\UltimateWarfare\Repository\BombardmentCooldownRepository;
 use FrankProjects\UltimateWarfare\Repository\ConstructionRepository;
 use FrankProjects\UltimateWarfare\Repository\PlayerRepository;
 use FrankProjects\UltimateWarfare\Repository\WorldRegionRepository;
@@ -16,6 +18,8 @@ use RuntimeException;
 
 final class OperationService
 {
+    private const int BOMBARDMENT_COOLDOWN_SECONDS = 600;
+
     private ReportCreator $reportCreator;
     private NetWorthUpdaterService $netWorthUpdaterService;
     private IncomeUpdaterService $incomeUpdaterService;
@@ -23,6 +27,7 @@ final class OperationService
     private WorldRegionUnitRepository $worldRegionUnitRepository;
     private WorldRegionRepository $worldRegionRepository;
     private ConstructionRepository $constructionRepository;
+    private BombardmentCooldownRepository $bombardmentCooldownRepository;
 
     public function __construct(
         ReportCreator $reportCreator,
@@ -31,7 +36,8 @@ final class OperationService
         PlayerRepository $playerRepository,
         WorldRegionUnitRepository $worldRegionUnitRepository,
         WorldRegionRepository $worldRegionRepository,
-        ConstructionRepository $constructionRepository
+        ConstructionRepository $constructionRepository,
+        BombardmentCooldownRepository $bombardmentCooldownRepository
     ) {
         $this->reportCreator = $reportCreator;
         $this->netWorthUpdaterService = $netWorthUpdaterService;
@@ -40,6 +46,7 @@ final class OperationService
         $this->worldRegionUnitRepository = $worldRegionUnitRepository;
         $this->worldRegionRepository = $worldRegionRepository;
         $this->constructionRepository = $constructionRepository;
+        $this->bombardmentCooldownRepository = $bombardmentCooldownRepository;
     }
 
     /**
@@ -53,6 +60,7 @@ final class OperationService
     ): array {
         $this->ensureCanExecute($region, $operation, $playerRegion, $amount);
         $this->hasWorldRegionGameUnitAmount($playerRegion, $operation, $amount);
+        $this->ensureNoBombardmentCooldown($playerRegion, $operation);
 
         $player = $playerRegion->getPlayer();
         if ($player === null) {
@@ -74,6 +82,8 @@ final class OperationService
             $this->constructionRepository
         );
         $operationResults = $operationProcessor->execute();
+
+        $this->createBombardmentCooldown($region, $operation, $playerRegion);
 
         $regionPlayer = $region->getPlayer();
         if ($regionPlayer !== null) {
@@ -142,5 +152,39 @@ final class OperationService
             }
         }
         throw new RuntimeException("Not enough game units");
+    }
+
+    private function ensureNoBombardmentCooldown(WorldRegion $playerRegion, Operation $operation): void
+    {
+        $cooldown = $this->bombardmentCooldownRepository->findActiveByWorldRegionAndOperation(
+            $playerRegion,
+            $operation->getSlug()
+        );
+
+        if ($cooldown !== null) {
+            $remaining = $cooldown->getCooldownUntil() - time();
+            $minutes = intval($remaining / 60);
+            $seconds = $remaining % 60;
+            throw new RuntimeException("Units are recharging. Ready in {$minutes}m {$seconds}s");
+        }
+    }
+
+    private function createBombardmentCooldown(
+        WorldRegion $region,
+        Operation $operation,
+        WorldRegion $playerRegion
+    ): void {
+        if (!$operation->hasCooldown()) {
+            return;
+        }
+
+        $cooldown = BombardmentCooldown::create(
+            $operation->getSlug(),
+            $playerRegion,
+            $region,
+            time() + self::BOMBARDMENT_COOLDOWN_SECONDS
+        );
+
+        $this->bombardmentCooldownRepository->save($cooldown);
     }
 }

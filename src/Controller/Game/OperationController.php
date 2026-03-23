@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace FrankProjects\UltimateWarfare\Controller\Game;
 
 use FrankProjects\UltimateWarfare\Exception\WorldRegionNotFoundException;
+use FrankProjects\UltimateWarfare\Repository\BombardmentCooldownRepository;
 use FrankProjects\UltimateWarfare\Repository\GameUnitRepository;
 use FrankProjects\UltimateWarfare\Repository\OperationRegistry;
 use FrankProjects\UltimateWarfare\Repository\WorldRegionRepository;
@@ -24,6 +25,7 @@ final class OperationController extends BaseGameController
     private RegionActionService $regionActionService;
     private OperationService $operationService;
     private DistanceCalculator $distanceCalculator;
+    private BombardmentCooldownRepository $bombardmentCooldownRepository;
 
     public function __construct(
         OperationRegistry $operationRegistry,
@@ -31,7 +33,8 @@ final class OperationController extends BaseGameController
         WorldRegionRepository $worldRegionRepository,
         RegionActionService $regionActionService,
         OperationService $operationService,
-        DistanceCalculator $distanceCalculator
+        DistanceCalculator $distanceCalculator,
+        BombardmentCooldownRepository $bombardmentCooldownRepository
     ) {
         $this->operationRegistry = $operationRegistry;
         $this->gameUnitRepository = $gameUnitRepository;
@@ -39,6 +42,7 @@ final class OperationController extends BaseGameController
         $this->regionActionService = $regionActionService;
         $this->operationService = $operationService;
         $this->distanceCalculator = $distanceCalculator;
+        $this->bombardmentCooldownRepository = $bombardmentCooldownRepository;
     }
 
     /**
@@ -320,6 +324,17 @@ final class OperationController extends BaseGameController
                 continue;
             }
 
+            // Skip regions with active bombardment cooldowns
+            if ($operation->hasCooldown()) {
+                $cooldown = $this->bombardmentCooldownRepository->findActiveByWorldRegionAndOperation(
+                    $playerRegion,
+                    $operation->getSlug()
+                );
+                if ($cooldown !== null) {
+                    continue;
+                }
+            }
+
             $eligibleRegions[] = [
                 'regionId' => $playerRegion->getId(),
                 'x' => $playerRegion->getX(),
@@ -409,12 +424,31 @@ final class OperationController extends BaseGameController
                 $amount
             );
 
-            return new JsonResponse([
+            $response = [
                 'success' => true,
                 'message' => 'Operation executed!',
                 'results' => $operationResults,
                 'newCash' => $player->getResources()->getCash(),
-            ]);
+            ];
+
+            if ($operation->hasCooldown()) {
+                $cooldown = $this->bombardmentCooldownRepository->findActiveByWorldRegionAndOperation(
+                    $playerRegion,
+                    $operation->getSlug()
+                );
+                if ($cooldown !== null) {
+                    $response['bombardmentCooldown'] = [
+                        'sourceX' => $playerRegion->getX(),
+                        'sourceY' => $playerRegion->getY(),
+                        'targetX' => $worldRegion->getX(),
+                        'targetY' => $worldRegion->getY(),
+                        'cooldownUntil' => $cooldown->getCooldownUntil(),
+                        'remainingSeconds' => max(0, $cooldown->getCooldownUntil() - time()),
+                    ];
+                }
+            }
+
+            return new JsonResponse($response);
         } catch (Throwable $e) {
             return new JsonResponse([
                 'success' => false,

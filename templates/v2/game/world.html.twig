@@ -14,6 +14,7 @@
     <script src="{{ asset('js/map/unit-renderer.js') }}"></script>
     <script src="{{ asset('js/map/tile-renderer.js') }}"></script>
     <script src="{{ asset('js/map/fleet-manager.js') }}"></script>
+    <script src="{{ asset('js/map/bombardment-manager.js') }}"></script>
     <script src="{{ asset('js/hex-map.js') }}"></script>
 {% endblock javascripts %}
 
@@ -75,6 +76,18 @@
                     eta: {{ fleet.eta }},
                     unitCount: {{ fleet.unitCount }},
                     units: {{ fleet.units|json_encode|raw }}
+                }{% if not loop.last %},{% endif %}
+                {% endfor %}
+            ],
+            playerBombardments: [
+                {% for bombardment in bombardments %}
+                {
+                    sourceX: {{ bombardment.sourceX }},
+                    sourceY: {{ bombardment.sourceY }},
+                    targetX: {{ bombardment.targetX }},
+                    targetY: {{ bombardment.targetY }},
+                    cooldownUntil: {{ bombardment.cooldownUntil }},
+                    remainingSeconds: {{ bombardment.remainingSeconds }}
                 }{% if not loop.last %},{% endif %}
                 {% endfor %}
             ]

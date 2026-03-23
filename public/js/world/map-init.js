@@ -5,6 +5,7 @@
 (function () {
     const worldRegions = WorldApp.worldRegions;
     const playerFleets = WorldApp.playerFleets;
+    const playerBombardments = WorldApp.playerBombardments || [];
 
     console.log('Loading ' + worldRegions.length + ' world regions...');
 
@@ -19,6 +20,7 @@
 
     worldMap.setSectors(worldRegions).then(function () {
         worldMap.setFleets(playerFleets);
+        worldMap.setBombardments(playerBombardments);
         worldMap.render();
         console.log('World map loaded successfully with ' + worldRegions.length + ' regions!');
     }).catch(function (error) {

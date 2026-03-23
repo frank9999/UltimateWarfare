@@ -44,6 +44,7 @@ class HexMap {
             maxZoom: 3.0
         });
         this.fleetManager = new FleetManager(this);
+        this.bombardmentManager = new BombardmentManager(this);
         this.tileRenderer = new TileRenderer(this.ctx, this.config);
 
         // Wire up camera callbacks
@@ -123,6 +124,10 @@ class HexMap {
 
     setFleets(fleets) {
         this.fleetManager.setFleets(fleets);
+    }
+
+    setBombardments(bombardments) {
+        this.bombardmentManager.setBombardments(bombardments);
     }
 
     setHighlightedRegions(regionIds, targetRegionId) {
@@ -245,6 +250,12 @@ class HexMap {
             function (x, y) { return self.hexToPixel(x, y); }
         );
 
+        // Render bombardment arcs
+        this.bombardmentManager.renderBombardmentArcs(
+            this.ctx,
+            function (x, y) { return self.hexToPixel(x, y); }
+        );
+
         this.ctx.restore();
 
         // Render UI elements
@@ -288,6 +299,7 @@ class HexMap {
 
     destroy() {
         this.fleetManager.destroy();
+        this.bombardmentManager.destroy();
         window.removeEventListener('resize', this.setupCanvas);
     }
 }

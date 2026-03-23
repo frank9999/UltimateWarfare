@@ -83,4 +83,9 @@ abstract readonly class Operation
     {
         return $this->gameUnitId;
     }
+
+    public function hasCooldown(): bool
+    {
+        return false;
+    }
 }

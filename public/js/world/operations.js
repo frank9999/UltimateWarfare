@@ -269,6 +269,11 @@
                     if (cashElements.length > 0) cashElements[0].textContent = result.newCash.toLocaleString('en-US');
                 }
 
+                // Add bombardment cooldown arc if present
+                if (result.bombardmentCooldown && WorldApp.worldMap) {
+                    WorldApp.worldMap.bombardmentManager.addBombardment(result.bombardmentCooldown);
+                }
+
                 cancelOperationMode();
                 showOperationResults(result.results);
             } else {

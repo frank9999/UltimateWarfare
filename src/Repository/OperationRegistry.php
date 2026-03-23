@@ -7,6 +7,7 @@ namespace FrankProjects\UltimateWarfare\Repository;
 use FrankProjects\UltimateWarfare\Entity\Operation;
 use FrankProjects\UltimateWarfare\Entity\Operation\AdvancedSpy2Operation;
 use FrankProjects\UltimateWarfare\Entity\Operation\AdvancedSpyOperation;
+use FrankProjects\UltimateWarfare\Entity\Operation\ArtilleryBombardmentOperation;
 use FrankProjects\UltimateWarfare\Entity\Operation\MissileAttackOperation;
 use FrankProjects\UltimateWarfare\Entity\Operation\NuclearMissileAttackOperation;
 use FrankProjects\UltimateWarfare\Entity\Operation\SniperAttackOperation;
@@ -23,6 +24,7 @@ final class OperationRegistry
     public function __construct()
     {
         $operationList = [
+            new ArtilleryBombardmentOperation(),
             new MissileAttackOperation(),
             new StealthBomberAttackOperation(),
             new SpyOperation(),

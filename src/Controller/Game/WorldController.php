@@ -8,6 +8,7 @@ use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitCategory;
 use FrankProjects\UltimateWarfare\Entity\Player;
 use FrankProjects\UltimateWarfare\Entity\World;
 use FrankProjects\UltimateWarfare\Entity\WorldRegion;
+use FrankProjects\UltimateWarfare\Repository\BombardmentCooldownRepository;
 use FrankProjects\UltimateWarfare\Repository\PlayerRepository;
 use FrankProjects\UltimateWarfare\Repository\FleetRepository;
 use FrankProjects\UltimateWarfare\Repository\WorldRepository;
@@ -20,15 +21,18 @@ final class WorldController extends BaseGameController
     private PlayerRepository $playerRepository;
     private WorldRepository $worldRepository;
     private FleetRepository $fleetRepository;
+    private BombardmentCooldownRepository $bombardmentCooldownRepository;
 
     public function __construct(
         PlayerRepository $playerRepository,
         WorldRepository $worldRepository,
-        FleetRepository $fleetRepository
+        FleetRepository $fleetRepository,
+        BombardmentCooldownRepository $bombardmentCooldownRepository
     ) {
         $this->playerRepository = $playerRepository;
         $this->worldRepository = $worldRepository;
         $this->fleetRepository = $fleetRepository;
+        $this->bombardmentCooldownRepository = $bombardmentCooldownRepository;
     }
 
     public function create(WorldGeneratorService $worldGeneratorService): Response
@@ -137,6 +141,7 @@ final class WorldController extends BaseGameController
 
         $regions = $this->getWorldRegionsData($world, $player);
         $fleets = $this->getPlayerFleetsData($player);
+        $bombardments = $this->getActiveBombardmentCooldowns($player);
 
         return $this->render(
             'v2/game/world.html.twig',
@@ -144,6 +149,7 @@ final class WorldController extends BaseGameController
                 'regions' => $regions,
                 'player' => $player,
                 'fleets' => $fleets,
+                'bombardments' => $bombardments,
             ]
         );
     }
@@ -371,6 +377,31 @@ final class WorldController extends BaseGameController
         }
 
         return $fleets;
+    }
+
+    /**
+     * @return list<array{
+     *   sourceX: int, sourceY: int, targetX: int, targetY: int,
+     *   cooldownUntil: int, remainingSeconds: int
+     * }>
+     */
+    private function getActiveBombardmentCooldowns(Player $player): array
+    {
+        $bombardments = [];
+        $currentTime = time();
+
+        foreach ($this->bombardmentCooldownRepository->findActiveByPlayer($player) as $cooldown) {
+            $bombardments[] = [
+                'sourceX' => $cooldown->getWorldRegion()->getX(),
+                'sourceY' => $cooldown->getWorldRegion()->getY(),
+                'targetX' => $cooldown->getTargetWorldRegion()->getX(),
+                'targetY' => $cooldown->getTargetWorldRegion()->getY(),
+                'cooldownUntil' => $cooldown->getCooldownUntil(),
+                'remainingSeconds' => max(0, $cooldown->getCooldownUntil() - $currentTime),
+            ];
+        }
+
+        return $bombardments;
     }
 
     private function getRegionImage(string $type): string
