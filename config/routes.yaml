@@ -511,10 +511,6 @@ Game/Message/Outbox/Read:
     requirements:
         messageId: '\d+'
 
-Game/Notepad:
-    path:      /game/notepad
-    controller: FrankProjects\UltimateWarfare\Controller\Game\NotepadController::notepad
-
 Game/Operation/ExecuteOperation:
     path: /game/world/region/execute-operation/{regionId}/{operationSlug}/{playerRegionId}
     controller: FrankProjects\UltimateWarfare\Controller\Game\OperationController::executeOperation
