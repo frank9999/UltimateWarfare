@@ -115,25 +115,6 @@ final class WorldController extends BaseGameController
         return $this->redirectToRoute('Game/Login', [], 302);
     }
 
-    public function world(): Response
-    {
-        $player = $this->getPlayer();
-        $world = $player->getWorld();
-
-        $sectors = [];
-        foreach ($world->getWorldSectors() as $sector) {
-            $sectors[$sector->getX()][$sector->getY()] = $sector;
-        }
-
-        return $this->render(
-            'game/world.html.twig',
-            [
-                'sectors' => $sectors,
-                'player' => $player
-            ]
-        );
-    }
-
     public function worldMap(): Response
     {
         $player = $this->getPlayer();

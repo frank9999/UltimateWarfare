@@ -643,17 +643,9 @@ Game/WorldMap:
     path:      /game/world-map
     controller: FrankProjects\UltimateWarfare\Controller\Game\WorldController::worldMap
 
-Game/World:
-    path:      /game/world
-    controller: FrankProjects\UltimateWarfare\Controller\Game\WorldController::world
-
 Game/World/Create:
     path:      /game/world/create
     controller: FrankProjects\UltimateWarfare\Controller\Game\WorldController::create
-
-Game/World/GetTiles:
-    path:      /game/world/get-tiles
-    controller: FrankProjects\UltimateWarfare\Controller\Game\WorldController::getTiles
 
 Game/World/Region:
     path:      /game/world/region/{regionId}
@@ -765,12 +757,6 @@ Game/World/Region/SendUnits/Send/Api:
     methods: [POST]
     requirements:
         regionId: '\d+'
-
-Game/World/Sector:
-    path:      /game/world/sector/{sectorId}
-    controller: FrankProjects\UltimateWarfare\Controller\Game\SectorController::sector
-    requirements:
-        sectorId: '\d+'
 
 Game/SelectName:
     path:      /game/select-name/{worldId}

@@ -3,7 +3,6 @@
   <entity name="FrankProjects\UltimateWarfare\Entity\WorldRegion" table="world_region">
     <indexes>
       <index name="worldxy" columns="world_id,x,y"/>
-      <index name="regionInSector" columns="sector_id,player_id"/>
     </indexes>
     <unique-constraints>
       <unique-constraint name="unique_world_region" columns="x,y,world_id"/>
@@ -61,11 +60,6 @@
     <many-to-one field="world" target-entity="FrankProjects\UltimateWarfare\Entity\World" inversed-by="worldRegions">
       <join-columns>
         <join-column name="world_id" nullable="false"/>
-      </join-columns>
-    </many-to-one>
-    <many-to-one field="worldSector" target-entity="FrankProjects\UltimateWarfare\Entity\WorldSector" inversed-by="worldRegions">
-      <join-columns>
-        <join-column name="sector_id" nullable="false"/>
       </join-columns>
     </many-to-one>
     <many-to-one field="player" target-entity="FrankProjects\UltimateWarfare\Entity\Player" inversed-by="worldRegions">

@@ -32,9 +32,6 @@ class World
     /** @var Collection<int, WorldRegion> */
     private Collection $worldRegions;
 
-    /** @var Collection<int, WorldSector> */
-    private Collection $worldSectors;
-
     /** @var Collection<int, Player> */
     private Collection $players;
 
@@ -52,7 +49,6 @@ class World
     public function __construct()
     {
         $this->worldRegions = new ArrayCollection();
-        $this->worldSectors = new ArrayCollection();
         $this->players = new ArrayCollection();
         $this->marketItems = new ArrayCollection();
         $this->messages = new ArrayCollection();
@@ -219,22 +215,6 @@ class World
     }
 
     /**
-     * @return Collection<int, WorldSector>
-     */
-    public function getWorldSectors(): Collection
-    {
-        return $this->worldSectors;
-    }
-
-    /**
-     * @param Collection<int, WorldSector> $worldSectors
-     */
-    public function setWorldSectors(Collection $worldSectors): void
-    {
-        $this->worldSectors = $worldSectors;
-    }
-
-    /**
      * @return Collection<int, Player>
      */
     public function getPlayers(): Collection
@@ -334,10 +314,6 @@ class World
                     return false;
                 }
             }
-        }
-
-        if (count($this->getWorldSectors()) !== 25) {
-            return false;
         }
 
         if (count($this->getWorldRegions()) !== 625) {

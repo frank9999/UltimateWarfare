@@ -30,7 +30,6 @@ class WorldRegion
     private int $space = 1000;
     private int $population = 0;
     private World $world;
-    private WorldSector $worldSector;
     private ?Player $player;
 
     /**
@@ -229,16 +228,6 @@ class WorldRegion
         $this->fleets = $fleets;
     }
 
-    public function getWorldSector(): WorldSector
-    {
-        return $this->worldSector;
-    }
-
-    public function setWorldSector(WorldSector $worldSector): void
-    {
-        $this->worldSector = $worldSector;
-    }
-
     /**
      * @return Collection<int, Fleet>
      */
@@ -260,8 +249,8 @@ class WorldRegion
         return "{$this->getX()}, {$this->getY()}";
     }
 
-    public static function createForWorldSector(
-        WorldSector $worldSector,
+    public static function createForWorld(
+        World $world,
         int $x,
         int $y,
         int $z,
@@ -269,8 +258,7 @@ class WorldRegion
         int $space
     ): WorldRegion {
         $worldRegion = new WorldRegion();
-        $worldRegion->setWorld($worldSector->getWorld());
-        $worldRegion->setWorldSector($worldSector);
+        $worldRegion->setWorld($world);
         $worldRegion->setX($x);
         $worldRegion->setY($y);
         $worldRegion->setZ($z);
