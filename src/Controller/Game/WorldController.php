@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace FrankProjects\UltimateWarfare\Controller\Game;
 
-use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitCategory;
 use FrankProjects\UltimateWarfare\Entity\Player;
 use FrankProjects\UltimateWarfare\Entity\World;
 use FrankProjects\UltimateWarfare\Entity\WorldRegion;
@@ -177,7 +176,7 @@ final class WorldController extends BaseGameController
 
             // Only include unit data for regions owned by the current player
             if ($isYours) {
-                $regionData['units'] = $this->getUnitSummary($region);
+                $regionData['units'] = $this->gameUnitRegistry->getRegionUnitSummary($region);
             }
 
             $regions[] = $regionData;
@@ -234,88 +233,6 @@ final class WorldController extends BaseGameController
         }
 
         return $visibleRegions;
-    }
-
-    /**
-     * Get a summary of units in a region grouped by type
-     *
-     * @return array{
-     *   buildings: int, defences: int, special: int, specialUnits: int,
-     *   troops: int, navalUnits: int, airUnits: int, missiles: int,
-     *   details: array<string, list<array{name: string, amount: int}>>
-     * }
-     */
-    private function getUnitSummary(WorldRegion $region): array
-    {
-        /** @var array{
-         *   buildings: int, defences: int, special: int, specialUnits: int,
-         *   troops: int, navalUnits: int, airUnits: int, missiles: int,
-         *   details: array<string, list<array{name: string, amount: int}>>
-         * } $summary
-         */
-        $summary = [
-            'buildings' => 0,
-            'defences' => 0,
-            'special' => 0,
-            'specialUnits' => 0,
-            'troops' => 0,
-            'navalUnits' => 0,
-            'airUnits' => 0,
-            'missiles' => 0,
-            'details' => [
-                'buildings' => [],
-                'defences' => [],
-                'special' => [],
-                'specialUnits' => [],
-                'troops' => [],
-                'navalUnits' => [],
-                'airUnits' => [],
-                'missiles' => [],
-            ],
-        ];
-
-        foreach ($region->getWorldRegionUnits() as $worldRegionUnit) {
-            $gameUnit = $this->gameUnitRegistry->find($worldRegionUnit->getGameUnit());
-            if ($gameUnit === null) {
-                continue;
-            }
-            $gameUnitCategory = $gameUnit->getGameUnitCategory();
-            $amount = $worldRegionUnit->getAmount();
-            $unitName = $gameUnit->getName();
-
-            match ($gameUnitCategory) {
-                GameUnitCategory::BUILDINGS => $this->addUnitToSummary($summary, 'buildings', $unitName, $amount),
-                GameUnitCategory::DEFENSE_BUILDINGS =>
-                    $this->addUnitToSummary($summary, 'defences', $unitName, $amount),
-                GameUnitCategory::SPECIAL_BUILDINGS => $this->addUnitToSummary($summary, 'special', $unitName, $amount),
-                GameUnitCategory::SPECIAL_UNITS =>
-                    $this->addUnitToSummary($summary, 'specialUnits', $unitName, $amount),
-                GameUnitCategory::TROOPS => $this->addUnitToSummary($summary, 'troops', $unitName, $amount),
-                GameUnitCategory::NAVAL_UNITS => $this->addUnitToSummary($summary, 'navalUnits', $unitName, $amount),
-                GameUnitCategory::AIR_UNITS => $this->addUnitToSummary($summary, 'airUnits', $unitName, $amount),
-                GameUnitCategory::MISSILES => $this->addUnitToSummary($summary, 'missiles', $unitName, $amount),
-            };
-        }
-
-        /** @var array{
-         *   buildings: int, defences: int, special: int, specialUnits: int,
-         *   troops: int, navalUnits: int, airUnits: int, missiles: int,
-         *   details: array<string, list<array{name: string, amount: int}>>
-         * } $summary
-         */
-        return $summary;
-    }
-
-    /**
-     * @param array<string, mixed> $summary
-     */
-    private function addUnitToSummary(array &$summary, string $type, string $unitName, int $amount): void
-    {
-        $summary[$type] = (is_int($summary[$type]) ? $summary[$type] : 0) + $amount;
-        /** @var array<string, list<array{name: string, amount: int}>> $details */
-        $details = is_array($summary['details']) ? $summary['details'] : [];
-        $details[$type][] = ['name' => $unitName, 'amount' => $amount];
-        $summary['details'] = $details;
     }
 
     /**

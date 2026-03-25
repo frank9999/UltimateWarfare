@@ -184,6 +184,11 @@
                 attackUnitsModal.style.display = 'none';
                 cancelAttackMode();
 
+                // Update source region units on the map
+                if (result.sourceRegionId && result.sourceRegionUnits) {
+                    WorldApp.worldMap.fleetManager.updateRegionUnits(result.sourceRegionId, result.sourceRegionUnits);
+                }
+
                 const newFleet = result.fleet;
                 WorldApp.worldMap.fleetManager.fleets.push(newFleet);
                 WorldApp.worldMap.fleetManager.startETACountdown();

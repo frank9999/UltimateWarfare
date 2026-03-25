@@ -369,6 +369,9 @@ class FleetManager {
                 // Remove fleet from list
                 this.removeFleet(fleet.id);
 
+                // Update region unit data
+                this.updateRegionUnits(result.regionId, result.units);
+
                 // Show success message
                 this.showNotification(result.message, 'success');
 
@@ -413,6 +416,9 @@ class FleetManager {
                 // Remove fleet from list
                 this.removeFleet(fleet.id);
 
+                // Update region unit data
+                this.updateRegionUnits(result.regionId, result.units);
+
                 // Show success message
                 this.showNotification(result.message, 'success');
 
@@ -439,6 +445,18 @@ class FleetManager {
      */
     removeFleet(fleetId) {
         this.fleets = this.fleets.filter(f => f.id !== fleetId);
+    }
+
+    /**
+     * Update region unit data in the sectors array
+     */
+    updateRegionUnits(regionId, units) {
+        if (!regionId || !units) return;
+
+        const region = this.map.sectors.find(r => r.id === regionId);
+        if (region) {
+            region.units = units;
+        }
     }
 
     /**

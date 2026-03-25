@@ -7,6 +7,7 @@ namespace FrankProjects\UltimateWarfare\Repository;
 use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitCategory;
 use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitEnum;
 use FrankProjects\UltimateWarfare\Entity\GameUnit;
+use FrankProjects\UltimateWarfare\Entity\WorldRegion;
 use FrankProjects\UltimateWarfare\Entity\GameUnit\AntiAirMissile;
 use FrankProjects\UltimateWarfare\Entity\GameUnit\Airport;
 use FrankProjects\UltimateWarfare\Entity\GameUnit\Artillery;
@@ -147,5 +148,57 @@ final class GameUnitRegistry
             static fn (GameUnit $gameUnit): GameUnitEnum => $gameUnit->getId(),
             $this->findByCategory($category)
         );
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function getRegionUnitSummary(WorldRegion $region): array
+    {
+        $summary = [
+            'buildings' => 0,
+            'defences' => 0,
+            'special' => 0,
+            'specialUnits' => 0,
+            'troops' => 0,
+            'navalUnits' => 0,
+            'airUnits' => 0,
+            'missiles' => 0,
+            'details' => [
+                'buildings' => [],
+                'defences' => [],
+                'special' => [],
+                'specialUnits' => [],
+                'troops' => [],
+                'navalUnits' => [],
+                'airUnits' => [],
+                'missiles' => [],
+            ],
+        ];
+
+        foreach ($region->getWorldRegionUnits() as $worldRegionUnit) {
+            $gameUnit = $this->find($worldRegionUnit->getGameUnit());
+            if ($gameUnit === null) {
+                continue;
+            }
+
+            $amount = $worldRegionUnit->getAmount();
+            $unitName = $gameUnit->getName();
+            $key = match ($gameUnit->getGameUnitCategory()) {
+                GameUnitCategory::BUILDINGS => 'buildings',
+                GameUnitCategory::DEFENSE_BUILDINGS => 'defences',
+                GameUnitCategory::SPECIAL_BUILDINGS => 'special',
+                GameUnitCategory::SPECIAL_UNITS => 'specialUnits',
+                GameUnitCategory::TROOPS => 'troops',
+                GameUnitCategory::NAVAL_UNITS => 'navalUnits',
+                GameUnitCategory::AIR_UNITS => 'airUnits',
+                GameUnitCategory::MISSILES => 'missiles',
+            };
+
+            $summary[$key] += $amount;
+            $summary['details'][$key][] = ['name' => $unitName, 'amount' => $amount];
+        }
+
+        return $summary;
     }
 }

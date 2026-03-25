@@ -204,6 +204,11 @@
             if (result.success) {
                 cancelSendMode();
 
+                // Update source region units on the map
+                if (result.sourceRegionId && result.sourceRegionUnits) {
+                    WorldApp.worldMap.fleetManager.updateRegionUnits(result.sourceRegionId, result.sourceRegionUnits);
+                }
+
                 // Add fleet to the map and start ETA countdown
                 const newFleet = result.fleet;
                 WorldApp.worldMap.fleetManager.fleets.push(newFleet);

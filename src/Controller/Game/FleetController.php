@@ -47,10 +47,12 @@ final class FleetController extends BaseGameController
     public function recallApi(int $fleetId): JsonResponse
     {
         try {
-            $this->fleetActionService->recall($fleetId, $this->getPlayer());
+            $region = $this->fleetActionService->recall($fleetId, $this->getPlayer());
             return new JsonResponse([
                 'success' => true,
-                'message' => 'You successfully recalled your troops!'
+                'message' => 'You successfully recalled your troops!',
+                'regionId' => $region->getId(),
+                'units' => $this->gameUnitRegistry->getRegionUnitSummary($region),
             ]);
         } catch (Throwable $e) {
             return new JsonResponse([
@@ -66,10 +68,12 @@ final class FleetController extends BaseGameController
     public function reinforceApi(int $fleetId): JsonResponse
     {
         try {
-            $this->fleetActionService->reinforce($fleetId, $this->getPlayer());
+            $region = $this->fleetActionService->reinforce($fleetId, $this->getPlayer());
             return new JsonResponse([
                 'success' => true,
-                'message' => 'You successfully reinforced your region!'
+                'message' => 'You successfully reinforced your region!',
+                'regionId' => $region->getId(),
+                'units' => $this->gameUnitRegistry->getRegionUnitSummary($region),
             ]);
         } catch (Throwable $e) {
             return new JsonResponse([
@@ -283,6 +287,8 @@ final class FleetController extends BaseGameController
                 'unitCount' => $totalUnitCount,
                 'units' => $sentUnits,
             ],
+            'sourceRegionId' => $sourceRegion->getId(),
+            'sourceRegionUnits' => $this->gameUnitRegistry->getRegionUnitSummary($sourceRegion),
         ]);
     }
 

@@ -363,6 +363,8 @@ final class AttackController extends BaseGameController
                 'unitCount' => $totalUnitCount,
                 'units' => $sentUnits,
             ],
+            'sourceRegionId' => $playerRegion->getId(),
+            'sourceRegionUnits' => $this->gameUnitRegistry->getRegionUnitSummary($playerRegion),
         ]);
     }
 
