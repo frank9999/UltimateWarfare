@@ -121,7 +121,7 @@ final class FleetActionService
         WorldRegion $targetRegion,
         Player $player,
         array $unitData
-    ): void {
+    ): Fleet {
         if ($targetRegion->getWorld()->getId() !== $player->getWorld()->getId()) {
             throw new RuntimeException('Target region does not exist!');
         }
@@ -167,6 +167,8 @@ final class FleetActionService
         foreach ($gameUnitsToSend as $gameUnitData) {
             $this->addFleetUnitToFleet($region, $gameUnitData['gameUnit'], $gameUnitData['amount'], $fleet);
         }
+
+        return $fleet;
     }
 
     private function addFleetUnitsToWorldRegion(Fleet $fleet, WorldRegion $worldRegion): void

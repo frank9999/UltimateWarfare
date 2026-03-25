@@ -206,7 +206,6 @@
 
                 // Add fleet to the map and start ETA countdown
                 const newFleet = result.fleet;
-                newFleet.id = Date.now();
                 WorldApp.worldMap.fleetManager.fleets.push(newFleet);
                 WorldApp.worldMap.fleetManager.startETACountdown();
                 WorldApp.worldMap.render();

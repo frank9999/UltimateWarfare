@@ -313,7 +313,7 @@ final class AttackController extends BaseGameController
         }
 
         try {
-            $this->fleetActionService->sendGameUnits(
+            $fleet = $this->fleetActionService->sendGameUnits(
                 $playerRegion,
                 $targetRegion,
                 $player,
@@ -350,6 +350,7 @@ final class AttackController extends BaseGameController
             'success' => true,
             'message' => 'Attack fleet dispatched!',
             'fleet' => [
+                'id' => $fleet->getId(),
                 'sourceX' => $playerRegion->getX(),
                 'sourceY' => $playerRegion->getY(),
                 'targetX' => $targetRegion->getX(),
