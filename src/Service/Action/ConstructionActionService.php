@@ -96,7 +96,7 @@ final class ConstructionActionService
                 $totalBuild = $totalBuild + $amount;
             }
 
-            $constructions[] = Construction::create($region, $player, $gameUnit->getId(), $amount);
+            $constructions[] = Construction::create($region, $player, $gameUnit->getGameUnitEnum(), $amount);
         }
 
         if ($gameUnitCategory === GameUnitCategory::BUILDINGS) {
@@ -308,7 +308,7 @@ final class ConstructionActionService
     private function removeGameUnitsFromWorldRegion(WorldRegion $worldRegion, GameUnit $gameUnit, int $amount): void
     {
         foreach ($worldRegion->getWorldRegionUnits() as $worldRegionUnit) {
-            if ($worldRegionUnit->getGameUnit() !== $gameUnit->getId()) {
+            if ($worldRegionUnit->getGameUnit() !== $gameUnit->getGameUnitEnum()) {
                 continue;
             }
 

@@ -34,7 +34,7 @@ final class Spy extends GameUnit
         );
     }
 
-    public function getId(): GameUnitEnum
+    public function getGameUnitEnum(): GameUnitEnum
     {
         return GameUnitEnum::SPY;
     }

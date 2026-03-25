@@ -44,7 +44,7 @@ final class Soldier extends GameUnit
         );
     }
 
-    public function getId(): GameUnitEnum
+    public function getGameUnitEnum(): GameUnitEnum
     {
         return GameUnitEnum::SOLDIER;
     }

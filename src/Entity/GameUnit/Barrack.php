@@ -33,7 +33,7 @@ final class Barrack extends GameUnit
         );
     }
 
-    public function getId(): GameUnitEnum
+    public function getGameUnitEnum(): GameUnitEnum
     {
         return GameUnitEnum::BARRACK;
     }

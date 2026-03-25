@@ -42,7 +42,7 @@ final class Fighter extends GameUnit
         );
     }
 
-    public function getId(): GameUnitEnum
+    public function getGameUnitEnum(): GameUnitEnum
     {
         return GameUnitEnum::FIGHTER;
     }

@@ -25,19 +25,19 @@
                         <img src="{{ asset('images/' ~ gameUnit.gameUnitCategory.imageDir ~ gameUnit.image) }}" alt="{{ gameUnit.name }}" width="150" height="130">
                     </td>
                     <td width="150">
-                        <a class="B" href="{{ path('Guide/GameUnit', {'gameUnitId': gameUnit.id.value}) }}" target="_blank" title="Information about {{ gameUnit.name }}" tabIndex="-1">
+                        <a class="B" href="{{ path('Guide/GameUnit', {'gameUnitId': gameUnit.gameUnitEnum.value}) }}" target="_blank" title="Information about {{ gameUnit.name }}" tabIndex="-1">
                             <b>{{ gameUnit.name }}</b>
                         </a><br />
                     </td>
                     <td width="100">
-                        {% if gameUnitData[gameUnit.id.value] is defined and gameUnitData[gameUnit.id.value] > 0 %}
-                            {{ gameUnitData[gameUnit.id.value] }}
+                        {% if gameUnitData[gameUnit.gameUnitEnum.value] is defined and gameUnitData[gameUnit.gameUnitEnum.value] > 0 %}
+                            {{ gameUnitData[gameUnit.gameUnitEnum.value] }}
                         {% else %}
                             0
                         {% endif %}
                     </td>
                     <td width="200">
-                        <input type="text" class="form-control" name="destroy[{{ gameUnit.id.value }}]" />
+                        <input type="text" class="form-control" name="destroy[{{ gameUnit.gameUnitEnum.value }}]" />
                     </td>
                 </tr>
             {% else %}

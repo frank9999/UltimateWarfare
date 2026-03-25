@@ -29,7 +29,7 @@ abstract class GameUnit
     ) {
     }
 
-    abstract public function getId(): GameUnitEnum;
+    abstract public function getGameUnitEnum(): GameUnitEnum;
 
     public function getName(): string
     {

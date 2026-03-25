@@ -44,7 +44,7 @@ final class MineSweeper extends GameUnit
         );
     }
 
-    public function getId(): GameUnitEnum
+    public function getGameUnitEnum(): GameUnitEnum
     {
         return GameUnitEnum::MINE_SWEEPER;
     }

@@ -91,14 +91,14 @@ final class GameUnitRegistry
 
         $this->gameUnits = [];
         foreach ($gameUnitList as $gameUnit) {
-            $this->gameUnits[$gameUnit->getId()->value] = $gameUnit;
+            $this->gameUnits[$gameUnit->getGameUnitEnum()->value] = $gameUnit;
         }
     }
 
-    public function find(GameUnitEnum $id): GameUnit
+    public function find(GameUnitEnum $gameUnitEnum): GameUnit
     {
-        return $this->gameUnits[$id->value]
-            ?? throw new \RuntimeException("GameUnit not found for enum: {$id->name}");
+        return $this->gameUnits[$gameUnitEnum->value]
+            ?? throw new \RuntimeException("GameUnit not found for enum: {$gameUnitEnum->name}");
     }
 
     /**
@@ -146,7 +146,7 @@ final class GameUnitRegistry
     public function getIdsByCategory(GameUnitCategory $category): array
     {
         return array_map(
-            static fn (GameUnit $gameUnit): GameUnitEnum => $gameUnit->getId(),
+            static fn (GameUnit $gameUnit): GameUnitEnum => $gameUnit->getGameUnitEnum(),
             $this->findByCategory($category)
         );
     }

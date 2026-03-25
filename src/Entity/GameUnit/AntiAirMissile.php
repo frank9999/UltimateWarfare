@@ -42,7 +42,7 @@ final class AntiAirMissile extends GameUnit
         );
     }
 
-    public function getId(): GameUnitEnum
+    public function getGameUnitEnum(): GameUnitEnum
     {
         return GameUnitEnum::ANTI_AIR_MISSILE;
     }

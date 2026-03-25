@@ -33,7 +33,7 @@ final class ChemicalRocket extends GameUnit
         );
     }
 
-    public function getId(): GameUnitEnum
+    public function getGameUnitEnum(): GameUnitEnum
     {
         return GameUnitEnum::CHEMICAL_ROCKET;
     }

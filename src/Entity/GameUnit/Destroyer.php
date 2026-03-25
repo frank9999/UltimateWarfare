@@ -44,7 +44,7 @@ final class Destroyer extends GameUnit
         );
     }
 
-    public function getId(): GameUnitEnum
+    public function getGameUnitEnum(): GameUnitEnum
     {
         return GameUnitEnum::DESTROYER;
     }

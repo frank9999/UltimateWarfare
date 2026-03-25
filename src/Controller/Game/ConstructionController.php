@@ -371,7 +371,7 @@ final class ConstructionController extends BaseGameController
                 }
 
                 $units[] = [
-                    'id' => $gameUnit->getId(),
+                    'gameUnitEnum' => $gameUnit->getGameUnitEnum(),
                     'name' => $gameUnit->getName(),
                     'description' => $gameUnit->getDescription(),
                     'image' => $gameUnit->getImage(),
@@ -396,8 +396,8 @@ final class ConstructionController extends BaseGameController
                             ? 'Requires a Factory'
                             : $behavior->getBuildRequirementDescription()
                     ),
-                    'owned' => $gameUnitData[$gameUnit->getId()->value] ?? 0,
-                    'inConstruction' => $constructionData[$gameUnit->getId()->value] ?? 0,
+                    'owned' => $gameUnitData[$gameUnit->getGameUnitEnum()->value] ?? 0,
+                    'inConstruction' => $constructionData[$gameUnit->getGameUnitEnum()->value] ?? 0,
                 ];
             }
 

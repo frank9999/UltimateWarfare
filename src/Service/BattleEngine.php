@@ -53,7 +53,12 @@ final class BattleEngine
 
         $battlePhaseResults = [];
         foreach ($this->getBattlePhases() as $battlePhaseName) {
-            $battlePhase = BattlePhase::factory($battlePhaseName, $attackerGameUnits, $defenderGameUnits, $this->gameUnitRegistry);
+            $battlePhase = BattlePhase::factory(
+                $battlePhaseName,
+                $attackerGameUnits,
+                $defenderGameUnits,
+                $this->gameUnitRegistry
+            );
             $battlePhase->startBattlePhase();
 
             $attackerGameUnits = $battlePhase->getAttackerGameUnits();

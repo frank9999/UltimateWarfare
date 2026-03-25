@@ -38,7 +38,7 @@ final class SeaMine extends GameUnit
         );
     }
 
-    public function getId(): GameUnitEnum
+    public function getGameUnitEnum(): GameUnitEnum
     {
         return GameUnitEnum::SEA_MINE;
     }

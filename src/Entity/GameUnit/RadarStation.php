@@ -33,7 +33,7 @@ final class RadarStation extends GameUnit
         );
     }
 
-    public function getId(): GameUnitEnum
+    public function getGameUnitEnum(): GameUnitEnum
     {
         return GameUnitEnum::RADAR_STATION;
     }

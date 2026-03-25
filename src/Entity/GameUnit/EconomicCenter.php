@@ -33,7 +33,7 @@ final class EconomicCenter extends GameUnit
         );
     }
 
-    public function getId(): GameUnitEnum
+    public function getGameUnitEnum(): GameUnitEnum
     {
         return GameUnitEnum::ECONOMIC_CENTER;
     }

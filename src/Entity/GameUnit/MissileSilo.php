@@ -33,7 +33,7 @@ final class MissileSilo extends GameUnit
         );
     }
 
-    public function getId(): GameUnitEnum
+    public function getGameUnitEnum(): GameUnitEnum
     {
         return GameUnitEnum::MISSILE_SILO;
     }

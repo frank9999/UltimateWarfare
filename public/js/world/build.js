@@ -294,7 +294,7 @@
                     '<img src="' + imgBase + '/' + unit.imageDir + unit.image + '" alt="' + unit.name + '" class="build-unit-image ' + (!unit.canBuild ? 'grayscale' : '') + '">' +
                     '<div>' +
                         '<div class="build-unit-name">' + unit.name + (!unit.canBuild ? ' 🔒' : '') +
-                            ' <span class="build-unit-info-icon" data-unit-id="' + unit.id + '">i</span></div>' +
+                            ' <span class="build-unit-info-icon" data-unit-id="' + unit.gameUnitEnum + '">i</span></div>' +
                         (!unit.canBuild
                             ? '<div class="build-requirement">' + unit.buildRequirement + '</div>'
                             : '<div class="build-unit-owned">You have: ' + unit.owned + constructionText + '</div>') +
@@ -307,7 +307,7 @@
                     '<div class="build-unit-cost-item"><img src="' + imgBase + '/icons/time.gif" class="build-unit-cost-icon"><span>' + timeStr + '</span></div>' +
                 '</div>' +
                 '<div class="build-unit-input">' +
-                    '<input type="number" min="0" value="0" data-unit-id="' + unit.id + '" class="build-quantity-input">' +
+                    '<input type="number" min="0" value="0" data-unit-id="' + unit.gameUnitEnum + '" class="build-quantity-input">' +
                 '</div>';
 
             container.appendChild(card);

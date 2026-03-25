@@ -38,7 +38,7 @@ final class LandMine extends GameUnit
         );
     }
 
-    public function getId(): GameUnitEnum
+    public function getGameUnitEnum(): GameUnitEnum
     {
         return GameUnitEnum::LAND_MINE;
     }

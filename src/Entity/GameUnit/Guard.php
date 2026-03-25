@@ -33,7 +33,7 @@ final class Guard extends GameUnit
         );
     }
 
-    public function getId(): GameUnitEnum
+    public function getGameUnitEnum(): GameUnitEnum
     {
         return GameUnitEnum::GUARD;
     }

@@ -34,7 +34,7 @@ final class Saboteur extends GameUnit
         );
     }
 
-    public function getId(): GameUnitEnum
+    public function getGameUnitEnum(): GameUnitEnum
     {
         return GameUnitEnum::SABOTEUR;
     }

@@ -204,7 +204,7 @@ final class FleetActionService
     {
         $hasUnit = false;
         foreach ($region->getWorldRegionUnits() as $regionUnit) {
-            if ($regionUnit->getGameUnit() === $gameUnit->getId()) {
+            if ($regionUnit->getGameUnit() === $gameUnit->getGameUnitEnum()) {
                 $hasUnit = true;
                 if ($amount > $regionUnit->getAmount()) {
                     throw new RuntimeException("You don't have that many " . $gameUnit->getName() . "s!");

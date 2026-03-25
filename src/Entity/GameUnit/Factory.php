@@ -33,7 +33,7 @@ final class Factory extends GameUnit
         );
     }
 
-    public function getId(): GameUnitEnum
+    public function getGameUnitEnum(): GameUnitEnum
     {
         return GameUnitEnum::FACTORY;
     }

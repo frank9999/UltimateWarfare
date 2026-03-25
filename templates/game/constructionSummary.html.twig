@@ -21,12 +21,12 @@
 
             {% set gameUnitInConstruction = 0 %}
             {% for gameUnit in gameUnits %}
-                {% if gameUnit.gameUnitCategory == gameUnitCategory and constructionData[gameUnit.id.value] is defined and constructionData[gameUnit.id.value] > 0 %}
+                {% if gameUnit.gameUnitCategory == gameUnitCategory and constructionData[gameUnit.gameUnitEnum.value] is defined and constructionData[gameUnit.gameUnitEnum.value] > 0 %}
                     {% set gameUnitInConstruction = 1 %}
                     <tr>
                         <td width="350">{{ gameUnit.nameMulti }}:</td>
                         <td width="350">
-                            {{ constructionData[gameUnit.id.value] }}
+                            {{ constructionData[gameUnit.gameUnitEnum.value] }}
                         </td>
                     </tr>
                 {% endif %}

@@ -34,7 +34,7 @@ final class TrainStation extends GameUnit
         );
     }
 
-    public function getId(): GameUnitEnum
+    public function getGameUnitEnum(): GameUnitEnum
     {
         return GameUnitEnum::TRAIN_STATION;
     }
