@@ -44,7 +44,11 @@ final class ArtilleryBombardment extends OperationProcessor
         $buildingUnits = [];
 
         foreach ($this->region->getWorldRegionUnits() as $worldRegionUnit) {
-            if ($worldRegionUnit->getGameUnit()->getGameUnitCategory()->isSendable()) {
+            $gameUnit = $this->gameUnitRegistry->find($worldRegionUnit->getGameUnit());
+            if ($gameUnit === null) {
+                continue;
+            }
+            if ($gameUnit->getGameUnitCategory()->isSendable()) {
                 $militaryUnits[] = $worldRegionUnit;
             } else {
                 $buildingUnits[] = $worldRegionUnit;
@@ -82,7 +86,10 @@ final class ArtilleryBombardment extends OperationProcessor
         $totalDestroyed = 0;
 
         foreach ($units as $worldRegionUnit) {
-            $gameUnit = $worldRegionUnit->getGameUnit();
+            $gameUnit = $this->gameUnitRegistry->find($worldRegionUnit->getGameUnit());
+            if ($gameUnit === null) {
+                continue;
+            }
             $amount = $worldRegionUnit->getAmount();
 
             $battleStats = $gameUnit->getBattleStats();
@@ -133,10 +140,9 @@ final class ArtilleryBombardment extends OperationProcessor
 
     private function getArtilleryGroundAttack(): int
     {
-        foreach ($this->playerRegion->getWorldRegionUnits() as $worldRegionUnit) {
-            if ($worldRegionUnit->getGameUnit()->getId() === $this->operation->getGameUnitId()) {
-                return $worldRegionUnit->getGameUnit()->getBattleStats()->getGroundBattleStats()->getAttack();
-            }
+        $gameUnit = $this->gameUnitRegistry->find($this->operation->getGameUnit());
+        if ($gameUnit !== null) {
+            return $gameUnit->getBattleStats()->getGroundBattleStats()->getAttack();
         }
 
         return 50;

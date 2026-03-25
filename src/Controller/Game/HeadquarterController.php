@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace FrankProjects\UltimateWarfare\Controller\Game;
 
 use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitCategory;
-use FrankProjects\UltimateWarfare\Repository\GameUnitRepository;
+use FrankProjects\UltimateWarfare\Repository\GameUnitRegistry;
 use FrankProjects\UltimateWarfare\Repository\ReportRepository;
 use FrankProjects\UltimateWarfare\Repository\WorldRegionUnitRepository;
 use Symfony\Component\HttpFoundation\Response;
@@ -14,16 +14,16 @@ final class HeadquarterController extends BaseGameController
 {
     private ReportRepository $reportRepository;
     private WorldRegionUnitRepository $worldRegionUnitRepository;
-    private GameUnitRepository $gameUnitRepository;
+    private GameUnitRegistry $gameUnitRegistry;
 
     public function __construct(
         ReportRepository $reportRepository,
         WorldRegionUnitRepository $worldRegionUnitRepository,
-        GameUnitRepository $gameUnitRepository
+        GameUnitRegistry $gameUnitRegistry
     ) {
         $this->reportRepository = $reportRepository;
         $this->worldRegionUnitRepository = $worldRegionUnitRepository;
-        $this->gameUnitRepository = $gameUnitRepository;
+        $this->gameUnitRegistry = $gameUnitRegistry;
     }
 
     public function army(): Response
@@ -35,7 +35,7 @@ final class HeadquarterController extends BaseGameController
             GameUnitCategory::MISSILES
         ];
 
-        $gameUnits = $this->gameUnitRepository->findAll();
+        $gameUnits = $this->gameUnitRegistry->findAll();
 
         return $this->render(
             'game/headquarter/army.html.twig',
@@ -83,7 +83,7 @@ final class HeadquarterController extends BaseGameController
             GameUnitCategory::SPECIAL_BUILDINGS
         ];
 
-        $gameUnits = $this->gameUnitRepository->findAll();
+        $gameUnits = $this->gameUnitRegistry->findAll();
 
         return $this->render(
             'game/headquarter/infrastructure.html.twig',

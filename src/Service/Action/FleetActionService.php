@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace FrankProjects\UltimateWarfare\Service\Action;
 
 use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitCategory;
+use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitEnum;
 use FrankProjects\UltimateWarfare\Entity\Fleet;
 use FrankProjects\UltimateWarfare\Entity\FleetUnit;
 use FrankProjects\UltimateWarfare\Entity\GameUnit;
@@ -13,7 +14,7 @@ use FrankProjects\UltimateWarfare\Entity\WorldRegion;
 use FrankProjects\UltimateWarfare\Entity\WorldRegionUnit;
 use FrankProjects\UltimateWarfare\Repository\FleetRepository;
 use FrankProjects\UltimateWarfare\Repository\FleetUnitRepository;
-use FrankProjects\UltimateWarfare\Repository\GameUnitRepository;
+use FrankProjects\UltimateWarfare\Repository\GameUnitRegistry;
 use FrankProjects\UltimateWarfare\Repository\WorldRegionUnitRepository;
 use FrankProjects\UltimateWarfare\Service\FleetFactory;
 use RuntimeException;
@@ -24,7 +25,7 @@ final class FleetActionService
 {
     private FleetRepository $fleetRepository;
     private FleetUnitRepository $fleetUnitRepository;
-    private GameUnitRepository $gameUnitRepository;
+    private GameUnitRegistry $gameUnitRegistry;
     private WorldRegionUnitRepository $worldRegionUnitRepository;
     private EntityManagerInterface $entityManager;
     private FleetFactory $fleetFactory;
@@ -32,14 +33,14 @@ final class FleetActionService
     public function __construct(
         FleetRepository $fleetRepository,
         FleetUnitRepository $fleetUnitRepository,
-        GameUnitRepository $gameUnitRepository,
+        GameUnitRegistry $gameUnitRegistry,
         WorldRegionUnitRepository $worldRegionUnitRepository,
         EntityManagerInterface $entityManager,
         FleetFactory $fleetFactory
     ) {
         $this->fleetRepository = $fleetRepository;
         $this->fleetUnitRepository = $fleetUnitRepository;
-        $this->gameUnitRepository = $gameUnitRepository;
+        $this->gameUnitRegistry = $gameUnitRegistry;
         $this->worldRegionUnitRepository = $worldRegionUnitRepository;
         $this->entityManager = $entityManager;
         $this->fleetFactory = $fleetFactory;
@@ -136,7 +137,12 @@ final class FleetActionService
                 continue;
             }
 
-            $gameUnit = $this->gameUnitRepository->find($gameUnitId);
+            $gameUnitEnum = GameUnitEnum::tryFrom($gameUnitId);
+            if ($gameUnitEnum === null) {
+                continue;
+            }
+
+            $gameUnit = $this->gameUnitRegistry->find($gameUnitEnum);
             if ($gameUnit === null) {
                 continue;
             }
@@ -176,7 +182,7 @@ final class FleetActionService
     {
         $found = false;
         foreach ($worldRegion->getWorldRegionUnits() as $worldRegionUnit) {
-            if ($fleetUnit->getGameUnit()->getId() === $worldRegionUnit->getGameUnit()->getId()) {
+            if ($fleetUnit->getGameUnit() === $worldRegionUnit->getGameUnit()) {
                 $worldRegionUnit->setAmount($worldRegionUnit->getAmount() + $fleetUnit->getAmount());
                 $this->worldRegionUnitRepository->save($worldRegionUnit);
                 $found = true;
@@ -198,7 +204,7 @@ final class FleetActionService
     {
         $hasUnit = false;
         foreach ($region->getWorldRegionUnits() as $regionUnit) {
-            if ($regionUnit->getGameUnit()->getId() === $gameUnit->getId()) {
+            if ($regionUnit->getGameUnit() === $gameUnit->getId()) {
                 $hasUnit = true;
                 if ($amount > $regionUnit->getAmount()) {
                     throw new RuntimeException("You don't have that many " . $gameUnit->getName() . "s!");

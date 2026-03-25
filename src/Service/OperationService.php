@@ -9,6 +9,7 @@ use FrankProjects\UltimateWarfare\Entity\Operation;
 use FrankProjects\UltimateWarfare\Entity\WorldRegion;
 use FrankProjects\UltimateWarfare\Repository\BombardmentCooldownRepository;
 use FrankProjects\UltimateWarfare\Repository\ConstructionRepository;
+use FrankProjects\UltimateWarfare\Repository\GameUnitRegistry;
 use FrankProjects\UltimateWarfare\Repository\PlayerRepository;
 use FrankProjects\UltimateWarfare\Repository\WorldRegionRepository;
 use FrankProjects\UltimateWarfare\Repository\WorldRegionUnitRepository;
@@ -28,6 +29,7 @@ final class OperationService
     private WorldRegionRepository $worldRegionRepository;
     private ConstructionRepository $constructionRepository;
     private BombardmentCooldownRepository $bombardmentCooldownRepository;
+    private GameUnitRegistry $gameUnitRegistry;
 
     public function __construct(
         ReportCreator $reportCreator,
@@ -37,7 +39,8 @@ final class OperationService
         WorldRegionUnitRepository $worldRegionUnitRepository,
         WorldRegionRepository $worldRegionRepository,
         ConstructionRepository $constructionRepository,
-        BombardmentCooldownRepository $bombardmentCooldownRepository
+        BombardmentCooldownRepository $bombardmentCooldownRepository,
+        GameUnitRegistry $gameUnitRegistry
     ) {
         $this->reportCreator = $reportCreator;
         $this->netWorthUpdaterService = $netWorthUpdaterService;
@@ -47,6 +50,7 @@ final class OperationService
         $this->worldRegionRepository = $worldRegionRepository;
         $this->constructionRepository = $constructionRepository;
         $this->bombardmentCooldownRepository = $bombardmentCooldownRepository;
+        $this->gameUnitRegistry = $gameUnitRegistry;
     }
 
     /**
@@ -79,7 +83,8 @@ final class OperationService
             $this->playerRepository,
             $this->worldRegionUnitRepository,
             $this->worldRegionRepository,
-            $this->constructionRepository
+            $this->constructionRepository,
+            $this->gameUnitRegistry
         );
         $operationResults = $operationProcessor->execute();
 
@@ -145,7 +150,7 @@ final class OperationService
         }
 
         foreach ($region->getWorldRegionUnits() as $regionUnit) {
-            if ($regionUnit->getGameUnit()->getId() === $operation->getGameUnitId()) {
+            if ($regionUnit->getGameUnit() === $operation->getGameUnit()) {
                 if ($regionUnit->getAmount() >= $amount) {
                     return;
                 }

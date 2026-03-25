@@ -4,13 +4,12 @@ declare(strict_types=1);
 
 namespace FrankProjects\UltimateWarfare\Service\OperationEngine\OperationProcessor;
 
+use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitEnum;
 use FrankProjects\UltimateWarfare\Entity\Report;
 use FrankProjects\UltimateWarfare\Service\OperationEngine\OperationProcessor;
 
 final class AdvancedSpy extends OperationProcessor
 {
-    protected const int GAME_UNIT_SPY_ID = 407;
-
     public function getFormula(): float
     {
         $guards = $this->getGuards();
@@ -55,7 +54,7 @@ final class AdvancedSpy extends OperationProcessor
         $spiesLost = intval($this->amount * 0.05);
 
         foreach ($this->playerRegion->getWorldRegionUnits() as $worldRegionUnit) {
-            if ($worldRegionUnit->getGameUnit()->getId() === self::GAME_UNIT_SPY_ID) {
+            if ($worldRegionUnit->getGameUnit() === GameUnitEnum::SPY) {
                 $worldRegionUnit->setAmount(intval($worldRegionUnit->getAmount() - $spiesLost));
                 $this->worldRegionUnitRepository->save($worldRegionUnit);
             }

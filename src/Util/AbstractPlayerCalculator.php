@@ -9,6 +9,7 @@ use FrankProjects\UltimateWarfare\Entity\Fleet;
 use FrankProjects\UltimateWarfare\Entity\GameUnit;
 use FrankProjects\UltimateWarfare\Entity\Player;
 use FrankProjects\UltimateWarfare\Entity\WorldRegion;
+use FrankProjects\UltimateWarfare\Repository\GameUnitRegistry;
 use RuntimeException;
 
 /**
@@ -21,6 +22,11 @@ abstract class AbstractPlayerCalculator
 
     protected AbstractGameResources $abstractGameResources;
 
+    public function __construct(
+        private readonly GameUnitRegistry $gameUnitRegistry
+    ) {
+    }
+
     protected function calculateForFleets(Player $player, string $type): void
     {
         foreach ($player->getFleets() as $fleet) {
@@ -31,7 +37,11 @@ abstract class AbstractPlayerCalculator
     private function calculateForFleetUnits(Fleet $fleet, string $type): void
     {
         foreach ($fleet->getFleetUnits() as $fleetUnit) {
-            $gameUnitResource = $this->getAbstractGameResources($fleetUnit->getGameUnit(), $type);
+            $gameUnit = $this->gameUnitRegistry->find($fleetUnit->getGameUnit());
+            if ($gameUnit === null) {
+                continue;
+            }
+            $gameUnitResource = $this->getAbstractGameResources($gameUnit, $type);
             $this->updateAbstractGameResource($fleetUnit->getAmount(), $gameUnitResource);
         }
     }
@@ -46,7 +56,11 @@ abstract class AbstractPlayerCalculator
     private function calculateForWorldRegionUnits(WorldRegion $worldRegion, string $type): void
     {
         foreach ($worldRegion->getWorldRegionUnits() as $worldRegionUnit) {
-            $gameUnitResource = $this->getAbstractGameResources($worldRegionUnit->getGameUnit(), $type);
+            $gameUnit = $this->gameUnitRegistry->find($worldRegionUnit->getGameUnit());
+            if ($gameUnit === null) {
+                continue;
+            }
+            $gameUnitResource = $this->getAbstractGameResources($gameUnit, $type);
             $this->updateAbstractGameResource($worldRegionUnit->getAmount(), $gameUnitResource);
         }
     }

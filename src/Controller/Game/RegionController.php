@@ -6,7 +6,7 @@ namespace FrankProjects\UltimateWarfare\Controller\Game;
 
 use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitCategory;
 use FrankProjects\UltimateWarfare\Exception\WorldRegionNotFoundException;
-use FrankProjects\UltimateWarfare\Repository\GameUnitRepository;
+use FrankProjects\UltimateWarfare\Repository\GameUnitRegistry;
 use FrankProjects\UltimateWarfare\Repository\WorldRegionRepository;
 use FrankProjects\UltimateWarfare\Service\Action\ConstructionActionService;
 use FrankProjects\UltimateWarfare\Service\Action\RegionActionService;
@@ -20,18 +20,18 @@ final class RegionController extends BaseGameController
     private WorldRegionRepository $worldRegionRepository;
     private ConstructionActionService $constructionActionService;
     private RegionActionService $regionActionService;
-    private GameUnitRepository $gameUnitRepository;
+    private GameUnitRegistry $gameUnitRegistry;
 
     public function __construct(
         WorldRegionRepository $worldRegionRepository,
         ConstructionActionService $constructionActionService,
         RegionActionService $regionActionService,
-        GameUnitRepository $gameUnitRepository
+        GameUnitRegistry $gameUnitRegistry
     ) {
         $this->worldRegionRepository = $worldRegionRepository;
         $this->constructionActionService = $constructionActionService;
         $this->regionActionService = $regionActionService;
-        $this->gameUnitRepository = $gameUnitRepository;
+        $this->gameUnitRegistry = $gameUnitRegistry;
     }
 
     public function buy(Request $request, int $regionId): Response
@@ -96,7 +96,7 @@ final class RegionController extends BaseGameController
         }
 
         $gameUnitsData = $this->worldRegionRepository->getWorldGameUnitSumByWorldRegion($worldRegion);
-        $gameUnits = $this->gameUnitRepository->findAll();
+        $gameUnits = $this->gameUnitRegistry->findAll();
 
         return $this->render(
             'game/region.html.twig',

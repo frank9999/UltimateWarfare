@@ -4,12 +4,11 @@ declare(strict_types=1);
 
 namespace FrankProjects\UltimateWarfare\Service\OperationEngine\OperationProcessor;
 
+use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitEnum;
 use FrankProjects\UltimateWarfare\Service\OperationEngine\OperationProcessor;
 
 final class SubmarineAttack extends OperationProcessor
 {
-    protected const int GAME_UNIT_SUBMARINE_ID = 403;
-    protected const int GAME_UNIT_SHIP_ID = 303;
     protected const int SHIPS_KILLED_PER_SUBMARINE = 1;
 
     public function getFormula(): float
@@ -33,16 +32,17 @@ final class SubmarineAttack extends OperationProcessor
     {
         $ships = 0;
         foreach ($this->region->getWorldRegionUnits() as $worldRegionUnit) {
-            if ($worldRegionUnit->getGameUnit()->getId() === self::GAME_UNIT_SHIP_ID) {
+            if ($worldRegionUnit->getGameUnit() === GameUnitEnum::DESTROYER) {
                 $ships = $ships + $worldRegionUnit->getAmount();
             }
         }
 
         if (($this->amount * self::SHIPS_KILLED_PER_SUBMARINE) > $ships) {
             foreach ($this->region->getWorldRegionUnits() as $worldRegionUnit) {
-                if ($worldRegionUnit->getGameUnit()->getId() === self::GAME_UNIT_SHIP_ID) {
+                if ($worldRegionUnit->getGameUnit() === GameUnitEnum::DESTROYER) {
                     $this->worldRegionUnitRepository->remove($worldRegionUnit);
-                    $this->addToOperationLog("You sunk {$ships} {$worldRegionUnit->getGameUnit()->getNameMulti()}!");
+                    $unitName = $this->gameUnitRegistry->find($worldRegionUnit->getGameUnit())?->getNameMulti() ?? '';
+                    $this->addToOperationLog("You sunk {$ships} {$unitName}!");
                 }
             }
 
@@ -53,12 +53,11 @@ final class SubmarineAttack extends OperationProcessor
         } else {
             $shipsDestroyed = $this->amount * self::SHIPS_KILLED_PER_SUBMARINE;
             foreach ($this->region->getWorldRegionUnits() as $worldRegionUnit) {
-                if ($worldRegionUnit->getGameUnit()->getId() === self::GAME_UNIT_SHIP_ID) {
+                if ($worldRegionUnit->getGameUnit() === GameUnitEnum::DESTROYER) {
                     $worldRegionUnit->setAmount($worldRegionUnit->getAmount() - $shipsDestroyed);
                     $this->worldRegionUnitRepository->save($worldRegionUnit);
-                    $this->addToOperationLog(
-                        "You sunk {$shipsDestroyed} {$worldRegionUnit->getGameUnit()->getNameMulti()}!"
-                    );
+                    $unitName = $this->gameUnitRegistry->find($worldRegionUnit->getGameUnit())?->getNameMulti() ?? '';
+                    $this->addToOperationLog("You sunk {$shipsDestroyed} {$unitName}!");
                 }
             }
 
@@ -75,12 +74,12 @@ final class SubmarineAttack extends OperationProcessor
         $submarinesLost = intval($this->amount * 0.2);
 
         foreach ($this->playerRegion->getWorldRegionUnits() as $worldRegionUnit) {
-            if ($worldRegionUnit->getGameUnit()->getId() === self::GAME_UNIT_SPECIAL_OPS_ID) {
+            if ($worldRegionUnit->getGameUnit() === GameUnitEnum::SABOTEUR) {
                 $worldRegionUnit->setAmount(intval($worldRegionUnit->getAmount() - $specialOpsLost));
                 $this->worldRegionUnitRepository->save($worldRegionUnit);
             }
 
-            if ($worldRegionUnit->getGameUnit()->getId() === self::GAME_UNIT_SUBMARINE_ID) {
+            if ($worldRegionUnit->getGameUnit() === GameUnitEnum::SUBMARINE) {
                 $worldRegionUnit->setAmount(intval($worldRegionUnit->getAmount() - $submarinesLost));
                 $this->worldRegionUnitRepository->save($worldRegionUnit);
             }

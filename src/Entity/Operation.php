@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace FrankProjects\UltimateWarfare\Entity;
 
+use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitEnum;
+
 abstract readonly class Operation
 {
     /**
@@ -18,7 +20,7 @@ abstract readonly class Operation
         private float $difficulty,
         private int $maxDistance,
         private string $researchClass,
-        private int $gameUnitId,
+        private GameUnitEnum $gameUnit,
     ) {
     }
 
@@ -79,9 +81,9 @@ abstract readonly class Operation
         return (new $this->researchClass())->getName();
     }
 
-    public function getGameUnitId(): int
+    public function getGameUnit(): GameUnitEnum
     {
-        return $this->gameUnitId;
+        return $this->gameUnit;
     }
 
     public function hasCooldown(): bool

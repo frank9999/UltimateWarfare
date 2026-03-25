@@ -7,7 +7,7 @@ namespace FrankProjects\UltimateWarfare\Repository\Doctrine;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
-use FrankProjects\UltimateWarfare\Entity\GameUnit;
+use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitEnum;
 use FrankProjects\UltimateWarfare\Entity\Player;
 use FrankProjects\UltimateWarfare\Entity\World;
 use FrankProjects\UltimateWarfare\Entity\WorldRegion;
@@ -57,18 +57,17 @@ final class DoctrineWorldRegionRepository implements WorldRegionRepository
     {
         $results = $this->entityManager
             ->createQuery(
-                'SELECT gu.id, sum(wru.amount) as total
+                'SELECT wru.gameUnit, sum(wru.amount) as total
               FROM ' . WorldRegionUnit::class . ' wru
-              JOIN ' . GameUnit::class . ' gu ON wru.gameUnit = gu
               WHERE wru.worldRegion = :worldRegion
-              GROUP BY gu.id'
+              GROUP BY wru.gameUnit'
             )->setParameter('worldRegion', $worldRegion)
             ->getArrayResult();
 
         $gameUnits = [];
-        /** @var array{'id': int, 'total': int} $result */
+        /** @var array{'gameUnit': GameUnitEnum, 'total': int} $result */
         foreach ($results as $result) {
-            $gameUnits[$result['id']] = $result['total'];
+            $gameUnits[$result['gameUnit']->value] = $result['total'];
         }
 
         return $gameUnits;

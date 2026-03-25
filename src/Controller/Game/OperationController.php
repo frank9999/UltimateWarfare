@@ -6,7 +6,7 @@ namespace FrankProjects\UltimateWarfare\Controller\Game;
 
 use FrankProjects\UltimateWarfare\Exception\WorldRegionNotFoundException;
 use FrankProjects\UltimateWarfare\Repository\BombardmentCooldownRepository;
-use FrankProjects\UltimateWarfare\Repository\GameUnitRepository;
+use FrankProjects\UltimateWarfare\Repository\GameUnitRegistry;
 use FrankProjects\UltimateWarfare\Repository\OperationRegistry;
 use FrankProjects\UltimateWarfare\Repository\WorldRegionRepository;
 use FrankProjects\UltimateWarfare\Service\Action\RegionActionService;
@@ -20,7 +20,7 @@ use Throwable;
 final class OperationController extends BaseGameController
 {
     private OperationRegistry $operationRegistry;
-    private GameUnitRepository $gameUnitRepository;
+    private GameUnitRegistry $gameUnitRegistry;
     private WorldRegionRepository $worldRegionRepository;
     private RegionActionService $regionActionService;
     private OperationService $operationService;
@@ -29,7 +29,7 @@ final class OperationController extends BaseGameController
 
     public function __construct(
         OperationRegistry $operationRegistry,
-        GameUnitRepository $gameUnitRepository,
+        GameUnitRegistry $gameUnitRegistry,
         WorldRegionRepository $worldRegionRepository,
         RegionActionService $regionActionService,
         OperationService $operationService,
@@ -37,7 +37,7 @@ final class OperationController extends BaseGameController
         BombardmentCooldownRepository $bombardmentCooldownRepository
     ) {
         $this->operationRegistry = $operationRegistry;
-        $this->gameUnitRepository = $gameUnitRepository;
+        $this->gameUnitRegistry = $gameUnitRegistry;
         $this->worldRegionRepository = $worldRegionRepository;
         $this->regionActionService = $regionActionService;
         $this->operationService = $operationService;
@@ -77,7 +77,7 @@ final class OperationController extends BaseGameController
             return $this->redirectToRoute('Game/RegionList', [], 302);
         }
 
-        $gameUnit = $this->gameUnitRepository->find($operation->getGameUnitId());
+        $gameUnit = $this->gameUnitRegistry->find($operation->getGameUnit());
 
         return $this->render(
             'game/operation/selectRegion.html.twig',
@@ -125,7 +125,7 @@ final class OperationController extends BaseGameController
 
         $gameUnitsData = $this->worldRegionRepository->getWorldGameUnitSumByWorldRegion($playerRegion);
         $operation = $this->operationRegistry->find($operationSlug);
-        $gameUnit = $operation !== null ? $this->gameUnitRepository->find($operation->getGameUnitId()) : null;
+        $gameUnit = $operation !== null ? $this->gameUnitRegistry->find($operation->getGameUnit()) : null;
 
         return $this->render(
             'game/operation/selectGameUnit.html.twig',
@@ -249,7 +249,7 @@ final class OperationController extends BaseGameController
 
         $operationsData = [];
         foreach ($operations as $operation) {
-            $gameUnit = $this->gameUnitRepository->find($operation->getGameUnitId());
+            $gameUnit = $this->gameUnitRegistry->find($operation->getGameUnit());
             $operationsData[] = [
                 'slug' => $operation->getSlug(),
                 'name' => $operation->getName(),
@@ -292,7 +292,7 @@ final class OperationController extends BaseGameController
             return new JsonResponse(['success' => false, 'message' => 'Unknown operation!'], 404);
         }
 
-        $requiredGameUnitId = $operation->getGameUnitId();
+        $requiredGameUnitId = $operation->getGameUnit();
         $maxDistance = $operation->getMaxDistance();
 
         $eligibleRegions = [];
@@ -312,7 +312,7 @@ final class OperationController extends BaseGameController
             $hasUnit = false;
             foreach ($playerRegion->getWorldRegionUnits() as $worldRegionUnit) {
                 if (
-                    $worldRegionUnit->getGameUnit()->getId() === $requiredGameUnitId
+                    $worldRegionUnit->getGameUnit() === $requiredGameUnitId
                     && $worldRegionUnit->getAmount() > 0
                 ) {
                     $hasUnit = true;
@@ -365,17 +365,17 @@ final class OperationController extends BaseGameController
             return new JsonResponse(['success' => false, 'message' => 'Unknown operation!'], 404);
         }
 
-        $requiredGameUnitId = $operation->getGameUnitId();
+        $requiredGameUnitId = $operation->getGameUnit();
         $availableAmount = 0;
 
         foreach ($playerRegion->getWorldRegionUnits() as $worldRegionUnit) {
-            if ($worldRegionUnit->getGameUnit()->getId() === $requiredGameUnitId) {
+            if ($worldRegionUnit->getGameUnit() === $requiredGameUnitId) {
                 $availableAmount = $worldRegionUnit->getAmount();
                 break;
             }
         }
 
-        $gameUnit = $this->gameUnitRepository->find($requiredGameUnitId);
+        $gameUnit = $this->gameUnitRegistry->find($requiredGameUnitId);
 
         return new JsonResponse([
             'success' => true,

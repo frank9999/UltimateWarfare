@@ -55,9 +55,9 @@
                 <td class="text-start" width="210">
                     {% for regionUnit in playerRegion.region.worldRegionUnits %}
                         {% if regionUnit.amount > 1 %}
-                            {{ regionUnit.amount }} {{ regionUnit.gameUnit.nameMulti }}<br />
+                            {{ regionUnit.amount }} {{ (regionUnit.gameUnit|game_unit).nameMulti }}<br />
                         {% else %}
-                            {{ regionUnit.amount }} {{ regionUnit.gameUnit.name }}<br />
+                            {{ regionUnit.amount }} {{ (regionUnit.gameUnit|game_unit).name }}<br />
                         {% endif %}
                     {% else %}
                         No units stationed here!

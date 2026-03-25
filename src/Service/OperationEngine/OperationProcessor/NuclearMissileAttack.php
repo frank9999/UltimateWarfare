@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace FrankProjects\UltimateWarfare\Service\OperationEngine\OperationProcessor;
 
+use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitEnum;
 use FrankProjects\UltimateWarfare\Service\OperationEngine\OperationProcessor;
 
 final class NuclearMissileAttack extends OperationProcessor
@@ -23,7 +24,7 @@ final class NuclearMissileAttack extends OperationProcessor
     public function processPreOperation(): void
     {
         foreach ($this->playerRegion->getWorldRegionUnits() as $worldRegionUnit) {
-            if ($worldRegionUnit->getGameUnit()->getId() === $this->operation->getGameUnitId()) {
+            if ($worldRegionUnit->getGameUnit() === $this->operation->getGameUnit()) {
                 $worldRegionUnit->setAmount($worldRegionUnit->getAmount() - $this->amount);
                 $this->worldRegionUnitRepository->save($worldRegionUnit);
             }
@@ -59,7 +60,7 @@ final class NuclearMissileAttack extends OperationProcessor
         $specialOpsLost = intval($this->getSpecialOps() * 0.05);
 
         foreach ($this->playerRegion->getWorldRegionUnits() as $worldRegionUnit) {
-            if ($worldRegionUnit->getGameUnit()->getId() === self::GAME_UNIT_SPECIAL_OPS_ID) {
+            if ($worldRegionUnit->getGameUnit() === GameUnitEnum::SABOTEUR) {
                 $worldRegionUnit->setAmount(intval($worldRegionUnit->getAmount() - $specialOpsLost));
                 $this->worldRegionUnitRepository->save($worldRegionUnit);
             }

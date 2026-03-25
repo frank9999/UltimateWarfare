@@ -7,10 +7,11 @@ namespace FrankProjects\UltimateWarfare\Repository\Doctrine;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitCategory;
-use FrankProjects\UltimateWarfare\Entity\GameUnit;
+use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitEnum;
 use FrankProjects\UltimateWarfare\Entity\Player;
 use FrankProjects\UltimateWarfare\Entity\WorldRegion;
 use FrankProjects\UltimateWarfare\Entity\WorldRegionUnit;
+use FrankProjects\UltimateWarfare\Repository\GameUnitRegistry;
 use FrankProjects\UltimateWarfare\Repository\WorldRegionUnitRepository;
 
 final class DoctrineWorldRegionUnitRepository implements WorldRegionUnitRepository
@@ -22,10 +23,13 @@ final class DoctrineWorldRegionUnitRepository implements WorldRegionUnitReposito
      */
     private EntityRepository $repository;
 
-    public function __construct(EntityManagerInterface $entityManager)
+    private GameUnitRegistry $gameUnitRegistry;
+
+    public function __construct(EntityManagerInterface $entityManager, GameUnitRegistry $gameUnitRegistry)
     {
         $this->entityManager = $entityManager;
         $this->repository = $this->entityManager->getRepository(WorldRegionUnit::class);
+        $this->gameUnitRegistry = $gameUnitRegistry;
     }
 
     public function find(int $id): ?WorldRegionUnit
@@ -39,16 +43,29 @@ final class DoctrineWorldRegionUnitRepository implements WorldRegionUnitReposito
      */
     public function findAmountAndNetWorthByPlayer(Player $player): array
     {
-        return $this->entityManager->createQuery(
-            'SELECT wru.amount, gu.netWorth
+        $results = $this->entityManager->createQuery(
+            'SELECT wru.gameUnit, wru.amount
               FROM ' . WorldRegionUnit::class . ' wru
               JOIN ' . WorldRegion::class . ' wr ON wru.worldRegion = wr
-              JOIN ' . GameUnit::class . ' gu ON wru.gameUnit = gu
               WHERE wr.player = :player'
         )->setParameter(
             'player',
             $player
-        )->getResult();
+        )->getArrayResult();
+
+        $data = [];
+        /** @var array{gameUnit: GameUnitEnum, amount: int} $result */
+        foreach ($results as $result) {
+            $gameUnit = $this->gameUnitRegistry->find($result['gameUnit']);
+            if ($gameUnit !== null) {
+                $data[] = [
+                    'amount' => $result['amount'],
+                    'netWorth' => $gameUnit->getNetWorth(),
+                ];
+            }
+        }
+
+        return $data;
     }
 
     /**
@@ -58,22 +75,32 @@ final class DoctrineWorldRegionUnitRepository implements WorldRegionUnitReposito
      */
     public function getGameUnitSumByPlayerAndGameUnitCategories(Player $player, array $gameUnitCategories): array
     {
+        $unitIds = [];
+        foreach ($gameUnitCategories as $category) {
+            foreach ($this->gameUnitRegistry->getIdsByCategory($category) as $id) {
+                $unitIds[] = $id;
+            }
+        }
+
+        if ($unitIds === []) {
+            return [];
+        }
+
         $results = $this->entityManager
             ->createQuery(
-                'SELECT gu.id, sum(wru.amount) as total
+                'SELECT wru.gameUnit, sum(wru.amount) as total
               FROM ' . WorldRegionUnit::class . ' wru
               JOIN ' . WorldRegion::class . ' wr ON wru.worldRegion = wr
-              JOIN ' . GameUnit::class . ' gu ON wru.gameUnit = gu
-              WHERE wr.player = :player AND gu.gameUnitCategory IN (:gameUnitCategories)
-              GROUP BY gu.id'
+              WHERE wr.player = :player AND wru.gameUnit IN (:unitIds)
+              GROUP BY wru.gameUnit'
             )->setParameter('player', $player)
-            ->setParameter('gameUnitCategories', $gameUnitCategories)
+            ->setParameter('unitIds', $unitIds)
             ->getArrayResult();
 
         $gameUnits = [];
-        /** @var array{'id': int, 'total': int} $result */
+        /** @var array{gameUnit: GameUnitEnum, total: int} $result */
         foreach ($results as $result) {
-            $gameUnits[$result['id']] = $result['total'];
+            $gameUnits[$result['gameUnit']->value] = $result['total'];
         }
 
         return $gameUnits;

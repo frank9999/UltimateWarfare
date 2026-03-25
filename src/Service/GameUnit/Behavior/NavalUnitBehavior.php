@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace FrankProjects\UltimateWarfare\Service\GameUnit\Behavior;
 
+use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitEnum;
 use FrankProjects\UltimateWarfare\Entity\Player;
 use FrankProjects\UltimateWarfare\Entity\WorldRegion;
 use FrankProjects\UltimateWarfare\Repository\WorldRegionRepository;
@@ -11,8 +12,6 @@ use FrankProjects\UltimateWarfare\Service\GameUnit\AbstractGameUnitBehavior;
 
 class NavalUnitBehavior extends AbstractGameUnitBehavior
 {
-    private const REQUIRED_BUILDING = 'Harbor';
-
     public function __construct(
         private WorldRegionRepository $regionRepository
     ) {
@@ -23,7 +22,7 @@ class NavalUnitBehavior extends AbstractGameUnitBehavior
         // Check 1: Must have Harbor
         $hasHarbor = false;
         foreach ($region->getWorldRegionUnits() as $regionUnit) {
-            if ($regionUnit->getGameUnit()->getName() === self::REQUIRED_BUILDING) {
+            if ($regionUnit->getGameUnit() === GameUnitEnum::HARBOR) {
                 $hasHarbor = true;
                 break;
             }

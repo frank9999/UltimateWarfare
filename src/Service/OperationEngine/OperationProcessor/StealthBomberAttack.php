@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace FrankProjects\UltimateWarfare\Service\OperationEngine\OperationProcessor;
 
 use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitCategory;
+use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitEnum;
 use FrankProjects\UltimateWarfare\Service\OperationEngine\OperationProcessor;
 
 final class StealthBomberAttack extends OperationProcessor
 {
     protected const int BUILDINGS_DESTROYED_PER_BOMBER = 5;
-    protected const int GAME_UNIT_STEALTH_BOMBER_ID = 404;
 
     public function getFormula(): float
     {
@@ -33,18 +33,17 @@ final class StealthBomberAttack extends OperationProcessor
     {
         $totalBuildings = 0;
         foreach ($this->region->getWorldRegionUnits() as $worldRegionUnit) {
-            if ($worldRegionUnit->getGameUnit()->getGameUnitCategory() === GameUnitCategory::SPECIAL_BUILDINGS) {
+            if ($this->gameUnitRegistry->find($worldRegionUnit->getGameUnit())?->getGameUnitCategory() === GameUnitCategory::SPECIAL_BUILDINGS) {
                 $totalBuildings = $totalBuildings + $worldRegionUnit->getAmount();
             }
         }
 
         if (($this->amount * self::BUILDINGS_DESTROYED_PER_BOMBER) > $totalBuildings) {
             foreach ($this->region->getWorldRegionUnits() as $worldRegionUnit) {
-                if ($worldRegionUnit->getGameUnit()->getGameUnitCategory() === GameUnitCategory::SPECIAL_BUILDINGS) {
+                if ($this->gameUnitRegistry->find($worldRegionUnit->getGameUnit())?->getGameUnitCategory() === GameUnitCategory::SPECIAL_BUILDINGS) {
                     $this->worldRegionUnitRepository->remove($worldRegionUnit);
-                    $this->addToOperationLog(
-                        "You destroyed all {$worldRegionUnit->getGameUnit()->getName()} buildings!"
-                    );
+                    $unitName = $this->gameUnitRegistry->find($worldRegionUnit->getGameUnit())?->getName() ?? '';
+                    $this->addToOperationLog("You destroyed all {$unitName} buildings!");
                 }
             }
 
@@ -56,14 +55,13 @@ final class StealthBomberAttack extends OperationProcessor
         } else {
             $buildingsDestroyed = $this->amount * self::BUILDINGS_DESTROYED_PER_BOMBER;
             foreach ($this->region->getWorldRegionUnits() as $worldRegionUnit) {
-                if ($worldRegionUnit->getGameUnit()->getGameUnitCategory() === GameUnitCategory::SPECIAL_BUILDINGS) {
+                if ($this->gameUnitRegistry->find($worldRegionUnit->getGameUnit())?->getGameUnitCategory() === GameUnitCategory::SPECIAL_BUILDINGS) {
                     $percentage = $worldRegionUnit->getAmount() / $totalBuildings;
                     $destroyed = round($buildingsDestroyed * $percentage);
                     $worldRegionUnit->setAmount((int) ($worldRegionUnit->getAmount() - $destroyed));
                     $this->worldRegionUnitRepository->save($worldRegionUnit);
-                    $this->addToOperationLog(
-                        "You destroyed {$destroyed} {$worldRegionUnit->getGameUnit()->getName()} buildings!"
-                    );
+                    $unitName = $this->gameUnitRegistry->find($worldRegionUnit->getGameUnit())?->getName() ?? '';
+                    $this->addToOperationLog("You destroyed {$destroyed} {$unitName} buildings!");
                 }
             }
 
@@ -80,12 +78,12 @@ final class StealthBomberAttack extends OperationProcessor
         $stealthBombersLost = intval($this->amount * 0.1);
 
         foreach ($this->playerRegion->getWorldRegionUnits() as $worldRegionUnit) {
-            if ($worldRegionUnit->getGameUnit()->getId() === self::GAME_UNIT_SPECIAL_OPS_ID) {
+            if ($worldRegionUnit->getGameUnit() === GameUnitEnum::SABOTEUR) {
                 $worldRegionUnit->setAmount(intval($worldRegionUnit->getAmount() - $specialOpsLost));
                 $this->worldRegionUnitRepository->save($worldRegionUnit);
             }
 
-            if ($worldRegionUnit->getGameUnit()->getId() === self::GAME_UNIT_STEALTH_BOMBER_ID) {
+            if ($worldRegionUnit->getGameUnit() === GameUnitEnum::STRATEGIC_BOMBER) {
                 $worldRegionUnit->setAmount(intval($worldRegionUnit->getAmount() - $stealthBombersLost));
                 $this->worldRegionUnitRepository->save($worldRegionUnit);
             }

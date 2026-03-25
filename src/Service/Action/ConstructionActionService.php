@@ -6,11 +6,12 @@ namespace FrankProjects\UltimateWarfare\Service\Action;
 
 use FrankProjects\UltimateWarfare\Entity\Construction;
 use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitCategory;
+use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitEnum;
 use FrankProjects\UltimateWarfare\Entity\GameUnit;
 use FrankProjects\UltimateWarfare\Entity\Player;
 use FrankProjects\UltimateWarfare\Entity\WorldRegion;
 use FrankProjects\UltimateWarfare\Repository\ConstructionRepository;
-use FrankProjects\UltimateWarfare\Repository\GameUnitRepository;
+use FrankProjects\UltimateWarfare\Repository\GameUnitRegistry;
 use FrankProjects\UltimateWarfare\Repository\PlayerRepository;
 use FrankProjects\UltimateWarfare\Repository\WorldRegionUnitRepository;
 use FrankProjects\UltimateWarfare\Service\GameUnit\GameUnitBehaviorFactory;
@@ -20,7 +21,7 @@ use RuntimeException;
 final class ConstructionActionService
 {
     private ConstructionRepository $constructionRepository;
-    private GameUnitRepository $gameUnitRepository;
+    private GameUnitRegistry $gameUnitRegistry;
     private PlayerRepository $playerRepository;
     private WorldRegionUnitRepository $worldRegionUnitRepository;
     private NetWorthUpdaterService $netWorthUpdaterService;
@@ -28,14 +29,14 @@ final class ConstructionActionService
 
     public function __construct(
         ConstructionRepository $constructionRepository,
-        GameUnitRepository $gameUnitRepository,
+        GameUnitRegistry $gameUnitRegistry,
         PlayerRepository $playerRepository,
         WorldRegionUnitRepository $worldRegionUnitRepository,
         NetWorthUpdaterService $netWorthUpdaterService,
         GameUnitBehaviorFactory $behaviorFactory
     ) {
         $this->constructionRepository = $constructionRepository;
-        $this->gameUnitRepository = $gameUnitRepository;
+        $this->gameUnitRegistry = $gameUnitRegistry;
         $this->playerRepository = $playerRepository;
         $this->worldRegionUnitRepository = $worldRegionUnitRepository;
         $this->netWorthUpdaterService = $netWorthUpdaterService;
@@ -67,7 +68,12 @@ final class ConstructionActionService
                 continue;
             }
 
-            $gameUnit = $this->gameUnitRepository->find($gameUnitId);
+            $gameUnitEnum = GameUnitEnum::tryFrom($gameUnitId);
+            if ($gameUnitEnum === null) {
+                continue;
+            }
+
+            $gameUnit = $this->gameUnitRegistry->find($gameUnitEnum);
             if ($gameUnit === null) {
                 continue;
             }
@@ -94,7 +100,7 @@ final class ConstructionActionService
                 $totalBuild = $totalBuild + $amount;
             }
 
-            $constructions[] = Construction::create($region, $player, $gameUnit, $amount);
+            $constructions[] = Construction::create($region, $player, $gameUnit->getId(), $amount);
         }
 
         if ($gameUnitCategory === GameUnitCategory::BUILDINGS) {
@@ -133,8 +139,11 @@ final class ConstructionActionService
         foreach ($constructions as $construction) {
             $this->constructionRepository->save($construction);
 
-            $behavior = $this->behaviorFactory->create($construction->getGameUnit());
-            $behavior->onBuild($region, $construction->getNumber());
+            $constructionGameUnit = $this->gameUnitRegistry->find($construction->getGameUnit());
+            if ($constructionGameUnit !== null) {
+                $behavior = $this->behaviorFactory->create($constructionGameUnit);
+                $behavior->onBuild($region, $construction->getNumber());
+            }
         }
     }
 
@@ -209,7 +218,11 @@ final class ConstructionActionService
         $index = [];
 
         foreach ($region->getWorldRegionUnits() as $worldRegionUnit) {
-            $rowName = $worldRegionUnit->getGameUnit()->getRowName();
+            $gameUnit = $this->gameUnitRegistry->find($worldRegionUnit->getGameUnit());
+            if ($gameUnit === null) {
+                continue;
+            }
+            $rowName = $gameUnit->getRowName();
             $index[$rowName] = ($index[$rowName] ?? 0) + $worldRegionUnit->getAmount();
         }
 
@@ -232,7 +245,12 @@ final class ConstructionActionService
                 continue;
             }
 
-            $gameUnit = $this->gameUnitRepository->find($gameUnitId);
+            $gameUnitEnum = GameUnitEnum::tryFrom($gameUnitId);
+            if ($gameUnitEnum === null) {
+                continue;
+            }
+
+            $gameUnit = $this->gameUnitRegistry->find($gameUnitEnum);
             if ($gameUnit === null) {
                 continue;
             }
@@ -291,7 +309,8 @@ final class ConstructionActionService
     {
         $regionBuildings = 0;
         foreach ($worldRegion->getWorldRegionUnits() as $regionUnit) {
-            if ($regionUnit->getGameUnit()->getGameUnitCategory() === $gameUnitCategory) {
+            $gameUnit = $this->gameUnitRegistry->find($regionUnit->getGameUnit());
+            if ($gameUnit !== null && $gameUnit->getGameUnitCategory() === $gameUnitCategory) {
                 $regionBuildings += $regionUnit->getAmount();
             }
         }
@@ -302,7 +321,7 @@ final class ConstructionActionService
     private function removeGameUnitsFromWorldRegion(WorldRegion $worldRegion, GameUnit $gameUnit, int $amount): void
     {
         foreach ($worldRegion->getWorldRegionUnits() as $worldRegionUnit) {
-            if ($worldRegionUnit->getGameUnit()->getId() !== $gameUnit->getId()) {
+            if ($worldRegionUnit->getGameUnit() !== $gameUnit->getId()) {
                 continue;
             }
 

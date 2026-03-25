@@ -78,11 +78,11 @@
             </td>
             <td class="text-start" width="210">
                 {% for regionUnit in playerRegion.region.worldRegionUnits %}
-                    {% if regionUnit.gameUnit.id == operation.gameUnitId %}
+                    {% if regionUnit.gameUnit.value == operation.gameUnit.value %}
                         {% if regionUnit.amount > 1 %}
-                            {{ regionUnit.amount }} {{ regionUnit.gameUnit.nameMulti }}<br />
+                            {{ regionUnit.amount }} {{ (regionUnit.gameUnit|game_unit).nameMulti }}<br />
                         {% else %}
-                            {{ regionUnit.amount }} {{ regionUnit.gameUnit.name }}<br />
+                            {{ regionUnit.amount }} {{ (regionUnit.gameUnit|game_unit).name }}<br />
                         {% endif %}
                     {% endif %}
                 {% else %}

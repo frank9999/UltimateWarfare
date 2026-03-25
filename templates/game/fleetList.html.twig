@@ -38,7 +38,7 @@
                 </td>
                 <td>
                     {% for unit in fleet.fleetUnits %}
-                        {{ unit.amount }} {{ unit.gameUnit.nameMulti }}<br />
+                        {{ unit.amount }} {{ (unit.gameUnit|game_unit).nameMulti }}<br />
                     {% endfor %}
                 </td>
 

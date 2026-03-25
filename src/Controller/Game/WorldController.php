@@ -9,6 +9,7 @@ use FrankProjects\UltimateWarfare\Entity\Player;
 use FrankProjects\UltimateWarfare\Entity\World;
 use FrankProjects\UltimateWarfare\Entity\WorldRegion;
 use FrankProjects\UltimateWarfare\Repository\BombardmentCooldownRepository;
+use FrankProjects\UltimateWarfare\Repository\GameUnitRegistry;
 use FrankProjects\UltimateWarfare\Repository\PlayerRepository;
 use FrankProjects\UltimateWarfare\Repository\FleetRepository;
 use FrankProjects\UltimateWarfare\Repository\WorldRepository;
@@ -22,17 +23,20 @@ final class WorldController extends BaseGameController
     private WorldRepository $worldRepository;
     private FleetRepository $fleetRepository;
     private BombardmentCooldownRepository $bombardmentCooldownRepository;
+    private GameUnitRegistry $gameUnitRegistry;
 
     public function __construct(
         PlayerRepository $playerRepository,
         WorldRepository $worldRepository,
         FleetRepository $fleetRepository,
-        BombardmentCooldownRepository $bombardmentCooldownRepository
+        BombardmentCooldownRepository $bombardmentCooldownRepository,
+        GameUnitRegistry $gameUnitRegistry
     ) {
         $this->playerRepository = $playerRepository;
         $this->worldRepository = $worldRepository;
         $this->fleetRepository = $fleetRepository;
         $this->bombardmentCooldownRepository = $bombardmentCooldownRepository;
+        $this->gameUnitRegistry = $gameUnitRegistry;
     }
 
     public function create(WorldGeneratorService $worldGeneratorService): Response
@@ -271,9 +275,13 @@ final class WorldController extends BaseGameController
         ];
 
         foreach ($region->getWorldRegionUnits() as $worldRegionUnit) {
-            $gameUnitCategory = $worldRegionUnit->getGameUnit()->getGameUnitCategory();
+            $gameUnit = $this->gameUnitRegistry->find($worldRegionUnit->getGameUnit());
+            if ($gameUnit === null) {
+                continue;
+            }
+            $gameUnitCategory = $gameUnit->getGameUnitCategory();
             $amount = $worldRegionUnit->getAmount();
-            $unitName = $worldRegionUnit->getGameUnit()->getName();
+            $unitName = $gameUnit->getName();
 
             match ($gameUnitCategory) {
                 GameUnitCategory::BUILDINGS => $this->addUnitToSummary($summary, 'buildings', $unitName, $amount),
@@ -335,8 +343,9 @@ final class WorldController extends BaseGameController
             foreach ($fleet->getFleetUnits() as $fleetUnit) {
                 $amount = $fleetUnit->getAmount();
                 $totalUnitCount += $amount;
+                $gameUnit = $this->gameUnitRegistry->find($fleetUnit->getGameUnit());
                 $units[] = [
-                    'name' => $fleetUnit->getGameUnit()->getName(),
+                    'name' => $gameUnit !== null ? $gameUnit->getName() : '',
                     'amount' => $amount,
                 ];
             }

@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace FrankProjects\UltimateWarfare\Service\BattleEngine;
 
+use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitEnum;
 use FrankProjects\UltimateWarfare\Entity\FleetUnit;
 use FrankProjects\UltimateWarfare\Entity\GameUnit;
-use FrankProjects\UltimateWarfare\Entity\GameUnit\BattleStats\AbstractBattleStats;
+use FrankProjects\UltimateWarfare\Entity\BattleStats\AbstractBattleStats;
 use FrankProjects\UltimateWarfare\Entity\WorldRegionUnit;
+use FrankProjects\UltimateWarfare\Repository\GameUnitRegistry;
 use RuntimeException;
 
 abstract class BattlePhase implements IBattlePhase
@@ -33,37 +35,40 @@ abstract class BattlePhase implements IBattlePhase
      */
     protected array $battleLog = [];
 
+    protected GameUnitRegistry $gameUnitRegistry;
+
     /**
-     * BattlePhase constructor.
-     *
-     * @param string $name
      * @param FleetUnit[] $attackerGameUnits
      * @param WorldRegionUnit[] $defenderGameUnits
      */
-    private function __construct(string $name, array $attackerGameUnits, array $defenderGameUnits)
-    {
+    private function __construct(
+        string $name,
+        array $attackerGameUnits,
+        array $defenderGameUnits,
+        GameUnitRegistry $gameUnitRegistry
+    ) {
         $this->name = $name;
         $this->attackerGameUnits = $attackerGameUnits;
         $this->defenderGameUnits = $defenderGameUnits;
+        $this->gameUnitRegistry = $gameUnitRegistry;
     }
 
     /**
-     * @param string $battlePhaseName
      * @param FleetUnit[] $attackerGameUnits
      * @param WorldRegionUnit[] $defenderGameUnits
-     * @return BattlePhase
      */
     public static function factory(
         string $battlePhaseName,
         array $attackerGameUnits,
-        array $defenderGameUnits
+        array $defenderGameUnits,
+        GameUnitRegistry $gameUnitRegistry
     ): BattlePhase {
         $className = "FrankProjects\\UltimateWarfare\\Service\\BattleEngine\\BattlePhase\\" . ucfirst($battlePhaseName);
         if (!class_exists($className) || is_subclass_of($className, __CLASS__) === false) {
             throw new RuntimeException("Unknown BattlePhase {$battlePhaseName}");
         }
 
-        return new $className($battlePhaseName, $attackerGameUnits, $defenderGameUnits);
+        return new $className($battlePhaseName, $attackerGameUnits, $defenderGameUnits, $gameUnitRegistry);
     }
 
     public function getName(): string
@@ -134,15 +139,20 @@ abstract class BattlePhase implements IBattlePhase
     private function processBattlePhase(int $power, array $gameUnits, string $action): array
     {
         foreach ($gameUnits as $index => $gameUnit) {
-            $deaths = $this->calculateCasualties($gameUnit->getGameUnit(), $power);
+            $resolvedUnit = $this->gameUnitRegistry->find($gameUnit->getGameUnit());
+            if ($resolvedUnit === null) {
+                continue;
+            }
+
+            $deaths = $this->calculateCasualties($resolvedUnit, $power);
 
             if ($deaths >= $gameUnit->getAmount()) {
                 unset($gameUnits[$index]);
-                $this->addToBattleLog("All {$action} {$gameUnit->getGameUnit()->getNameMulti()} died in the fight");
+                $this->addToBattleLog("All {$action} {$resolvedUnit->getNameMulti()} died in the fight");
             } elseif ($deaths > 0) {
                 $gameUnits[$index]->setAmount($gameUnit->getAmount() - $deaths);
                 $this->addToBattleLog(
-                    "{$deaths} {$action} {$gameUnit->getGameUnit()->getNameMulti()} died in the fight"
+                    "{$deaths} {$action} {$resolvedUnit->getNameMulti()} died in the fight"
                 );
             }
         }
@@ -183,7 +193,11 @@ abstract class BattlePhase implements IBattlePhase
     {
         $power = 0;
         foreach ($this->getAttackerGameUnits() as $fleetUnit) {
-            $power += $this->getBattlePhaseBattleStats($fleetUnit->getGameUnit())->getAttack()
+            $gameUnit = $this->gameUnitRegistry->find($fleetUnit->getGameUnit());
+            if ($gameUnit === null) {
+                continue;
+            }
+            $power += $this->getBattlePhaseBattleStats($gameUnit)->getAttack()
                 * $fleetUnit->getAmount();
         }
 
@@ -194,7 +208,11 @@ abstract class BattlePhase implements IBattlePhase
     {
         $power = 0;
         foreach ($this->getDefenderGameUnits() as $worldRegionUnit) {
-            $power += $this->getBattlePhaseBattleStats($worldRegionUnit->getGameUnit())->getDefence()
+            $gameUnit = $this->gameUnitRegistry->find($worldRegionUnit->getGameUnit());
+            if ($gameUnit === null) {
+                continue;
+            }
+            $power += $this->getBattlePhaseBattleStats($gameUnit)->getDefence()
                 * $worldRegionUnit->getAmount();
         }
 

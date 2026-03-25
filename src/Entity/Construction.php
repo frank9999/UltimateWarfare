@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace FrankProjects\UltimateWarfare\Entity;
 
+use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitEnum;
+
 class Construction
 {
     private int $id;
@@ -11,7 +13,7 @@ class Construction
     private int $timestamp;
     private Player $player;
     private WorldRegion $worldRegion;
-    private GameUnit $gameUnit;
+    private GameUnitEnum $gameUnit;
 
     public function setId(int $id): void
     {
@@ -63,12 +65,12 @@ class Construction
         $this->worldRegion = $worldRegion;
     }
 
-    public function getGameUnit(): GameUnit
+    public function getGameUnit(): GameUnitEnum
     {
         return $this->gameUnit;
     }
 
-    public function setGameUnit(GameUnit $gameUnit): void
+    public function setGameUnit(GameUnitEnum $gameUnit): void
     {
         $this->gameUnit = $gameUnit;
     }
@@ -76,7 +78,7 @@ class Construction
     public static function create(
         WorldRegion $worldRegion,
         Player $player,
-        GameUnit $gameUnit,
+        GameUnitEnum $gameUnit,
         int $amount
     ): Construction {
         $construction = new Construction();

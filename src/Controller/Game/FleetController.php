@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace FrankProjects\UltimateWarfare\Controller\Game;
 
 use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitCategory;
+use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitEnum;
 use FrankProjects\UltimateWarfare\Entity\Player;
 use FrankProjects\UltimateWarfare\Entity\WorldRegion;
 use FrankProjects\UltimateWarfare\Exception\WorldRegionNotFoundException;
-use FrankProjects\UltimateWarfare\Repository\GameUnitRepository;
+use FrankProjects\UltimateWarfare\Repository\GameUnitRegistry;
 use FrankProjects\UltimateWarfare\Repository\WorldRegionRepository;
 use FrankProjects\UltimateWarfare\Service\Action\FleetActionService;
 use FrankProjects\UltimateWarfare\Service\Action\RegionActionService;
@@ -23,20 +24,20 @@ final class FleetController extends BaseGameController
     private WorldRegionRepository $worldRegionRepository;
     private FleetActionService $fleetActionService;
     private RegionActionService $regionActionService;
-    private GameUnitRepository $gameUnitRepository;
+    private GameUnitRegistry $gameUnitRegistry;
     private DistanceCalculator $distanceCalculator;
 
     public function __construct(
         WorldRegionRepository $worldRegionRepository,
         FleetActionService $fleetActionService,
         RegionActionService $regionActionService,
-        GameUnitRepository $gameUnitRepository,
+        GameUnitRegistry $gameUnitRegistry,
         DistanceCalculator $distanceCalculator
     ) {
         $this->worldRegionRepository = $worldRegionRepository;
         $this->fleetActionService = $fleetActionService;
         $this->regionActionService = $regionActionService;
-        $this->gameUnitRepository = $gameUnitRepository;
+        $this->gameUnitRegistry = $gameUnitRegistry;
         $this->distanceCalculator = $distanceCalculator;
     }
 
@@ -97,7 +98,12 @@ final class FleetController extends BaseGameController
                 continue;
             }
 
-            $gameUnit = $worldRegionUnit->getGameUnit();
+            $gameUnitEnum = $worldRegionUnit->getGameUnit();
+            $gameUnit = $this->gameUnitRegistry->find($gameUnitEnum);
+            if ($gameUnit === null) {
+                continue;
+            }
+
             $category = $gameUnit->getGameUnitCategory();
 
             if (!$category->isSendable()) {
@@ -117,7 +123,7 @@ final class FleetController extends BaseGameController
             }
 
             $units[] = [
-                'gameUnitId' => $gameUnit->getId(),
+                'gameUnitId' => $gameUnitEnum->value,
                 'name' => $gameUnit->getName(),
                 'image' => $gameUnit->getImage(),
                 'imageDir' => $category->getImageDir(),
@@ -249,7 +255,8 @@ final class FleetController extends BaseGameController
         $sentUnits = [];
         $totalUnitCount = 0;
         foreach ($filteredUnits as $gameUnitId => $amount) {
-            $gameUnit = $this->gameUnitRepository->find($gameUnitId);
+            $gameUnitEnum = GameUnitEnum::tryFrom($gameUnitId);
+            $gameUnit = $gameUnitEnum !== null ? $this->gameUnitRegistry->find($gameUnitEnum) : null;
             if ($gameUnit !== null) {
                 $sentUnits[] = [
                     'name' => $gameUnit->getName(),
@@ -318,7 +325,7 @@ final class FleetController extends BaseGameController
 
         $gameUnitsData = $this->worldRegionRepository->getWorldGameUnitSumByWorldRegion($worldRegion);
         $targetRegions = $this->getTargetWorldRegionData($player, $worldRegion);
-        $gameUnits = $this->gameUnitRepository->findByGameUnitCategories([
+        $gameUnits = $this->gameUnitRegistry->findByCategories([
             GameUnitCategory::TROOPS,
             GameUnitCategory::AIR_UNITS,
             GameUnitCategory::NAVAL_UNITS,

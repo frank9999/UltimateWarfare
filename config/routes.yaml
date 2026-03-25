@@ -38,15 +38,6 @@ Admin/GameNews/Remove:
     requirements:
         gameNewsId: '\d+'
 
-Admin/GameUnit/List:
-    path:      /admin/game-unit/list
-    controller: FrankProjects\UltimateWarfare\Controller\Admin\GameUnitController::list
-
-Admin/GameUnit/Edit:
-    path:      /admin/game-unit/edit/{gameUnitId}
-    controller: FrankProjects\UltimateWarfare\Controller\Admin\GameUnitController::edit
-    requirements:
-        gameUnitId: '\d+'
 
 Admin/ServerLogs:
     path:      /admin/server-logs

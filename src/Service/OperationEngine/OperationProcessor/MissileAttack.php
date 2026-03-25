@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace FrankProjects\UltimateWarfare\Service\OperationEngine\OperationProcessor;
 
 use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitCategory;
+use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitEnum;
 use FrankProjects\UltimateWarfare\Service\OperationEngine\OperationProcessor;
 
 final class MissileAttack extends OperationProcessor
@@ -24,7 +25,7 @@ final class MissileAttack extends OperationProcessor
     public function processPreOperation(): void
     {
         foreach ($this->playerRegion->getWorldRegionUnits() as $worldRegionUnit) {
-            if ($worldRegionUnit->getGameUnit()->getId() === $this->operation->getGameUnitId()) {
+            if ($worldRegionUnit->getGameUnit() === $this->operation->getGameUnit()) {
                 $worldRegionUnit->setAmount($worldRegionUnit->getAmount() - $this->amount);
                 $this->worldRegionUnitRepository->save($worldRegionUnit);
             }
@@ -35,7 +36,7 @@ final class MissileAttack extends OperationProcessor
     {
         $totalBuildings = 0;
         foreach ($this->region->getWorldRegionUnits() as $worldRegionUnit) {
-            if ($worldRegionUnit->getGameUnit()->getGameUnitCategory() === GameUnitCategory::BUILDINGS) {
+            if ($this->gameUnitRegistry->find($worldRegionUnit->getGameUnit())?->getGameUnitCategory() === GameUnitCategory::BUILDINGS) {
                 $totalBuildings = $totalBuildings + $worldRegionUnit->getAmount();
             }
         }
@@ -43,11 +44,10 @@ final class MissileAttack extends OperationProcessor
         if (($this->amount / 2) > $totalBuildings) {
             $buildingsDestroyed = $totalBuildings;
             foreach ($this->region->getWorldRegionUnits() as $worldRegionUnit) {
-                if ($worldRegionUnit->getGameUnit()->getGameUnitCategory() === GameUnitCategory::BUILDINGS) {
+                if ($this->gameUnitRegistry->find($worldRegionUnit->getGameUnit())?->getGameUnitCategory() === GameUnitCategory::BUILDINGS) {
                     $this->worldRegionUnitRepository->remove($worldRegionUnit);
-                    $this->addToOperationLog(
-                        "You destroyed all {$worldRegionUnit->getGameUnit()->getName()} buildings!"
-                    );
+                    $unitName = $this->gameUnitRegistry->find($worldRegionUnit->getGameUnit())?->getName() ?? '';
+                    $this->addToOperationLog("You destroyed all {$unitName} buildings!");
                 }
             }
 
@@ -57,14 +57,13 @@ final class MissileAttack extends OperationProcessor
         } else {
             $buildingsDestroyed = intval($this->amount / 2);
             foreach ($this->region->getWorldRegionUnits() as $worldRegionUnit) {
-                if ($worldRegionUnit->getGameUnit()->getGameUnitCategory() === GameUnitCategory::BUILDINGS) {
+                if ($this->gameUnitRegistry->find($worldRegionUnit->getGameUnit())?->getGameUnitCategory() === GameUnitCategory::BUILDINGS) {
                     $percentage = $worldRegionUnit->getAmount() / $totalBuildings;
                     $destroyed = intval($buildingsDestroyed * $percentage);
                     $worldRegionUnit->setAmount($worldRegionUnit->getAmount() - $destroyed);
                     $this->worldRegionUnitRepository->save($worldRegionUnit);
-                    $this->addToOperationLog(
-                        "You destroyed {$destroyed} {$worldRegionUnit->getGameUnit()->getName()} buildings!"
-                    );
+                    $unitName = $this->gameUnitRegistry->find($worldRegionUnit->getGameUnit())?->getName() ?? '';
+                    $this->addToOperationLog("You destroyed {$destroyed} {$unitName} buildings!");
                 }
             }
 
@@ -82,7 +81,7 @@ final class MissileAttack extends OperationProcessor
         $troopsLost = intval($this->getSpecialOps() * 0.05);
 
         foreach ($this->playerRegion->getWorldRegionUnits() as $worldRegionUnit) {
-            if ($worldRegionUnit->getGameUnit()->getId() === self::GAME_UNIT_SPECIAL_OPS_ID) {
+            if ($worldRegionUnit->getGameUnit() === GameUnitEnum::SABOTEUR) {
                 $worldRegionUnit->setAmount(intval($worldRegionUnit->getAmount() - $troopsLost));
                 $this->worldRegionUnitRepository->save($worldRegionUnit);
             }

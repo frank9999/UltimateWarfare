@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace FrankProjects\UltimateWarfare\Service\OperationEngine;
 
+use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitEnum;
 use FrankProjects\UltimateWarfare\Entity\Operation;
 use FrankProjects\UltimateWarfare\Entity\Player;
 use FrankProjects\UltimateWarfare\Entity\WorldRegion;
 use FrankProjects\UltimateWarfare\Repository\ConstructionRepository;
+use FrankProjects\UltimateWarfare\Repository\GameUnitRegistry;
 use FrankProjects\UltimateWarfare\Repository\PlayerRepository;
 use FrankProjects\UltimateWarfare\Repository\WorldRegionRepository;
 use FrankProjects\UltimateWarfare\Repository\WorldRegionUnitRepository;
@@ -16,8 +18,6 @@ use RuntimeException;
 
 abstract class OperationProcessor implements OperationInterface
 {
-    protected const int GAME_UNIT_SPECIAL_OPS_ID = 401;
-    protected const int GAME_UNIT_GUARD_ID = 400;
     protected WorldRegion $region;
     protected Operation $operation;
     protected WorldRegion $playerRegion;
@@ -27,24 +27,12 @@ abstract class OperationProcessor implements OperationInterface
     protected WorldRegionUnitRepository $worldRegionUnitRepository;
     protected WorldRegionRepository $worldRegionRepository;
     protected ConstructionRepository $constructionRepository;
+    protected GameUnitRegistry $gameUnitRegistry;
     /**
      * @var array <int, string>
      */
     protected array $operationLog = [];
 
-    /**
-     * OperationProcessor constructor.
-     *
-     * @param WorldRegion $region
-     * @param Operation $operation
-     * @param WorldRegion $playerRegion
-     * @param int $amount
-     * @param ReportCreator $reportCreator
-     * @param PlayerRepository $playerRepository
-     * @param WorldRegionUnitRepository $worldRegionUnitRepository
-     * @param WorldRegionRepository $worldRegionRepository
-     * @param ConstructionRepository $constructionRepository
-     */
     private function __construct(
         WorldRegion $region,
         Operation $operation,
@@ -54,7 +42,8 @@ abstract class OperationProcessor implements OperationInterface
         PlayerRepository $playerRepository,
         WorldRegionUnitRepository $worldRegionUnitRepository,
         WorldRegionRepository $worldRegionRepository,
-        ConstructionRepository $constructionRepository
+        ConstructionRepository $constructionRepository,
+        GameUnitRegistry $gameUnitRegistry
     ) {
         $this->region = $region;
         $this->operation = $operation;
@@ -65,6 +54,7 @@ abstract class OperationProcessor implements OperationInterface
         $this->worldRegionUnitRepository = $worldRegionUnitRepository;
         $this->worldRegionRepository = $worldRegionRepository;
         $this->constructionRepository = $constructionRepository;
+        $this->gameUnitRegistry = $gameUnitRegistry;
     }
 
     public static function factory(
@@ -76,7 +66,8 @@ abstract class OperationProcessor implements OperationInterface
         PlayerRepository $playerRepository,
         WorldRegionUnitRepository $worldRegionUnitRepository,
         WorldRegionRepository $worldRegionRepository,
-        ConstructionRepository $constructionRepository
+        ConstructionRepository $constructionRepository,
+        GameUnitRegistry $gameUnitRegistry
     ): OperationInterface {
         $className = $operation->getProcessorClass();
         if (!class_exists($className) || is_subclass_of($className, OperationInterface::class) === false) {
@@ -92,7 +83,8 @@ abstract class OperationProcessor implements OperationInterface
             $playerRepository,
             $worldRegionUnitRepository,
             $worldRegionRepository,
-            $constructionRepository
+            $constructionRepository,
+            $gameUnitRegistry
         );
     }
 
@@ -125,7 +117,7 @@ abstract class OperationProcessor implements OperationInterface
     protected function getSpecialOps(): int
     {
         foreach ($this->playerRegion->getWorldRegionUnits() as $worldRegionUnit) {
-            if ($worldRegionUnit->getGameUnit()->getId() === self::GAME_UNIT_SPECIAL_OPS_ID) {
+            if ($worldRegionUnit->getGameUnit() === GameUnitEnum::SABOTEUR) {
                 return $worldRegionUnit->getAmount();
             }
         }
@@ -136,7 +128,7 @@ abstract class OperationProcessor implements OperationInterface
     protected function getGuards(): int
     {
         foreach ($this->region->getWorldRegionUnits() as $worldRegionUnit) {
-            if ($worldRegionUnit->getGameUnit()->getId() === self::GAME_UNIT_GUARD_ID) {
+            if ($worldRegionUnit->getGameUnit() === GameUnitEnum::GUARD) {
                 return $worldRegionUnit->getAmount();
             }
         }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace FrankProjects\UltimateWarfare\Entity\Operation;
 
+use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitEnum;
 use FrankProjects\UltimateWarfare\Entity\Operation;
 use FrankProjects\UltimateWarfare\Entity\Research\SpecialOperations2Research;
 use FrankProjects\UltimateWarfare\Service\OperationEngine\OperationProcessor\ArtilleryBombardment;
@@ -24,7 +25,7 @@ final readonly class ArtilleryBombardmentOperation extends Operation
             difficulty: 0,
             maxDistance: 2,
             researchClass: SpecialOperations2Research::class,
-            gameUnitId: 603,
+            gameUnit: GameUnitEnum::ARTILLERY,
         );
     }
 

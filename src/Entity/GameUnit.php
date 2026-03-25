@@ -4,77 +4,36 @@ declare(strict_types=1);
 
 namespace FrankProjects\UltimateWarfare\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitCategory;
-use FrankProjects\UltimateWarfare\Entity\GameUnit\BattleStats;
-use FrankProjects\UltimateWarfare\Entity\GameUnit\Cost;
-use FrankProjects\UltimateWarfare\Entity\GameUnit\Income;
-use FrankProjects\UltimateWarfare\Entity\GameUnit\Upkeep;
+use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitEnum;
+use FrankProjects\UltimateWarfare\Entity\GameResources\Cost;
+use FrankProjects\UltimateWarfare\Entity\GameResources\Income;
+use FrankProjects\UltimateWarfare\Entity\GameResources\Upkeep;
 
-class GameUnit
+abstract class GameUnit
 {
-    private int $id;
-    private string $name;
-    private string $nameMulti;
-    private string $rowName;
-    private string $image;
-    private int $netWorth;
-    private int $timestamp;
-    private string $description;
-
-    /** @var Collection<int, WorldRegionUnit> */
-    private Collection $worldRegionUnits;
-
-    /** @var Collection<int, Construction> */
-    private Collection $constructions;
-
-    /** @var Collection<int, FleetUnit> */
-    private Collection $fleetUnits;
-
-    private BattleStats $battleStats;
-    private Cost $cost;
-    private Income $income;
-    private Upkeep $upkeep;
-
-    private ?string $behaviorClass = null; // Links to behavior implementation
-
-    private GameUnitCategory $gameUnitCategory;
-
-    public function __construct()
-    {
-        $this->worldRegionUnits = new ArrayCollection();
-        $this->constructions = new ArrayCollection();
-        $this->fleetUnits = new ArrayCollection();
-        $this->battleStats = new BattleStats();
-        $this->cost = new Cost();
-        $this->income = new Income();
-        $this->upkeep = new Upkeep();
+    public function __construct(
+        private readonly string $name,
+        private readonly string $nameMulti,
+        private readonly string $rowName,
+        private readonly string $image,
+        private readonly int $netWorth,
+        private readonly int $timestamp,
+        private readonly string $description,
+        private readonly GameUnitCategory $gameUnitCategory,
+        private readonly ?string $behaviorClass,
+        private readonly Cost $cost,
+        private readonly Income $income,
+        private readonly Upkeep $upkeep,
+        private readonly BattleStats $battleStats,
+    ) {
     }
 
-    public function setId(int $id): void
-    {
-        $this->id = $id;
-    }
-
-    public function getId(): int
-    {
-        return $this->id;
-    }
-
-    public function setName(string $name): void
-    {
-        $this->name = $name;
-    }
+    abstract public function getId(): GameUnitEnum;
 
     public function getName(): string
     {
         return $this->name;
-    }
-
-    public function setNameMulti(string $nameMulti): void
-    {
-        $this->nameMulti = $nameMulti;
     }
 
     public function getNameMulti(): string
@@ -82,19 +41,9 @@ class GameUnit
         return $this->nameMulti;
     }
 
-    public function setRowName(string $rowName): void
-    {
-        $this->rowName = $rowName;
-    }
-
     public function getRowName(): string
     {
         return $this->rowName;
-    }
-
-    public function setImage(string $image): void
-    {
-        $this->image = $image;
     }
 
     public function getImage(): string
@@ -102,19 +51,9 @@ class GameUnit
         return $this->image;
     }
 
-    public function setNetWorth(int $netWorth): void
-    {
-        $this->netWorth = $netWorth;
-    }
-
     public function getNetWorth(): int
     {
         return $this->netWorth;
-    }
-
-    public function setTimestamp(int $timestamp): void
-    {
-        $this->timestamp = $timestamp;
     }
 
     public function getTimestamp(): int
@@ -122,19 +61,19 @@ class GameUnit
         return $this->timestamp;
     }
 
-    public function setDescription(string $description): void
-    {
-        $this->description = $description;
-    }
-
     public function getDescription(): string
     {
         return $this->description;
     }
 
-    public function getBattleStats(): BattleStats
+    public function getGameUnitCategory(): GameUnitCategory
     {
-        return $this->battleStats;
+        return $this->gameUnitCategory;
+    }
+
+    public function getBehaviorClass(): ?string
+    {
+        return $this->behaviorClass;
     }
 
     public function getCost(): Cost
@@ -152,71 +91,8 @@ class GameUnit
         return $this->upkeep;
     }
 
-    /**
-     * @return Collection<int, WorldRegionUnit>
-     */
-    public function getWorldRegionUnits(): Collection
+    public function getBattleStats(): BattleStats
     {
-        return $this->worldRegionUnits;
-    }
-
-    /**
-     * @param Collection<int, WorldRegionUnit> $worldRegionUnits
-     */
-    public function setWorldRegionUnits(Collection $worldRegionUnits): void
-    {
-        $this->worldRegionUnits = $worldRegionUnits;
-    }
-
-    /**
-     * @return Collection<int, Construction>
-     */
-    public function getConstructions(): Collection
-    {
-        return $this->constructions;
-    }
-
-    /**
-     * @param Collection<int, Construction> $constructions
-     */
-    public function setConstructions(Collection $constructions): void
-    {
-        $this->constructions = $constructions;
-    }
-
-    /**
-     * @return Collection<int, FleetUnit>
-     */
-    public function getFleetUnits(): Collection
-    {
-        return $this->fleetUnits;
-    }
-
-    /**
-     * @param Collection<int, FleetUnit> $fleetUnits
-     */
-    public function setFleetUnits(Collection $fleetUnits): void
-    {
-        $this->fleetUnits = $fleetUnits;
-    }
-
-    public function getBehaviorClass(): ?string
-    {
-        return $this->behaviorClass;
-    }
-
-    public function setBehaviorClass(?string $behaviorClass): void
-    {
-        $this->behaviorClass = $behaviorClass;
-    }
-
-    public function getGameUnitCategory(): GameUnitCategory
-    {
-        return $this->gameUnitCategory;
-    }
-
-    public function setGameUnitCategory(GameUnitCategory $gameUnitCategory): void
-    {
-        $this->gameUnitCategory = $gameUnitCategory;
+        return $this->battleStats;
     }
 }

@@ -5,13 +5,12 @@ declare(strict_types=1);
 namespace FrankProjects\UltimateWarfare\Service\OperationEngine\OperationProcessor;
 
 use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitCategory;
+use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitEnum;
 use FrankProjects\UltimateWarfare\Entity\Report;
 use FrankProjects\UltimateWarfare\Service\OperationEngine\OperationProcessor;
 
 final class Spy extends OperationProcessor
 {
-    protected const int GAME_UNIT_SPY_ID = 407;
-
     public function getFormula(): float
     {
         $guards = $this->getGuards();
@@ -33,10 +32,9 @@ final class Spy extends OperationProcessor
         $this->addToOperationLog("Searching for buildings...");
         $buildingsFound = false;
         foreach ($this->region->getWorldRegionUnits() as $worldRegionUnit) {
-            if ($worldRegionUnit->getGameUnit()->getGameUnitCategory() === GameUnitCategory::BUILDINGS) {
-                $this->addToOperationLog(
-                    "- {$worldRegionUnit->getAmount()} {$worldRegionUnit->getGameUnit()->getNameMulti()}"
-                );
+            $resolvedUnit = $this->gameUnitRegistry->find($worldRegionUnit->getGameUnit());
+            if ($resolvedUnit?->getGameUnitCategory() === GameUnitCategory::BUILDINGS) {
+                $this->addToOperationLog("- {$worldRegionUnit->getAmount()} {$resolvedUnit->getNameMulti()}");
                 $buildingsFound = true;
             }
         }
@@ -50,10 +48,9 @@ final class Spy extends OperationProcessor
         $this->addToOperationLog("Searching for units...");
         $unitsFound = false;
         foreach ($this->region->getWorldRegionUnits() as $worldRegionUnit) {
-            if ($worldRegionUnit->getGameUnit()->getGameUnitCategory() === GameUnitCategory::TROOPS) {
-                $this->addToOperationLog(
-                    "- {$worldRegionUnit->getAmount()} {$worldRegionUnit->getGameUnit()->getNameMulti()}"
-                );
+            $resolvedUnit = $this->gameUnitRegistry->find($worldRegionUnit->getGameUnit());
+            if ($resolvedUnit?->getGameUnitCategory() === GameUnitCategory::TROOPS) {
+                $this->addToOperationLog("- {$worldRegionUnit->getAmount()} {$resolvedUnit->getNameMulti()}");
                 $unitsFound = true;
             }
         }
@@ -70,7 +67,7 @@ final class Spy extends OperationProcessor
         $spiesLost = intval($this->amount * 0.05);
 
         foreach ($this->playerRegion->getWorldRegionUnits() as $worldRegionUnit) {
-            if ($worldRegionUnit->getGameUnit()->getId() === self::GAME_UNIT_SPY_ID) {
+            if ($worldRegionUnit->getGameUnit() === GameUnitEnum::SPY) {
                 $worldRegionUnit->setAmount(intval($worldRegionUnit->getAmount() - $spiesLost));
                 $this->worldRegionUnitRepository->save($worldRegionUnit);
             }

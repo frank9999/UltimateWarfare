@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace FrankProjects\UltimateWarfare\Entity\Operation;
 
+use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitEnum;
 use FrankProjects\UltimateWarfare\Entity\Operation;
 use FrankProjects\UltimateWarfare\Entity\Research\SpecialOperationsResearch;
 use FrankProjects\UltimateWarfare\Service\OperationEngine\OperationProcessor\MissileAttack;
@@ -23,7 +24,7 @@ final readonly class MissileAttackOperation extends Operation
             difficulty: 0.5,
             maxDistance: 3,
             researchClass: SpecialOperationsResearch::class,
-            gameUnitId: 405,
+            gameUnit: GameUnitEnum::ROCKET,
         );
     }
 

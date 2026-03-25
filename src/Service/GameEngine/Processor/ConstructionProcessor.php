@@ -9,6 +9,7 @@ use FrankProjects\UltimateWarfare\Entity\Player;
 use FrankProjects\UltimateWarfare\Entity\Report;
 use FrankProjects\UltimateWarfare\Entity\WorldRegionUnit;
 use FrankProjects\UltimateWarfare\Repository\ConstructionRepository;
+use FrankProjects\UltimateWarfare\Repository\GameUnitRegistry;
 use FrankProjects\UltimateWarfare\Repository\PlayerRepository;
 use FrankProjects\UltimateWarfare\Repository\ReportRepository;
 use FrankProjects\UltimateWarfare\Repository\WorldRegionUnitRepository;
@@ -22,6 +23,7 @@ final class ConstructionProcessor implements Processor
     private ReportRepository $reportRepository;
     private WorldRegionUnitRepository $worldRegionUnitRepository;
     private NetWorthUpdaterService $netWorthUpdaterService;
+    private GameUnitRegistry $gameUnitRegistry;
     private int $constructionTimeOverride;
 
     public function __construct(
@@ -30,6 +32,7 @@ final class ConstructionProcessor implements Processor
         ReportRepository $reportRepository,
         WorldRegionUnitRepository $worldRegionUnitRepository,
         NetWorthUpdaterService $netWorthUpdaterService,
+        GameUnitRegistry $gameUnitRegistry,
         int $constructionTimeOverride
     ) {
         $this->constructionRepository = $constructionRepository;
@@ -37,6 +40,7 @@ final class ConstructionProcessor implements Processor
         $this->reportRepository = $reportRepository;
         $this->worldRegionUnitRepository = $worldRegionUnitRepository;
         $this->netWorthUpdaterService = $netWorthUpdaterService;
+        $this->gameUnitRegistry = $gameUnitRegistry;
         $this->constructionTimeOverride = $constructionTimeOverride;
     }
 
@@ -67,15 +71,20 @@ final class ConstructionProcessor implements Processor
 
     private function updatePlayerResources(Player $player, Construction $construction): Player
     {
-        $upkeepCash = $construction->getNumber() * $construction->getGameUnit()->getUpkeep()->getCash();
-        $upkeepFood = $construction->getNumber() * $construction->getGameUnit()->getUpkeep()->getFood();
-        $upkeepWood = $construction->getNumber() * $construction->getGameUnit()->getUpkeep()->getWood();
-        $upkeepSteel = $construction->getNumber() * $construction->getGameUnit()->getUpkeep()->getSteel();
+        $gameUnit = $this->gameUnitRegistry->find($construction->getGameUnit());
+        if ($gameUnit === null) {
+            return $player;
+        }
 
-        $incomeCash = $construction->getNumber() * $construction->getGameUnit()->getIncome()->getCash();
-        $incomeFood = $construction->getNumber() * $construction->getGameUnit()->getIncome()->getFood();
-        $incomeWood = $construction->getNumber() * $construction->getGameUnit()->getIncome()->getWood();
-        $incomeSteel = $construction->getNumber() * $construction->getGameUnit()->getIncome()->getSteel();
+        $upkeepCash = $construction->getNumber() * $gameUnit->getUpkeep()->getCash();
+        $upkeepFood = $construction->getNumber() * $gameUnit->getUpkeep()->getFood();
+        $upkeepWood = $construction->getNumber() * $gameUnit->getUpkeep()->getWood();
+        $upkeepSteel = $construction->getNumber() * $gameUnit->getUpkeep()->getSteel();
+
+        $incomeCash = $construction->getNumber() * $gameUnit->getIncome()->getCash();
+        $incomeFood = $construction->getNumber() * $gameUnit->getIncome()->getFood();
+        $incomeWood = $construction->getNumber() * $gameUnit->getIncome()->getWood();
+        $incomeSteel = $construction->getNumber() * $gameUnit->getIncome()->getSteel();
 
         $income = $player->getIncome();
         $upkeep = $player->getUpkeep();
@@ -125,14 +134,17 @@ final class ConstructionProcessor implements Processor
 
     private function createConstructionReport(Construction $construction): void
     {
+        $gameUnit = $this->gameUnitRegistry->find($construction->getGameUnit());
         $reportType = Report::TYPE_GENERAL;
         if ($construction->getNumber() > 1) {
-            $message = "You completed {$construction->getNumber()} {$construction->getGameUnit()->getNameMulti()}!";
+            $unitName = $gameUnit?->getNameMulti() ?? '';
+            $message = "You completed {$construction->getNumber()} {$unitName}!";
         } else {
-            $message = "You completed {$construction->getNumber()} {$construction->getGameUnit()->getName()}!";
+            $unitName = $gameUnit?->getName() ?? '';
+            $message = "You completed {$construction->getNumber()} {$unitName}!";
         }
 
-        $finishedConstructionTime = $construction->getTimestamp() + $construction->getGameUnit()->getTimestamp();
+        $finishedConstructionTime = $construction->getTimestamp() + ($gameUnit?->getTimestamp() ?? 0);
         $report = Report::createForPlayer($construction->getPlayer(), $finishedConstructionTime, $reportType, $message);
         $this->reportRepository->save($report);
     }
@@ -141,7 +153,7 @@ final class ConstructionProcessor implements Processor
     {
         $worldRegion = $construction->getWorldRegion();
         foreach ($worldRegion->getWorldRegionUnits() as $worldRegionUnitObject) {
-            if ($worldRegionUnitObject->getGameUnit()->getId() === $construction->getGameUnit()->getId()) {
+            if ($worldRegionUnitObject->getGameUnit() === $construction->getGameUnit()) {
                 return $worldRegionUnitObject;
             }
         }

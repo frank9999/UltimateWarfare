@@ -15,12 +15,12 @@
 
             {% set gameUnitCategoryExist = 0 %}
             {% for gameUnit in gameUnits %}
-                {% if gameUnit.gameUnitCategory == gameUnitCategory and gameUnitData[gameUnit.id] is defined and gameUnitData[gameUnit.id] > 0 %}
+                {% if gameUnit.gameUnitCategory == gameUnitCategory and gameUnitData[gameUnit.id.value] is defined and gameUnitData[gameUnit.id.value] > 0 %}
                     {% set gameUnitCategoryExist = 1 %}
                     <tr>
                         <td width="350">{{ gameUnit.nameMulti }}:</td>
                         <td width="350">
-                            {{ gameUnitData[gameUnit.id] }}
+                            {{ gameUnitData[gameUnit.id.value] }}
                         </td>
                     </tr>
                 {% endif %}

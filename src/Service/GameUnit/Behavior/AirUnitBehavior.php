@@ -4,18 +4,17 @@ declare(strict_types=1);
 
 namespace FrankProjects\UltimateWarfare\Service\GameUnit\Behavior;
 
+use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitEnum;
 use FrankProjects\UltimateWarfare\Entity\Player;
 use FrankProjects\UltimateWarfare\Entity\WorldRegion;
 use FrankProjects\UltimateWarfare\Service\GameUnit\AbstractGameUnitBehavior;
 
 class AirUnitBehavior extends AbstractGameUnitBehavior
 {
-    private const REQUIRED_BUILDING = 'Airfield';
-
     public function canBuild(WorldRegion $region, Player $player): bool
     {
         foreach ($region->getWorldRegionUnits() as $regionUnit) {
-            if ($regionUnit->getGameUnit()->getName() === self::REQUIRED_BUILDING) {
+            if ($regionUnit->getGameUnit() === GameUnitEnum::AIRPORT) {
                 return true;
             }
         }

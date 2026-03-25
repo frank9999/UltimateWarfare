@@ -113,7 +113,7 @@ class OperationTest extends TestCase
         self::assertGreaterThanOrEqual(0.0, $operation->getDifficulty());
         self::assertLessThanOrEqual(1.0, $operation->getDifficulty());
         self::assertGreaterThan(0, $operation->getMaxDistance());
-        self::assertGreaterThan(0, $operation->getGameUnitId());
+        self::assertGreaterThan(0, $operation->getGameUnit()->value);
     }
 
     public function testAllOperationsHaveUniqueSlugs(): void
@@ -139,7 +139,7 @@ class OperationTest extends TestCase
         self::assertSame(150, $operation->getCost());
         self::assertSame(0.1, $operation->getDifficulty());
         self::assertSame(3, $operation->getMaxDistance());
-        self::assertSame(407, $operation->getGameUnitId());
+        self::assertSame(407, $operation->getGameUnit()->value);
         self::assertTrue($operation->isEnabled());
     }
 }

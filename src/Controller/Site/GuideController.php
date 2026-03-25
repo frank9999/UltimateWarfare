@@ -6,7 +6,8 @@ namespace FrankProjects\UltimateWarfare\Controller\Site;
 
 use FrankProjects\UltimateWarfare\Controller\BaseController;
 use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitCategory;
-use FrankProjects\UltimateWarfare\Repository\GameUnitRepository;
+use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitEnum;
+use FrankProjects\UltimateWarfare\Repository\GameUnitRegistry;
 use FrankProjects\UltimateWarfare\Repository\OperationRegistry;
 use FrankProjects\UltimateWarfare\Repository\ResearchRegistry;
 use Symfony\Component\HttpFoundation\Response;
@@ -23,9 +24,10 @@ final class GuideController extends BaseController
         return $this->render('site/guide/construction.html.twig');
     }
 
-    public function gameUnit(int $gameUnitId, GameUnitRepository $gameUnitRepository): Response
+    public function gameUnit(int $gameUnitId, GameUnitRegistry $gameUnitRegistry): Response
     {
-        $gameUnit = $gameUnitRepository->find($gameUnitId);
+        $gameUnitEnum = GameUnitEnum::tryFrom($gameUnitId);
+        $gameUnit = $gameUnitEnum !== null ? $gameUnitRegistry->find($gameUnitEnum) : null;
 
         if ($gameUnit === null) {
             $this->addFlash('error', 'No such game unit!');
@@ -82,7 +84,7 @@ final class GuideController extends BaseController
         );
     }
 
-    public function listUnits(int $gameUnitCategoryId, GameUnitRepository $gameUnitRepository): Response
+    public function listUnits(int $gameUnitCategoryId, GameUnitRegistry $gameUnitRegistry): Response
     {
         $gameUnitCategory = GameUnitCategory::fromInteger($gameUnitCategoryId);
         if ($gameUnitCategory === null) {
@@ -96,10 +98,7 @@ final class GuideController extends BaseController
             );
         }
 
-        $gameUnits = [];
-        foreach ($gameUnitRepository->findByGameUnitCategory($gameUnitCategory) as $gameUnit) {
-            $gameUnits[] = $gameUnit;
-        }
+        $gameUnits = $gameUnitRegistry->findByCategory($gameUnitCategory);
 
         return $this->render(
             'site/guide/listGameUnits.html.twig',

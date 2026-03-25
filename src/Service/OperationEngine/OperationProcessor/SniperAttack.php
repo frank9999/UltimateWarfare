@@ -4,13 +4,11 @@ declare(strict_types=1);
 
 namespace FrankProjects\UltimateWarfare\Service\OperationEngine\OperationProcessor;
 
+use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitEnum;
 use FrankProjects\UltimateWarfare\Service\OperationEngine\OperationProcessor;
 
 final class SniperAttack extends OperationProcessor
 {
-    protected const int GAME_UNIT_SOLDIER_ID = 300;
-    protected const int GAME_UNIT_SNIPER_ID = 402;
-
     protected const int SOLDIERS_KILLED_PER_SNIPER = 5;
 
     public function getFormula(): float
@@ -34,18 +32,17 @@ final class SniperAttack extends OperationProcessor
     {
         $soldiers = 0;
         foreach ($this->region->getWorldRegionUnits() as $worldRegionUnit) {
-            if ($worldRegionUnit->getGameUnit()->getId() === self::GAME_UNIT_SOLDIER_ID) {
+            if ($worldRegionUnit->getGameUnit() === GameUnitEnum::SOLDIER) {
                 $soldiers = $soldiers + $worldRegionUnit->getAmount();
             }
         }
 
         if (($this->amount * self::SOLDIERS_KILLED_PER_SNIPER) > $soldiers) {
             foreach ($this->region->getWorldRegionUnits() as $worldRegionUnit) {
-                if ($worldRegionUnit->getGameUnit()->getId() === self::GAME_UNIT_SOLDIER_ID) {
+                if ($worldRegionUnit->getGameUnit() === GameUnitEnum::SOLDIER) {
                     $this->worldRegionUnitRepository->remove($worldRegionUnit);
-                    $this->addToOperationLog(
-                        "You killed {$soldiers} {$worldRegionUnit->getGameUnit()->getNameMulti()}!"
-                    );
+                    $unitName = $this->gameUnitRegistry->find($worldRegionUnit->getGameUnit())?->getNameMulti() ?? '';
+                    $this->addToOperationLog("You killed {$soldiers} {$unitName}!");
                 }
             }
 
@@ -56,12 +53,11 @@ final class SniperAttack extends OperationProcessor
         } else {
             $soldiersKilled = $this->amount * self::SOLDIERS_KILLED_PER_SNIPER;
             foreach ($this->region->getWorldRegionUnits() as $worldRegionUnit) {
-                if ($worldRegionUnit->getGameUnit()->getId() === self::GAME_UNIT_SOLDIER_ID) {
+                if ($worldRegionUnit->getGameUnit() === GameUnitEnum::SOLDIER) {
                     $worldRegionUnit->setAmount($worldRegionUnit->getAmount() - $soldiersKilled);
                     $this->worldRegionUnitRepository->save($worldRegionUnit);
-                    $this->addToOperationLog(
-                        "You killed {$soldiersKilled} {$worldRegionUnit->getGameUnit()->getNameMulti()}!"
-                    );
+                    $unitName = $this->gameUnitRegistry->find($worldRegionUnit->getGameUnit())?->getNameMulti() ?? '';
+                    $this->addToOperationLog("You killed {$soldiersKilled} {$unitName}!");
                 }
             }
 
@@ -78,12 +74,12 @@ final class SniperAttack extends OperationProcessor
         $snipersLost = intval($this->amount * 0.2);
 
         foreach ($this->playerRegion->getWorldRegionUnits() as $worldRegionUnit) {
-            if ($worldRegionUnit->getGameUnit()->getId() === self::GAME_UNIT_SPECIAL_OPS_ID) {
+            if ($worldRegionUnit->getGameUnit() === GameUnitEnum::SABOTEUR) {
                 $worldRegionUnit->setAmount(intval($worldRegionUnit->getAmount() - $specialOpsLost));
                 $this->worldRegionUnitRepository->save($worldRegionUnit);
             }
 
-            if ($worldRegionUnit->getGameUnit()->getId() === self::GAME_UNIT_SNIPER_ID) {
+            if ($worldRegionUnit->getGameUnit() === GameUnitEnum::SNIPER) {
                 $worldRegionUnit->setAmount(intval($worldRegionUnit->getAmount() - $snipersLost));
                 $this->worldRegionUnitRepository->save($worldRegionUnit);
             }

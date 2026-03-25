@@ -8,10 +8,11 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use FrankProjects\UltimateWarfare\Entity\Construction;
 use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitCategory;
-use FrankProjects\UltimateWarfare\Entity\GameUnit;
+use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitEnum;
 use FrankProjects\UltimateWarfare\Entity\Player;
 use FrankProjects\UltimateWarfare\Entity\WorldRegion;
 use FrankProjects\UltimateWarfare\Repository\ConstructionRepository;
+use FrankProjects\UltimateWarfare\Repository\GameUnitRegistry;
 
 final class DoctrineConstructionRepository implements ConstructionRepository
 {
@@ -22,10 +23,13 @@ final class DoctrineConstructionRepository implements ConstructionRepository
      */
     private EntityRepository $repository;
 
-    public function __construct(EntityManagerInterface $entityManager)
+    private GameUnitRegistry $gameUnitRegistry;
+
+    public function __construct(EntityManagerInterface $entityManager, GameUnitRegistry $gameUnitRegistry)
     {
         $this->entityManager = $entityManager;
         $this->repository = $this->entityManager->getRepository(Construction::class);
+        $this->gameUnitRegistry = $gameUnitRegistry;
     }
 
     public function find(int $id): ?Construction
@@ -46,18 +50,17 @@ final class DoctrineConstructionRepository implements ConstructionRepository
     {
         $results = $this->entityManager
             ->createQuery(
-                'SELECT gu.id, sum(c.number) as total
+                'SELECT c.gameUnit, sum(c.number) as total
               FROM ' . Construction::class . ' c
-              JOIN ' . GameUnit::class . ' gu ON c.gameUnit = gu
               WHERE c.worldRegion = :worldRegion
-              GROUP BY gu.id'
+              GROUP BY c.gameUnit'
             )->setParameter('worldRegion', $worldRegion)
             ->getArrayResult();
 
         $gameUnits = [];
-        /** @var array{'id': int, 'total': int} $result */
+        /** @var array{gameUnit: GameUnitEnum, total: int} $result */
         foreach ($results as $result) {
-            $gameUnits[$result['id']] = $result['total'];
+            $gameUnits[$result['gameUnit']->value] = $result['total'];
         }
 
         return $gameUnits;
@@ -67,42 +70,42 @@ final class DoctrineConstructionRepository implements ConstructionRepository
         WorldRegion $worldRegion,
         GameUnitCategory $gameUnitCategory
     ): int {
-        $results = $this->entityManager
-            ->createQuery(
-                'SELECT gu.id, sum(c.number) as total
-              FROM ' . Construction::class . ' c
-              JOIN ' . GameUnit::class . ' gu ON c.gameUnit = gu
-              WHERE c.worldRegion = :worldRegion AND gu.gameUnitCategory = :gameUnitCategory
-              GROUP BY gu.id'
-            )->setParameter('worldRegion', $worldRegion)
-            ->setParameter('gameUnitCategory', $gameUnitCategory)
-            ->getArrayResult();
+        $unitIds = $this->gameUnitRegistry->getIdsByCategory($gameUnitCategory);
 
-        $gameUnitsUnderConstruction = 0;
-        /** @var array{'id': int, 'total': int} $result */
-        foreach ($results as $result) {
-            $gameUnitsUnderConstruction += $result['total'];
+        if ($unitIds === []) {
+            return 0;
         }
 
-        return $gameUnitsUnderConstruction;
+        $results = $this->entityManager
+            ->createQuery(
+                'SELECT sum(c.number) as total
+              FROM ' . Construction::class . ' c
+              WHERE c.worldRegion = :worldRegion AND c.gameUnit IN (:unitIds)'
+            )->setParameter('worldRegion', $worldRegion)
+            ->setParameter('unitIds', $unitIds)
+            ->getArrayResult();
+
+        /** @var array{total: int|null} $result */
+        $result = $results[0] ?? ['total' => null];
+
+        return $result['total'] ?? 0;
     }
 
     public function getGameUnitConstructionSumByPlayer(Player $player): array
     {
         $results = $this->entityManager
             ->createQuery(
-                'SELECT gu.id, sum(c.number) as total
+                'SELECT c.gameUnit, sum(c.number) as total
               FROM ' . Construction::class . ' c
-              JOIN ' . GameUnit::class . ' gu ON c.gameUnit = gu
               WHERE c.player = :player
-              GROUP BY gu.id'
+              GROUP BY c.gameUnit'
             )->setParameter('player', $player)
             ->getArrayResult();
 
         $gameUnits = [];
-        /** @var array{'id': int, 'total': int} $result */
+        /** @var array{gameUnit: GameUnitEnum, total: int} $result */
         foreach ($results as $result) {
-            $gameUnits[$result['id']] = $result['total'];
+            $gameUnits[$result['gameUnit']->value] = $result['total'];
         }
 
         return $gameUnits;
@@ -115,17 +118,20 @@ final class DoctrineConstructionRepository implements ConstructionRepository
      */
     public function findByPlayerAndGameUnitCategory(Player $player, GameUnitCategory $gameUnitCategory): array
     {
+        $unitIds = $this->gameUnitRegistry->getIdsByCategory($gameUnitCategory);
+
+        if ($unitIds === []) {
+            return [];
+        }
+
         return $this->entityManager
             ->createQuery(
                 'SELECT c
               FROM ' . Construction::class . ' c
-              JOIN ' . GameUnit::class . ' gu ON c.gameUnit = gu
-              WHERE c.player = :player AND gu.gameUnitCategory = :gameUnitCategory
+              WHERE c.player = :player AND c.gameUnit IN (:unitIds)
               ORDER BY c.timestamp DESC'
-            )->setParameter(
-                'player',
-                $player
-            )->setParameter('gameUnitCategory', $gameUnitCategory)
+            )->setParameter('player', $player)
+            ->setParameter('unitIds', $unitIds)
             ->getResult();
     }
 
@@ -135,14 +141,18 @@ final class DoctrineConstructionRepository implements ConstructionRepository
      */
     public function getCompletedConstructions(int $timestamp): array
     {
-        return $this->entityManager
-            ->createQuery(
-                'SELECT c
-              FROM ' . Construction::class . ' c
-              JOIN ' . GameUnit::class . ' gu ON c.gameUnit = gu
-              WHERE (c.timestamp + gu.timestamp) < :timestamp'
-            )->setParameter('timestamp', $timestamp)
-            ->getResult();
+        /** @var Construction[] $allConstructions */
+        $allConstructions = $this->repository->findAll();
+
+        $completed = [];
+        foreach ($allConstructions as $construction) {
+            $gameUnit = $this->gameUnitRegistry->find($construction->getGameUnit());
+            if ($gameUnit !== null && ($construction->getTimestamp() + $gameUnit->getTimestamp()) < $timestamp) {
+                $completed[] = $construction;
+            }
+        }
+
+        return $completed;
     }
 
     /**

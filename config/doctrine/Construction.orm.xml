@@ -24,10 +24,10 @@
         <join-column name="region_id" nullable="false"/>
       </join-columns>
     </many-to-one>
-    <many-to-one field="gameUnit" target-entity="FrankProjects\UltimateWarfare\Entity\GameUnit" inversed-by="constructions">
-      <join-columns>
-        <join-column name="unit_id" nullable="false"/>
-      </join-columns>
-    </many-to-one>
+    <field name="gameUnit" type="integer" column="unit_id" enum-type="FrankProjects\UltimateWarfare\Entity\Enum\GameUnitEnum">
+      <options>
+        <option name="unsigned">1</option>
+      </options>
+    </field>
   </entity>
 </doctrine-mapping>

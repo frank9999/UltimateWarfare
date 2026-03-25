@@ -31,7 +31,7 @@
                 </td>
                 <td class="text-start" width="210">
                     {% for unit in regionData.region.worldRegionUnits %}
-                        {{ unit.gameUnit.name }}: {{ unit.amount }}
+                        {{ (unit.gameUnit|game_unit).name }}: {{ unit.amount }}
                         <br />
                     {% else %}
                         No units stationed here!

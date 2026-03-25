@@ -4,13 +4,15 @@ declare(strict_types=1);
 
 namespace FrankProjects\UltimateWarfare\Entity;
 
+use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitEnum;
+
 class WorldRegionUnit
 {
     private int $id;
     private int $amount;
     private int $morale;
     private WorldRegion $worldRegion;
-    private GameUnit $gameUnit;
+    private GameUnitEnum $gameUnit;
 
     public function setId(int $id): void
     {
@@ -52,17 +54,17 @@ class WorldRegionUnit
         $this->worldRegion = $worldRegion;
     }
 
-    public function getGameUnit(): GameUnit
+    public function getGameUnit(): GameUnitEnum
     {
         return $this->gameUnit;
     }
 
-    public function setGameUnit(GameUnit $gameUnit): void
+    public function setGameUnit(GameUnitEnum $gameUnit): void
     {
         $this->gameUnit = $gameUnit;
     }
 
-    public static function create(WorldRegion $worldRegion, GameUnit $gameUnit, int $amount): WorldRegionUnit
+    public static function create(WorldRegion $worldRegion, GameUnitEnum $gameUnit, int $amount): WorldRegionUnit
     {
         $worldRegionUnit = new WorldRegionUnit();
         $worldRegionUnit->setWorldRegion($worldRegion);

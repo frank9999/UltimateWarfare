@@ -1,0 +1,45 @@
+<?php
+
+declare(strict_types=1);
+
+namespace FrankProjects\UltimateWarfare\Entity\GameUnit;
+
+use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitCategory;
+use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitEnum;
+use FrankProjects\UltimateWarfare\Entity\GameUnit;
+use FrankProjects\UltimateWarfare\Entity\BattleStats;
+use FrankProjects\UltimateWarfare\Entity\GameResources\Cost;
+use FrankProjects\UltimateWarfare\Entity\GameResources\Income;
+use FrankProjects\UltimateWarfare\Entity\GameResources\Upkeep;
+use FrankProjects\UltimateWarfare\Entity\BattleStats\GroundBattleStats;
+
+final class Bunker extends GameUnit
+{
+    public function __construct()
+    {
+        parent::__construct(
+            name: 'Bunker',
+            nameMulti: 'Bunkers',
+            rowName: 'bunker',
+            image: 'bunker.gif',
+            netWorth: 0,
+            timestamp: 900,
+            description: 'Every bunker can hold 100 soldiers and gives them 200% Defence bonus.',
+            gameUnitCategory: GameUnitCategory::DEFENSE_BUILDINGS,
+            behaviorClass: null,
+            cost: new Cost(cash: 8500, food: 50, wood: 150, steel: 150),
+            income: new Income(cash: 0, food: 0, wood: 0, steel: 0),
+            upkeep: new Upkeep(cash: 0, food: 0, wood: 0, steel: 0),
+            battleStats: new BattleStats(
+                health: 4000,
+                armor: 35,
+                groundBattleStats: new GroundBattleStats(defence: 1, defenceSpeed: 0),
+            ),
+        );
+    }
+
+    public function getId(): GameUnitEnum
+    {
+        return GameUnitEnum::BUNKER;
+    }
+}

@@ -7,6 +7,7 @@ namespace FrankProjects\UltimateWarfare\Service;
 use FrankProjects\UltimateWarfare\Entity\Fleet;
 use FrankProjects\UltimateWarfare\Entity\FleetUnit;
 use FrankProjects\UltimateWarfare\Entity\WorldRegionUnit;
+use FrankProjects\UltimateWarfare\Repository\GameUnitRegistry;
 use FrankProjects\UltimateWarfare\Service\BattleEngine\BattlePhase;
 use FrankProjects\UltimateWarfare\Service\BattleEngine\BattleReportCreator;
 use FrankProjects\UltimateWarfare\Service\BattleEngine\BattleResult;
@@ -19,17 +20,20 @@ final class BattleEngine
     private BattleReportCreator $battleReportCreator;
     private NetWorthUpdaterService $netWorthUpdaterService;
     private IncomeUpdaterService $incomeUpdaterService;
+    private GameUnitRegistry $gameUnitRegistry;
 
     public function __construct(
         BattleUpdaterService $battleUpdaterService,
         BattleReportCreator $battleReportCreator,
         NetWorthUpdaterService $netWorthUpdaterService,
-        IncomeUpdaterService $incomeUpdaterService
+        IncomeUpdaterService $incomeUpdaterService,
+        GameUnitRegistry $gameUnitRegistry
     ) {
         $this->battleUpdaterService = $battleUpdaterService;
         $this->battleReportCreator = $battleReportCreator;
         $this->netWorthUpdaterService = $netWorthUpdaterService;
         $this->incomeUpdaterService = $incomeUpdaterService;
+        $this->gameUnitRegistry = $gameUnitRegistry;
     }
 
     /**
@@ -49,7 +53,7 @@ final class BattleEngine
 
         $battlePhaseResults = [];
         foreach ($this->getBattlePhases() as $battlePhaseName) {
-            $battlePhase = BattlePhase::factory($battlePhaseName, $attackerGameUnits, $defenderGameUnits);
+            $battlePhase = BattlePhase::factory($battlePhaseName, $attackerGameUnits, $defenderGameUnits, $this->gameUnitRegistry);
             $battlePhase->startBattlePhase();
 
             $attackerGameUnits = $battlePhase->getAttackerGameUnits();

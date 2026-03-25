@@ -5,9 +5,10 @@ declare(strict_types=1);
 namespace FrankProjects\UltimateWarfare\Controller\Game;
 
 use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitCategory;
+use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitEnum;
 use FrankProjects\UltimateWarfare\Exception\WorldRegionNotFoundException;
 use FrankProjects\UltimateWarfare\Repository\ConstructionRepository;
-use FrankProjects\UltimateWarfare\Repository\GameUnitRepository;
+use FrankProjects\UltimateWarfare\Repository\GameUnitRegistry;
 use FrankProjects\UltimateWarfare\Repository\WorldRegionRepository;
 use FrankProjects\UltimateWarfare\Service\Action\ConstructionActionService;
 use FrankProjects\UltimateWarfare\Service\Action\RegionActionService;
@@ -24,7 +25,7 @@ final class ConstructionController extends BaseGameController
     private WorldRegionRepository $worldRegionRepository;
     private ConstructionActionService $constructionActionService;
     private RegionActionService $regionActionService;
-    private GameUnitRepository $gameUnitRepository;
+    private GameUnitRegistry $gameUnitRegistry;
     private GameUnitBehaviorFactory $behaviorFactory;
 
     public function __construct(
@@ -32,14 +33,14 @@ final class ConstructionController extends BaseGameController
         WorldRegionRepository $worldRegionRepository,
         ConstructionActionService $constructionActionService,
         RegionActionService $regionActionService,
-        GameUnitRepository $gameUnitRepository,
+        GameUnitRegistry $gameUnitRegistry,
         GameUnitBehaviorFactory $behaviorFactory
     ) {
         $this->constructionRepository = $constructionRepository;
         $this->worldRegionRepository = $worldRegionRepository;
         $this->constructionActionService = $constructionActionService;
         $this->regionActionService = $regionActionService;
-        $this->gameUnitRepository = $gameUnitRepository;
+        $this->gameUnitRegistry = $gameUnitRegistry;
         $this->behaviorFactory = $behaviorFactory;
     }
 
@@ -48,9 +49,9 @@ final class ConstructionController extends BaseGameController
         $gameUnitCategories = GameUnitCategory::getAll();
         $gameUnitCategory = GameUnitCategory::fromInteger($gameUnitCategoryId);
         if ($gameUnitCategory === null) {
-            $gameUnits = $this->gameUnitRepository->findAll();
+            $gameUnits = $this->gameUnitRegistry->findAll();
         } else {
-            $gameUnits = $this->gameUnitRepository->findByGameUnitCategory($gameUnitCategory);
+            $gameUnits = $this->gameUnitRegistry->findByCategory($gameUnitCategory);
         }
 
         if ($gameUnitCategory === null) {
@@ -117,7 +118,7 @@ final class ConstructionController extends BaseGameController
             }
         }
 
-        $gameUnits = $this->gameUnitRepository->findByGameUnitCategory($gameUnitCategory);
+        $gameUnits = $this->gameUnitRegistry->findByCategory($gameUnitCategory);
 
         return $this->render(
             'game/region/constructGameUnits.html.twig',
@@ -174,7 +175,7 @@ final class ConstructionController extends BaseGameController
             }
         }
 
-        $gameUnits = $this->gameUnitRepository->findByGameUnitCategory($gameUnitCategory);
+        $gameUnits = $this->gameUnitRegistry->findByCategory($gameUnitCategory);
 
         return $this->render(
             'game/region/removeGameUnits.html.twig',
@@ -286,28 +287,28 @@ final class ConstructionController extends BaseGameController
         $hasMissileSilo = false;
 
         foreach ($worldRegion->getWorldRegionUnits() as $worldRegionUnit) {
-            $unitName = $worldRegionUnit->getGameUnit()->getRowName();
+            $gameUnitEnum = $worldRegionUnit->getGameUnit();
             if ($worldRegionUnit->getAmount() < 1) {
                 continue;
             }
 
-            match ($unitName) {
-                'barrack' => $hasBarrack = true,
-                'factory' => $hasFactory = true,
-                'airport' => $hasAirport = true,
-                'harbor' => $hasHarbor = true,
-                'missle_silo' => $hasMissileSilo = true,
+            match ($gameUnitEnum) {
+                GameUnitEnum::BARRACK => $hasBarrack = true,
+                GameUnitEnum::FACTORY => $hasFactory = true,
+                GameUnitEnum::AIRPORT => $hasAirport = true,
+                GameUnitEnum::HARBOR => $hasHarbor = true,
+                GameUnitEnum::MISSILE_SILO => $hasMissileSilo = true,
                 default => null,
             };
         }
 
         foreach ($worldRegion->getConstructions() as $construction) {
-            match ($construction->getGameUnit()->getRowName()) {
-                'barrack' => $hasBarrack = true,
-                'factory' => $hasFactory = true,
-                'airport' => $hasAirport = true,
-                'harbor' => $hasHarbor = true,
-                'missle_silo' => $hasMissileSilo = true,
+            match ($construction->getGameUnit()) {
+                GameUnitEnum::BARRACK => $hasBarrack = true,
+                GameUnitEnum::FACTORY => $hasFactory = true,
+                GameUnitEnum::AIRPORT => $hasAirport = true,
+                GameUnitEnum::HARBOR => $hasHarbor = true,
+                GameUnitEnum::MISSILE_SILO => $hasMissileSilo = true,
                 default => null,
             };
         }
@@ -341,7 +342,7 @@ final class ConstructionController extends BaseGameController
 
         $categories = [];
         foreach ($availableCategories as $gameUnitCategory) {
-            $gameUnits = $this->gameUnitRepository->findByGameUnitCategory($gameUnitCategory);
+            $gameUnits = $this->gameUnitRegistry->findByCategory($gameUnitCategory);
             $units = [];
 
             foreach ($gameUnits as $gameUnit) {
@@ -395,8 +396,8 @@ final class ConstructionController extends BaseGameController
                             ? 'Requires a Factory'
                             : $behavior->getBuildRequirementDescription()
                     ),
-                    'owned' => $gameUnitData[$gameUnit->getId()] ?? 0,
-                    'inConstruction' => $constructionData[$gameUnit->getId()] ?? 0,
+                    'owned' => $gameUnitData[$gameUnit->getId()->value] ?? 0,
+                    'inConstruction' => $constructionData[$gameUnit->getId()->value] ?? 0,
                 ];
             }
 
