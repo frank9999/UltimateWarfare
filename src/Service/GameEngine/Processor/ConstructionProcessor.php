@@ -72,10 +72,6 @@ final class ConstructionProcessor implements Processor
     private function updatePlayerResources(Player $player, Construction $construction): Player
     {
         $gameUnit = $this->gameUnitRegistry->find($construction->getGameUnit());
-        if ($gameUnit === null) {
-            return $player;
-        }
-
         $upkeepCash = $construction->getNumber() * $gameUnit->getUpkeep()->getCash();
         $upkeepFood = $construction->getNumber() * $gameUnit->getUpkeep()->getFood();
         $upkeepWood = $construction->getNumber() * $gameUnit->getUpkeep()->getWood();
@@ -137,14 +133,14 @@ final class ConstructionProcessor implements Processor
         $gameUnit = $this->gameUnitRegistry->find($construction->getGameUnit());
         $reportType = Report::TYPE_GENERAL;
         if ($construction->getNumber() > 1) {
-            $unitName = $gameUnit?->getNameMulti() ?? '';
+            $unitName = $gameUnit->getNameMulti();
             $message = "You completed {$construction->getNumber()} {$unitName}!";
         } else {
-            $unitName = $gameUnit?->getName() ?? '';
+            $unitName = $gameUnit->getName();
             $message = "You completed {$construction->getNumber()} {$unitName}!";
         }
 
-        $finishedConstructionTime = $construction->getTimestamp() + ($gameUnit?->getTimestamp() ?? 0);
+        $finishedConstructionTime = $construction->getTimestamp() + $gameUnit->getTimestamp();
         $report = Report::createForPlayer($construction->getPlayer(), $finishedConstructionTime, $reportType, $message);
         $this->reportRepository->save($report);
     }

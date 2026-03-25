@@ -24,7 +24,7 @@ class GameUnitExtension extends AbstractExtension
         ];
     }
 
-    public function resolveGameUnit(GameUnitEnum $gameUnitEnum): ?GameUnit
+    public function resolveGameUnit(GameUnitEnum $gameUnitEnum): GameUnit
     {
         return $this->gameUnitRegistry->find($gameUnitEnum);
     }

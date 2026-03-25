@@ -33,16 +33,16 @@ final class StealthBomberAttack extends OperationProcessor
     {
         $totalBuildings = 0;
         foreach ($this->region->getWorldRegionUnits() as $worldRegionUnit) {
-            if ($this->gameUnitRegistry->find($worldRegionUnit->getGameUnit())?->getGameUnitCategory() === GameUnitCategory::SPECIAL_BUILDINGS) {
+            if ($this->gameUnitRegistry->find($worldRegionUnit->getGameUnit())->getGameUnitCategory() === GameUnitCategory::SPECIAL_BUILDINGS) {
                 $totalBuildings = $totalBuildings + $worldRegionUnit->getAmount();
             }
         }
 
         if (($this->amount * self::BUILDINGS_DESTROYED_PER_BOMBER) > $totalBuildings) {
             foreach ($this->region->getWorldRegionUnits() as $worldRegionUnit) {
-                if ($this->gameUnitRegistry->find($worldRegionUnit->getGameUnit())?->getGameUnitCategory() === GameUnitCategory::SPECIAL_BUILDINGS) {
+                if ($this->gameUnitRegistry->find($worldRegionUnit->getGameUnit())->getGameUnitCategory() === GameUnitCategory::SPECIAL_BUILDINGS) {
                     $this->worldRegionUnitRepository->remove($worldRegionUnit);
-                    $unitName = $this->gameUnitRegistry->find($worldRegionUnit->getGameUnit())?->getName() ?? '';
+                    $unitName = $this->gameUnitRegistry->find($worldRegionUnit->getGameUnit())->getName();
                     $this->addToOperationLog("You destroyed all {$unitName} buildings!");
                 }
             }
@@ -55,12 +55,12 @@ final class StealthBomberAttack extends OperationProcessor
         } else {
             $buildingsDestroyed = $this->amount * self::BUILDINGS_DESTROYED_PER_BOMBER;
             foreach ($this->region->getWorldRegionUnits() as $worldRegionUnit) {
-                if ($this->gameUnitRegistry->find($worldRegionUnit->getGameUnit())?->getGameUnitCategory() === GameUnitCategory::SPECIAL_BUILDINGS) {
+                if ($this->gameUnitRegistry->find($worldRegionUnit->getGameUnit())->getGameUnitCategory() === GameUnitCategory::SPECIAL_BUILDINGS) {
                     $percentage = $worldRegionUnit->getAmount() / $totalBuildings;
                     $destroyed = round($buildingsDestroyed * $percentage);
                     $worldRegionUnit->setAmount((int) ($worldRegionUnit->getAmount() - $destroyed));
                     $this->worldRegionUnitRepository->save($worldRegionUnit);
-                    $unitName = $this->gameUnitRegistry->find($worldRegionUnit->getGameUnit())?->getName() ?? '';
+                    $unitName = $this->gameUnitRegistry->find($worldRegionUnit->getGameUnit())->getName();
                     $this->addToOperationLog("You destroyed {$destroyed} {$unitName} buildings!");
                 }
             }

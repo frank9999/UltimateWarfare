@@ -95,9 +95,10 @@ final class GameUnitRegistry
         }
     }
 
-    public function find(GameUnitEnum $id): ?GameUnit
+    public function find(GameUnitEnum $id): GameUnit
     {
-        return $this->gameUnits[$id->value] ?? null;
+        return $this->gameUnits[$id->value]
+            ?? throw new \RuntimeException("GameUnit not found for enum: {$id->name}");
     }
 
     /**
@@ -178,10 +179,6 @@ final class GameUnitRegistry
 
         foreach ($region->getWorldRegionUnits() as $worldRegionUnit) {
             $gameUnit = $this->find($worldRegionUnit->getGameUnit());
-            if ($gameUnit === null) {
-                continue;
-            }
-
             $amount = $worldRegionUnit->getAmount();
             $unitName = $gameUnit->getName();
             $key = match ($gameUnit->getGameUnitCategory()) {

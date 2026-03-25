@@ -173,10 +173,6 @@ final class AttackController extends BaseGameController
 
             $gameUnitEnum = $worldRegionUnit->getGameUnit();
             $gameUnit = $this->gameUnitRegistry->find($gameUnitEnum);
-            if ($gameUnit === null) {
-                continue;
-            }
-
             $category = $gameUnit->getGameUnitCategory();
             $rowName = $gameUnit->getRowName();
 
@@ -279,9 +275,6 @@ final class AttackController extends BaseGameController
             }
             $gameUnitEnum = $worldRegionUnit->getGameUnit();
             $gameUnit = $this->gameUnitRegistry->find($gameUnitEnum);
-            if ($gameUnit === null) {
-                continue;
-            }
             $unitRange = $this->getUnitRange(
                 $gameUnit->getGameUnitCategory(),
                 $gameUnit->getRowName(),
@@ -337,13 +330,11 @@ final class AttackController extends BaseGameController
         foreach ($filteredUnits as $gameUnitId => $amount) {
             $gameUnitEnum = GameUnitEnum::from($gameUnitId);
             $gameUnit = $this->gameUnitRegistry->find($gameUnitEnum);
-            if ($gameUnit !== null) {
-                $sentUnits[] = [
-                    'name' => $gameUnit->getName(),
-                    'amount' => (int) $amount,
-                ];
-                $totalUnitCount += (int) $amount;
-            }
+            $sentUnits[] = [
+                'name' => $gameUnit->getName(),
+                'amount' => (int) $amount,
+            ];
+            $totalUnitCount += (int) $amount;
         }
 
         return new JsonResponse([
@@ -517,9 +508,6 @@ final class AttackController extends BaseGameController
             }
 
             $gameUnit = $this->gameUnitRegistry->find($worldRegionUnit->getGameUnit());
-            if ($gameUnit === null) {
-                continue;
-            }
             $unitRange = $this->getUnitRange(
                 $gameUnit->getGameUnitCategory(),
                 $gameUnit->getRowName(),

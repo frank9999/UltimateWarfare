@@ -74,10 +74,6 @@ final class ConstructionActionService
             }
 
             $gameUnit = $this->gameUnitRegistry->find($gameUnitEnum);
-            if ($gameUnit === null) {
-                continue;
-            }
-
             if ($gameUnit->getGameUnitCategory() !== $gameUnitCategory) {
                 continue;
             }
@@ -140,10 +136,8 @@ final class ConstructionActionService
             $this->constructionRepository->save($construction);
 
             $constructionGameUnit = $this->gameUnitRegistry->find($construction->getGameUnit());
-            if ($constructionGameUnit !== null) {
-                $behavior = $this->behaviorFactory->create($constructionGameUnit);
-                $behavior->onBuild($region, $construction->getNumber());
-            }
+            $behavior = $this->behaviorFactory->create($constructionGameUnit);
+            $behavior->onBuild($region, $construction->getNumber());
         }
     }
 
@@ -219,9 +213,6 @@ final class ConstructionActionService
 
         foreach ($region->getWorldRegionUnits() as $worldRegionUnit) {
             $gameUnit = $this->gameUnitRegistry->find($worldRegionUnit->getGameUnit());
-            if ($gameUnit === null) {
-                continue;
-            }
             $rowName = $gameUnit->getRowName();
             $index[$rowName] = ($index[$rowName] ?? 0) + $worldRegionUnit->getAmount();
         }
@@ -251,10 +242,6 @@ final class ConstructionActionService
             }
 
             $gameUnit = $this->gameUnitRegistry->find($gameUnitEnum);
-            if ($gameUnit === null) {
-                continue;
-            }
-
             if ($gameUnit->getGameUnitCategory() !== $gameUnitCategory) {
                 continue;
             }
@@ -310,7 +297,7 @@ final class ConstructionActionService
         $regionBuildings = 0;
         foreach ($worldRegion->getWorldRegionUnits() as $regionUnit) {
             $gameUnit = $this->gameUnitRegistry->find($regionUnit->getGameUnit());
-            if ($gameUnit !== null && $gameUnit->getGameUnitCategory() === $gameUnitCategory) {
+            if ($gameUnit->getGameUnitCategory() === $gameUnitCategory) {
                 $regionBuildings += $regionUnit->getAmount();
             }
         }

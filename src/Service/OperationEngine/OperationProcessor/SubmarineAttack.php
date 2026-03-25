@@ -41,7 +41,7 @@ final class SubmarineAttack extends OperationProcessor
             foreach ($this->region->getWorldRegionUnits() as $worldRegionUnit) {
                 if ($worldRegionUnit->getGameUnit() === GameUnitEnum::DESTROYER) {
                     $this->worldRegionUnitRepository->remove($worldRegionUnit);
-                    $unitName = $this->gameUnitRegistry->find($worldRegionUnit->getGameUnit())?->getNameMulti() ?? '';
+                    $unitName = $this->gameUnitRegistry->find($worldRegionUnit->getGameUnit())->getNameMulti();
                     $this->addToOperationLog("You sunk {$ships} {$unitName}!");
                 }
             }
@@ -56,7 +56,7 @@ final class SubmarineAttack extends OperationProcessor
                 if ($worldRegionUnit->getGameUnit() === GameUnitEnum::DESTROYER) {
                     $worldRegionUnit->setAmount($worldRegionUnit->getAmount() - $shipsDestroyed);
                     $this->worldRegionUnitRepository->save($worldRegionUnit);
-                    $unitName = $this->gameUnitRegistry->find($worldRegionUnit->getGameUnit())?->getNameMulti() ?? '';
+                    $unitName = $this->gameUnitRegistry->find($worldRegionUnit->getGameUnit())->getNameMulti();
                     $this->addToOperationLog("You sunk {$shipsDestroyed} {$unitName}!");
                 }
             }

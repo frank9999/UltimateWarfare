@@ -41,7 +41,7 @@ final class SniperAttack extends OperationProcessor
             foreach ($this->region->getWorldRegionUnits() as $worldRegionUnit) {
                 if ($worldRegionUnit->getGameUnit() === GameUnitEnum::SOLDIER) {
                     $this->worldRegionUnitRepository->remove($worldRegionUnit);
-                    $unitName = $this->gameUnitRegistry->find($worldRegionUnit->getGameUnit())?->getNameMulti() ?? '';
+                    $unitName = $this->gameUnitRegistry->find($worldRegionUnit->getGameUnit())->getNameMulti();
                     $this->addToOperationLog("You killed {$soldiers} {$unitName}!");
                 }
             }
@@ -56,7 +56,7 @@ final class SniperAttack extends OperationProcessor
                 if ($worldRegionUnit->getGameUnit() === GameUnitEnum::SOLDIER) {
                     $worldRegionUnit->setAmount($worldRegionUnit->getAmount() - $soldiersKilled);
                     $this->worldRegionUnitRepository->save($worldRegionUnit);
-                    $unitName = $this->gameUnitRegistry->find($worldRegionUnit->getGameUnit())?->getNameMulti() ?? '';
+                    $unitName = $this->gameUnitRegistry->find($worldRegionUnit->getGameUnit())->getNameMulti();
                     $this->addToOperationLog("You killed {$soldiersKilled} {$unitName}!");
                 }
             }

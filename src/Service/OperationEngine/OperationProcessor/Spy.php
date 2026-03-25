@@ -33,7 +33,7 @@ final class Spy extends OperationProcessor
         $buildingsFound = false;
         foreach ($this->region->getWorldRegionUnits() as $worldRegionUnit) {
             $resolvedUnit = $this->gameUnitRegistry->find($worldRegionUnit->getGameUnit());
-            if ($resolvedUnit?->getGameUnitCategory() === GameUnitCategory::BUILDINGS) {
+            if ($resolvedUnit->getGameUnitCategory() === GameUnitCategory::BUILDINGS) {
                 $this->addToOperationLog("- {$worldRegionUnit->getAmount()} {$resolvedUnit->getNameMulti()}");
                 $buildingsFound = true;
             }
@@ -49,7 +49,7 @@ final class Spy extends OperationProcessor
         $unitsFound = false;
         foreach ($this->region->getWorldRegionUnits() as $worldRegionUnit) {
             $resolvedUnit = $this->gameUnitRegistry->find($worldRegionUnit->getGameUnit());
-            if ($resolvedUnit?->getGameUnitCategory() === GameUnitCategory::TROOPS) {
+            if ($resolvedUnit->getGameUnitCategory() === GameUnitCategory::TROOPS) {
                 $this->addToOperationLog("- {$worldRegionUnit->getAmount()} {$resolvedUnit->getNameMulti()}");
                 $unitsFound = true;
             }

@@ -262,7 +262,7 @@ final class WorldController extends BaseGameController
                 $totalUnitCount += $amount;
                 $gameUnit = $this->gameUnitRegistry->find($fleetUnit->getGameUnit());
                 $units[] = [
-                    'name' => $gameUnit !== null ? $gameUnit->getName() : '',
+                    'name' => $gameUnit->getName(),
                     'amount' => $amount,
                 ];
             }

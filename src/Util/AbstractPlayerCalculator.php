@@ -38,9 +38,6 @@ abstract class AbstractPlayerCalculator
     {
         foreach ($fleet->getFleetUnits() as $fleetUnit) {
             $gameUnit = $this->gameUnitRegistry->find($fleetUnit->getGameUnit());
-            if ($gameUnit === null) {
-                continue;
-            }
             $gameUnitResource = $this->getAbstractGameResources($gameUnit, $type);
             $this->updateAbstractGameResource($fleetUnit->getAmount(), $gameUnitResource);
         }
@@ -57,9 +54,6 @@ abstract class AbstractPlayerCalculator
     {
         foreach ($worldRegion->getWorldRegionUnits() as $worldRegionUnit) {
             $gameUnit = $this->gameUnitRegistry->find($worldRegionUnit->getGameUnit());
-            if ($gameUnit === null) {
-                continue;
-            }
             $gameUnitResource = $this->getAbstractGameResources($gameUnit, $type);
             $this->updateAbstractGameResource($worldRegionUnit->getAmount(), $gameUnitResource);
         }

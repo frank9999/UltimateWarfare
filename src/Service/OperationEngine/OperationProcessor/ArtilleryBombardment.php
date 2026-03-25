@@ -45,9 +45,6 @@ final class ArtilleryBombardment extends OperationProcessor
 
         foreach ($this->region->getWorldRegionUnits() as $worldRegionUnit) {
             $gameUnit = $this->gameUnitRegistry->find($worldRegionUnit->getGameUnit());
-            if ($gameUnit === null) {
-                continue;
-            }
             if ($gameUnit->getGameUnitCategory()->isSendable()) {
                 $militaryUnits[] = $worldRegionUnit;
             } else {
@@ -87,9 +84,6 @@ final class ArtilleryBombardment extends OperationProcessor
 
         foreach ($units as $worldRegionUnit) {
             $gameUnit = $this->gameUnitRegistry->find($worldRegionUnit->getGameUnit());
-            if ($gameUnit === null) {
-                continue;
-            }
             $amount = $worldRegionUnit->getAmount();
 
             $battleStats = $gameUnit->getBattleStats();
@@ -141,11 +135,7 @@ final class ArtilleryBombardment extends OperationProcessor
     private function getArtilleryGroundAttack(): int
     {
         $gameUnit = $this->gameUnitRegistry->find($this->operation->getGameUnit());
-        if ($gameUnit !== null) {
-            return $gameUnit->getBattleStats()->getGroundBattleStats()->getAttack();
-        }
-
-        return 50;
+        return $gameUnit->getBattleStats()->getGroundBattleStats()->getAttack();
     }
 
     public function processFailed(): void

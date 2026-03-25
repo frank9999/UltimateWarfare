@@ -145,10 +145,6 @@ final class FleetActionService
             }
 
             $gameUnit = $this->gameUnitRegistry->find($gameUnitEnum);
-            if ($gameUnit === null) {
-                continue;
-            }
-
             if ($gameUnit->getGameUnitCategory()->isSendable() === false) {
                 continue;
             }

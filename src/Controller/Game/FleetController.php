@@ -104,10 +104,6 @@ final class FleetController extends BaseGameController
 
             $gameUnitEnum = $worldRegionUnit->getGameUnit();
             $gameUnit = $this->gameUnitRegistry->find($gameUnitEnum);
-            if ($gameUnit === null) {
-                continue;
-            }
-
             $category = $gameUnit->getGameUnitCategory();
 
             if (!$category->isSendable()) {
@@ -260,14 +256,15 @@ final class FleetController extends BaseGameController
         $totalUnitCount = 0;
         foreach ($filteredUnits as $gameUnitId => $amount) {
             $gameUnitEnum = GameUnitEnum::tryFrom($gameUnitId);
-            $gameUnit = $gameUnitEnum !== null ? $this->gameUnitRegistry->find($gameUnitEnum) : null;
-            if ($gameUnit !== null) {
-                $sentUnits[] = [
-                    'name' => $gameUnit->getName(),
-                    'amount' => (int) $amount,
-                ];
-                $totalUnitCount += (int) $amount;
+            if ($gameUnitEnum === null) {
+                continue;
             }
+            $gameUnit = $this->gameUnitRegistry->find($gameUnitEnum);
+            $sentUnits[] = [
+                'name' => $gameUnit->getName(),
+                'amount' => (int) $amount,
+            ];
+            $totalUnitCount += (int) $amount;
         }
 
         return new JsonResponse([

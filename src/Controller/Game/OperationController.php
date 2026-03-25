@@ -258,8 +258,8 @@ final class OperationController extends BaseGameController
                 'description' => $operation->getDescription(),
                 'difficulty' => $operation->getDifficulty(),
                 'maxDistance' => $operation->getMaxDistance(),
-                'unitName' => $gameUnit !== null ? $gameUnit->getName() : '',
-                'unitImage' => $gameUnit !== null ? $gameUnit->getImage() : '',
+                'unitName' => $gameUnit->getName(),
+                'unitImage' => $gameUnit->getImage(),
             ];
         }
 
@@ -379,8 +379,8 @@ final class OperationController extends BaseGameController
 
         return new JsonResponse([
             'success' => true,
-            'unitName' => $gameUnit !== null ? $gameUnit->getName() : '',
-            'unitImage' => $gameUnit !== null ? $gameUnit->getImage() : '',
+            'unitName' => $gameUnit->getName(),
+            'unitImage' => $gameUnit->getImage(),
             'available' => $availableAmount,
             'costPerUnit' => $operation->getCost(),
             'playerCash' => $player->getResources()->getCash(),

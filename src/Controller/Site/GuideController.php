@@ -27,12 +27,12 @@ final class GuideController extends BaseController
     public function gameUnit(int $gameUnitId, GameUnitRegistry $gameUnitRegistry): Response
     {
         $gameUnitEnum = GameUnitEnum::tryFrom($gameUnitId);
-        $gameUnit = $gameUnitEnum !== null ? $gameUnitRegistry->find($gameUnitEnum) : null;
-
-        if ($gameUnit === null) {
+        if ($gameUnitEnum === null) {
             $this->addFlash('error', 'No such game unit!');
             return $this->redirectToRoute('Guide/ListUnits');
         }
+
+        $gameUnit = $gameUnitRegistry->find($gameUnitEnum);
 
         return $this->render(
             'site/guide/gameUnit.html.twig',

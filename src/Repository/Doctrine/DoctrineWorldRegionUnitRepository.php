@@ -57,12 +57,10 @@ final class DoctrineWorldRegionUnitRepository implements WorldRegionUnitReposito
         /** @var array{gameUnit: GameUnitEnum, amount: int} $result */
         foreach ($results as $result) {
             $gameUnit = $this->gameUnitRegistry->find($result['gameUnit']);
-            if ($gameUnit !== null) {
-                $data[] = [
-                    'amount' => $result['amount'],
-                    'netWorth' => $gameUnit->getNetWorth(),
-                ];
-            }
+            $data[] = [
+                'amount' => $result['amount'],
+                'netWorth' => $gameUnit->getNetWorth(),
+            ];
         }
 
         return $data;

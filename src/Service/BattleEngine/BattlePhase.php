@@ -140,10 +140,6 @@ abstract class BattlePhase implements IBattlePhase
     {
         foreach ($gameUnits as $index => $gameUnit) {
             $resolvedUnit = $this->gameUnitRegistry->find($gameUnit->getGameUnit());
-            if ($resolvedUnit === null) {
-                continue;
-            }
-
             $deaths = $this->calculateCasualties($resolvedUnit, $power);
 
             if ($deaths >= $gameUnit->getAmount()) {
@@ -194,9 +190,6 @@ abstract class BattlePhase implements IBattlePhase
         $power = 0;
         foreach ($this->getAttackerGameUnits() as $fleetUnit) {
             $gameUnit = $this->gameUnitRegistry->find($fleetUnit->getGameUnit());
-            if ($gameUnit === null) {
-                continue;
-            }
             $power += $this->getBattlePhaseBattleStats($gameUnit)->getAttack()
                 * $fleetUnit->getAmount();
         }
@@ -209,9 +202,6 @@ abstract class BattlePhase implements IBattlePhase
         $power = 0;
         foreach ($this->getDefenderGameUnits() as $worldRegionUnit) {
             $gameUnit = $this->gameUnitRegistry->find($worldRegionUnit->getGameUnit());
-            if ($gameUnit === null) {
-                continue;
-            }
             $power += $this->getBattlePhaseBattleStats($gameUnit)->getDefence()
                 * $worldRegionUnit->getAmount();
         }

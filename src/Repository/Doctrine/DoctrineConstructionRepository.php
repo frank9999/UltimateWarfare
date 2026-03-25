@@ -147,7 +147,7 @@ final class DoctrineConstructionRepository implements ConstructionRepository
         $completed = [];
         foreach ($allConstructions as $construction) {
             $gameUnit = $this->gameUnitRegistry->find($construction->getGameUnit());
-            if ($gameUnit !== null && ($construction->getTimestamp() + $gameUnit->getTimestamp()) < $timestamp) {
+            if (($construction->getTimestamp() + $gameUnit->getTimestamp()) < $timestamp) {
                 $completed[] = $construction;
             }
         }
