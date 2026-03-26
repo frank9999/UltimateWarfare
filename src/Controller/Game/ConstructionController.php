@@ -13,7 +13,6 @@ use FrankProjects\UltimateWarfare\Repository\WorldRegionRepository;
 use FrankProjects\UltimateWarfare\Service\Action\ConstructionActionService;
 use FrankProjects\UltimateWarfare\Service\Action\RegionActionService;
 use FrankProjects\UltimateWarfare\Service\GameUnit\GameUnitBehaviorFactory;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Throwable;
@@ -44,43 +43,51 @@ final class ConstructionController extends BaseGameController
         $this->behaviorFactory = $behaviorFactory;
     }
 
-    public function construction(int $gameUnitCategoryId): Response
+    public function constructionOverviewApi(): JsonResponse
     {
-        $gameUnitCategories = GameUnitCategory::getAll();
-        $gameUnitCategory = GameUnitCategory::fromInteger($gameUnitCategoryId);
-        if ($gameUnitCategory === null) {
-            $gameUnits = $this->gameUnitRegistry->findAll();
-        } else {
-            $gameUnits = $this->gameUnitRegistry->findByCategory($gameUnitCategory);
+        $constructions = $this->constructionRepository->findByPlayer($this->getPlayer());
+        $items = [];
+
+        foreach ($constructions as $construction) {
+            $gameUnit = $this->gameUnitRegistry->find($construction->getGameUnit());
+            $unitName = $construction->getNumber() === 1
+                ? $gameUnit->getName()
+                : $gameUnit->getNameMulti();
+            $timeLeft = ($construction->getTimestamp() + $gameUnit->getTimestamp()) - time();
+
+            $items[] = [
+                'id' => $construction->getId(),
+                'unitName' => $unitName,
+                'number' => $construction->getNumber(),
+                'regionId' => $construction->getWorldRegion()->getId(),
+                'regionX' => $construction->getWorldRegion()->getX(),
+                'regionY' => $construction->getWorldRegion()->getY(),
+                'timeLeft' => max(0, $timeLeft),
+                'categoryId' => $gameUnit->getGameUnitCategory()->value,
+                'categoryName' => $gameUnit->getGameUnitCategory()->getLabel(),
+            ];
         }
 
-        if ($gameUnitCategory === null) {
-            $constructionData = $this->constructionRepository->getGameUnitConstructionSumByPlayer($this->getPlayer());
-            return $this->render(
-                'game/constructionSummary.html.twig',
-                [
-                    'player' => $this->getPlayer(),
-                    'gameUnits' => $gameUnits,
-                    'gameUnitCategories' => $gameUnitCategories,
-                    'constructionData' => $constructionData
-                ]
-            );
+        return new JsonResponse([
+            'success' => true,
+            'constructions' => $items,
+        ]);
+    }
+
+    public function cancelApi(int $constructionId): JsonResponse
+    {
+        try {
+            $this->constructionActionService->cancelConstruction($this->getPlayer(), $constructionId);
+            return new JsonResponse([
+                'success' => true,
+                'message' => 'Successfully cancelled construction queue!',
+            ]);
+        } catch (Throwable $e) {
+            return new JsonResponse([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 400);
         }
-
-        $constructions = $this->constructionRepository->findByPlayerAndGameUnitCategory(
-            $this->getPlayer(),
-            $gameUnitCategory
-        );
-
-        return $this->render(
-            'game/construction.html.twig',
-            [
-                'player' => $this->getPlayer(),
-                'constructions' => $constructions,
-                'gameUnitCategory' => $gameUnitCategory,
-                'gameUnitCategories' => $gameUnitCategories,
-            ]
-        );
     }
 
     public function constructGameUnits(Request $request, int $regionId, int $gameUnitCategoryId): Response
@@ -196,18 +203,6 @@ final class ConstructionController extends BaseGameController
             'success',
             "You have {$gameUnitCategory->getRemoveGameUnitActionDescription()} {$gameUnitCategory->getLabel()}!"
         );
-    }
-
-    public function cancel(int $constructionId): RedirectResponse
-    {
-        try {
-            $this->constructionActionService->cancelConstruction($this->getPlayer(), $constructionId);
-            $this->addFlash('success', 'Successfully cancelled construction queue!');
-        } catch (Throwable $e) {
-            $this->addFlash('error', $e->getMessage());
-        }
-
-        return $this->redirectToRoute('Game/Construction', [], 302);
     }
 
     public function constructGameUnitsApi(Request $request, int $regionId, int $gameUnitCategoryId): JsonResponse

@@ -233,17 +233,15 @@ Game/Banned:
     path:      /game/banned
     controller: FrankProjects\UltimateWarfare\Controller\Game\UserController::banned
 
-Game/Construction:
-    path:      /game/construction/{gameUnitCategoryId}
-    controller: FrankProjects\UltimateWarfare\Controller\Game\ConstructionController::construction
-    defaults:
-        gameUnitCategoryId: 0
-    requirements:
-        gameUnitCategoryId: '\d+'
+Game/Api/Construction/Overview:
+    path:      /game/api/construction/overview
+    controller: FrankProjects\UltimateWarfare\Controller\Game\ConstructionController::constructionOverviewApi
+    methods: [GET]
 
-Game/Construction/Cancel:
-    path:      /game/construction/cancel/{constructionId}
-    controller: FrankProjects\UltimateWarfare\Controller\Game\ConstructionController::cancel
+Game/Api/Construction/Cancel:
+    path:      /game/api/construction/cancel/{constructionId}
+    controller: FrankProjects\UltimateWarfare\Controller\Game\ConstructionController::cancelApi
+    methods: [POST]
     requirements:
         constructionId: '\d+'
 

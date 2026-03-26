@@ -17,7 +17,6 @@
     let reportsTotalPages = 1;
     let reportsCategories = [];
 
-    document.getElementById('reportsBtn').addEventListener('click', showReportsModal);
     closeReportsModal.onclick = function () { reportsModal.style.display = 'none'; };
     closeReportsBtn.onclick = function () { reportsModal.style.display = 'none'; };
 
@@ -120,6 +119,7 @@
 
     // Expose for outside-click handling
     window.WorldReports = {
-        modal: reportsModal
+        modal: reportsModal,
+        show: showReportsModal
     };
 })();

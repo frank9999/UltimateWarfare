@@ -231,14 +231,25 @@
     // ===== Headquarter Modal =====
     const hqModal = document.getElementById('headquarterModal');
     document.getElementById('closeHqModal').onclick = function () { hqModal.style.display = 'none'; };
-    document.getElementById('headquarterBtn').addEventListener('click', function () { hqModal.style.display = 'block'; });
     document.getElementById('hqOldInterfaceBtn').onclick = function () { window.location.href = '/game/headquarter'; };
-    document.getElementById('hqMarketBtn').onclick = function () { window.location.href = '/game/market'; };
-    document.getElementById('hqFederationBtn').onclick = function () { window.location.href = '/game/federation'; };
-    document.getElementById('hqResearchBtn').onclick = function () { hqModal.style.display = 'none'; document.getElementById('researchBtn').click(); };
-    document.getElementById('hqRegionsBtn').onclick = function () { window.location.href = '/game/region-list'; };
-    document.getElementById('hqFleetsBtn').onclick = function () { window.location.href = '/game/fleets'; };
-    document.getElementById('hqConstructionBtn').onclick = function () { window.location.href = '/game/construction'; };
+
+    // ===== Navigation Hamburger Menu =====
+    const navMenu = document.getElementById('navMenu');
+    document.getElementById('navMenuBtn').addEventListener('click', function (e) {
+        e.stopPropagation();
+        navMenu.classList.toggle('show');
+    });
+
+    function closeNavMenu() { navMenu.classList.remove('show'); }
+
+    document.getElementById('navHqBtn').onclick = function (e) { e.preventDefault(); closeNavMenu(); hqModal.style.display = 'block'; };
+    document.getElementById('navReportsBtn').onclick = function (e) { e.preventDefault(); closeNavMenu(); WorldReports.show(); };
+    document.getElementById('navRegionsBtn').onclick = function (e) { e.preventDefault(); closeNavMenu(); window.location.href = '/game/region-list'; };
+    document.getElementById('navConstructionBtn').onclick = function (e) { e.preventDefault(); closeNavMenu(); WorldConstruction.show(); };
+    document.getElementById('navFleetsBtn').onclick = function (e) { e.preventDefault(); closeNavMenu(); window.location.href = '/game/fleets'; };
+    document.getElementById('navMarketBtn').onclick = function (e) { e.preventDefault(); closeNavMenu(); window.location.href = '/game/market'; };
+    document.getElementById('navResearchBtn').onclick = function (e) { e.preventDefault(); closeNavMenu(); WorldResearch.show(); };
+    document.getElementById('navFederationBtn').onclick = function (e) { e.preventDefault(); closeNavMenu(); window.location.href = '/game/federation'; };
 
     // ===== Close modals on outside click =====
     window.onclick = function (event) {
@@ -249,12 +260,16 @@
         if (event.target === sendMessageModal) { sendMessageModal.style.display = 'none'; }
         if (event.target === WorldBuild.modal) { WorldBuild.modal.style.display = 'none'; }
         if (event.target === WorldReports.modal) { WorldReports.modal.style.display = 'none'; }
+        if (event.target === WorldConstruction.modal) { WorldConstruction.modal.style.display = 'none'; }
         if (event.target === WorldSendUnits.modal) { WorldSendUnits.modal.style.display = 'none'; }
         if (event.target === WorldMessages.modal) { WorldMessages.modal.style.display = 'none'; }
         if (event.target === WorldOperations.selectOperationModal) { WorldOperations.selectOperationModal.style.display = 'none'; }
         if (event.target === WorldOperations.operationUnitsModal) { WorldOperations.operationUnitsModal.style.display = 'none'; }
         if (event.target === WorldOperations.operationResultsModal) { WorldOperations.operationResultsModal.style.display = 'none'; }
         if (event.target === WorldResearch.modal) { WorldResearch.modal.style.display = 'none'; }
+
+        // Close nav dropdown on outside click
+        if (navMenu.classList.contains('show')) { closeNavMenu(); }
     };
 
     // ===== Default tile click handler =====

@@ -60,14 +60,8 @@
         <div class="modal-body">
             <p style="text-align: center;">Select an action:</p>
         </div>
-        <div class="modal-footer hq-buttons">
+        <div class="modal-footer">
             <button type="button" id="hqOldInterfaceBtn">Old Interface</button>
-            <button type="button" id="hqMarketBtn">Market</button>
-            <button type="button" id="hqFederationBtn">Federation</button>
-            <button type="button" id="hqResearchBtn">Research</button>
-            <button type="button" id="hqRegionsBtn">Regions</button>
-            <button type="button" id="hqFleetsBtn">Fleets</button>
-            <button type="button" id="hqConstructionBtn">Construction</button>
         </div>
     </div>
 </div>
@@ -113,6 +107,25 @@
         </div>
         <div class="modal-footer">
             <button type="button" id="closeReportsBtn">Close</button>
+        </div>
+    </div>
+</div>
+
+{# Construction Overview Modal #}
+<div id="constructionModal" class="modal">
+    <div class="modal-content modal-lg">
+        <div class="modal-header">
+            <span class="modal-title">Construction Overview</span>
+            <span class="close" id="closeConstructionModal">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div class="build-tabs" id="constructionTabs"></div>
+            <div id="constructionContainer" style="max-height: 400px; overflow-y: auto;">
+                <div class="build-loading">Loading construction data...</div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" id="closeConstructionBtn">Close</button>
         </div>
     </div>
 </div>

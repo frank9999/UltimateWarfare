@@ -96,6 +96,59 @@
     background: #a08365;
 }
 
+/* ===== Navigation Dropdown (Hamburger) ===== */
+.nav-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.nav-dropdown-btn {
+    padding: 5px 15px;
+    background: #8B7355;
+    color: #f3e6c1;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 18px;
+}
+
+.nav-dropdown-btn:hover {
+    background: #a08365;
+}
+
+.nav-dropdown-content {
+    display: none;
+    position: absolute;
+    left: 0;
+    background-color: #2a2a2a;
+    min-width: 180px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 10000;
+    border: 2px solid #8B7355;
+    border-radius: 4px;
+    margin-top: 5px;
+}
+
+.nav-dropdown-content a {
+    color: #f3e6c1;
+    padding: 10px 15px;
+    text-decoration: none;
+    display: block;
+    border-bottom: 1px solid #8B7355;
+}
+
+.nav-dropdown-content a:last-child {
+    border-bottom: none;
+}
+
+.nav-dropdown-content a:hover {
+    background-color: #3a3a3a;
+}
+
+.nav-dropdown-content.show {
+    display: block;
+}
+
 /* ===== Profile Dropdown ===== */
 .profile-dropdown {
     position: relative;
@@ -313,6 +366,20 @@
 .modal-footer.hq-buttons button {
     margin: 0;
     min-width: 120px;
+}
+
+.construction-cancel-btn {
+    background: #c44;
+    color: #f3e6c1;
+    border: none;
+    padding: 4px 12px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.construction-cancel-btn:hover {
+    background: #e55;
 }
 
 .close {

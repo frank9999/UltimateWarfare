@@ -31,7 +31,6 @@
     const ROW_GAP = 200;
     const PADDING = 20;
 
-    document.getElementById('researchBtn').addEventListener('click', showResearchModal);
     closeResearchModal.onclick = function () { hideModal(); };
 
     function showResearchModal() {
@@ -270,6 +269,7 @@
     }
 
     window.WorldResearch = {
-        modal: researchModal
+        modal: researchModal,
+        show: showResearchModal
     };
 })();
