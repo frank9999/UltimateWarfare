@@ -561,34 +561,10 @@ Game/Rankings:
     defaults:
         sortBy: 'region'
 
-Game/Reports:
-    path:      /game/reports/{type}
-    controller: FrankProjects\UltimateWarfare\Controller\Game\ReportController::report
-    defaults:
-        type: 0
-    requirements:
-        type: '\d+'
-
 Game/Reports/Api:
     path:      /game/api/reports
     controller: FrankProjects\UltimateWarfare\Controller\Game\ReportController::reportsApi
     methods: [GET]
-
-Game/Research:
-    path:      /game/research
-    controller: FrankProjects\UltimateWarfare\Controller\Game\ResearchController::research
-
-Game/Research/Cancel:
-    path:      /game/research/cancel/{researchSlug}
-    controller: FrankProjects\UltimateWarfare\Controller\Game\ResearchController::performCancel
-
-Game/Research/History:
-    path:      /game/research/history
-    controller: FrankProjects\UltimateWarfare\Controller\Game\ResearchController::history
-
-Game/Research/Perform:
-    path:      /game/research/perform/{researchSlug}
-    controller: FrankProjects\UltimateWarfare\Controller\Game\ResearchController::performResearch
 
 Game/Api/Research/Tree:
     path:      /game/api/research/tree

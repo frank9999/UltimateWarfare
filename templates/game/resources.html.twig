@@ -7,13 +7,13 @@
 
 {% if player.notifications.attacked != 0 %}
     <div class="alert alert-danger" role="alert">
-        <a class="B" href="{{ path('Game/Reports', {'type': 1}) }}"><b>You are under attack!</b></a>
+        <b>You are under attack!</b>
     </div>
 {% endif %}
 
 {% if player.notifications.general != 0 %}
     <div class="alert alert-warning" role="alert">
-        <a class="B" href="{{ path('Game/Reports', {'type': 2}) }}"><b>General Report!</b></a>
+        <b>General Report!</b>
     </div>
 {% endif %}
 
@@ -25,12 +25,12 @@
 
 {% if player.notifications.aid != 0 %}
     <div class="alert alert-warning" role="alert">
-        <a class="B" href="{{ path('Game/Reports', {'type': 5}) }}"><b>You received aid!</b></a>
+        <b>You received aid!</b>
     </div>
 {% endif %}
 
 {% if player.notifications.market != 0 %}
     <div class="alert alert-warning" role="alert">
-        <a class="B" href="{{ path('Game/Reports', {'type': 4}) }}"><b>You sold/bought something on the market!</b></a>
+        <b>You sold/bought something on the market!</b>
     </div>
 {% endif %}
