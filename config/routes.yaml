@@ -373,40 +373,33 @@ Game/Headquarter/Infrastructure:
     path:      /game/headquarter/infrastructure
     controller: FrankProjects\UltimateWarfare\Controller\Game\HeadquarterController::infrastructure
 
-Game/Market:
-    path:      /game/market
-    controller: FrankProjects\UltimateWarfare\Controller\Game\MarketController::buy
+Game/Api/Market/BuyList:
+    path:      /game/api/market/buy-list
+    controller: FrankProjects\UltimateWarfare\Controller\Game\MarketController::marketBuyListApi
+    methods: [GET]
 
-Game/Market/Cancel/Order:
-    path:      /game/market/cancel/{marketItemId}
-    controller: FrankProjects\UltimateWarfare\Controller\Game\MarketController::cancelOrder
+Game/Api/Market/SellList:
+    path:      /game/api/market/sell-list
+    controller: FrankProjects\UltimateWarfare\Controller\Game\MarketController::marketSellListApi
+    methods: [GET]
+
+Game/Api/Market/MyOrders:
+    path:      /game/api/market/my-orders
+    controller: FrankProjects\UltimateWarfare\Controller\Game\MarketController::marketMyOrdersApi
+    methods: [GET]
+
+Game/Api/Market/Action:
+    path:      /game/api/market/{action}/{marketItemId}
+    controller: FrankProjects\UltimateWarfare\Controller\Game\MarketController::marketActionApi
+    methods: [POST]
     requirements:
+        action: 'buy|sell|cancel'
         marketItemId: '\d+'
 
-Game/Market/Buy/Order:
-    path:      /game/market/buy/{marketItemId}
-    controller: FrankProjects\UltimateWarfare\Controller\Game\MarketController::buyOrder
-    requirements:
-        marketItemId: '\d+'
-
-Game/Market/Sell:
-    path:      /game/market/sell
-    controller: FrankProjects\UltimateWarfare\Controller\Game\MarketController::sell
-
-
-Game/Market/Sell/Order:
-    path:      /game/market/sell/{marketItemId}
-    controller: FrankProjects\UltimateWarfare\Controller\Game\MarketController::sellOrder
-    requirements:
-        marketItemId: '\d+'
-
-Game/Market/ListOrders:
-    path:      /game/market/orders
-    controller: FrankProjects\UltimateWarfare\Controller\Game\MarketController::listOrders
-
-Game/Market/CreateOrder:
-    path:      /game/market/new-order
-    controller: FrankProjects\UltimateWarfare\Controller\Game\MarketController::createOrder
+Game/Api/Market/CreateOrder:
+    path:      /game/api/market/create-order
+    controller: FrankProjects\UltimateWarfare\Controller\Game\MarketController::marketCreateOrderApi
+    methods: [POST]
 
 Game/Message/Inbox:
     path:      /game/message/inbox

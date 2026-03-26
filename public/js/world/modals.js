@@ -247,7 +247,7 @@
     document.getElementById('navRegionsBtn').onclick = function (e) { e.preventDefault(); closeNavMenu(); WorldRegionOverview.show(); };
     document.getElementById('navConstructionBtn').onclick = function (e) { e.preventDefault(); closeNavMenu(); WorldConstruction.show(); };
     document.getElementById('navFleetsBtn').onclick = function (e) { e.preventDefault(); closeNavMenu(); WorldFleetOverview.show(); };
-    document.getElementById('navMarketBtn').onclick = function (e) { e.preventDefault(); closeNavMenu(); window.location.href = '/game/market'; };
+    document.getElementById('navMarketBtn').onclick = function (e) { e.preventDefault(); closeNavMenu(); WorldMarket.show(); };
     document.getElementById('navResearchBtn').onclick = function (e) { e.preventDefault(); closeNavMenu(); WorldResearch.show(); };
     document.getElementById('navFederationBtn').onclick = function (e) { e.preventDefault(); closeNavMenu(); window.location.href = '/game/federation'; };
 
@@ -269,6 +269,7 @@
         if (event.target === WorldOperations.operationResultsModal) { WorldOperations.operationResultsModal.style.display = 'none'; }
         if (event.target === WorldRegionOverview.modal) { WorldRegionOverview.modal.style.display = 'none'; }
         if (event.target === WorldResearch.modal) { WorldResearch.modal.style.display = 'none'; }
+        if (event.target === WorldMarket.modal) { WorldMarket.modal.style.display = 'none'; }
 
         // Close nav dropdown on outside click
         if (navMenu.classList.contains('show')) { closeNavMenu(); }
