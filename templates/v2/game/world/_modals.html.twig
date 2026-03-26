@@ -130,6 +130,24 @@
     </div>
 </div>
 
+{# Fleet Overview Modal #}
+<div id="fleetOverviewModal" class="modal">
+    <div class="modal-content modal-lg">
+        <div class="modal-header">
+            <span class="modal-title">Fleet Overview</span>
+            <span class="close" id="closeFleetOverviewModal">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div id="fleetOverviewContainer" style="max-height: 400px; overflow-y: auto;">
+                <div class="build-loading">Loading fleet data...</div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" id="closeFleetOverviewBtn">Close</button>
+        </div>
+    </div>
+</div>
+
 {# Select Operation Modal #}
 <div id="selectOperationModal" class="modal">
     <div class="modal-content modal-lg">

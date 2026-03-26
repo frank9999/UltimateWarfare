@@ -331,13 +331,10 @@ Game/Federation/ChangePlayerHierarchy:
     path:      /game/federation/change-roles
     controller: FrankProjects\UltimateWarfare\Controller\Game\FederationController::changePlayerHierarchy
 
-Game/Fleets:
-    path:      /game/fleets
-    controller: FrankProjects\UltimateWarfare\Controller\Game\FleetController::fleetList
-
-Game/Fleet/Attack:
-    path:      /game/fleet/attack/{fleetId}
-    controller: FrankProjects\UltimateWarfare\Controller\Game\BattleController::battle
+Game/Api/Fleet/Overview:
+    path:      /game/api/fleet/overview
+    controller: FrankProjects\UltimateWarfare\Controller\Game\FleetController::fleetOverviewApi
+    methods: [GET]
 
 Game/Fleet/Attack/Api:
     path:      /game/api/fleet/attack/{fleetId}
@@ -346,20 +343,12 @@ Game/Fleet/Attack/Api:
     requirements:
         fleetId: '\d+'
 
-Game/Fleet/Recall:
-    path:      /game/fleet/recall/{fleetId}
-    controller: FrankProjects\UltimateWarfare\Controller\Game\FleetController::recall
-
 Game/Fleet/Recall/Api:
     path:      /game/api/fleet/recall/{fleetId}
     controller: FrankProjects\UltimateWarfare\Controller\Game\FleetController::recallApi
     methods: [POST]
     requirements:
         fleetId: '\d+'
-
-Game/Fleet/Reinforce:
-    path:      /game/fleet/reinforce/{fleetId}
-    controller: FrankProjects\UltimateWarfare\Controller\Game\FleetController::reinforce
 
 Game/Fleet/Reinforce/Api:
     path:      /game/api/fleet/reinforce/{fleetId}
@@ -715,12 +704,6 @@ Game/World/Region/RemoveGameUnits:
     requirements:
         regionId: '\d+'
         gameUnitCategoryId: '\d+'
-
-Game/World/Region/SendUnits:
-    path:      /game/world/region/send-units/{regionId}
-    controller: FrankProjects\UltimateWarfare\Controller\Game\FleetController::sendGameUnits
-    requirements:
-        regionId: '\d+'
 
 Game/World/Region/SendUnits/Data/Api:
     path:      /game/api/world/region/send-units-data/{regionId}

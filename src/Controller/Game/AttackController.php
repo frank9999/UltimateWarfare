@@ -460,7 +460,7 @@ final class AttackController extends BaseGameController
                 $player,
                 $units
             );
-            return $this->redirectToRoute('Game/Fleets', [], 302);
+            return $this->redirectToRoute('Game/WorldMap', [], 302);
         }
 
         $gameUnitsData = $this->worldRegionRepository->getWorldGameUnitSumByWorldRegion($playerRegion);

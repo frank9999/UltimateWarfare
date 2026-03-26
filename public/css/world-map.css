@@ -382,6 +382,44 @@
     background: #e55;
 }
 
+.fleet-action-btn {
+    color: #f3e6c1;
+    border: none;
+    padding: 4px 12px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.fleet-action-btn.recall {
+    background: #5577aa;
+}
+
+.fleet-action-btn.recall:hover {
+    background: #6688bb;
+}
+
+.fleet-action-btn.reinforce {
+    background: #4a8;
+}
+
+.fleet-action-btn.reinforce:hover {
+    background: #5b9;
+}
+
+.fleet-action-btn.attack {
+    background: #c44;
+}
+
+.fleet-action-btn.attack:hover {
+    background: #e55;
+}
+
+.fleet-action-btn:disabled {
+    opacity: 0.6;
+    cursor: default;
+}
+
 .close {
     color: #f3e6c1;
     font-size: 28px;
