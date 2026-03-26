@@ -561,10 +561,6 @@ Game/Rankings:
     defaults:
         sortBy: 'region'
 
-Game/RegionList:
-    path:      /game/region-list
-    controller: FrankProjects\UltimateWarfare\Controller\Game\RegionController::regionList
-
 Game/Reports:
     path:      /game/reports/{type}
     controller: FrankProjects\UltimateWarfare\Controller\Game\ReportController::report
@@ -621,12 +617,6 @@ Game/World/Create:
     path:      /game/world/create
     controller: FrankProjects\UltimateWarfare\Controller\Game\WorldController::create
 
-Game/World/Region:
-    path:      /game/world/region/{regionId}
-    controller: FrankProjects\UltimateWarfare\Controller\Game\RegionController::region
-    requirements:
-        regionId: '\d+'
-
 Game/World/Region/Attack:
     path:      /game/world/region/attack/{regionId}
     controller: FrankProjects\UltimateWarfare\Controller\Game\AttackController::attack
@@ -678,12 +668,25 @@ Game/World/Region/Build/Api:
         regionId: '\d+'
         gameUnitCategoryId: '\d+'
 
+Game/World/Region/Destroy/Api:
+    path:      /game/api/world/region/destroy/{regionId}/{gameUnitCategoryId}
+    controller: FrankProjects\UltimateWarfare\Controller\Game\ConstructionController::removeGameUnitsApi
+    methods: [POST]
+    requirements:
+        regionId: '\d+'
+        gameUnitCategoryId: '\d+'
+
 Game/Api/Region/AllBuildData:
     path:      /game/api/world/region/all-build-data/{regionId}
     controller: FrankProjects\UltimateWarfare\Controller\Game\ConstructionController::getAllBuildDataApi
     methods:   [GET]
     requirements:
         regionId: '\d+'
+
+Game/Api/Region/Overview:
+    path:      /game/api/region/overview
+    controller: FrankProjects\UltimateWarfare\Controller\Game\RegionController::regionOverviewApi
+    methods:   [GET]
 
 Game/World/Region/Buy:
     path:      /game/world/region/buy/{regionId}

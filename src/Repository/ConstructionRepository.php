@@ -35,6 +35,11 @@ interface ConstructionRepository
     public function getGameUnitConstructionSumByPlayer(Player $player): array;
 
     /**
+     * @return array<int, array<int, int>>
+     */
+    public function getGameUnitConstructionSumByPlayerGroupedByRegion(Player $player): array;
+
+    /**
      * @param Player $player
      * @param GameUnitCategory $gameUnitCategory
      * @return Construction[]

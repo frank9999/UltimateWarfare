@@ -51,7 +51,7 @@ final class AttackController extends BaseGameController
             $playerRegions = $this->regionActionService->getAttackFromWorldRegionList($worldRegion, $this->getPlayer());
         } catch (WorldRegionNotFoundException $e) {
             $this->addFlash('error', $e->getMessage());
-            return $this->redirectToRoute('Game/RegionList', [], 302);
+            return $this->redirectToRoute('Game/WorldMap', [], 302);
         } catch (Throwable $e) {
             $this->addFlash('error', $e->getMessage());
         }
@@ -431,24 +431,24 @@ final class AttackController extends BaseGameController
             $worldRegion = $this->regionActionService->getWorldRegionByIdAndWorld($regionId, $player->getWorld());
         } catch (WorldRegionNotFoundException $e) {
             $this->addFlash('error', $e->getMessage());
-            return $this->redirectToRoute('Game/RegionList', [], 302);
+            return $this->redirectToRoute('Game/WorldMap', [], 302);
         }
 
         if ($worldRegion->getPlayer() === null) {
             $this->addFlash('error', "Can not attack nobody!");
-            return $this->redirectToRoute('Game/World/Region', ['regionId' => $worldRegion->getId()], 302);
+            return $this->redirectToRoute('Game/WorldMap', [], 302);
         }
 
         if ($worldRegion->getPlayer()->getId() === $player->getId()) {
             $this->addFlash('error', "Can not attack your own region!");
-            return $this->redirectToRoute('Game/World/Region', ['regionId' => $worldRegion->getId()], 302);
+            return $this->redirectToRoute('Game/WorldMap', [], 302);
         }
 
         try {
             $playerRegion = $this->regionActionService->getWorldRegionByIdAndPlayer($playerRegionId, $player);
         } catch (WorldRegionNotFoundException $e) {
             $this->addFlash('error', $e->getMessage());
-            return $this->redirectToRoute('Game/RegionList', [], 302);
+            return $this->redirectToRoute('Game/WorldMap', [], 302);
         }
 
         if ($request->isMethod(Request::METHOD_POST)) {

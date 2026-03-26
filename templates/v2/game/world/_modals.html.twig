@@ -87,6 +87,26 @@
     </div>
 </div>
 
+{# Destroy Modal #}
+<div id="destroyModal" class="modal">
+    <div class="modal-content build-modal-content">
+        <div class="modal-header">
+            <span class="modal-title">Destroy Units - Region <span id="destroyRegionCoords"></span></span>
+            <span class="close" id="closeDestroyModal">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div class="build-tabs" id="destroyTabs"></div>
+            <div id="destroyUnitsContainer" class="build-units-container">
+                <div class="build-loading">Loading units...</div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" id="closeDestroyBtn">Cancel</button>
+            <button type="button" id="confirmDestroyBtn" style="background-color: #f44336;">Destroy Selected</button>
+        </div>
+    </div>
+</div>
+
 {# Reports Modal #}
 <div id="reportsModal" class="modal">
     <div class="modal-content modal-lg">
@@ -284,6 +304,24 @@
             <div id="researchTreeContainer" class="research-tree-container">
                 <div class="build-loading">Loading research tree...</div>
             </div>
+        </div>
+    </div>
+</div>
+
+{# Region Overview Modal #}
+<div id="regionOverviewModal" class="modal">
+    <div class="modal-content modal-xl">
+        <div class="modal-header">
+            <span class="modal-title">Regions</span>
+            <span class="close" id="closeRegionOverviewModal">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div id="regionOverviewContainer" style="max-height: 400px; overflow-y: auto;">
+                <div class="build-loading">Loading regions...</div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" id="closeRegionOverviewBtn">Close</button>
         </div>
     </div>
 </div>

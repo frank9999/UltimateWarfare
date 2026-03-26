@@ -100,13 +100,13 @@ final class ConstructionController extends BaseGameController
             $worldRegion = $this->regionActionService->getWorldRegionByIdAndPlayer($regionId, $this->getPlayer());
         } catch (WorldRegionNotFoundException $e) {
             $this->addFlash('error', $e->getMessage());
-            return $this->redirectToRoute('Game/RegionList', [], 302);
+            return $this->redirectToRoute('Game/WorldMap', [], 302);
         }
 
         $gameUnitCategory = GameUnitCategory::fromInteger($gameUnitCategoryId);
         if ($gameUnitCategory === null) {
             $this->addFlash('error', 'Unknown GameUnitCategory!');
-            return $this->redirectToRoute('Game/World/Region', ['regionId' => $worldRegion->getId()], 302);
+            return $this->redirectToRoute('Game/WorldMap', [], 302);
         }
 
         if ($request->isMethod(Request::METHOD_POST)) {
@@ -158,12 +158,12 @@ final class ConstructionController extends BaseGameController
             $worldRegion = $this->regionActionService->getWorldRegionByIdAndPlayer($regionId, $this->getPlayer());
         } catch (WorldRegionNotFoundException $e) {
             $this->addFlash('error', $e->getMessage());
-            return $this->redirectToRoute('Game/RegionList', [], 302);
+            return $this->redirectToRoute('Game/WorldMap', [], 302);
         }
 
         $gameUnitCategory = GameUnitCategory::fromInteger($gameUnitCategoryId);
         if ($gameUnitCategory === null) {
-            return $this->redirectToRoute('Game/World/Region', ['regionId' => $worldRegion->getId()], 302);
+            return $this->redirectToRoute('Game/WorldMap', [], 302);
         }
 
         if ($request->isMethod(Request::METHOD_POST)) {
@@ -249,6 +249,57 @@ final class ConstructionController extends BaseGameController
                 'newCash' => $player->getResources()->getCash(),
                 'newWood' => $player->getResources()->getWood(),
                 'newSteel' => $player->getResources()->getSteel()
+            ]);
+        } catch (Throwable $e) {
+            return new JsonResponse([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 400);
+        }
+    }
+
+    public function removeGameUnitsApi(Request $request, int $regionId, int $gameUnitCategoryId): JsonResponse
+    {
+        try {
+            $worldRegion = $this->regionActionService->getWorldRegionByIdAndPlayer($regionId, $this->getPlayer());
+        } catch (WorldRegionNotFoundException $e) {
+            return new JsonResponse([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 400);
+        }
+
+        $gameUnitCategory = GameUnitCategory::fromInteger($gameUnitCategoryId);
+        if ($gameUnitCategory === null) {
+            return new JsonResponse([
+                'success' => false,
+                'message' => 'Unknown GameUnitCategory!'
+            ], 400);
+        }
+
+        try {
+            /** @var array<string, mixed>|null $data */
+            $data = json_decode($request->getContent(), true);
+            /** @var array<int, string> $destroy */
+            $destroy = is_array($data) && isset($data['destroy']) && is_array($data['destroy'])
+                ? $data['destroy']
+                : [];
+
+            $this->constructionActionService->removeGameUnits(
+                $worldRegion,
+                $this->getPlayer(),
+                $gameUnitCategory,
+                $destroy
+            );
+
+            $action = $gameUnitCategory->getRemoveGameUnitActionDescription();
+            $message = "You have {$action} {$gameUnitCategory->getLabel()}!";
+
+            return new JsonResponse([
+                'success' => true,
+                'message' => $message,
+                'regionId' => $worldRegion->getId(),
+                'units' => $this->gameUnitRegistry->getRegionUnitSummary($worldRegion),
             ]);
         } catch (Throwable $e) {
             return new JsonResponse([

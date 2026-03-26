@@ -6,15 +6,6 @@
         <a class="nav-link" href="{{ path('Game/Reports') }}">Reports</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link" href="{{ path('Game/WorldMap') }}">Construction</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" href="{{ path('Game/WorldMap') }}">Fleets</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" href="{{ path('Game/RegionList') }}">Regions</a>
-    </li>
-    <li class="nav-item">
         <a class="nav-link" href="{{ path('Game/Market') }}">Market</a>
     </li>
     <li class="nav-item">
@@ -27,31 +18,12 @@
         <a class="nav-link" href="{{ path('Game/WorldMap') }}">World</a>
     </li>
     <li class="nav-item">
-        <a class="nav-link" href="{{ path('Game/Message/Inbox') }}">
-            Messages
-            {% if player.notifications.message == 1 %}
-                (!)
-            {% endif %}
-        </a>
-    </li>
-    {% if uw_forum_enabled == true %}
-        <li class="nav-item">
-            <a class="nav-link" href="{{ path('Forum') }}">Forum</a>
-        </li>
-    {% endif %}
-    <li class="nav-item">
         <a class="nav-link" href="{{ path('Game/Rankings') }}">Rankings</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" href="{{ path('Guide') }}" target="_blank">Help/FAQ</a>
     </li>
     <li class="nav-item">
         <a class="nav-link" href="{{ path('Game/Surrender') }}">Surrender</a>
     </li>
     <li class="nav-item">
         <a class="nav-link" href="{{ path('Game/Account') }}">Account Management</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" href="{{ path('Site/Logout') }}">Log out</a>
     </li>
 </ul>

@@ -382,6 +382,7 @@
     window.WorldBuild = {
         showBuildModal: showBuildModal,
         prefetchBuildData: prefetchBuildData,
+        invalidateCache: function (regionId) { delete buildDataCache[regionId]; },
         modal: buildModal
     };
 })();

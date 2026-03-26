@@ -131,22 +131,19 @@
             if (result.success) {
                 showNotification(result.message, 'success');
 
-                // Remove fleet from worldmap fleet manager
-                if (window.WorldApp && WorldApp.worldMap && WorldApp.worldMap.fleetManager) {
-                    var fm = WorldApp.worldMap.fleetManager;
-                    fm.fleets = fm.fleets.filter(function (f) { return f.id !== fleetId; });
-                    WorldApp.worldMap.render();
-                }
-
-                // Update region units on map if returned
-                if (result.regionId && result.units && window.WorldApp && WorldApp.worldMap) {
-                    var sectors = WorldApp.worldMap.sectors;
-                    for (var i = 0; i < sectors.length; i++) {
-                        if (sectors[i].id === result.regionId) {
-                            sectors[i].units = result.units;
-                            break;
-                        }
+                if (window.WorldApp && WorldApp.worldMap) {
+                    // Remove fleet from worldmap fleet manager
+                    if (WorldApp.worldMap.fleetManager) {
+                        var fm = WorldApp.worldMap.fleetManager;
+                        fm.fleets = fm.fleets.filter(function (f) { return f.id !== fleetId; });
                     }
+
+                    // Update region units on map if returned
+                    if (result.regionId && result.units) {
+                        WorldApp.worldMap.fleetManager.updateRegionUnits(result.regionId, result.units);
+                    }
+
+                    WorldApp.worldMap.render();
                 }
 
                 loadFleets();

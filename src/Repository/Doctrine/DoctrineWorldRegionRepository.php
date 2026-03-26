@@ -73,6 +73,30 @@ final class DoctrineWorldRegionRepository implements WorldRegionRepository
         return $gameUnits;
     }
 
+    /**
+     * @return array<int, array<int, int>>
+     */
+    public function getWorldGameUnitSumByPlayer(Player $player): array
+    {
+        $results = $this->entityManager
+            ->createQuery(
+                'SELECT IDENTITY(wru.worldRegion) as regionId, wru.gameUnit, sum(wru.amount) as total
+              FROM ' . WorldRegionUnit::class . ' wru
+              JOIN ' . WorldRegion::class . ' wr WITH wru.worldRegion = wr
+              WHERE wr.player = :player
+              GROUP BY regionId, wru.gameUnit'
+            )->setParameter('player', $player)
+            ->getArrayResult();
+
+        $grouped = [];
+        /** @var array{regionId: string, gameUnit: GameUnitEnum, total: string} $result */
+        foreach ($results as $result) {
+            $grouped[(int) $result['regionId']][$result['gameUnit']->value] = (int) $result['total'];
+        }
+
+        return $grouped;
+    }
+
     public function getPreviousWorldRegionForPlayer(int $id, Player $player): ?WorldRegion
     {
         return $this->entityManager

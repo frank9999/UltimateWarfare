@@ -66,7 +66,7 @@ final class OperationController extends BaseGameController
             );
         } catch (WorldRegionNotFoundException $e) {
             $this->addFlash('error', $e->getMessage());
-            return $this->redirectToRoute('Game/RegionList', [], 302);
+            return $this->redirectToRoute('Game/WorldMap', [], 302);
         } catch (Throwable $e) {
             $this->addFlash('error', $e->getMessage());
         }
@@ -74,7 +74,7 @@ final class OperationController extends BaseGameController
         $operation = $this->operationRegistry->find($operationSlug);
         if ($operation === null) {
             $this->addFlash('error', 'Unknown operation selected!');
-            return $this->redirectToRoute('Game/RegionList', [], 302);
+            return $this->redirectToRoute('Game/WorldMap', [], 302);
         }
 
         $gameUnit = $this->gameUnitRegistry->find($operation->getGameUnit());
@@ -103,24 +103,24 @@ final class OperationController extends BaseGameController
             $worldRegion = $this->regionActionService->getWorldRegionByIdAndWorld($regionId, $player->getWorld());
         } catch (WorldRegionNotFoundException $e) {
             $this->addFlash('error', $e->getMessage());
-            return $this->redirectToRoute('Game/RegionList', [], 302);
+            return $this->redirectToRoute('Game/WorldMap', [], 302);
         }
 
         if ($worldRegion->getPlayer() === null) {
             $this->addFlash('error', "Can not attack nobody!");
-            return $this->redirectToRoute('Game/World/Region', ['regionId' => $worldRegion->getId()], 302);
+            return $this->redirectToRoute('Game/WorldMap', [], 302);
         }
 
         if ($worldRegion->getPlayer()->getId() === $player->getId()) {
             $this->addFlash('error', "Can not attack your own region!");
-            return $this->redirectToRoute('Game/World/Region', ['regionId' => $worldRegion->getId()], 302);
+            return $this->redirectToRoute('Game/WorldMap', [], 302);
         }
 
         try {
             $playerRegion = $this->regionActionService->getWorldRegionByIdAndPlayer($playerRegionId, $player);
         } catch (WorldRegionNotFoundException $e) {
             $this->addFlash('error', $e->getMessage());
-            return $this->redirectToRoute('Game/RegionList', [], 302);
+            return $this->redirectToRoute('Game/WorldMap', [], 302);
         }
 
         $gameUnitsData = $this->worldRegionRepository->getWorldGameUnitSumByWorldRegion($playerRegion);
@@ -148,17 +148,17 @@ final class OperationController extends BaseGameController
             $worldRegion = $this->regionActionService->getWorldRegionByIdAndWorld($regionId, $player->getWorld());
         } catch (WorldRegionNotFoundException $e) {
             $this->addFlash('error', $e->getMessage());
-            return $this->redirectToRoute('Game/RegionList', [], 302);
+            return $this->redirectToRoute('Game/WorldMap', [], 302);
         }
 
         if ($worldRegion->getPlayer() === null) {
             $this->addFlash('error', "Can not attack nobody!");
-            return $this->redirectToRoute('Game/World/Region', ['regionId' => $worldRegion->getId()], 302);
+            return $this->redirectToRoute('Game/WorldMap', [], 302);
         }
 
         if ($worldRegion->getPlayer()->getId() === $player->getId()) {
             $this->addFlash('error', "Can not attack your own region!");
-            return $this->redirectToRoute('Game/World/Region', ['regionId' => $worldRegion->getId()], 302);
+            return $this->redirectToRoute('Game/WorldMap', [], 302);
         }
 
         $operations = $this->operationRegistry->findAvailableForPlayer($player);
@@ -186,20 +186,20 @@ final class OperationController extends BaseGameController
             $worldRegion = $this->regionActionService->getWorldRegionByIdAndWorld($regionId, $player->getWorld());
         } catch (WorldRegionNotFoundException $e) {
             $this->addFlash('error', $e->getMessage());
-            return $this->redirectToRoute('Game/RegionList', [], 302);
+            return $this->redirectToRoute('Game/WorldMap', [], 302);
         }
 
         $operation = $this->operationRegistry->find($operationSlug);
         if ($operation === null) {
             $this->addFlash('error', 'Unknown operation selected!');
-            return $this->redirectToRoute('Game/RegionList', [], 302);
+            return $this->redirectToRoute('Game/WorldMap', [], 302);
         }
 
         try {
             $playerRegion = $this->regionActionService->getWorldRegionByIdAndPlayer($playerRegionId, $player);
         } catch (WorldRegionNotFoundException $e) {
             $this->addFlash('error', $e->getMessage());
-            return $this->redirectToRoute('Game/RegionList', [], 302);
+            return $this->redirectToRoute('Game/WorldMap', [], 302);
         }
 
         if ($request->isMethod(Request::METHOD_POST)) {

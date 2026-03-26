@@ -3,7 +3,7 @@
 {% block title %}Ultimate Warfare - Build region{% endblock title %}
 
 {% block content %}
-    Go to: <a class="B" href="{{ path('Game/World/Region', {'regionId': region.id}) }}">Region</a>
+    Go to: <a class="B" href="{{ path('Game/WorldMap') }}">World Map</a>
     {% for gameUnitCategory in gameUnitCategories %}
         - <a class="B" href="{{ path('Game/World/Region/RemoveGameUnits', {'regionId': region.id, 'gameUnitCategoryId': gameUnitCategory.value}) }}">{{ gameUnitCategory.label }}</a>
     {% endfor %}

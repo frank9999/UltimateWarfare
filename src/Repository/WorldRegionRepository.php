@@ -26,6 +26,11 @@ interface WorldRegionRepository
      */
     public function getWorldGameUnitSumByWorldRegion(WorldRegion $worldRegion): array;
 
+    /**
+     * @return array<int, array<int, int>>
+     */
+    public function getWorldGameUnitSumByPlayer(Player $player): array;
+
     public function getPreviousWorldRegionForPlayer(int $id, Player $player): ?WorldRegion;
 
     public function getNextWorldRegionForPlayer(int $id, Player $player): ?WorldRegion;
