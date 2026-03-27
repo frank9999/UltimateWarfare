@@ -6,9 +6,6 @@
                     <b>Forum Moderator</b>
                 </p>
             {% endif %}
-            {% if post.user.hasAvatar %}
-                <img alt="{{ post.user.username }} Avatar" src="data:image/jpeg;base64,{{ post.user.avatar|base64_encode() }}" />
-            {% endif %}
         </td>
         <td rowspan="3" width="700">{{ post.content|nl2br }}
             <br/>

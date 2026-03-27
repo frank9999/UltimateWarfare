@@ -9,18 +9,7 @@
         </tr>
         <tr>
             <td width="150" valign="middle">Name:</td>
-            <td width="350">
-                <table class="table text-center">
-                    <tr>
-                        <td style="border:0" valign="middle">{{ profilePlayer.name }}</td>
-                        {% if profilePlayer.getUser.hasAvatar %}
-                            <td style="border:0" align="right">
-                                <img alt="{{ profilePlayer.getUser.username }} Avatar" src="data:image/jpeg;base64,{{ profilePlayer.getUser.avatar|base64_encode() }}" />
-                            </td>
-                        {% endif %}
-                    </tr>
-                </table>
-            </td>
+            <td width="350">{{ profilePlayer.name }}</td>
         </tr>
         <tr>
             <td width="150">Join date:</td>

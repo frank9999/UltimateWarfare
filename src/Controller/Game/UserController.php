@@ -61,13 +61,6 @@ final class UserController extends BaseGameController
     public function profileApi(): JsonResponse
     {
         $user = $this->getGameUser();
-        $avatarBase64 = '';
-        if ($user->hasAvatar()) {
-            $avatar = $user->getAvatar();
-            if (is_resource($avatar)) {
-                $avatarBase64 = base64_encode((string) stream_get_contents($avatar));
-            }
-        }
 
         return new JsonResponse([
             'success' => true,
@@ -77,8 +70,6 @@ final class UserController extends BaseGameController
                 'signup' => $user->getSignup()->format('Y-m-d H:i:s'),
                 'accountType' => $this->getAccountType(),
                 'active' => $user->getActive(),
-                'hasAvatar' => $user->hasAvatar(),
-                'avatarBase64' => $avatarBase64,
             ]
         ]);
     }
@@ -123,55 +114,6 @@ final class UserController extends BaseGameController
         } catch (\Throwable $e) {
             return new JsonResponse(['success' => false, 'message' => 'An error occurred.']);
         }
-    }
-
-    public function uploadAvatarApi(Request $request): JsonResponse
-    {
-        $user = $this->getGameUser();
-
-        try {
-            $avatar = $request->files->get('avatar');
-            if ($avatar === null) {
-                return new JsonResponse(['success' => false, 'message' => 'No file uploaded.']);
-            }
-
-            /** @var \Symfony\Component\HttpFoundation\File\UploadedFile $avatar */
-            if ($avatar->getSize() > 1024 * 1024) {
-                return new JsonResponse(['success' => false, 'message' => 'File is too large. Maximum size is 1MB.']);
-            }
-
-            $uploadedFile = $user->getId() . '-' . uniqid('', true) . '.' . $avatar->guessExtension();
-
-            $avatar->move(
-                $this->getParameter('app.avatars_directory'),
-                $uploadedFile
-            );
-
-            $image = new \Imagick($this->getParameter('app.avatars_directory') . '/' . $uploadedFile);
-            $image->setImageFormat('png');
-            $image->setImageBackgroundColor('transparent');
-            $image->setImageAlphaChannel(\Imagick::ALPHACHANNEL_OPAQUE);
-            $image->cropThumbnailImage(200, 200);
-            $image->roundCornersImage(100, 100);
-
-            unlink($this->getParameter('app.avatars_directory') . '/' . $uploadedFile);
-
-            $user->setAvatar($image->getImageBlob());
-            $this->userRepository->save($user);
-
-            return new JsonResponse(['success' => true, 'message' => 'Avatar uploaded successfully!']);
-        } catch (\Throwable $e) {
-            return new JsonResponse(['success' => false, 'message' => 'Could not upload avatar.']);
-        }
-    }
-
-    public function deleteAvatarApi(): JsonResponse
-    {
-        $user = $this->getGameUser();
-        $user->setAvatar('');
-        $this->userRepository->save($user);
-
-        return new JsonResponse(['success' => true, 'message' => 'Avatar deleted successfully!']);
     }
 
     private function getAccountType(): string

@@ -1,5 +1,5 @@
 /**
- * Profile modal logic (account info, password change, avatar).
+ * Profile modal logic (account info, password change).
  * Depends on: notifications.js
  */
 (function () {
@@ -30,8 +30,7 @@
         profileTabs.innerHTML = '';
         var tabs = [
             { id: 'info', name: 'Account Info' },
-            { id: 'password', name: 'Password' },
-            { id: 'avatar', name: 'Avatar' }
+            { id: 'password', name: 'Password' }
         ];
 
         tabs.forEach(function (tab) {
@@ -73,8 +72,6 @@
             renderInfoTab();
         } else if (currentTab === 'password') {
             renderPasswordTab();
-        } else if (currentTab === 'avatar') {
-            renderAvatarTab();
         }
     }
 
@@ -110,33 +107,6 @@
         profileFooter.innerHTML = '<button type="button" id="closeProfileBtn">Close</button> <button type="button" id="savePasswordBtn">Change Password</button>';
         document.getElementById('closeProfileBtn').onclick = function () { profileModal.style.display = 'none'; };
         document.getElementById('savePasswordBtn').onclick = changePassword;
-    }
-
-    function renderAvatarTab() {
-        var html = '<div style="text-align: center;">';
-
-        if (profileData.hasAvatar && profileData.avatarBase64) {
-            html += '<div style="margin-bottom: 15px;"><img src="data:image/png;base64,' + profileData.avatarBase64 + '" style="width: 200px; height: 200px; border-radius: 50%;"></div>';
-            html += '<button type="button" id="deleteAvatarBtn" style="background: #c44; margin-bottom: 15px;">Remove Avatar</button><br>';
-        } else {
-            html += '<div style="margin-bottom: 15px; color: #aaa;">No avatar set</div>';
-        }
-
-        html += '<div style="margin-top: 10px;">';
-        html += '<label style="display: block; color: #aaa; margin-bottom: 8px;">Upload New Avatar (max 1MB)</label>';
-        html += '<input type="file" id="avatarFileInput" accept="image/*" style="color: #eee;">';
-        html += '</div>';
-        html += '<div id="profileAvatarMessage" style="margin-top: 8px;"></div>';
-        html += '</div>';
-
-        profileContainer.innerHTML = html;
-        profileFooter.innerHTML = '<button type="button" id="closeProfileBtn">Close</button> <button type="button" id="uploadAvatarBtn">Upload Avatar</button>';
-        document.getElementById('closeProfileBtn').onclick = function () { profileModal.style.display = 'none'; };
-        document.getElementById('uploadAvatarBtn').onclick = uploadAvatar;
-
-        if (profileData.hasAvatar) {
-            document.getElementById('deleteAvatarBtn').onclick = deleteAvatar;
-        }
     }
 
     async function changePassword() {
@@ -178,54 +148,6 @@
             }
         } catch (error) {
             messageDiv.innerHTML = '<span style="color: #f44336;">An error occurred.</span>';
-        }
-    }
-
-    async function uploadAvatar() {
-        var fileInput = document.getElementById('avatarFileInput');
-        var messageDiv = document.getElementById('profileAvatarMessage');
-
-        if (!fileInput.files || !fileInput.files[0]) {
-            messageDiv.innerHTML = '<span style="color: #f44336;">Please select a file.</span>';
-            return;
-        }
-
-        var formData = new FormData();
-        formData.append('avatar', fileInput.files[0]);
-
-        try {
-            var response = await fetch('/game/api/profile/upload-avatar', {
-                method: 'POST',
-                body: formData
-            });
-            var result = await response.json();
-
-            if (result.success) {
-                showNotification(result.message, 'success');
-                loadProfile();
-            } else {
-                messageDiv.innerHTML = '<span style="color: #f44336;">' + escapeHtml(result.message) + '</span>';
-            }
-        } catch (error) {
-            messageDiv.innerHTML = '<span style="color: #f44336;">An error occurred.</span>';
-        }
-    }
-
-    async function deleteAvatar() {
-        try {
-            var response = await fetch('/game/api/profile/delete-avatar', {
-                method: 'POST'
-            });
-            var result = await response.json();
-
-            if (result.success) {
-                showNotification(result.message, 'success');
-                loadProfile();
-            } else {
-                showNotification(result.message, 'error');
-            }
-        } catch (error) {
-            showNotification('An error occurred.', 'error');
         }
     }
 

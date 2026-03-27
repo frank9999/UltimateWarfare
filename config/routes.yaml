@@ -223,16 +223,6 @@ Game/Api/Profile/ChangePassword:
     controller: FrankProjects\UltimateWarfare\Controller\Game\UserController::changePasswordApi
     methods: [POST]
 
-Game/Api/Profile/UploadAvatar:
-    path:      /game/api/profile/upload-avatar
-    controller: FrankProjects\UltimateWarfare\Controller\Game\UserController::uploadAvatarApi
-    methods: [POST]
-
-Game/Api/Profile/DeleteAvatar:
-    path:      /game/api/profile/delete-avatar
-    controller: FrankProjects\UltimateWarfare\Controller\Game\UserController::deleteAvatarApi
-    methods: [POST]
-
 Game/Api/Worlds:
     path:      /game/api/worlds
     controller: FrankProjects\UltimateWarfare\Controller\Game\WorldController::worldsApi
