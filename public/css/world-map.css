@@ -356,6 +356,19 @@
     background: #a08365;
 }
 
+.market-action-btn {
+    padding: 5px 15px;
+    background: #8B7355;
+    color: #f3e6c1;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.market-action-btn:hover {
+    background: #a08365;
+}
+
 .modal-footer.hq-buttons {
     display: flex;
     flex-wrap: wrap;

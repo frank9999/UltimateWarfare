@@ -245,91 +245,105 @@ Game/Api/Construction/Cancel:
     requirements:
         constructionId: '\d+'
 
-Game/Federation:
-    path:      /game/federation
-    controller: FrankProjects\UltimateWarfare\Controller\Game\FederationController::federation
+Game/Api/Federation/Status:
+    path:      /game/api/federation/status
+    controller: FrankProjects\UltimateWarfare\Controller\Game\FederationController::statusApi
+    methods: [GET]
 
-Game/Federation/Applications:
-    path:      /game/federation/applications
-    controller: FrankProjects\UltimateWarfare\Controller\Game\FederationApplicationController::showFederationApplications
+Game/Api/Federation/List:
+    path:      /game/api/federation/list
+    controller: FrankProjects\UltimateWarfare\Controller\Game\FederationController::listApi
+    methods: [GET]
 
-Game/Federation/Application/Accept:
-    path:      /game/federation/application/accept/{federationApplicationId}
-    controller: FrankProjects\UltimateWarfare\Controller\Game\FederationApplicationController::acceptFederationApplication
-    requirements:
-        federationApplicationId: '\d+'
-
-Game/Federation/Application/Reject:
-    path:      /game/federation/application/reject{federationApplicationId}
-    controller: FrankProjects\UltimateWarfare\Controller\Game\FederationApplicationController::rejectFederationApplication
-    requirements:
-        federationApplicationId: '\d+'
-
-Game/Federation/Application/Send:
-    path:      /game/federation/application/send/{federationId}
-    controller: FrankProjects\UltimateWarfare\Controller\Game\FederationApplicationController::sendApplication
+Game/Api/Federation/Show:
+    path:      /game/api/federation/show/{federationId}
+    controller: FrankProjects\UltimateWarfare\Controller\Game\FederationController::showApi
+    methods: [GET]
     requirements:
         federationId: '\d+'
 
-Game/Federation/Bank/Deposit:
-    path:      /game/federation/bank/deposit
-    controller: FrankProjects\UltimateWarfare\Controller\Game\FederationBankController::deposit
+Game/Api/Federation/News:
+    path:      /game/api/federation/news
+    controller: FrankProjects\UltimateWarfare\Controller\Game\FederationController::newsApi
+    methods: [GET]
 
-Game/Federation/Bank/Withdraw:
-    path:      /game/federation/bank/withdraw
-    controller: FrankProjects\UltimateWarfare\Controller\Game\FederationBankController::withdraw
+Game/Api/Federation/Create:
+    path:      /game/api/federation/create
+    controller: FrankProjects\UltimateWarfare\Controller\Game\FederationController::createApi
+    methods: [POST]
 
-Game/Federation/Show:
-    path:      /game/federation/{federationId}
-    controller: FrankProjects\UltimateWarfare\Controller\Game\FederationController::showFederation
-    requirements:
-        federationId: '\d+'
+Game/Api/Federation/SendAid:
+    path:      /game/api/federation/send-aid
+    controller: FrankProjects\UltimateWarfare\Controller\Game\FederationController::sendAidApi
+    methods: [POST]
 
-Game/Federation/Create:
-    path:      /game/federation/create
-    controller: FrankProjects\UltimateWarfare\Controller\Game\FederationController::createFederation
+Game/Api/Federation/Remove:
+    path:      /game/api/federation/remove
+    controller: FrankProjects\UltimateWarfare\Controller\Game\FederationController::removeApi
+    methods: [POST]
 
-Game/Federation/Join:
-    path:      /game/federation/join
-    controller: FrankProjects\UltimateWarfare\Controller\Game\FederationController::joinFederation
+Game/Api/Federation/ChangeName:
+    path:      /game/api/federation/change-name
+    controller: FrankProjects\UltimateWarfare\Controller\Game\FederationController::changeNameApi
+    methods: [POST]
 
-Game/Federation/List:
-    path:      /game/federation/list
-    controller: FrankProjects\UltimateWarfare\Controller\Game\FederationController::listFederations
+Game/Api/Federation/Leave:
+    path:      /game/api/federation/leave
+    controller: FrankProjects\UltimateWarfare\Controller\Game\FederationController::leaveApi
+    methods: [POST]
 
-Game/Federation/News:
-    path:      /game/federation/news
-    controller: FrankProjects\UltimateWarfare\Controller\Game\FederationController::federationNews
-
-Game/Federation/SendAid:
-    path:      /game/federation/send-aid
-    controller: FrankProjects\UltimateWarfare\Controller\Game\FederationController::sendAid
-
-Game/Federation/Remove:
-    path:      /game/federation/remove
-    controller: FrankProjects\UltimateWarfare\Controller\Game\FederationController::removeFederation
-
-Game/Federation/ChangeName:
-    path:      /game/federation/change-name
-    controller: FrankProjects\UltimateWarfare\Controller\Game\FederationController::changeFederationName
-
-Game/Federation/Leave:
-    path:      /game/federation/leave
-    controller: FrankProjects\UltimateWarfare\Controller\Game\FederationController::leaveFederation
-
-Game/Federation/KickPlayer:
-    path:      /game/federation/kick/{playerId}
-    controller: FrankProjects\UltimateWarfare\Controller\Game\FederationController::kickPlayer
+Game/Api/Federation/Kick:
+    path:      /game/api/federation/kick/{playerId}
+    controller: FrankProjects\UltimateWarfare\Controller\Game\FederationController::kickPlayerApi
+    methods: [POST]
     requirements:
         playerId: '\d+'
 
-Game/Federation/UpdateLeadershipMessage:
-    path:      /game/federation/update-leadership-message
-    controller: FrankProjects\UltimateWarfare\Controller\Game\FederationController::updateLeadershipMessage
+Game/Api/Federation/UpdateMessage:
+    path:      /game/api/federation/update-message
+    controller: FrankProjects\UltimateWarfare\Controller\Game\FederationController::updateMessageApi
+    methods: [POST]
 
-Game/Federation/ChangePlayerHierarchy:
-    path:      /game/federation/change-roles
-    controller: FrankProjects\UltimateWarfare\Controller\Game\FederationController::changePlayerHierarchy
+Game/Api/Federation/ChangeRole:
+    path:      /game/api/federation/change-role
+    controller: FrankProjects\UltimateWarfare\Controller\Game\FederationController::changeRoleApi
+    methods: [POST]
+
+Game/Api/Federation/Applications:
+    path:      /game/api/federation/applications
+    controller: FrankProjects\UltimateWarfare\Controller\Game\FederationApplicationController::applicationsApi
+    methods: [GET]
+
+Game/Api/Federation/Application/Accept:
+    path:      /game/api/federation/application/accept/{federationApplicationId}
+    controller: FrankProjects\UltimateWarfare\Controller\Game\FederationApplicationController::acceptApi
+    methods: [POST]
+    requirements:
+        federationApplicationId: '\d+'
+
+Game/Api/Federation/Application/Reject:
+    path:      /game/api/federation/application/reject/{federationApplicationId}
+    controller: FrankProjects\UltimateWarfare\Controller\Game\FederationApplicationController::rejectApi
+    methods: [POST]
+    requirements:
+        federationApplicationId: '\d+'
+
+Game/Api/Federation/Application/Send:
+    path:      /game/api/federation/apply/{federationId}
+    controller: FrankProjects\UltimateWarfare\Controller\Game\FederationApplicationController::sendApplicationApi
+    methods: [POST]
+    requirements:
+        federationId: '\d+'
+
+Game/Api/Federation/Bank/Deposit:
+    path:      /game/api/federation/bank/deposit
+    controller: FrankProjects\UltimateWarfare\Controller\Game\FederationBankController::depositApi
+    methods: [POST]
+
+Game/Api/Federation/Bank/Withdraw:
+    path:      /game/api/federation/bank/withdraw
+    controller: FrankProjects\UltimateWarfare\Controller\Game\FederationBankController::withdrawApi
+    methods: [POST]
 
 Game/Api/Fleet/Overview:
     path:      /game/api/fleet/overview

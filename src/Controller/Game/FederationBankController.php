@@ -4,11 +4,9 @@ declare(strict_types=1);
 
 namespace FrankProjects\UltimateWarfare\Controller\Game;
 
-use FrankProjects\UltimateWarfare\Form\DTO\BankTransactionFormDTO;
-use FrankProjects\UltimateWarfare\Form\Game\BankTransactionType;
 use FrankProjects\UltimateWarfare\Service\Action\FederationBankActionService;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Throwable;
 
 final class FederationBankController extends BaseGameController
@@ -21,79 +19,33 @@ final class FederationBankController extends BaseGameController
         $this->federationBankActionService = $federationBankActionService;
     }
 
-    public function deposit(Request $request): Response
+    public function depositApi(Request $request): JsonResponse
     {
-        $player = $this->getPlayer();
-        $federation = $player->getFederation();
-        if ($federation === null) {
-            return $this->render(
-                'game/federation/noFederation.html.twig',
-                [
-                    'player' => $player
-                ]
-            );
+        try {
+            /** @var array{resources?: array<string, string>} $data */
+            $data = json_decode($request->getContent(), true);
+            /** @var array<string, string> $resources */
+            $resources = $data['resources'] ?? [];
+            $this->federationBankActionService->deposit($this->getPlayer(), $resources);
+
+            return new JsonResponse(['success' => true, 'message' => 'Deposit successful']);
+        } catch (Throwable $e) {
+            return new JsonResponse(['success' => false, 'message' => $e->getMessage()]);
         }
-
-        $bankTransaction = new BankTransactionFormDTO();
-        $form = $this->createForm(BankTransactionType::class, $bankTransaction, [
-            'submit_label' => 'Deposit',
-        ]);
-
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            try {
-                $this->federationBankActionService->deposit($player, $bankTransaction->toResourceArray());
-                $this->addFlash('success', 'You successfully made a deposit!');
-            } catch (Throwable $e) {
-                $this->addFlash('error', $e->getMessage());
-            }
-        }
-
-        return $this->render(
-            'game/federation/bank/deposit.html.twig',
-            [
-                'player' => $player,
-                'federationResources' => $federation->getResources(),
-                'form' => $form->createView(),
-            ]
-        );
     }
 
-    public function withdraw(Request $request): Response
+    public function withdrawApi(Request $request): JsonResponse
     {
-        $player = $this->getPlayer();
-        $federation = $player->getFederation();
-        if ($federation === null) {
-            return $this->render(
-                'game/federation/noFederation.html.twig',
-                [
-                    'player' => $player
-                ]
-            );
+        try {
+            /** @var array{resources?: array<string, string>} $data */
+            $data = json_decode($request->getContent(), true);
+            /** @var array<string, string> $resources */
+            $resources = $data['resources'] ?? [];
+            $this->federationBankActionService->withdraw($this->getPlayer(), $resources);
+
+            return new JsonResponse(['success' => true, 'message' => 'Withdrawal successful']);
+        } catch (Throwable $e) {
+            return new JsonResponse(['success' => false, 'message' => $e->getMessage()]);
         }
-
-        $bankTransaction = new BankTransactionFormDTO();
-        $form = $this->createForm(BankTransactionType::class, $bankTransaction, [
-            'submit_label' => 'Withdraw',
-        ]);
-
-        $form->handleRequest($request);
-        if ($form->isSubmitted() && $form->isValid()) {
-            try {
-                $this->federationBankActionService->withdraw($player, $bankTransaction->toResourceArray());
-                $this->addFlash('success', 'You successfully made a withdrawal!');
-            } catch (Throwable $e) {
-                $this->addFlash('error', $e->getMessage());
-            }
-        }
-
-        return $this->render(
-            'game/federation/bank/withdraw.html.twig',
-            [
-                'player' => $player,
-                'federationResources' => $federation->getResources(),
-                'form' => $form->createView(),
-            ]
-        );
     }
 }

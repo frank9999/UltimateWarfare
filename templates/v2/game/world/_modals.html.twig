@@ -345,6 +345,25 @@
     </div>
 </div>
 
+{# Federation Modal #}
+<div id="federationModal" class="modal">
+    <div class="modal-content modal-lg">
+        <div class="modal-header">
+            <span class="modal-title">Federation</span>
+            <span class="close" id="closeFederationModal">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div class="build-tabs" id="federationTabs"></div>
+            <div id="federationContainer" style="max-height: 400px; overflow-y: auto;">
+                <div class="build-loading">Loading federation data...</div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" id="closeFederationBtn">Close</button>
+        </div>
+    </div>
+</div>
+
 {# Send Units Modal - Step 1: Select units #}
 <div id="sendUnitsModal" class="modal">
     <div class="modal-content build-modal-content">
