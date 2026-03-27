@@ -35,7 +35,7 @@ final class SurrenderController extends BaseGameController
                 } else {
                     $playerRepository->remove($player);
                     $this->addFlash('success', "You have surrendered your empire...");
-                    return $this->redirectToRoute('Game/Account');
+                    return $this->redirectToRoute('Game/SelectWorld');
                 }
             } else {
                 $this->addFlash('error', 'Wrong password!');

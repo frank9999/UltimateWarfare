@@ -37,7 +37,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Equatab
     private array $roles;
     private DateTime $signup;
     private bool $active = true;
-    private bool $adviser = false;
     private bool $forumBan = false;
 
     /** @var Collection<int, Player> */
@@ -283,16 +282,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Equatab
     public function getActive(): bool
     {
         return $this->active;
-    }
-
-    public function setAdviser(bool $adviser): void
-    {
-        $this->adviser = $adviser;
-    }
-
-    public function getAdviser(): bool
-    {
-        return $this->adviser;
     }
 
     public function setForumBan(bool $forumBan): void

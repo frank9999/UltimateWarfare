@@ -213,21 +213,30 @@ Game/Login/Player:
     requirements:
         playerId: '\d+'
 
-Game/Account:
-    path:      /game/account
-    controller: FrankProjects\UltimateWarfare\Controller\Game\UserController::account
+Game/Api/Profile:
+    path:      /game/api/profile
+    controller: FrankProjects\UltimateWarfare\Controller\Game\UserController::profileApi
+    methods: [GET]
 
-Game/Account/Edit:
-    path:      /game/account/edit
-    controller: FrankProjects\UltimateWarfare\Controller\Game\UserController::edit
+Game/Api/Profile/ChangePassword:
+    path:      /game/api/profile/change-password
+    controller: FrankProjects\UltimateWarfare\Controller\Game\UserController::changePasswordApi
+    methods: [POST]
 
-Game/Account/UploadAvatar:
-    path:      /game/account/upload_avatar
-    controller: FrankProjects\UltimateWarfare\Controller\Game\UserController::uploadAvatar
+Game/Api/Profile/UploadAvatar:
+    path:      /game/api/profile/upload-avatar
+    controller: FrankProjects\UltimateWarfare\Controller\Game\UserController::uploadAvatarApi
+    methods: [POST]
 
-Game/Account/DeleteAvatar:
-    path:      /game/account/delete_avatar
-    controller: FrankProjects\UltimateWarfare\Controller\Game\UserController::deleteAvatar
+Game/Api/Profile/DeleteAvatar:
+    path:      /game/api/profile/delete-avatar
+    controller: FrankProjects\UltimateWarfare\Controller\Game\UserController::deleteAvatarApi
+    methods: [POST]
+
+Game/Api/Worlds:
+    path:      /game/api/worlds
+    controller: FrankProjects\UltimateWarfare\Controller\Game\WorldController::worldsApi
+    methods: [GET]
 
 Game/Banned:
     path:      /game/banned

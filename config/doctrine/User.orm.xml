@@ -28,11 +28,6 @@
         <option name="default">1</option>
       </options>
     </field>
-    <field name="adviser" type="boolean" column="adviser">
-      <options>
-        <option name="default">1</option>
-      </options>
-    </field>
     <field name="forumBan" type="boolean" column="forum_ban">
       <options>
         <option name="default">0</option>

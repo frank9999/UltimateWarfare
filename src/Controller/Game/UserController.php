@@ -5,11 +5,9 @@ declare(strict_types=1);
 namespace FrankProjects\UltimateWarfare\Controller\Game;
 
 use FrankProjects\UltimateWarfare\Entity\UnbanRequest;
-use FrankProjects\UltimateWarfare\Form\ChangePasswordType;
-use FrankProjects\UltimateWarfare\Form\UploadAvatarType;
 use FrankProjects\UltimateWarfare\Repository\UnbanRequestRepository;
 use FrankProjects\UltimateWarfare\Repository\UserRepository;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -27,22 +25,12 @@ final class UserController extends BaseGameController
         $this->unbanRequestRepository = $unbanRequestRepository;
     }
 
-    public function account(): Response
-    {
-        return $this->render(
-            'game/account.html.twig',
-            [
-                'user' => $this->getGameUser()
-            ]
-        );
-    }
-
     public function banned(Request $request): Response
     {
         $user = $this->getGameUser(false);
         if ($user->getActive()) {
             $this->addFlash('error', 'You are not banned!');
-            return $this->redirectToRoute('Game/Account');
+            return $this->redirectToRoute('Game/WorldMap');
         }
 
         $unbanRequest = $this->unbanRequestRepository->findByUser($user);
@@ -70,106 +58,120 @@ final class UserController extends BaseGameController
         );
     }
 
-    public function edit(Request $request, UserPasswordHasherInterface $passwordHasher): Response
+    public function profileApi(): JsonResponse
     {
         $user = $this->getGameUser();
-        $changePasswordForm = $this->createForm(ChangePasswordType::class, $user);
-        $changePasswordForm->handleRequest($request);
-
-        if ($changePasswordForm->isSubmitted() && $changePasswordForm->isValid()) {
-            /** @var string $oldPassword */
-            $oldPassword = $changePasswordForm->get('oldPassword')->getData();
-            /** @var string|null $plainPassword */
-            $plainPassword = $changePasswordForm->get('plainPassword')->getData();
-
-            if ($passwordHasher->isPasswordValid($user, $oldPassword)) {
-                if ($plainPassword === null) {
-                    $this->addFlash('error', 'New passwords do not match');
-                } else {
-                    $newEncodedPassword = $passwordHasher->hashPassword($user, $plainPassword);
-                    $user->setPassword($newEncodedPassword);
-                    $this->userRepository->save($user);
-
-                    $this->addFlash('success', "Password change successfully!");
-                }
-            } else {
-                $this->addFlash('error', 'Old password is invalid');
+        $avatarBase64 = '';
+        if ($user->hasAvatar()) {
+            $avatar = $user->getAvatar();
+            if (is_resource($avatar)) {
+                $avatarBase64 = base64_encode((string) stream_get_contents($avatar));
             }
         }
 
-        if ($request->isMethod(Request::METHOD_POST)) {
-            if ($request->request->get('change_settings') !== null) {
-                $this->changeSettings($request);
-            }
-        }
-
-        return $this->render(
-            'game/editAccount.html.twig',
-            [
-                'user' => $this->getGameUser(),
-                'userType' => $this->getAccountType(),
-                'changePasswordForm' => $changePasswordForm->createView(),
-                'uploadAvatar' => $this->createForm(UploadAvatarType::class)->createView()
+        return new JsonResponse([
+            'success' => true,
+            'data' => [
+                'username' => $user->getUsername(),
+                'email' => $user->getEmail(),
+                'signup' => $user->getSignup()->format('Y-m-d H:i:s'),
+                'accountType' => $this->getAccountType(),
+                'active' => $user->getActive(),
+                'hasAvatar' => $user->hasAvatar(),
+                'avatarBase64' => $avatarBase64,
             ]
-        );
+        ]);
     }
 
-    public function uploadAvatar(Request $request): Response
+    public function changePasswordApi(
+        Request $request,
+        UserPasswordHasherInterface $passwordHasher
+    ): JsonResponse {
+        $user = $this->getGameUser();
+
+        try {
+            /** @var array{oldPassword?: string, newPassword?: string, newPasswordRepeat?: string} $data */
+            $data = json_decode($request->getContent(), true);
+            $oldPassword = $data['oldPassword'] ?? '';
+            $newPassword = $data['newPassword'] ?? '';
+            $newPasswordRepeat = $data['newPasswordRepeat'] ?? '';
+
+            if ($oldPassword === '' || $newPassword === '') {
+                return new JsonResponse(['success' => false, 'message' => 'All fields are required.']);
+            }
+
+            if (strlen($newPassword) < 8) {
+                return new JsonResponse([
+                    'success' => false,
+                    'message' => 'New password must be at least 8 characters.',
+                ]);
+            }
+
+            if ($newPassword !== $newPasswordRepeat) {
+                return new JsonResponse(['success' => false, 'message' => 'New passwords do not match.']);
+            }
+
+            if (!$passwordHasher->isPasswordValid($user, $oldPassword)) {
+                return new JsonResponse(['success' => false, 'message' => 'Old password is invalid.']);
+            }
+
+            $newEncodedPassword = $passwordHasher->hashPassword($user, $newPassword);
+            $user->setPassword($newEncodedPassword);
+            $this->userRepository->save($user);
+
+            return new JsonResponse(['success' => true, 'message' => 'Password changed successfully!']);
+        } catch (\Throwable $e) {
+            return new JsonResponse(['success' => false, 'message' => 'An error occurred.']);
+        }
+    }
+
+    public function uploadAvatarApi(Request $request): JsonResponse
     {
         $user = $this->getGameUser();
-        $form = $this->createForm(UploadAvatarType::class);
-        $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            /** @var UploadedFile $avatar */
-            $avatar = $form->get('avatar')->getData();
+        try {
+            $avatar = $request->files->get('avatar');
+            if ($avatar === null) {
+                return new JsonResponse(['success' => false, 'message' => 'No file uploaded.']);
+            }
+
+            /** @var \Symfony\Component\HttpFoundation\File\UploadedFile $avatar */
+            if ($avatar->getSize() > 1024 * 1024) {
+                return new JsonResponse(['success' => false, 'message' => 'File is too large. Maximum size is 1MB.']);
+            }
+
             $uploadedFile = $user->getId() . '-' . uniqid('', true) . '.' . $avatar->guessExtension();
 
-            try {
-                $avatar->move(
-                    $this->getParameter('app.avatars_directory'),
-                    $uploadedFile
-                );
+            $avatar->move(
+                $this->getParameter('app.avatars_directory'),
+                $uploadedFile
+            );
 
-                $image = new \Imagick($this->getParameter('app.avatars_directory') . '/' . $uploadedFile);
-                $image->setImageFormat('png');
-                $image->setImageBackgroundColor('transparent');
-                $image->setImageAlphaChannel(\Imagick::ALPHACHANNEL_OPAQUE);
-                $image->cropThumbnailImage(200, 200);
-                $image->roundCornersImage(100, 100);
+            $image = new \Imagick($this->getParameter('app.avatars_directory') . '/' . $uploadedFile);
+            $image->setImageFormat('png');
+            $image->setImageBackgroundColor('transparent');
+            $image->setImageAlphaChannel(\Imagick::ALPHACHANNEL_OPAQUE);
+            $image->cropThumbnailImage(200, 200);
+            $image->roundCornersImage(100, 100);
 
-                unlink($this->getParameter('app.avatars_directory') . '/' . $uploadedFile);
+            unlink($this->getParameter('app.avatars_directory') . '/' . $uploadedFile);
 
-                $user->setAvatar($image->getImageBlob());
-                $this->userRepository->save($user);
+            $user->setAvatar($image->getImageBlob());
+            $this->userRepository->save($user);
 
-                $this->addFlash('success', 'Avatar uploaded successfully!');
-            } catch (\Exception $e) {
-                $this->addFlash('error', 'Could not upload avatar');
-            }
-
-            return $this->redirectToRoute('Game/Account/Edit');
+            return new JsonResponse(['success' => true, 'message' => 'Avatar uploaded successfully!']);
+        } catch (\Throwable $e) {
+            return new JsonResponse(['success' => false, 'message' => 'Could not upload avatar.']);
         }
-
-        return $this->render(
-            'game/editAccount.html.twig',
-            [
-                'user' => $this->getGameUser(),
-                'userType' => $this->getAccountType(),
-                'changePasswordForm' => $this->createForm(ChangePasswordType::class)->createView(),
-                'uploadAvatar' => $form->createView()
-            ]
-        );
     }
 
-    public function deleteAvatar(): Response
+    public function deleteAvatarApi(): JsonResponse
     {
         $user = $this->getGameUser();
         $user->setAvatar('');
         $this->userRepository->save($user);
 
-        $this->addFlash('success', 'Avatar successfully deleted!');
-        return $this->redirectToRoute('Game/Account/Edit');
+        return new JsonResponse(['success' => true, 'message' => 'Avatar deleted successfully!']);
     }
 
     private function getAccountType(): string
@@ -186,26 +188,5 @@ final class UserController extends BaseGameController
         }
 
         return 'Guest';
-    }
-
-    private function changeSettings(Request $request): void
-    {
-        $user = $this->getGameUser();
-
-        if ($request->request->get('adviser') !== null) {
-            if ($user->getAdviser() === false) {
-                $user->setAdviser(true);
-                $this->userRepository->save($user);
-
-                $this->addFlash('success', 'Successfully changed settings!');
-            }
-        } else {
-            if ($user->getAdviser()) {
-                $user->setAdviser(false);
-                $this->userRepository->save($user);
-
-                $this->addFlash('success', 'Successfully changed settings!');
-            }
-        }
     }
 }

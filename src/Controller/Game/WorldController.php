@@ -13,6 +13,7 @@ use FrankProjects\UltimateWarfare\Repository\PlayerRepository;
 use FrankProjects\UltimateWarfare\Repository\FleetRepository;
 use FrankProjects\UltimateWarfare\Repository\WorldRepository;
 use FrankProjects\UltimateWarfare\Service\WorldGeneratorService;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -57,6 +58,41 @@ final class WorldController extends BaseGameController
         $worldGeneratorService->generateBasicWorld();
 
         return $this->redirectToRoute('Game/SelectWorld', [], 302);
+    }
+
+    public function worldsApi(): JsonResponse
+    {
+        $user = $this->getGameUser();
+
+        $myWorlds = [];
+        foreach ($user->getPlayers() as $player) {
+            $world = $player->getWorld();
+            $myWorlds[] = [
+                'playerId' => $player->getId(),
+                'playerName' => $player->getName(),
+                'worldName' => $world->getName(),
+            ];
+        }
+
+        $joinableWorlds = [];
+        $worlds = $this->worldRepository->findByPublic(true);
+        foreach ($worlds as $world) {
+            if ($world->isJoinableForUser($user)) {
+                $joinableWorlds[] = [
+                    'worldId' => $world->getId(),
+                    'worldName' => $world->getName(),
+                    'description' => $world->getDescription(),
+                    'maxPlayers' => $world->getMaxPlayers(),
+                    'currentPlayers' => $world->getPlayers()->count(),
+                ];
+            }
+        }
+
+        return new JsonResponse([
+            'success' => true,
+            'myWorlds' => $myWorlds,
+            'joinableWorlds' => $joinableWorlds,
+        ]);
     }
 
     public function selectWorld(): Response

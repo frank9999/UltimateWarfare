@@ -20,9 +20,13 @@
                 </svg>
             </button>
             <div class="dropdown-content" id="profileDropdown">
-                <a href="{{ path('Game/Account/Edit') }}">Profile</a>
+                <a href="#" id="worldsBtn">Worlds</a>
+                <a href="#" id="profileBtn">Profile</a>
                 <a href="{{ path('Guide') }}">Help/FAQ</a>
                 <a href="#" id="messagesBtn">Messages</a>
+                {% if is_granted('ROLE_ADMIN') %}
+                    <a href="{{ path('Admin') }}">Admin Panel</a>
+                {% endif %}
                 <a href="{{ path('Site/Logout') }}">Log Off</a>
             </div>
         </div>
