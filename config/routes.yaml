@@ -223,6 +223,11 @@ Game/Api/Profile/ChangePassword:
     controller: FrankProjects\UltimateWarfare\Controller\Game\UserController::changePasswordApi
     methods: [POST]
 
+Game/Api/Profile/Surrender:
+    path:      /game/api/profile/surrender
+    controller: FrankProjects\UltimateWarfare\Controller\Game\UserController::surrenderApi
+    methods: [POST]
+
 Game/Api/Worlds:
     path:      /game/api/worlds
     controller: FrankProjects\UltimateWarfare\Controller\Game\WorldController::worldsApi
@@ -586,10 +591,6 @@ Game/Api/Research/Cancel:
     path:      /game/api/research/cancel/{researchSlug}
     controller: FrankProjects\UltimateWarfare\Controller\Game\ResearchController::performCancelApi
     methods: [POST]
-
-Game/Surrender:
-    path:      /game/surrender
-    controller: FrankProjects\UltimateWarfare\Controller\Game\SurrenderController::surrender
 
 Game/WorldMap:
     path:      /game/world-map

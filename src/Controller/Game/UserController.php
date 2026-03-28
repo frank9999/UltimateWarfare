@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace FrankProjects\UltimateWarfare\Controller\Game;
 
 use FrankProjects\UltimateWarfare\Entity\UnbanRequest;
+use FrankProjects\UltimateWarfare\Repository\PlayerRepository;
 use FrankProjects\UltimateWarfare\Repository\UnbanRequestRepository;
 use FrankProjects\UltimateWarfare\Repository\UserRepository;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -61,6 +62,9 @@ final class UserController extends BaseGameController
     public function profileApi(): JsonResponse
     {
         $user = $this->getGameUser();
+        $player = $this->getPlayer();
+        $isFederationFounder = $player->getFederation() !== null
+            && $player->getFederation()->getFounder() === $player;
 
         return new JsonResponse([
             'success' => true,
@@ -70,8 +74,58 @@ final class UserController extends BaseGameController
                 'signup' => $user->getSignup()->format('Y-m-d H:i:s'),
                 'accountType' => $this->getAccountType(),
                 'active' => $user->getActive(),
+                'canSurrender' => $player->canSurrender(),
+                'isFederationFounder' => $isFederationFounder,
             ]
         ]);
+    }
+
+    public function surrenderApi(
+        Request $request,
+        UserPasswordHasherInterface $passwordHasher,
+        PlayerRepository $playerRepository
+    ): JsonResponse {
+        $player = $this->getPlayer();
+        $user = $this->getGameUser();
+
+        try {
+            /** @var array{password?: string} $data */
+            $data = json_decode($request->getContent(), true);
+            $password = $data['password'] ?? '';
+
+            if ($password === '') {
+                return new JsonResponse(['success' => false, 'message' => 'Password is required.']);
+            }
+
+            if (!$passwordHasher->isPasswordValid($user, $password)) {
+                return new JsonResponse(['success' => false, 'message' => 'Wrong password!']);
+            }
+
+            if (!$player->canSurrender()) {
+                return new JsonResponse([
+                    'success' => false,
+                    'message' => 'You cannot surrender for the first 48 hours!',
+                ]);
+            }
+
+            if ($player->getFederation() !== null && $player->getFederation()->getFounder() === $player) {
+                return new JsonResponse([
+                    'success' => false,
+                    'message' => 'You cannot surrender if you are a Federation founder. '
+                        . 'Please disband your Federation first.',
+                ]);
+            }
+
+            $playerRepository->remove($player);
+
+            return new JsonResponse([
+                'success' => true,
+                'message' => 'You have surrendered your empire...',
+                'redirect' => '/game/world/select',
+            ]);
+        } catch (\Throwable $e) {
+            return new JsonResponse(['success' => false, 'message' => 'An error occurred.']);
+        }
     }
 
     public function changePasswordApi(
