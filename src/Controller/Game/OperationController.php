@@ -8,7 +8,6 @@ use FrankProjects\UltimateWarfare\Exception\WorldRegionNotFoundException;
 use FrankProjects\UltimateWarfare\Repository\BombardmentCooldownRepository;
 use FrankProjects\UltimateWarfare\Repository\GameUnitRegistry;
 use FrankProjects\UltimateWarfare\Repository\OperationRegistry;
-use FrankProjects\UltimateWarfare\Repository\WorldRegionRepository;
 use FrankProjects\UltimateWarfare\Service\Action\RegionActionService;
 use FrankProjects\UltimateWarfare\Service\OperationService;
 use FrankProjects\UltimateWarfare\Util\DistanceCalculator;
@@ -20,7 +19,6 @@ final class OperationController extends BaseGameController
 {
     private OperationRegistry $operationRegistry;
     private GameUnitRegistry $gameUnitRegistry;
-    private WorldRegionRepository $worldRegionRepository;
     private RegionActionService $regionActionService;
     private OperationService $operationService;
     private DistanceCalculator $distanceCalculator;
@@ -29,7 +27,6 @@ final class OperationController extends BaseGameController
     public function __construct(
         OperationRegistry $operationRegistry,
         GameUnitRegistry $gameUnitRegistry,
-        WorldRegionRepository $worldRegionRepository,
         RegionActionService $regionActionService,
         OperationService $operationService,
         DistanceCalculator $distanceCalculator,
@@ -37,7 +34,6 @@ final class OperationController extends BaseGameController
     ) {
         $this->operationRegistry = $operationRegistry;
         $this->gameUnitRegistry = $gameUnitRegistry;
-        $this->worldRegionRepository = $worldRegionRepository;
         $this->regionActionService = $regionActionService;
         $this->operationService = $operationService;
         $this->distanceCalculator = $distanceCalculator;

@@ -9,7 +9,6 @@ use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitEnum;
 use FrankProjects\UltimateWarfare\Entity\WorldRegion;
 use FrankProjects\UltimateWarfare\Exception\WorldRegionNotFoundException;
 use FrankProjects\UltimateWarfare\Repository\GameUnitRegistry;
-use FrankProjects\UltimateWarfare\Repository\WorldRegionRepository;
 use FrankProjects\UltimateWarfare\Service\Action\FleetActionService;
 use FrankProjects\UltimateWarfare\Service\Action\RegionActionService;
 use FrankProjects\UltimateWarfare\Util\DistanceCalculator;
@@ -19,20 +18,17 @@ use Throwable;
 
 final class AttackController extends BaseGameController
 {
-    private WorldRegionRepository $worldRegionRepository;
     private FleetActionService $fleetActionService;
     private RegionActionService $regionActionService;
     private GameUnitRegistry $gameUnitRegistry;
     private DistanceCalculator $distanceCalculator;
 
     public function __construct(
-        WorldRegionRepository $worldRegionRepository,
         FleetActionService $fleetActionService,
         RegionActionService $regionActionService,
         GameUnitRegistry $gameUnitRegistry,
         DistanceCalculator $distanceCalculator
     ) {
-        $this->worldRegionRepository = $worldRegionRepository;
         $this->fleetActionService = $fleetActionService;
         $this->regionActionService = $regionActionService;
         $this->gameUnitRegistry = $gameUnitRegistry;

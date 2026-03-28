@@ -18,27 +18,6 @@ Admin/Contact/Remove:
     requirements:
         contactId: '\d+'
 
-Admin/GameNews/Create:
-    path:      /admin/game-news/create
-    controller: FrankProjects\UltimateWarfare\Controller\Admin\GameNewsController::create
-
-Admin/GameNews/List:
-    path:      /admin/game-news/list
-    controller: FrankProjects\UltimateWarfare\Controller\Admin\GameNewsController::list
-
-Admin/GameNews/Edit:
-    path:      /admin/game-news/edit/{gameNewsId}
-    controller: FrankProjects\UltimateWarfare\Controller\Admin\GameNewsController::edit
-    requirements:
-        gameNewsId: '\d+'
-
-Admin/GameNews/Remove:
-    path:      /admin/game-news/remove/{gameNewsId}
-    controller: FrankProjects\UltimateWarfare\Controller\Admin\GameNewsController::remove
-    requirements:
-        gameNewsId: '\d+'
-
-
 Admin/ServerLogs:
     path:      /admin/server-logs
     controller: FrankProjects\UltimateWarfare\Controller\Admin\ServerLogsController::showLogs

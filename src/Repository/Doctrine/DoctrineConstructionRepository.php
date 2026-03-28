@@ -88,7 +88,7 @@ final class DoctrineConstructionRepository implements ConstructionRepository
         /** @var array{total: int|null} $result */
         $result = $results[0] ?? ['total' => null];
 
-        return (int) ($result['total'] ?? 0);
+        return $result['total'] ?? 0;
     }
 
     /**
