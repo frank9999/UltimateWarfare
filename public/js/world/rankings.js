@@ -85,7 +85,7 @@
         allRankings.forEach(function (player, index) {
             html += '<tr style="border-bottom: 1px solid #555;">';
             html += '<td style="padding: 8px; text-align: center;">' + (index + 1) + '</td>';
-            html += '<td style="padding: 8px; text-align: left;">' + escapeHtml(player.name);
+            html += '<td style="padding: 8px; text-align: left;"><a href="#" class="player-link" data-player="' + escapeHtml(player.name) + '" style="color: #f3e6c1; text-decoration: underline; cursor: pointer;">' + escapeHtml(player.name) + '</a>';
             if (player.federation) {
                 html += ' <i style="color: #aaa;">(' + escapeHtml(player.federation) + ')</i>';
             }
@@ -101,6 +101,14 @@
         rankingsContainer.querySelectorAll('th[data-sort]').forEach(function (th) {
             th.onclick = function () {
                 onHeaderClick(th.getAttribute('data-sort'));
+            };
+        });
+
+        rankingsContainer.querySelectorAll('.player-link').forEach(function (link) {
+            link.onclick = function (e) {
+                e.preventDefault();
+                hide();
+                WorldPlayerProfile.show(link.getAttribute('data-player'));
             };
         });
     }

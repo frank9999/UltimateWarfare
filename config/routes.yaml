@@ -484,9 +484,10 @@ Game/Api/Operation/Execute:
         operationSlug: '[a-z0-9-]+'
         playerRegionId: '\d+'
 
-Game/Profile:
-    path:      /game/profile/{playerName}
-    controller: FrankProjects\UltimateWarfare\Controller\Game\ProfileController::profile
+Game/Api/Player/Profile:
+    path:      /game/api/player/profile/{playerName}
+    controller: FrankProjects\UltimateWarfare\Controller\Game\ProfileController::playerProfileApi
+    methods: [GET]
 
 Game/Api/Rankings:
     path:      /game/api/rankings

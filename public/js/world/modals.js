@@ -97,9 +97,15 @@
             '<div class="region-details">' +
             '<p><strong>Coordinates:</strong> ' + region.x + ', ' + region.y + '</p>' +
             '<p><strong>Type:</strong> ' + region.type + '</p>' +
-            '<p><strong>Owner:</strong> <span style="color: #ff6b6b;">' + region.ownerName + '</span></p>' +
+            '<p><strong>Owner:</strong> <a href="#" id="enemyOwnerLink" style="color: #ff6b6b; text-decoration: underline; cursor: pointer;">' + region.ownerName + '</a></p>' +
             '</div></div>';
         enemyModal.style.display = 'block';
+
+        document.getElementById('enemyOwnerLink').onclick = function (e) {
+            e.preventDefault();
+            enemyModal.style.display = 'none';
+            WorldPlayerProfile.show(region.ownerName);
+        };
     }
 
     closeEnemyModal.onclick = function () { enemyModal.style.display = 'none'; selectedEnemyRegion = null; };
@@ -267,6 +273,7 @@
         if (event.target === WorldMarket.modal) { WorldMarket.modal.style.display = 'none'; }
         if (event.target === WorldFederation.modal) { WorldFederation.modal.style.display = 'none'; }
         if (event.target === WorldRankings.modal) { WorldRankings.modal.style.display = 'none'; }
+        if (event.target === WorldPlayerProfile.modal) { WorldPlayerProfile.modal.style.display = 'none'; }
 
         // Close nav dropdown on outside click
         if (navMenu.classList.contains('show')) { closeNavMenu(); }
