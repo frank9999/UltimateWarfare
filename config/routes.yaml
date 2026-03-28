@@ -377,7 +377,7 @@ Game/Fleet/Reinforce/Api:
 
 Game/Api/Statistics:
     path:      /game/api/statistics
-    controller: FrankProjects\UltimateWarfare\Controller\Game\HeadquarterController::statisticsApi
+    controller: FrankProjects\UltimateWarfare\Controller\Game\StatisticsController::statisticsApi
     methods: [GET]
 
 Game/Api/Market/BuyList:
@@ -408,124 +408,57 @@ Game/Api/Market/CreateOrder:
     controller: FrankProjects\UltimateWarfare\Controller\Game\MarketController::marketCreateOrderApi
     methods: [POST]
 
-Game/Message/Inbox:
-    path:      /game/message/inbox
-    controller: FrankProjects\UltimateWarfare\Controller\Game\MessageController::inbox
-
-Game/Message/Inbox/Delete:
-    path:      /game/message/inbox/delete/{messageId}
-    controller: FrankProjects\UltimateWarfare\Controller\Game\MessageController::inboxDelete
-    requirements:
-        messageId: '\d+'
-
-Game/Message/Inbox/Read:
-    path:      /game/message/inbox/read/{messageId}
-    controller: FrankProjects\UltimateWarfare\Controller\Game\MessageController::inboxRead
-    requirements:
-        messageId: '\d+'
-
-Game/Message/Send/Api:
+Game/Api/Message/Send:
     path:      /game/api/message/send
     controller: FrankProjects\UltimateWarfare\Controller\Game\MessageController::sendMessageApi
     methods: [POST]
 
-Game/Message/Inbox/Api:
+Game/Api/Message/Inbox:
     path:      /game/api/message/inbox
     controller: FrankProjects\UltimateWarfare\Controller\Game\MessageController::inboxApi
     methods: [GET]
 
-Game/Message/Outbox/Api:
+Game/Api/Message/Outbox:
     path:      /game/api/message/outbox
     controller: FrankProjects\UltimateWarfare\Controller\Game\MessageController::outboxApi
     methods: [GET]
 
-Game/Message/Read/Api:
+Game/Api/Message/Read:
     path:      /game/api/message/inbox/{messageId}
     controller: FrankProjects\UltimateWarfare\Controller\Game\MessageController::readMessageApi
     methods: [GET]
     requirements:
         messageId: '\d+'
 
-Game/Message/ReadOutbox/Api:
+Game/Api/Message/ReadOutbox:
     path:      /game/api/message/outbox/{messageId}
     controller: FrankProjects\UltimateWarfare\Controller\Game\MessageController::readOutboxMessageApi
     methods: [GET]
     requirements:
         messageId: '\d+'
 
-Game/Message/DeleteInbox/Api:
+Game/Api/Message/DeleteInbox:
     path:      /game/api/message/inbox/{messageId}
     controller: FrankProjects\UltimateWarfare\Controller\Game\MessageController::deleteInboxMessageApi
     methods: [DELETE]
     requirements:
         messageId: '\d+'
 
-Game/Message/DeleteOutbox/Api:
+Game/Api/Message/DeleteOutbox:
     path:      /game/api/message/outbox/{messageId}
     controller: FrankProjects\UltimateWarfare\Controller\Game\MessageController::deleteOutboxMessageApi
     methods: [DELETE]
     requirements:
         messageId: '\d+'
 
-Game/Message/New:
-    path:      /game/message/new/{playerName}
-    controller: FrankProjects\UltimateWarfare\Controller\Game\MessageController::newMessage
-    defaults:
-        playerName: ''
-
-Game/Message/Outbox:
-    path:      /game/message/outbox
-    controller: FrankProjects\UltimateWarfare\Controller\Game\MessageController::outbox
-
-Game/Message/Outbox/Delete:
-    path:      /game/message/outbox/delete/{messageId}
-    controller: FrankProjects\UltimateWarfare\Controller\Game\MessageController::outboxDelete
-    requirements:
-        messageId: '\d+'
-
-Game/Message/Outbox/Read:
-    path:      /game/message/outbox/read/{messageId}
-    controller: FrankProjects\UltimateWarfare\Controller\Game\MessageController::outboxRead
-    requirements:
-        messageId: '\d+'
-
-Game/Operation/ExecuteOperation:
-    path: /game/world/region/execute-operation/{regionId}/{operationSlug}/{playerRegionId}
-    controller: FrankProjects\UltimateWarfare\Controller\Game\OperationController::executeOperation
-    requirements:
-        regionId: '\d+'
-        operationSlug: '[a-z0-9-]+'
-        playerRegionId: '\d+'
-
-Game/Operation/SelectGameUnit:
-    path: /game/world/region/select-operation-units/{regionId}/{operationSlug}/{playerRegionId}
-    controller: FrankProjects\UltimateWarfare\Controller\Game\OperationController::selectGameUnits
-    requirements:
-        regionId: '\d+'
-        operationSlug: '[a-z0-9-]+'
-        playerRegionId: '\d+'
-
-Game/Operation/SelectOperation:
-    path: /game/world/region/select-operation/{regionId}
-    controller: FrankProjects\UltimateWarfare\Controller\Game\OperationController::selectOperation
-    requirements:
-        regionId: '\d+'
-
-Game/Operation/SelectWorldRegion:
-    path: /game/world/region/select-operation-region/{regionId}/{operationSlug}
-    controller: FrankProjects\UltimateWarfare\Controller\Game\OperationController::selectWorldRegion
-    requirements:
-        regionId: '\d+'
-        operationSlug: '[a-z0-9-]+'
-
-Game/Operation/List/Api:
+Game/Api/Operation/List:
     path:      /game/api/operation/list/{regionId}
     controller: FrankProjects\UltimateWarfare\Controller\Game\OperationController::operationsApi
     methods: [GET]
     requirements:
         regionId: '\d+'
 
-Game/Operation/EligibleRegions/Api:
+Game/Api/Operation/EligibleRegions:
     path:      /game/api/operation/eligible-regions/{regionId}/{operationSlug}
     controller: FrankProjects\UltimateWarfare\Controller\Game\OperationController::operationEligibleRegionsApi
     methods: [GET]
@@ -533,7 +466,7 @@ Game/Operation/EligibleRegions/Api:
         regionId: '\d+'
         operationSlug: '[a-z0-9-]+'
 
-Game/Operation/Units/Api:
+Game/Api/Operation/Units:
     path:      /game/api/operation/units/{regionId}/{operationSlug}/{playerRegionId}
     controller: FrankProjects\UltimateWarfare\Controller\Game\OperationController::operationUnitsApi
     methods: [GET]
@@ -542,7 +475,7 @@ Game/Operation/Units/Api:
         operationSlug: '[a-z0-9-]+'
         playerRegionId: '\d+'
 
-Game/Operation/Execute/Api:
+Game/Api/Operation/Execute:
     path:      /game/api/operation/execute/{regionId}/{operationSlug}/{playerRegionId}
     controller: FrankProjects\UltimateWarfare\Controller\Game\OperationController::executeOperationApi
     methods: [POST]
@@ -560,7 +493,7 @@ Game/Api/Rankings:
     controller: FrankProjects\UltimateWarfare\Controller\Game\RankingController::rankingApi
     methods: [GET]
 
-Game/Reports/Api:
+Game/Api/Reports:
     path:      /game/api/reports
     controller: FrankProjects\UltimateWarfare\Controller\Game\ReportController::reportsApi
     methods: [GET]
@@ -588,20 +521,14 @@ Game/World/Create:
     path:      /game/world/create
     controller: FrankProjects\UltimateWarfare\Controller\Game\WorldController::create
 
-Game/World/Region/Attack:
-    path:      /game/world/region/attack/{regionId}
-    controller: FrankProjects\UltimateWarfare\Controller\Game\AttackController::attack
-    requirements:
-        regionId: '\d+'
-
-Game/World/Region/Attack/Api:
+Game/Api/World/Region/Attack:
     path:      /game/api/world/region/attack-from/{regionId}
     controller: FrankProjects\UltimateWarfare\Controller\Game\AttackController::attackFromRegionsApi
     methods: [GET]
     requirements:
         regionId: '\d+'
 
-Game/World/Region/Attack/Units/Api:
+Game/Api/World/Region/Attack/Units:
     path:      /game/api/world/region/attack-units/{regionId}/{playerRegionId}
     controller: FrankProjects\UltimateWarfare\Controller\Game\AttackController::attackUnitsApi
     methods: [GET]
@@ -609,7 +536,7 @@ Game/World/Region/Attack/Units/Api:
         regionId: '\d+'
         playerRegionId: '\d+'
 
-Game/World/Region/Attack/Send/Api:
+Game/Api/World/Region/Attack/Send:
     path:      /game/api/world/region/attack-send/{regionId}/{playerRegionId}
     controller: FrankProjects\UltimateWarfare\Controller\Game\AttackController::attackSendApi
     methods: [POST]
@@ -617,21 +544,7 @@ Game/World/Region/Attack/Send/Api:
         regionId: '\d+'
         playerRegionId: '\d+'
 
-Game/World/Region/AttackSelectGameUnits:
-    path:      /game/world/region/attack/{regionId}/{playerRegionId}
-    controller: FrankProjects\UltimateWarfare\Controller\Game\AttackController::attackSelectGameUnits
-    requirements:
-        regionId: '\d+'
-        playerRegionId: '\d+'
-
-Game/World/Region/Build:
-    path:      /game/world/region/build/{regionId}/{gameUnitCategoryId}
-    controller: FrankProjects\UltimateWarfare\Controller\Game\ConstructionController::constructGameUnits
-    requirements:
-        regionId: '\d+'
-        gameUnitCategoryId: '\d+'
-
-Game/World/Region/Build/Api:
+Game/Api/World/Region/Build:
     path:      /game/api/world/region/build/{regionId}/{gameUnitCategoryId}
     controller: FrankProjects\UltimateWarfare\Controller\Game\ConstructionController::constructGameUnitsApi
     methods: [POST]
@@ -639,7 +552,7 @@ Game/World/Region/Build/Api:
         regionId: '\d+'
         gameUnitCategoryId: '\d+'
 
-Game/World/Region/Destroy/Api:
+Game/Api/World/Region/Destroy:
     path:      /game/api/world/region/destroy/{regionId}/{gameUnitCategoryId}
     controller: FrankProjects\UltimateWarfare\Controller\Game\ConstructionController::removeGameUnitsApi
     methods: [POST]
@@ -659,41 +572,28 @@ Game/Api/Region/Overview:
     controller: FrankProjects\UltimateWarfare\Controller\Game\RegionController::regionOverviewApi
     methods:   [GET]
 
-Game/World/Region/Buy:
-    path:      /game/world/region/buy/{regionId}
-    controller: FrankProjects\UltimateWarfare\Controller\Game\RegionController::buy
-    requirements:
-        regionId: '\d+'
-
-Game/World/Region/Buy/Api:
+Game/Api/World/Region/Buy:
     path:      /game/api/world/region/buy/{regionId}
     controller: FrankProjects\UltimateWarfare\Controller\Game\RegionController::buyApi
     methods: [POST]
     requirements:
         regionId: '\d+'
 
-Game/World/Region/RemoveGameUnits:
-    path:      /game/world/region/remove/{regionId}/{gameUnitCategoryId}
-    controller: FrankProjects\UltimateWarfare\Controller\Game\ConstructionController::removeGameUnits
-    requirements:
-        regionId: '\d+'
-        gameUnitCategoryId: '\d+'
-
-Game/World/Region/SendUnits/Data/Api:
+Game/Api/World/Region/SendUnits/Data:
     path:      /game/api/world/region/send-units-data/{regionId}
     controller: FrankProjects\UltimateWarfare\Controller\Game\FleetController::sendUnitsDataApi
     methods: [GET]
     requirements:
         regionId: '\d+'
 
-Game/World/Region/SendUnits/Targets/Api:
+Game/Api/World/Region/SendUnits/Targets:
     path:      /game/api/world/region/send-units-targets/{regionId}
     controller: FrankProjects\UltimateWarfare\Controller\Game\FleetController::sendUnitsTargetsApi
     methods: [GET]
     requirements:
         regionId: '\d+'
 
-Game/World/Region/SendUnits/Send/Api:
+Game/Api/World/Region/SendUnits/Send:
     path:      /game/api/world/region/send-units/{regionId}
     controller: FrankProjects\UltimateWarfare\Controller\Game\FleetController::sendUnitsApi
     methods: [POST]

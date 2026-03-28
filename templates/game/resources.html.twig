@@ -17,11 +17,6 @@
     </div>
 {% endif %}
 
-{% if player.notifications.message != 0 %}
-    <div class="alert alert-warning" role="alert">
-        <a class="B" href="{{ path('Game/Message/Inbox') }}"><b>You have new message(s).</b></a>
-    </div>
-{% endif %}
 
 {% if player.notifications.aid != 0 %}
     <div class="alert alert-warning" role="alert">
