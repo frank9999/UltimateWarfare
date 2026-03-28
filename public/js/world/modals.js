@@ -1,5 +1,5 @@
 /**
- * Region modal handlers (buy, enemy, yours, headquarter) and UI controls.
+ * Region modal handlers (buy, enemy, yours) and UI controls.
  * Depends on: notifications.js, WorldApp config, WorldBuild, WorldAttack
  */
 (function () {
@@ -228,11 +228,6 @@
         }
     };
 
-    // ===== Headquarter Modal =====
-    const hqModal = document.getElementById('headquarterModal');
-    document.getElementById('closeHqModal').onclick = function () { hqModal.style.display = 'none'; };
-    document.getElementById('hqOldInterfaceBtn').onclick = function () { window.location.href = '/game/headquarter'; };
-
     // ===== Navigation Hamburger Menu =====
     const navMenu = document.getElementById('navMenu');
     document.getElementById('navMenuBtn').addEventListener('click', function (e) {
@@ -242,7 +237,6 @@
 
     function closeNavMenu() { navMenu.classList.remove('show'); }
 
-    document.getElementById('navHqBtn').onclick = function (e) { e.preventDefault(); closeNavMenu(); hqModal.style.display = 'block'; };
     document.getElementById('navReportsBtn').onclick = function (e) { e.preventDefault(); closeNavMenu(); WorldReports.show(); };
     document.getElementById('navRegionsBtn').onclick = function (e) { e.preventDefault(); closeNavMenu(); WorldRegionOverview.show(); };
     document.getElementById('navConstructionBtn').onclick = function (e) { e.preventDefault(); closeNavMenu(); WorldConstruction.show(); };
@@ -251,13 +245,13 @@
     document.getElementById('navResearchBtn').onclick = function (e) { e.preventDefault(); closeNavMenu(); WorldResearch.show(); };
     document.getElementById('navFederationBtn').onclick = function (e) { e.preventDefault(); closeNavMenu(); WorldFederation.show(); };
     document.getElementById('navRankingsBtn').onclick = function (e) { e.preventDefault(); closeNavMenu(); WorldRankings.show(); };
+    document.getElementById('navStatisticsBtn').onclick = function (e) { e.preventDefault(); closeNavMenu(); WorldStatistics.show(); };
 
     // ===== Close modals on outside click =====
     window.onclick = function (event) {
         if (event.target === modal) { modal.style.display = 'none'; selectedRegion = null; }
         if (event.target === enemyModal) { enemyModal.style.display = 'none'; selectedEnemyRegion = null; }
         if (event.target === yourModal) { yourModal.style.display = 'none'; selectedYourRegion = null; }
-        if (event.target === hqModal) { hqModal.style.display = 'none'; }
         if (event.target === sendMessageModal) { sendMessageModal.style.display = 'none'; }
         if (event.target === WorldBuild.modal) { WorldBuild.modal.style.display = 'none'; }
         if (event.target === WorldReports.modal) { WorldReports.modal.style.display = 'none'; }

@@ -30,7 +30,7 @@ final class LoginController extends BaseGameController
         }
         $player = $players->first();
         $requestStack->getSession()->set('playerId', $player->getId());
-        return $this->redirectToRoute('Game/Headquarter');
+        return $this->redirectToRoute('Game/WorldMap');
     }
 
     public function loginForPlayer(
@@ -56,7 +56,7 @@ final class LoginController extends BaseGameController
         }
 
         $requestStack->getSession()->set('playerId', $player->getId());
-        return $this->redirectToRoute('Game/Headquarter');
+        return $this->redirectToRoute('Game/WorldMap');
     }
 
     private function getLoginUser(): User

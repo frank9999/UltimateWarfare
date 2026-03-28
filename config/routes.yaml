@@ -375,21 +375,10 @@ Game/Fleet/Reinforce/Api:
     requirements:
         fleetId: '\d+'
 
-Game/Headquarter:
-    path:      /game/headquarter
-    controller: FrankProjects\UltimateWarfare\Controller\Game\HeadquarterController::headquarter
-
-Game/Headquarter/Army:
-    path:      /game/headquarter/army
-    controller: FrankProjects\UltimateWarfare\Controller\Game\HeadquarterController::army
-
-Game/Headquarter/Income:
-    path:      /game/headquarter/income
-    controller: FrankProjects\UltimateWarfare\Controller\Game\HeadquarterController::income
-
-Game/Headquarter/Infrastructure:
-    path:      /game/headquarter/infrastructure
-    controller: FrankProjects\UltimateWarfare\Controller\Game\HeadquarterController::infrastructure
+Game/Api/Statistics:
+    path:      /game/api/statistics
+    controller: FrankProjects\UltimateWarfare\Controller\Game\HeadquarterController::statisticsApi
+    methods: [GET]
 
 Game/Api/Market/BuyList:
     path:      /game/api/market/buy-list

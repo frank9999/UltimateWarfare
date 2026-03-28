@@ -50,18 +50,17 @@
     </div>
 </div>
 
-{# Headquarter Modal #}
-<div id="headquarterModal" class="modal">
+{# Statistics Modal #}
+<div id="statisticsModal" class="modal">
     <div class="modal-content modal-lg">
         <div class="modal-header">
-            <span class="modal-title">Headquarter</span>
-            <span class="close" id="closeHqModal">&times;</span>
+            <span class="modal-title">Statistics</span>
+            <span class="close" id="closeStatisticsModal">&times;</span>
         </div>
-        <div class="modal-body">
-            <p style="text-align: center;">Select an action:</p>
-        </div>
-        <div class="modal-footer">
-            <button type="button" id="hqOldInterfaceBtn">Old Interface</button>
+        <div id="statisticsTabs" class="build-tabs"></div>
+        <div class="modal-body" id="statisticsContainer"></div>
+        <div class="modal-footer" id="statisticsFooter">
+            <button type="button" id="closeStatisticsBtn">Close</button>
         </div>
     </div>
 </div>

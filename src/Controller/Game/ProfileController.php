@@ -16,7 +16,7 @@ final class ProfileController extends BaseGameController
 
         if ($profilePlayer === null) {
             $this->addFlash('error', 'Player profile can not be found!');
-            return $this->redirectToRoute('Game/Headquarter');
+            return $this->redirectToRoute('Game/WorldMap');
         }
 
         return $this->render(

@@ -6,96 +6,145 @@ namespace FrankProjects\UltimateWarfare\Controller\Game;
 
 use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitCategory;
 use FrankProjects\UltimateWarfare\Repository\GameUnitRegistry;
-use FrankProjects\UltimateWarfare\Repository\ReportRepository;
 use FrankProjects\UltimateWarfare\Repository\WorldRegionUnitRepository;
-use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 final class HeadquarterController extends BaseGameController
 {
-    private ReportRepository $reportRepository;
     private WorldRegionUnitRepository $worldRegionUnitRepository;
     private GameUnitRegistry $gameUnitRegistry;
 
     public function __construct(
-        ReportRepository $reportRepository,
         WorldRegionUnitRepository $worldRegionUnitRepository,
         GameUnitRegistry $gameUnitRegistry
     ) {
-        $this->reportRepository = $reportRepository;
         $this->worldRegionUnitRepository = $worldRegionUnitRepository;
         $this->gameUnitRegistry = $gameUnitRegistry;
     }
 
-    public function army(): Response
+    public function statisticsApi(): JsonResponse
     {
-        $gameUnitCategories = [
+        $player = $this->getPlayer();
+
+        $income = $player->getIncome();
+        $upkeep = $player->getUpkeep();
+        $resources = $player->getResources();
+
+        $warnings = [];
+        $netFood = $income->getFood() - $upkeep->getFood();
+        if ($netFood < 0 && ($resources->getFood() + $netFood) < 0) {
+            $seconds = $resources->getFood() > 0
+                ? (int) (($resources->getFood() / abs($netFood)) * 3600)
+                : 0;
+            $warnings[] = [
+                'type' => 'food',
+                'seconds' => $seconds,
+            ];
+        }
+
+        $netCash = $income->getCash() - $upkeep->getCash();
+        if ($netCash < 0 && ($resources->getCash() + $netCash) < 0) {
+            $seconds = $resources->getCash() > 0
+                ? (int) (($resources->getCash() / abs($netCash)) * 3600)
+                : 0;
+            $warnings[] = [
+                'type' => 'cash',
+                'seconds' => $seconds,
+            ];
+        }
+
+        $armyCategories = [
             GameUnitCategory::TROOPS,
             GameUnitCategory::AIR_UNITS,
             GameUnitCategory::NAVAL_UNITS,
-            GameUnitCategory::MISSILES
+            GameUnitCategory::MISSILES,
         ];
 
-        $gameUnits = $this->gameUnitRegistry->findAll();
-
-        return $this->render(
-            'game/headquarter/army.html.twig',
-            [
-                'player' => $this->getPlayer(),
-                'gameUnitCategories' => $gameUnitCategories,
-                'gameUnits' => $gameUnits,
-                'gameUnitData' => $this->worldRegionUnitRepository->getGameUnitSumByPlayerAndGameUnitCategories(
-                    $this->getPlayer(),
-                    $gameUnitCategories
-                )
-            ]
-        );
-    }
-
-    public function headquarter(): Response
-    {
-        $reports = $this->reportRepository->findReports($this->getPlayer(), 10);
-
-        return $this->render(
-            'game/headquarter.html.twig',
-            [
-                'player' => $this->getPlayer(),
-                'reports' => $reports
-            ]
-        );
-    }
-
-    public function income(): Response
-    {
-        return $this->render(
-            'game/headquarter/income.html.twig',
-            [
-                'player' => $this->getPlayer(),
-                'incomePop' => 0,
-            ]
-        );
-    }
-
-    public function infrastructure(): Response
-    {
-        $gameUnitCategories = [
+        $infraCategories = [
             GameUnitCategory::BUILDINGS,
             GameUnitCategory::DEFENSE_BUILDINGS,
-            GameUnitCategory::SPECIAL_BUILDINGS
+            GameUnitCategory::SPECIAL_BUILDINGS,
         ];
+
+        $armyData = $this->worldRegionUnitRepository->getGameUnitSumByPlayerAndGameUnitCategories(
+            $player,
+            $armyCategories
+        );
+
+        $infraData = $this->worldRegionUnitRepository->getGameUnitSumByPlayerAndGameUnitCategories(
+            $player,
+            $infraCategories
+        );
 
         $gameUnits = $this->gameUnitRegistry->findAll();
 
-        return $this->render(
-            'game/headquarter/infrastructure.html.twig',
-            [
-                'player' => $this->getPlayer(),
-                'gameUnits' => $gameUnits,
-                'gameUnitCategories' => $gameUnitCategories,
-                'gameUnitData' => $this->worldRegionUnitRepository->getGameUnitSumByPlayerAndGameUnitCategories(
-                    $this->getPlayer(),
-                    $gameUnitCategories
-                )
-            ]
-        );
+        $army = [];
+        foreach ($armyCategories as $category) {
+            $units = [];
+            foreach ($gameUnits as $gameUnit) {
+                if ($gameUnit->getGameUnitCategory() !== $category) {
+                    continue;
+                }
+                $enumValue = $gameUnit->getGameUnitEnum()->value;
+                if (isset($armyData[$enumValue]) && $armyData[$enumValue] > 0) {
+                    $units[] = [
+                        'name' => $gameUnit->getNameMulti(),
+                        'amount' => $armyData[$enumValue],
+                    ];
+                }
+            }
+            $army[] = [
+                'category' => $category->getLabel(),
+                'units' => $units,
+            ];
+        }
+
+        $infrastructure = [];
+        foreach ($infraCategories as $category) {
+            $units = [];
+            foreach ($gameUnits as $gameUnit) {
+                if ($gameUnit->getGameUnitCategory() !== $category) {
+                    continue;
+                }
+                $enumValue = $gameUnit->getGameUnitEnum()->value;
+                if (isset($infraData[$enumValue]) && $infraData[$enumValue] > 0) {
+                    $units[] = [
+                        'name' => $gameUnit->getNameMulti(),
+                        'amount' => $infraData[$enumValue],
+                    ];
+                }
+            }
+            $infrastructure[] = [
+                'category' => $category->getLabel(),
+                'units' => $units,
+            ];
+        }
+
+        return new JsonResponse([
+            'success' => true,
+            'data' => [
+                'status' => [
+                    'cash' => $resources->getCash(),
+                    'wood' => $resources->getWood(),
+                    'steel' => $resources->getSteel(),
+                    'food' => $resources->getFood(),
+                    'regions' => count($player->getWorldRegions()),
+                    'netWorth' => $player->getNetWorth(),
+                ],
+                'income' => [
+                    'cashIncome' => $income->getCash(),
+                    'cashUpkeep' => $upkeep->getCash(),
+                    'cashNet' => $income->getCash() - $upkeep->getCash(),
+                    'foodProduction' => $income->getFood(),
+                    'foodConsumption' => $upkeep->getFood(),
+                    'foodNet' => $income->getFood() - $upkeep->getFood(),
+                    'steelIncome' => $income->getSteel(),
+                    'woodIncome' => $income->getWood(),
+                ],
+                'warnings' => $warnings,
+                'army' => $army,
+                'infrastructure' => $infrastructure,
+            ],
+        ]);
     }
 }
