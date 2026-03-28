@@ -9,7 +9,7 @@ use FrankProjects\UltimateWarfare\Repository\GameUnitRegistry;
 use FrankProjects\UltimateWarfare\Repository\WorldRegionUnitRepository;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
-final class HeadquarterController extends BaseGameController
+final class StatisticsController extends BaseGameController
 {
     private WorldRegionUnitRepository $worldRegionUnitRepository;
     private GameUnitRegistry $gameUnitRegistry;

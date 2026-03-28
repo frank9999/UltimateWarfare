@@ -14,7 +14,6 @@ use FrankProjects\UltimateWarfare\Service\Action\ConstructionActionService;
 use FrankProjects\UltimateWarfare\Service\Action\RegionActionService;
 use FrankProjects\UltimateWarfare\Service\GameUnit\GameUnitBehaviorFactory;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Throwable;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
@@ -88,121 +87,6 @@ final class ConstructionController extends BaseGameController
                 'message' => $e->getMessage(),
             ], 400);
         }
-    }
-
-    public function constructGameUnits(Request $request, int $regionId, int $gameUnitCategoryId): Response
-    {
-        /**
-         * XXX TODO: Fix unit info page
-         * XXX TODO: Fix buildtime to human readable format
-         */
-        try {
-            $worldRegion = $this->regionActionService->getWorldRegionByIdAndPlayer($regionId, $this->getPlayer());
-        } catch (WorldRegionNotFoundException $e) {
-            $this->addFlash('error', $e->getMessage());
-            return $this->redirectToRoute('Game/WorldMap', [], 302);
-        }
-
-        $gameUnitCategory = GameUnitCategory::fromInteger($gameUnitCategoryId);
-        if ($gameUnitCategory === null) {
-            $this->addFlash('error', 'Unknown GameUnitCategory!');
-            return $this->redirectToRoute('Game/WorldMap', [], 302);
-        }
-
-        if ($request->isMethod(Request::METHOD_POST)) {
-            try {
-                /** @var array<int, string> $construct */
-                $construct = $request->request->all('construct');
-                $this->constructionActionService->constructGameUnits(
-                    $worldRegion,
-                    $this->getPlayer(),
-                    $gameUnitCategory,
-                    $construct
-                );
-                $this->addConstructGameUnitsFlash($gameUnitCategory);
-            } catch (Throwable $e) {
-                $this->addFlash('error', $e->getMessage());
-            }
-        }
-
-        $gameUnits = $this->gameUnitRegistry->findByCategory($gameUnitCategory);
-
-        return $this->render(
-            'game/region/constructGameUnits.html.twig',
-            [
-                'region' => $worldRegion,
-                'player' => $this->getPlayer(),
-                'spaceLeft' => $this->constructionActionService->getBuildingSpaceLeft($gameUnitCategory, $worldRegion),
-                'gameUnitCategory' => $gameUnitCategory,
-                'gameUnitCategories' => GameUnitCategory::getAll(),
-                'gameUnitData' => $this->worldRegionRepository->getWorldGameUnitSumByWorldRegion($worldRegion),
-                'gameUnits' => $gameUnits,
-                'constructionData' => $this->constructionRepository->getGameUnitConstructionSumByWorldRegion(
-                    $worldRegion
-                )
-            ]
-        );
-    }
-
-    private function addConstructGameUnitsFlash(GameUnitCategory $gameUnitCategory): void
-    {
-        $this->addFlash(
-            'success',
-            "New {$gameUnitCategory->getLabel()} are now being {$gameUnitCategory->getConstructionAction()}!"
-        );
-    }
-
-    public function removeGameUnits(Request $request, int $regionId, int $gameUnitCategoryId): Response
-    {
-        try {
-            $worldRegion = $this->regionActionService->getWorldRegionByIdAndPlayer($regionId, $this->getPlayer());
-        } catch (WorldRegionNotFoundException $e) {
-            $this->addFlash('error', $e->getMessage());
-            return $this->redirectToRoute('Game/WorldMap', [], 302);
-        }
-
-        $gameUnitCategory = GameUnitCategory::fromInteger($gameUnitCategoryId);
-        if ($gameUnitCategory === null) {
-            return $this->redirectToRoute('Game/WorldMap', [], 302);
-        }
-
-        if ($request->isMethod(Request::METHOD_POST)) {
-            try {
-                /** @var array<int, string> $destroy */
-                $destroy = $request->request->all('destroy');
-                $this->constructionActionService->removeGameUnits(
-                    $worldRegion,
-                    $this->getPlayer(),
-                    $gameUnitCategory,
-                    $destroy
-                );
-                $this->addRemoveGameUnitsFlash($gameUnitCategory);
-            } catch (Throwable $e) {
-                $this->addFlash('error', $e->getMessage());
-            }
-        }
-
-        $gameUnits = $this->gameUnitRegistry->findByCategory($gameUnitCategory);
-
-        return $this->render(
-            'game/region/removeGameUnits.html.twig',
-            [
-                'region' => $worldRegion,
-                'player' => $this->getPlayer(),
-                'gameUnits' => $gameUnits,
-                'gameUnitCategory' => $gameUnitCategory,
-                'gameUnitCategories' => GameUnitCategory::getAll(),
-                'gameUnitData' => $this->worldRegionRepository->getWorldGameUnitSumByWorldRegion($worldRegion),
-            ]
-        );
-    }
-
-    private function addRemoveGameUnitsFlash(GameUnitCategory $gameUnitCategory): void
-    {
-        $this->addFlash(
-            'success',
-            "You have {$gameUnitCategory->getRemoveGameUnitActionDescription()} {$gameUnitCategory->getLabel()}!"
-        );
     }
 
     public function constructGameUnitsApi(Request $request, int $regionId, int $gameUnitCategoryId): JsonResponse

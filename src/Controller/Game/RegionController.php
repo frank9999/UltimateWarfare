@@ -5,14 +5,10 @@ declare(strict_types=1);
 namespace FrankProjects\UltimateWarfare\Controller\Game;
 
 use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitCategory;
-use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitEnum;
-use FrankProjects\UltimateWarfare\Exception\WorldRegionNotFoundException;
 use FrankProjects\UltimateWarfare\Repository\ConstructionRepository;
 use FrankProjects\UltimateWarfare\Repository\GameUnitRegistry;
 use FrankProjects\UltimateWarfare\Repository\WorldRegionRepository;
 use FrankProjects\UltimateWarfare\Service\Action\RegionActionService;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Throwable;
 
@@ -33,36 +29,6 @@ final class RegionController extends BaseGameController
         $this->worldRegionRepository = $worldRegionRepository;
         $this->constructionRepository = $constructionRepository;
         $this->gameUnitRegistry = $gameUnitRegistry;
-    }
-
-    public function buy(Request $request, int $regionId): Response
-    {
-        $player = $this->getPlayer();
-        $worldRegion = null;
-
-        try {
-            $worldRegion = $this->regionActionService->getWorldRegionByIdAndWorld($regionId, $player->getWorld());
-
-            if ($request->isMethod(Request::METHOD_POST)) {
-                $this->regionActionService->buyWorldRegion($regionId, $this->getPlayer());
-                $this->addFlash('success', 'You have bought a Region!');
-                return $this->redirectToRoute('Game/WorldMap');
-            }
-        } catch (WorldRegionNotFoundException $e) {
-            $this->addFlash('error', $e->getMessage());
-            return $this->redirectToRoute('Game/WorldMap');
-        } catch (Throwable $e) {
-            $this->addFlash('error', $e->getMessage());
-        }
-
-        return $this->render(
-            'game/region/buy.html.twig',
-            [
-                'region' => $worldRegion,
-                'player' => $player,
-                'price' => $player->getRegionPrice()
-            ]
-        );
     }
 
     public function buyApi(int $regionId): JsonResponse

@@ -18,9 +18,7 @@ final class RankingController extends BaseGameController
         foreach ($players as $rankedPlayer) {
             $rankings[] = [
                 'name' => $rankedPlayer->getName(),
-                'federation' => $rankedPlayer->getFederation() !== null
-                    ? $rankedPlayer->getFederation()->getName()
-                    : null,
+                'federation' => $rankedPlayer->getFederation()?->getName(),
                 'regions' => count($rankedPlayer->getWorldRegions()),
                 'netWorth' => $rankedPlayer->getNetWorth(),
             ];
