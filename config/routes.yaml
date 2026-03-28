@@ -566,11 +566,10 @@ Game/Profile:
     path:      /game/profile/{playerName}
     controller: FrankProjects\UltimateWarfare\Controller\Game\ProfileController::profile
 
-Game/Rankings:
-    path:      /game/rankings/{sortBy}
-    controller: FrankProjects\UltimateWarfare\Controller\Game\RankingController::ranking
-    defaults:
-        sortBy: 'region'
+Game/Api/Rankings:
+    path:      /game/api/rankings
+    controller: FrankProjects\UltimateWarfare\Controller\Game\RankingController::rankingApi
+    methods: [GET]
 
 Game/Reports/Api:
     path:      /game/api/reports

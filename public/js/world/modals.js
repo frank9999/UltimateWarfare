@@ -250,6 +250,7 @@
     document.getElementById('navMarketBtn').onclick = function (e) { e.preventDefault(); closeNavMenu(); WorldMarket.show(); };
     document.getElementById('navResearchBtn').onclick = function (e) { e.preventDefault(); closeNavMenu(); WorldResearch.show(); };
     document.getElementById('navFederationBtn').onclick = function (e) { e.preventDefault(); closeNavMenu(); WorldFederation.show(); };
+    document.getElementById('navRankingsBtn').onclick = function (e) { e.preventDefault(); closeNavMenu(); WorldRankings.show(); };
 
     // ===== Close modals on outside click =====
     window.onclick = function (event) {
@@ -271,6 +272,7 @@
         if (event.target === WorldResearch.modal) { WorldResearch.modal.style.display = 'none'; }
         if (event.target === WorldMarket.modal) { WorldMarket.modal.style.display = 'none'; }
         if (event.target === WorldFederation.modal) { WorldFederation.modal.style.display = 'none'; }
+        if (event.target === WorldRankings.modal) { WorldRankings.modal.style.display = 'none'; }
 
         // Close nav dropdown on outside click
         if (navMenu.classList.contains('show')) { closeNavMenu(); }
