@@ -1,26 +1,28 @@
 {% extends 'site/guideBase.html.twig' %}
 
 {% block content %}
-    <table class="table text-center">
-        <tr class="tabletop">
-            <td colspan="2"><b>Research</b></td>
-        </tr>
-        {% for research in researches %}
-            <tr>
-                <td width="150"><img src="{{ asset('images/research/' ~ research.image) }}" alt="{{ research.name }}" width="150" height="130"></td>
+    <div class="uw-card">
+        <div class="uw-card-header">Research</div>
+        <div class="uw-card-body">
+            <table class="table text-center">
+                {% for research in researches %}
+                    <tr>
+                        <td width="150"><img src="{{ asset('images/research/' ~ research.image) }}" alt="{{ research.name }}" width="150" height="130"></td>
 
-                <td class="text-start" width="450">
-                    {{ research.description }}<br /><br />
-                    Name: {{ research.name }}<br />
-                    Cash: {{ research.cost }}<br />
-                    Research time: {{ research.timestamp }}<br /><br />
+                        <td class="text-start" width="450">
+                            {{ research.description }}<br /><br />
+                            Name: {{ research.name }}<br />
+                            Cash: {{ research.cost }}<br />
+                            Research time: {{ research.timestamp }}<br /><br />
 
-                    <b>Requirements:</b><br />
+                            <b>Requirements:</b><br />
 
-                    {% for name in research.prerequisiteNames %}
-                        - {{ name }}<br />
-                    {% endfor %}
-                </td>
-        {% endfor %}
-    </table>
+                            {% for name in research.prerequisiteNames %}
+                                - {{ name }}<br />
+                            {% endfor %}
+                        </td>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
 {% endblock %}

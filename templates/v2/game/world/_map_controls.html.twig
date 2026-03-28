@@ -23,7 +23,7 @@
             <div class="dropdown-content" id="profileDropdown">
                 <a href="#" id="worldsBtn">Worlds</a>
                 <a href="#" id="profileBtn">Profile</a>
-                <a href="{{ path('Guide') }}">Help/FAQ</a>
+                <a href="{{ path('Guide') }}">Guide</a>
                 <a href="#" id="messagesBtn">Messages</a>
                 {% if is_granted('ROLE_ADMIN') %}
                     <a href="{{ path('Admin') }}">Admin Panel</a>

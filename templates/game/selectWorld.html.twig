@@ -3,39 +3,33 @@
 {% block title %}Ultimate Warfare - Select World{% endblock title %}
 
 {% block content %}
-    <table class="table text-center">
-        <tr class="tabletop">
-            <td colspan="2"><b>Select your World</b></td>
-        </tr>
-        {% for world in worlds %}
-            <tr>
-                <td width="400">
-                    <b>{{ world.name }}</b><br />
-                    <img src="{{ asset('images/world/' ~ world.image) }}" alt="{{ world.name }}">
-                </td>
-                <td width="300">
-                    <b>Max players:</b> {{ world.maxplayers }}<br /><br />
-                    <b>Info:</b><br />
-                    {{ world.description }}<br /><br />
-                    <b>At start:</b><br />
-                    Cash: {{ world.resources.cash }}<br />
-                    Wood: {{ world.resources.wood }}<br />
-                    Steel: {{ world.resources.steel }}<br />
-                    Food: {{ world.resources.food }}<br /><br />
-                    <a class="btn btn-primary" href="{{ path('Game/SelectName', {'worldId': world.id}) }}"><b>Play this World</b></a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="2">
+    <div class="uw-card">
+        <div class="uw-card-header">Select your World</div>
+        <div class="uw-card-body">
+            {% for world in worlds %}
+                <div style="display: flex; gap: 30px; align-items: flex-start; padding: 15px 0; border-bottom: 1px solid #3a3a3a;">
                     <div>
-                        No active worlds to join. Create a new game world!
+                        <strong>{{ world.name }}</strong><br />
+                        <img src="{{ asset('images/world/' ~ world.image) }}" alt="{{ world.name }}" style="margin-top: 10px;">
                     </div>
                     <div>
-                        <a class="btn btn-primary" href="{{ path('Game/World/Create') }}"><b>Create new world</b></a>
+                        <strong>Max players:</strong> {{ world.maxplayers }}<br /><br />
+                        <strong>Info:</strong><br />
+                        {{ world.description }}<br /><br />
+                        <strong>At start:</strong><br />
+                        Cash: {{ world.resources.cash }}<br />
+                        Wood: {{ world.resources.wood }}<br />
+                        Steel: {{ world.resources.steel }}<br />
+                        Food: {{ world.resources.food }}<br /><br />
+                        <a class="btn btn-primary" href="{{ path('Game/SelectName', {'worldId': world.id}) }}"><strong>Play this World</strong></a>
                     </div>
-                </td>
-            </tr>
-        {% endfor %}
-    </table>
+                </div>
+            {% else %}
+                <div class="text-center">
+                    <p>No active worlds to join. Create a new game world!</p>
+                    <a class="btn btn-primary" href="{{ path('Game/World/Create') }}"><strong>Create new world</strong></a>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
 {% endblock %}

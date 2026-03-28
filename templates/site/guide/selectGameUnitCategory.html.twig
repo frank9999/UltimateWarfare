@@ -1,16 +1,12 @@
 {% extends 'site/guideBase.html.twig' %}
 
 {% block content %}
-    <table class="table text-center">
-        <tr class="tabletop">
-            <td><b>Select Unit Type</b></td>
-        </tr>
-        <tr>
-            <td>
+    <div class="uw-card">
+        <div class="uw-card-header">Select Unit Type</div>
+        <div class="uw-card-body">
                 {% for gameUnitCategory in gameUnitCategories %}
-                    <a href="{{ path('Guide/ListUnits', {'gameUnitCategoryId': gameUnitCategory.value}) }}" class="B">{{ gameUnitCategory.label }}</a><br />
+                    <a href="{{ path('Guide/ListUnits', {'gameUnitCategoryId': gameUnitCategory.value}) }}">{{ gameUnitCategory.label }}</a><br />
                 {% endfor %}
-            </td>
-        </tr>
-    </table>
+        </div>
+    </div>
 {% endblock %}

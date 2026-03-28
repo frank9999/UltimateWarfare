@@ -3,17 +3,19 @@
 {% block title %}Ultimate Warfare - Register{% endblock title %}
 
 {% block content %}
-    <div class="uw-div">
-        <div class="uw-div-top">
-            <h3 class="text-center">Register Account</h3>
-        </div>
-        {{ form_start(form) }}
-        {{ form_widget(form) }}
-        {{ form_end(form) }}
+    <div class="form-card-wrapper">
+        <div class="uw-card">
+            <div class="uw-card-header">Register Account</div>
+            <div class="uw-card-body">
+                {{ form_start(form) }}
+                {{ form_widget(form) }}
+                {{ form_end(form) }}
 
-        <p>
-            An email with an activation code will be sent to the email address you register, so make sure you enter a correct address.
-        </p>
+                <p style="margin-top: 12px; color: #999; font-size: 13px;">
+                    An email with an activation code will be sent to the email address you register, so make sure you enter a correct address.
+                </p>
+            </div>
+        </div>
     </div>
 
     <script type="text/javascript">

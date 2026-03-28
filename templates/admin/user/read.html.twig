@@ -3,156 +3,162 @@
 {% block title %}ADMIN - User{% endblock title %}
 
 {% block content %}
-    <table class="table text-center">
-        <tr class="tabletop">
-            <td colspan="2"><b>User information</b></td>
-        </tr>
-        <tr>
-            <td>Username</td>
-            <td>{{ user.username }}</td>
-        </tr>
-        <tr>
-            <td>Email</td>
-            <td>{{ user.email }}</td>
-        </tr>
-        <tr>
-            <td>Sign-up date</td>
-            <td>{{ user.signup|date("Y-m-d H:i:s") }}</td>
-        </tr>
-        <tr>
-            <td>Last login</td>
-            <td>
-                {% if user.lastLogin is not empty %}
-                    {{ user.lastLogin|date("Y-m-d H:i:s") }}
-                {% endif %}
-            </td>
-        </tr>
-        <tr>
-            <td>Enabled</td>
-            <td>
-                {% if user.enabled == 1 %}
-                    <span class="good">Yes</span>
-                {% else %}
-                    <span class="bad">No</span>
-                {% endif %}
-            </td>
-        </tr>
-        <tr>
-            <td>Status</td>
-            <td>
-                {% if user.active == 1 %}
-                    <span class="good">Active</span>
-                {% else %}
-                    <span class="bad">Banned/De-activated</span>
-                {% endif %}
-            </td>
-        </tr>
-        {% if uw_forum_enabled == true %}
-            <tr>
-                <td>Forum</td>
-                <td>
-                    {% if user.forumBan == 1 %}
-                        <span class="bad">Banned</span>
-                    {% else %}
-                        <span class="good">Active</span>
-                    {% endif %}
-                </td>
-            </tr>
-        {% endif %}
-        <tr>
-            <td>Roles</td>
-            <td>
-                {% for role in user.roles %}
-                    <p>{{ role }}</p>
-                {% endfor %}
-            </td>
-        </tr>
-        <tr>
-            <td colspan="2">
-                <p>
-                    {% if user.active == 1 %}
-                        <a class="btn btn-danger" href="{{ path('Admin/User/Ban', {'userId': user.id}) }}">Ban</a>
-                    {% else %}
-                        <a class="btn btn-danger" href="{{ path('Admin/User/Unban', {'userId': user.id}) }}">Unban</a>
-                    {% endif %}
-                </p>
-                {% if uw_forum_enabled == true %}
-                    <p>
-                        {% if user.forumBan == 1 %}
-                            <a class="btn btn-danger" href="{{ path('Admin/User/ForumUnban', {'userId': user.id}) }}">Forum unban</a>
-                        {% else %}
-                            <a class="btn btn-danger" href="{{ path('Admin/User/ForumBan', {'userId': user.id}) }}">Forum ban</a>
-                        {% endif %}
-                    </p>
-                {% endif %}
-                {% if user.enabled == 0 %}
-                    <p>
-                        <a class="btn btn-danger" href="{{ path('Admin/User/Enable', {'userId': user.id}) }}">Enable account</a>
-                    </p>
-                {% endif %}
-                {% if 'ROLE_ADMIN' not in user.roles %}
-                    <p>
-                        <a class="btn btn-danger" href="{{ path('Admin/User/MakeAdmin', {'userId': user.id}) }}">Make Admin</a>
-                    </p>
-                {% else %}
-                    <p>
-                        <a class="btn btn-danger" href="{{ path('Admin/User/RemoveAdmin', {'userId': user.id}) }}">Remove Admin</a>
-                    </p>
-                {% endif %}
-            </td>
-        </tr>
-    </table>
-
-    <table class="table text-center">
-        <tr class="tabletop">
-            <td colspan="2"><b>Players</b></td>
-        </tr>
-        <tr>
-            <td>Player name</td>
-            <td>World</td>
-        </tr>
-        {% for player in user.players %}
-            <tr>
-                <td>{{ player.name }}</td>
-                <td>{{ player.world.name }}</td>
-            </tr>
-        {% endfor %}
-    </table>
-
-    <table class="table text-center">
-        <tr class="tabletop">
-            <td colspan="4"><b>Possible multi accounts (same IP: {{ user.lastIp ?? 'Unknown' }})</b></td>
-        </tr>
-        {% if sameIpUsers|length > 0 %}
-            <tr>
-                <td>Username</td>
-                <td>Email</td>
-                <td>Last login</td>
-                <td>Status</td>
-            </tr>
-            {% for sameIpUser in sameIpUsers %}
+    <div class="uw-card">
+        <div class="uw-card-header">User information</div>
+        <div class="uw-card-body">
+            <table class="table text-center">
                 <tr>
-                    <td><a href="{{ path('Admin/User/Read', {'userId': sameIpUser.id}) }}">{{ sameIpUser.username }}</a></td>
-                    <td>{{ sameIpUser.email }}</td>
+                    <td>Username</td>
+                    <td>{{ user.username }}</td>
+                </tr>
+                <tr>
+                    <td>Email</td>
+                    <td>{{ user.email }}</td>
+                </tr>
+                <tr>
+                    <td>Sign-up date</td>
+                    <td>{{ user.signup|date("Y-m-d H:i:s") }}</td>
+                </tr>
+                <tr>
+                    <td>Last login</td>
                     <td>
-                        {% if sameIpUser.lastLogin is not empty %}
-                            {{ sameIpUser.lastLogin|date("Y-m-d H:i:s") }}
-                        {% endif %}
-                    </td>
-                    <td>
-                        {% if sameIpUser.active == 1 %}
-                            <span class="good">Active</span>
-                        {% else %}
-                            <span class="bad">Banned</span>
+                        {% if user.lastLogin is not empty %}
+                            {{ user.lastLogin|date("Y-m-d H:i:s") }}
                         {% endif %}
                     </td>
                 </tr>
-            {% endfor %}
-        {% else %}
-            <tr>
-                <td colspan="4">No other users found with the same IP</td>
-            </tr>
-        {% endif %}
-    </table>
+                <tr>
+                    <td>Enabled</td>
+                    <td>
+                        {% if user.enabled == 1 %}
+                            <span class="good">Yes</span>
+                        {% else %}
+                            <span class="bad">No</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <td>Status</td>
+                    <td>
+                        {% if user.active == 1 %}
+                            <span class="good">Active</span>
+                        {% else %}
+                            <span class="bad">Banned/De-activated</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% if uw_forum_enabled == true %}
+                    <tr>
+                        <td>Forum</td>
+                        <td>
+                            {% if user.forumBan == 1 %}
+                                <span class="bad">Banned</span>
+                            {% else %}
+                                <span class="good">Active</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endif %}
+                <tr>
+                    <td>Roles</td>
+                    <td>
+                        {% for role in user.roles %}
+                            <p>{{ role }}</p>
+                        {% endfor %}
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <p>
+                            {% if user.active == 1 %}
+                                <a class="btn btn-danger" href="{{ path('Admin/User/Ban', {'userId': user.id}) }}">Ban</a>
+                            {% else %}
+                                <a class="btn btn-danger" href="{{ path('Admin/User/Unban', {'userId': user.id}) }}">Unban</a>
+                            {% endif %}
+                        </p>
+                        {% if uw_forum_enabled == true %}
+                            <p>
+                                {% if user.forumBan == 1 %}
+                                    <a class="btn btn-danger" href="{{ path('Admin/User/ForumUnban', {'userId': user.id}) }}">Forum unban</a>
+                                {% else %}
+                                    <a class="btn btn-danger" href="{{ path('Admin/User/ForumBan', {'userId': user.id}) }}">Forum ban</a>
+                                {% endif %}
+                            </p>
+                        {% endif %}
+                        {% if user.enabled == 0 %}
+                            <p>
+                                <a class="btn btn-danger" href="{{ path('Admin/User/Enable', {'userId': user.id}) }}">Enable account</a>
+                            </p>
+                        {% endif %}
+                        {% if 'ROLE_ADMIN' not in user.roles %}
+                            <p>
+                                <a class="btn btn-danger" href="{{ path('Admin/User/MakeAdmin', {'userId': user.id}) }}">Make Admin</a>
+                            </p>
+                        {% else %}
+                            <p>
+                                <a class="btn btn-danger" href="{{ path('Admin/User/RemoveAdmin', {'userId': user.id}) }}">Remove Admin</a>
+                            </p>
+                        {% endif %}
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="uw-card">
+        <div class="uw-card-header">Players</div>
+        <div class="uw-card-body">
+            <table class="table text-center">
+                <tr>
+                    <td>Player name</td>
+                    <td>World</td>
+                </tr>
+                {% for player in user.players %}
+                    <tr>
+                        <td>{{ player.name }}</td>
+                        <td>{{ player.world.name }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+
+    <div class="uw-card">
+        <div class="uw-card-header">Possible multi accounts (same IP: {{ user.lastIp ?? 'Unknown' }})</div>
+        <div class="uw-card-body">
+            <table class="table text-center">
+                {% if sameIpUsers|length > 0 %}
+                    <tr>
+                        <td>Username</td>
+                        <td>Email</td>
+                        <td>Last login</td>
+                        <td>Status</td>
+                    </tr>
+                    {% for sameIpUser in sameIpUsers %}
+                        <tr>
+                            <td><a href="{{ path('Admin/User/Read', {'userId': sameIpUser.id}) }}">{{ sameIpUser.username }}</a></td>
+                            <td>{{ sameIpUser.email }}</td>
+                            <td>
+                                {% if sameIpUser.lastLogin is not empty %}
+                                    {{ sameIpUser.lastLogin|date("Y-m-d H:i:s") }}
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if sameIpUser.active == 1 %}
+                                    <span class="good">Active</span>
+                                {% else %}
+                                    <span class="bad">Banned</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="4">No other users found with the same IP</td>
+                    </tr>
+                {% endif %}
+            </table>
+        </div>
+    </div>
 
 {% endblock %}

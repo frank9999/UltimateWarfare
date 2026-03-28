@@ -1,8 +1,7 @@
 {% extends 'site/guideBase.html.twig' %}
 {% block content %}
-    <table class="table text-start">
-        <tr>
-            <td>
+    <div class="uw-card">
+        <div class="uw-card-body">
                 The attack system is a quite advanced system. When your attack fleet arrives and attacks there so no way
                 back. The results of the battle depends on many factors, we will run through them step by step now.<br/><br/>
 
@@ -23,9 +22,8 @@
                 And same for region 3,2. The reinforcements to defend a region are based on the train stations, airports
                 and harbors from the surrounding regions and ofcource on the units that are located in those
                 regions.<br/><br/>
-            </td>
-        </tr>
-    </table>
+        </div>
+    </div>
 
     <br/>
     <br/>
@@ -43,10 +41,10 @@
                 <br/><a href="{{ url('Guide/Attack') }}"><span style="color:gold"><b>Building<br/>YOU</b></span></a>
             </td>
             <td width="119" height="103" background="{{ asset('images/map/forest.png') }}" valign="top">
-                <br/><a class="A" href="{{ url('Guide/Attack') }}">Attack<br/>DEFENDER</a>
+                <br/><a href="{{ url('Guide/Attack') }}">Attack<br/>DEFENDER</a>
             </td>
             <td width="119" height="103" background="{{ asset('images/map/forest.png') }}" valign="top">
-                <br/><a class="A" href="{{ url('Guide/Attack') }}">Buy</a>
+                <br/><a href="{{ url('Guide/Attack') }}">Buy</a>
             </td>
         </tr>
         <tr>
@@ -55,10 +53,10 @@
                 <br/><a href="{{ url('Guide/Attack') }}"><span style="color:gold"><b>Building<br/>YOU</b></span></a>
             </td>
             <td width="119" height="103" background="{{ asset('images/map/forest.png') }}" valign="top">
-                <br/><a class="A" href="{{ url('Guide/Attack') }}">Attack<br/>DEFENDER</a>
+                <br/><a href="{{ url('Guide/Attack') }}">Attack<br/>DEFENDER</a>
             </td>
             <td width="119" height="103" background="{{ asset('images/map/forest.png') }}" valign="top">
-                <br/><a class="A" href="{{ url('Guide/Attack') }}">Attack<br/>DEFENDER</a></td>
+                <br/><a href="{{ url('Guide/Attack') }}">Attack<br/>DEFENDER</a></td>
         </tr>
         <tr>
             <td width="15">3</td>
@@ -66,10 +64,10 @@
                 <br/><a href="{{ url('Guide/Attack') }}"><span style="color:gold"><b>Building<br/>YOU</b></span></a>
             </td>
             <td width="119" height="103" background="{{ asset('images/map/forest.png') }}" valign="top">
-                <br/><a class="A" href="{{ url('Guide/Attack') }}">Attack<br/>DEFENDER</a>
+                <br/><a href="{{ url('Guide/Attack') }}">Attack<br/>DEFENDER</a>
             </td>
             <td width="119" height="103" background="{{ asset('images/map/forest.png') }}" valign="top">
-                <br/><a class="A" href="{{ url('Guide/Attack') }}">Buy</a>
+                <br/><a href="{{ url('Guide/Attack') }}">Buy</a>
             </td>
         </tr>
     </table>
@@ -77,9 +75,8 @@
     <br/>
     <br/>
 
-    <table class="table text-start">
-        <tr>
-            <td>
+    <div class="uw-card">
+        <div class="uw-card-body">
                 <br/>
                 Some Limits:
                 <ul>
@@ -143,20 +140,17 @@
                 stage!<br/>
                 The attacker gains the region WITH all buildings.<br/>
                 Look below for an example battle report:
-            </td>
-        </tr>
-    </table>
+        </div>
+    </div>
 
     <br/>
     <br/>
 
 
-    <table class="table text-center">
-        <tr class="tabletop">
-            <td><b>Ultimate Warfare Battle Report</b></td>
-        </tr>
-        <tr>
-            <td><b>Air Battle</b>
+    <div class="uw-card">
+        <div class="uw-card-header">Ultimate Warfare Battle Report</div>
+        <div class="uw-card-body">
+            <b>Air Battle</b>
                 <br/>
                 You started with 21 planes...<br/>
                 You killed 0 enemy planes,<br/>
@@ -200,7 +194,6 @@
                 After the battle you had 639 left, your enemy had 0 soldiers left.<br/><br/>
 
                 YOU WON
-            </td>
-        </tr>
-    </table>
+        </div>
+    </div>
 {% endblock %}

@@ -1,57 +1,44 @@
 {% extends 'site.html.twig' %}
 {% block content %}
-    <table class="table text">
-        <tr class="tabletop">
-            <td class="text-center"><b>Welcome to Ultimate Warfare</b></td>
-        </tr>
-        <tr>
-            <td>
-                <p class="text-center">
-                    Ultimate Warfare is an online multiplayer browser based strategy game where you compete with thousands of others for world domination!
-                </p>
-                <p class="text-center">
-                    <a class="btn btn-primary" href="{{ path('Site/Register') }}">Register now for free!</a>
-                </p>
-                <p class="text-left">
-                    <b>Features:</b>
-                    <ul>
-                        <li>Free to play MMORPG (Massively multiplayer online role-playing game)</li>
-                        <li>Online / Browser based game (No download required)</li>
-                        <li>Player vs Player (PVP) and Federation (Clan) battles</li>
-                        <li>War game (Conquer regions on a world map)</li>
-                    </ul>
-                </p>
-            </td>
-        </tr>
-    </table>
+    <div class="uw-hero" style="background-image: url('{{ asset('images/uw_background.jpg') }}');">
+        <div class="uw-hero-overlay">
+            <h1>Ultimate Warfare</h1>
+            <p class="tagline">Compete for world domination in this free multiplayer strategy game</p>
+            <a class="btn-cta" href="{{ path('Site/Register') }}">Play Now - Free</a>
+        </div>
+    </div>
 
-    <br />
+    <div class="features-grid">
+        <div class="feature-item">
+            <strong>Free to Play</strong>
+            <span>Browser based MMORPG, no download required</span>
+        </div>
+        <div class="feature-item">
+            <strong>PVP Battles</strong>
+            <span>Player vs Player and Federation warfare</span>
+        </div>
+        <div class="feature-item">
+            <strong>World Map</strong>
+            <span>Conquer regions on an interactive hex map</span>
+        </div>
+        <div class="feature-item">
+            <strong>Strategy</strong>
+            <span>Research, build, and command your armies</span>
+        </div>
+    </div>
 
-    <table class="table text">
-        <tr class="tabletop">
-            <td class="text-center"><strong>Game News</strong></td>
-        </tr>
-
-        {% for news in gameNews %}
-            <tr>
-                <td class="text-center">
-                    <b>{{ news.title }}</b>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    {{ news.message|nl2br }}
-                    <br />
-                    <br />
-                    <i>
-                        Posted on {{ news.createDateTime|date("Y-m-d H:i:s") }}
-                    </i>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td class="text-center">No Game News found!</td>
-            </tr>
-        {% endfor %}
-    </table>
+    <div class="uw-card">
+        <div class="uw-card-header">Game News</div>
+        <div class="uw-card-body">
+            {% for news in gameNews %}
+                <div class="news-item">
+                    <div class="news-title">{{ news.title }}</div>
+                    <div>{{ news.message|nl2br }}</div>
+                    <div class="news-date">Posted on {{ news.createDateTime|date("Y-m-d H:i:s") }}</div>
+                </div>
+            {% else %}
+                <p class="text-center">No game news yet.</p>
+            {% endfor %}
+        </div>
+    </div>
 {% endblock %}

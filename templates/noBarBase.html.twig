@@ -1,9 +1,11 @@
 {% extends 'base.html.twig' %}
 
-{% block body %}
-    <main class="col-sm-12 justify-content-center">
-        {% include 'flashes.html.twig' %}
+{% block navigation %}
+    {% include 'site/navigation.html.twig' %}
+{% endblock %}
 
-        {% block content %}{% endblock %}
-    </main>
+{% block body %}
+    {% include 'flashes.html.twig' %}
+
+    {% block content %}{% endblock %}
 {% endblock %}

@@ -3,21 +3,23 @@
 {% block title %}ADMIN - Server Logs{% endblock title %}
 
 {% block content %}
-    <table class="table text-center">
-        <tr class="tabletop">
-            <td colspan="3"><b>Server Logs</b></td>
-        </tr>
-        {% for logFile, logData in logs %}
-            <tr>
-                <td colspan="3">{{ logFile }}</td>
-            </tr>
-            {% for log in logData %}
-                <tr>
-                    <td>{{ log.datetime }}</td>
-                    <td>{{ log.level_name }}</td>
-                    <td>{{ log.message }}</td>
-                </tr>
-            {% endfor %}
-        {% endfor %}
-    </table>
+    <div class="uw-card">
+        <div class="uw-card-header">Server Logs</div>
+        <div class="uw-card-body">
+            <table class="table text-center">
+                {% for logFile, logData in logs %}
+                    <tr>
+                        <td colspan="3">{{ logFile }}</td>
+                    </tr>
+                    {% for log in logData %}
+                        <tr>
+                            <td>{{ log.datetime }}</td>
+                            <td>{{ log.level_name }}</td>
+                            <td>{{ log.message }}</td>
+                        </tr>
+                    {% endfor %}
+                {% endfor %}
+            </table>
+        </div>
+    </div>
 {% endblock %}

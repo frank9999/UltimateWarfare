@@ -3,27 +3,24 @@
 {% block title %}Ultimate Warfare - Contact{% endblock title %}
 
 {% block content %}
-    <table class="table text-center">
-        <tr class="tabletop">
-            <td><b>Contact</b></td>
-        </tr>
-        <tr>
-            <td>
-                <p>
-                    I would like to hear what you think. Send me a message, whether it is praise or criticism, a question, a suggestion, or just a hello.
+    <div class="form-card-wrapper">
+        <div class="uw-card">
+            <div class="uw-card-header">Contact</div>
+            <div class="uw-card-body">
+                <p class="text-center">
+                    Your feedback helps us improve Ultimate Warfare. Whether you have a suggestion, a question, or want to report an issue, we'd love to hear from you.
                 </p>
 
                 {{ form_start(form) }}
                 {{ form_widget(form) }}
                 {{ form_end(form) }}
-            </td>
-        </tr>
-    </table>
+            </div>
+        </div>
+    </div>
 
     <script type="text/javascript">
         var gg_recaptcha_site_key = '{{ gg_recaptcha_site_key }}';
     </script>
     <script src="{{ asset('js/recaptcha.js') }}"></script>
     <script type="text/javascript" src="https://www.google.com/recaptcha/api.js?onload=onGoogleReCaptchaLoad&render=explicit"></script>
-
 {% endblock %}

@@ -1,23 +1,25 @@
 {% extends 'site/guideBase.html.twig' %}
 
 {% block content %}
-    <table class="table text-center">
-        <tr class="tabletop">
-            <td colspan="2"><b>Operations</b></td>
-        </tr>
-        {% for operation in operations %}
-            <tr>
-                <td width="150"><img src="{{ asset('images/operations/' ~ operation.image) }}" alt="{{ operation.name }}" width="150" height="130"></td>
-                <td class="text-start" width="450">
-                    {{ operation.description }}
-                    <ul>
-                        <li>Name: {{ operation.name }}</li>
-                        <li>Cash: {{ operation.cost }}</li>
-                        <li>Research requirement: {{ operation.researchName }}</li>
-                        <li>Difficulty: {{ operation.difficulty }}</li>
-                    </ul>
-                </td>
-            </tr>
-        {% endfor %}
-    </table>
+    <div class="uw-card">
+        <div class="uw-card-header">Operations</div>
+        <div class="uw-card-body">
+            <table class="table text-center">
+                {% for operation in operations %}
+                    <tr>
+                        <td width="150"><img src="{{ asset('images/operations/' ~ operation.image) }}" alt="{{ operation.name }}" width="150" height="130"></td>
+                        <td class="text-start" width="450">
+                            {{ operation.description }}
+                            <ul>
+                                <li>Name: {{ operation.name }}</li>
+                                <li>Cash: {{ operation.cost }}</li>
+                                <li>Research requirement: {{ operation.researchName }}</li>
+                                <li>Difficulty: {{ operation.difficulty }}</li>
+                            </ul>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
 {% endblock %}
