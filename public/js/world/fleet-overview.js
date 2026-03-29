@@ -28,8 +28,8 @@
         fleetContainer.innerHTML = '<div class="build-loading">Loading fleet data...</div>';
 
         try {
-            var response = await fetch('/game/api/fleet/overview');
-            var result = await response.json();
+            const response = await fetch('/game/api/fleet/overview');
+            const result = await response.json();
 
             if (result.success) {
                 allFleets = result.fleets;
@@ -50,7 +50,7 @@
             return;
         }
 
-        var html = '<table style="width: 100%; border-collapse: collapse;">';
+        let html = '<table style="width: 100%; border-collapse: collapse;">';
         html += '<tr style="border-bottom: 2px solid #8B7355;">';
         html += '<th style="padding: 8px; text-align: center;">From</th>';
         html += '<th style="padding: 8px; text-align: center;">To</th>';
@@ -61,18 +61,18 @@
         html += '</tr>';
 
         allFleets.forEach(function (fleet) {
-            var unitsHtml = fleet.units.map(function (u) {
+            const unitsHtml = fleet.units.map(function (u) {
                 return escapeHtml(u.amount + ' ' + u.name);
             }).join('<br>');
 
-            var timeHtml;
+            let timeHtml;
             if (fleet.hasArrived) {
                 timeHtml = '<b style="color: #4CAF50;">Arrived!</b>';
             } else {
                 timeHtml = '<span class="fleet-timer" data-timeleft="' + fleet.timeLeft + '">' + formatTime(fleet.timeLeft) + '</span>';
             }
 
-            var actionsHtml = '';
+            let actionsHtml = '';
             if (!fleet.hasArrived) {
                 actionsHtml = '<button class="fleet-action-btn recall" data-id="' + fleet.id + '" data-action="recall">Recall</button>';
             } else if (fleet.targetIsYours) {
@@ -98,15 +98,15 @@
 
         fleetContainer.querySelectorAll('.fleet-action-btn').forEach(function (btn) {
             btn.onclick = function () {
-                var fleetId = parseInt(btn.getAttribute('data-id'), 10);
-                var action = btn.getAttribute('data-action');
+                const fleetId = parseInt(btn.getAttribute('data-id'), 10);
+                const action = btn.getAttribute('data-action');
                 handleFleetAction(fleetId, action, btn);
             };
         });
     }
 
     async function handleFleetAction(fleetId, action, btn) {
-        var url;
+        let url;
         if (action === 'recall') {
             url = '/game/api/fleet/recall/' + fleetId;
         } else if (action === 'reinforce') {
@@ -118,15 +118,15 @@
         }
 
         btn.disabled = true;
-        var originalText = btn.textContent;
+        const originalText = btn.textContent;
         btn.textContent = '...';
 
         try {
-            var response = await fetch(url, {
+            const response = await fetch(url, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' }
             });
-            var result = await response.json();
+            const result = await response.json();
 
             if (result.success) {
                 showNotification(result.message, 'success');
@@ -134,7 +134,7 @@
                 if (window.WorldApp && WorldApp.worldMap) {
                     // Remove fleet from worldmap fleet manager
                     if (WorldApp.worldMap.fleetManager) {
-                        var fm = WorldApp.worldMap.fleetManager;
+                        const fm = WorldApp.worldMap.fleetManager;
                         fm.fleets = fm.fleets.filter(function (f) { return f.id !== fleetId; });
                     }
 
@@ -166,11 +166,11 @@
         }
 
         timerInterval = setInterval(function () {
-            var timers = fleetContainer.querySelectorAll('.fleet-timer');
-            var needsRefresh = false;
+            const timers = fleetContainer.querySelectorAll('.fleet-timer');
+            let needsRefresh = false;
 
             timers.forEach(function (el) {
-                var timeLeft = parseInt(el.getAttribute('data-timeleft'), 10) - 1;
+                let timeLeft = parseInt(el.getAttribute('data-timeleft'), 10) - 1;
                 if (timeLeft <= 0) {
                     timeLeft = 0;
                     needsRefresh = true;
@@ -187,10 +187,10 @@
 
     function formatTime(seconds) {
         if (seconds <= 0) { return 'Arrived!'; }
-        var h = Math.floor(seconds / 3600);
-        var m = Math.floor((seconds % 3600) / 60);
-        var s = seconds % 60;
-        var parts = [];
+        const h = Math.floor(seconds / 3600);
+        const m = Math.floor((seconds % 3600) / 60);
+        const s = seconds % 60;
+        const parts = [];
         if (h > 0) { parts.push(h + 'h'); }
         if (m > 0) { parts.push(m + 'm'); }
         parts.push(s + 's');
@@ -198,7 +198,7 @@
     }
 
     function escapeHtml(text) {
-        var div = document.createElement('div');
+        const div = document.createElement('div');
         div.appendChild(document.createTextNode(text));
         return div.innerHTML;
     }

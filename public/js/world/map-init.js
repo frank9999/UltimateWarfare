@@ -3,13 +3,13 @@
  * Depends on: notifications.js, modals.js (WorldApp.defaultTileClick)
  */
 (function () {
-    var worldRegions = WorldApp.worldRegions;
-    var playerFleets = WorldApp.playerFleets;
-    var playerBombardments = WorldApp.playerBombardments || [];
+    const worldRegions = WorldApp.worldRegions;
+    const playerFleets = WorldApp.playerFleets;
+    const playerBombardments = WorldApp.playerBombardments || [];
 
     // Find the player's first owned region for centering
-    var homeRegion = null;
-    for (var i = 0; i < worldRegions.length; i++) {
+    let homeRegion = null;
+    for (let i = 0; i < worldRegions.length; i++) {
         if (worldRegions[i].isYours) {
             homeRegion = worldRegions[i];
             break;
@@ -18,7 +18,7 @@
 
     console.log('Loading ' + worldRegions.length + ' world regions...');
 
-    var worldMap = new HexMap('worldMap', {
+    const worldMap = new HexMap('worldMap', {
         hexSize: 40,
         imageBasePath: WorldApp.imageBasePath,
         overlaysEnabled: false,
@@ -29,7 +29,7 @@
 
     function centerOnHomeRegion() {
         if (homeRegion) {
-            var pos = worldMap.hexToPixel(homeRegion.x, homeRegion.y);
+            const pos = worldMap.hexToPixel(homeRegion.x, homeRegion.y);
             worldMap.cameraController.resetView(pos.x, pos.y);
         } else {
             worldMap.cameraController.resetView();
@@ -47,7 +47,7 @@
     });
 
     // ===== UI Controls =====
-    var overlayLegend = document.getElementById('overlayLegend');
+    const overlayLegend = document.getElementById('overlayLegend');
 
     document.getElementById('toggleOverlay').addEventListener('click', function () {
         worldMap.config.overlaysEnabled = !worldMap.config.overlaysEnabled;
@@ -73,37 +73,37 @@
     });
 
     window.addEventListener('click', function () {
-        var dropdown = document.getElementById('profileDropdown');
+        const dropdown = document.getElementById('profileDropdown');
         if (dropdown && dropdown.classList.contains('show')) {
             dropdown.classList.remove('show');
         }
     });
 
     // ===== Unit Tooltip =====
-    var unitTooltip = document.getElementById('unitTooltip');
-    var tooltipRAF = null;
+    const unitTooltip = document.getElementById('unitTooltip');
+    let tooltipRAF = null;
 
     worldMap.canvas.addEventListener('mousemove', function (e) {
         if (tooltipRAF) return;
-        var evt = e;
+        const evt = e;
         tooltipRAF = requestAnimationFrame(function () {
             tooltipRAF = null;
 
-            var rect = worldMap.canvas.getBoundingClientRect();
-            var mouseX = evt.clientX - rect.left;
-            var mouseY = evt.clientY - rect.top;
+            const rect = worldMap.canvas.getBoundingClientRect();
+            const mouseX = evt.clientX - rect.left;
+            const mouseY = evt.clientY - rect.top;
 
             // O(1) tile lookup instead of iterating all sectors
-            var hoveredRegion = worldMap.getTileAtScreenPos(mouseX, mouseY);
-            var foundIcon = null;
+            const hoveredRegion = worldMap.getTileAtScreenPos(mouseX, mouseY);
+            let foundIcon = null;
 
             if (hoveredRegion && hoveredRegion.iconPositions) {
-                var worldPos = worldMap.cameraController.screenToWorld(mouseX, mouseY);
-                for (var j = 0; j < hoveredRegion.iconPositions.length; j++) {
-                    var icon = hoveredRegion.iconPositions[j];
-                    var dx = worldPos.x - icon.x;
-                    var dy = worldPos.y - icon.y;
-                    var distance = Math.sqrt(dx * dx + dy * dy);
+                const worldPos = worldMap.cameraController.screenToWorld(mouseX, mouseY);
+                for (let j = 0; j < hoveredRegion.iconPositions.length; j++) {
+                    const icon = hoveredRegion.iconPositions[j];
+                    const dx = worldPos.x - icon.x;
+                    const dy = worldPos.y - icon.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
 
                     if (distance <= icon.size) {
                         foundIcon = { icon: icon, region: hoveredRegion };
@@ -113,8 +113,8 @@
             }
 
             if (foundIcon) {
-                var fi = foundIcon.icon;
-                var tooltipHtml = '<div class="tooltip-title" style="color: ' + fi.color + '">' + fi.label + '</div>';
+                const fi = foundIcon.icon;
+                let tooltipHtml = '<div class="tooltip-title" style="color: ' + fi.color + '">' + fi.label + '</div>';
 
                 if (fi.details && fi.details.length > 0) {
                     fi.details.forEach(function (unit) {

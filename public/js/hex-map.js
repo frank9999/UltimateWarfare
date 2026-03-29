@@ -147,9 +147,9 @@ class HexMap {
      * Uses odd-r offset: odd rows are shifted right by half a hex width
      */
     hexToPixel(col, row) {
-        var x = col * this.config.hexWidth
+        const x = col * this.config.hexWidth
             + (row % 2) * (this.config.hexWidth / 2);
-        var y = row * this.config.rowStepY;
+        const y = row * this.config.rowStepY;
         return { x: x, y: y };
     }
 
@@ -158,32 +158,32 @@ class HexMap {
      * Checks the estimated tile and its neighbors for the closest match
      */
     getTileAtScreenPos(screenX, screenY) {
-        var world = this.cameraController.screenToWorld(screenX, screenY);
+        const world = this.cameraController.screenToWorld(screenX, screenY);
 
         // Approximate row from y
-        var approxRow = Math.round(world.y / this.config.rowStepY);
+        const approxRow = Math.round(world.y / this.config.rowStepY);
 
         // Approximate col from x (accounting for odd-row offset)
-        var rowOffset = (approxRow % 2) * (this.config.hexWidth / 2);
-        var approxCol = Math.round(
+        const rowOffset = (approxRow % 2) * (this.config.hexWidth / 2);
+        const approxCol = Math.round(
             (world.x - rowOffset) / this.config.hexWidth
         );
 
         // Check candidate tile and 8 surrounding grid cells
-        var bestTile = null;
-        var bestDist = Infinity;
+        let bestTile = null;
+        let bestDist = Infinity;
 
-        for (var dr = -1; dr <= 1; dr++) {
-            for (var dc = -1; dc <= 1; dc++) {
-                var r = approxRow + dr;
-                var c = approxCol + dc;
-                var sector = this.sectorLookup.get(c + ',' + r);
+        for (let dr = -1; dr <= 1; dr++) {
+            for (let dc = -1; dc <= 1; dc++) {
+                const r = approxRow + dr;
+                const c = approxCol + dc;
+                const sector = this.sectorLookup.get(c + ',' + r);
 
                 if (sector) {
-                    var pos = this.hexToPixel(c, r);
-                    var dx = world.x - pos.x;
-                    var dy = world.y - pos.y;
-                    var dist = dx * dx + dy * dy;
+                    const pos = this.hexToPixel(c, r);
+                    const dx = world.x - pos.x;
+                    const dy = world.y - pos.y;
+                    const dist = dx * dx + dy * dy;
 
                     if (dist < bestDist) {
                         bestDist = dist;
@@ -199,8 +199,8 @@ class HexMap {
     // ===== Interaction =====
 
     updateHoveredTile(e) {
-        var rect = this.canvas.getBoundingClientRect();
-        var tile = this.getTileAtScreenPos(
+        const rect = this.canvas.getBoundingClientRect();
+        const tile = this.getTileAtScreenPos(
             e.clientX - rect.left,
             e.clientY - rect.top
         );
@@ -212,8 +212,8 @@ class HexMap {
     }
 
     handleTileClick(e) {
-        var rect = this.canvas.getBoundingClientRect();
-        var tile = this.getTileAtScreenPos(
+        const rect = this.canvas.getBoundingClientRect();
+        const tile = this.getTileAtScreenPos(
             e.clientX - rect.left,
             e.clientY - rect.top
         );
@@ -236,17 +236,17 @@ class HexMap {
         this.cameraController.applyTransform(this.ctx);
 
         // Render only visible tiles (view frustum culling)
-        var self = this;
-        var bounds = this.cameraController.getVisibleBounds();
-        var margin = this.config.hexWidth;
-        var minRow = Math.floor((bounds.minY - margin) / this.config.rowStepY) - 1;
-        var maxRow = Math.ceil((bounds.maxY + margin) / this.config.rowStepY) + 1;
-        var minCol = Math.floor((bounds.minX - margin) / this.config.hexWidth) - 1;
-        var maxCol = Math.ceil((bounds.maxX + margin) / this.config.hexWidth) + 1;
+        const self = this;
+        const bounds = this.cameraController.getVisibleBounds();
+        const margin = this.config.hexWidth;
+        const minRow = Math.floor((bounds.minY - margin) / this.config.rowStepY) - 1;
+        const maxRow = Math.ceil((bounds.maxY + margin) / this.config.rowStepY) + 1;
+        const minCol = Math.floor((bounds.minX - margin) / this.config.hexWidth) - 1;
+        const maxCol = Math.ceil((bounds.maxX + margin) / this.config.hexWidth) + 1;
 
-        for (var row = minRow; row <= maxRow; row++) {
-            for (var col = minCol; col <= maxCol; col++) {
-                var sector = this.sectorLookup.get(col + ',' + row);
+        for (let row = minRow; row <= maxRow; row++) {
+            for (let col = minCol; col <= maxCol; col++) {
+                const sector = this.sectorLookup.get(col + ',' + row);
                 if (sector) {
                     this.renderTile(sector);
                 }
@@ -277,9 +277,9 @@ class HexMap {
     }
 
     renderTile(sector) {
-        var pos = this.hexToPixel(sector.x, sector.y);
-        var imageUrl = this.config.imageBasePath + '/map/' + sector.image;
-        var img = this.images.get(imageUrl);
+        const pos = this.hexToPixel(sector.x, sector.y);
+        const imageUrl = this.config.imageBasePath + '/map/' + sector.image;
+        const img = this.images.get(imageUrl);
 
         this.tileRenderer.renderTile(
             sector, pos, img, this.hoveredTile, this.images
@@ -314,7 +314,7 @@ class HexMap {
 }
 
 // Backward compatibility alias
-var IsometricMap = HexMap;
+const IsometricMap = HexMap;
 
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = HexMap;

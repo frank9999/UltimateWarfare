@@ -3,15 +3,15 @@
  * Depends on: notifications.js
  */
 (function () {
-    var worldsModal = document.getElementById('worldsModal');
-    var worldsTabs = document.getElementById('worldsTabs');
-    var worldsContainer = document.getElementById('worldsContainer');
+    const worldsModal = document.getElementById('worldsModal');
+    const worldsTabs = document.getElementById('worldsTabs');
+    const worldsContainer = document.getElementById('worldsContainer');
 
-    var currentTab = 'myWorlds';
+    let currentTab = 'myWorlds';
 
     document.getElementById('worldsBtn').addEventListener('click', function (e) {
         e.preventDefault();
-        var dropdown = document.getElementById('profileDropdown');
+        const dropdown = document.getElementById('profileDropdown');
         if (dropdown) dropdown.classList.remove('show');
         showWorldsModal();
     });
@@ -27,13 +27,13 @@
 
     function renderTabs() {
         worldsTabs.innerHTML = '';
-        var tabs = [
+        const tabs = [
             { id: 'myWorlds', name: 'My Worlds' },
             { id: 'joinWorld', name: 'Join World' }
         ];
 
         tabs.forEach(function (tab) {
-            var el = document.createElement('div');
+            const el = document.createElement('div');
             el.className = 'build-tab' + (currentTab === tab.id ? ' active' : '');
             el.textContent = tab.name;
             el.onclick = function () {
@@ -45,14 +45,14 @@
         });
     }
 
-    var worldsData = null;
+    let worldsData = null;
 
     async function loadWorlds() {
         worldsContainer.innerHTML = '<div class="build-loading">Loading worlds...</div>';
 
         try {
-            var response = await fetch('/game/api/worlds');
-            var result = await response.json();
+            const response = await fetch('/game/api/worlds');
+            const result = await response.json();
 
             if (result.success) {
                 worldsData = result;
@@ -77,14 +77,14 @@
     }
 
     function renderMyWorlds() {
-        var worlds = worldsData.myWorlds;
+        const worlds = worldsData.myWorlds;
 
         if (worlds.length === 0) {
             worldsContainer.innerHTML = '<div style="text-align: center; color: #aaa; padding: 20px;">You are not playing in any worlds yet.</div>';
             return;
         }
 
-        var html = '<table style="width: 100%; border-collapse: collapse;">';
+        let html = '<table style="width: 100%; border-collapse: collapse;">';
         html += '<tr style="border-bottom: 1px solid #333;"><th style="padding: 8px; text-align: left; color: #aaa;">World</th><th style="padding: 8px; text-align: left; color: #aaa;">Player Name</th><th style="padding: 8px; text-align: right;"></th></tr>';
 
         worlds.forEach(function (w) {
@@ -100,14 +100,14 @@
     }
 
     function renderJoinWorld() {
-        var worlds = worldsData.joinableWorlds;
+        const worlds = worldsData.joinableWorlds;
 
         if (worlds.length === 0) {
             worldsContainer.innerHTML = '<div style="text-align: center; color: #aaa; padding: 20px;">No worlds available to join at this time.</div>';
             return;
         }
 
-        var html = '<table style="width: 100%; border-collapse: collapse;">';
+        let html = '<table style="width: 100%; border-collapse: collapse;">';
         html += '<tr style="border-bottom: 1px solid #333;"><th style="padding: 8px; text-align: left; color: #aaa;">World</th><th style="padding: 8px; text-align: left; color: #aaa;">Players</th><th style="padding: 8px; text-align: left; color: #aaa;">Description</th><th style="padding: 8px; text-align: right;"></th></tr>';
 
         worlds.forEach(function (w) {
@@ -124,7 +124,7 @@
     }
 
     function escapeHtml(text) {
-        var div = document.createElement('div');
+        const div = document.createElement('div');
         div.appendChild(document.createTextNode(text));
         return div.innerHTML;
     }

@@ -35,8 +35,8 @@ class BombardmentManager {
 
         if (this.bombardments.length > 0) {
             this.updateInterval = setInterval(() => {
-                var currentTime = Date.now();
-                var deltaTime = currentTime - this.lastAnimationTime;
+                const currentTime = Date.now();
+                const deltaTime = currentTime - this.lastAnimationTime;
                 this.animationOffset = (this.animationOffset + deltaTime * 0.04) % 20;
                 this.lastAnimationTime = currentTime;
 
@@ -60,7 +60,7 @@ class BombardmentManager {
      * Update remaining time and remove expired cooldowns
      */
     updateCooldowns() {
-        var now = Math.floor(Date.now() / 1000);
+        const now = Math.floor(Date.now() / 1000);
         this.bombardments = this.bombardments.filter(function (b) {
             b.remainingSeconds = Math.max(0, b.cooldownUntil - now);
             return b.remainingSeconds > 0;
@@ -79,16 +79,16 @@ class BombardmentManager {
             return;
         }
 
-        var self = this;
+        const self = this;
         ctx.save();
 
         this.bombardments.forEach(function (bombardment) {
-            var source = coordToPixel(bombardment.sourceX, bombardment.sourceY);
-            var target = coordToPixel(bombardment.targetX, bombardment.targetY);
+            const source = coordToPixel(bombardment.sourceX, bombardment.sourceY);
+            const target = coordToPixel(bombardment.targetX, bombardment.targetY);
 
-            var minutes = Math.floor(bombardment.remainingSeconds / 60);
-            var seconds = bombardment.remainingSeconds % 60;
-            var timeText = minutes + 'm ' + (seconds < 10 ? '0' : '') + seconds + 's';
+            const minutes = Math.floor(bombardment.remainingSeconds / 60);
+            const seconds = bombardment.remainingSeconds % 60;
+            const timeText = minutes + 'm ' + (seconds < 10 ? '0' : '') + seconds + 's';
 
             self.renderArc(ctx, source, target, timeText);
         });
@@ -101,17 +101,17 @@ class BombardmentManager {
      * with a cooldown label rendered directly on the canvas at the arc peak
      */
     renderArc(ctx, source, target, timeText) {
-        var midX = (source.x + target.x) / 2;
-        var midY = (source.y + target.y) / 2;
+        const midX = (source.x + target.x) / 2;
+        const midY = (source.y + target.y) / 2;
 
         // Calculate arc height based on distance
-        var dx = target.x - source.x;
-        var dy = target.y - source.y;
-        var dist = Math.sqrt(dx * dx + dy * dy);
-        var arcHeight = Math.max(40, dist * 0.5);
+        const dx = target.x - source.x;
+        const dy = target.y - source.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        const arcHeight = Math.max(40, dist * 0.5);
 
-        var controlX = midX;
-        var controlY = midY - arcHeight;
+        const controlX = midX;
+        const controlY = midY - arcHeight;
 
         // Animated dashed arc
         ctx.beginPath();
@@ -134,15 +134,15 @@ class BombardmentManager {
         ctx.fill();
 
         // Cooldown label at the arc peak (t=0.5 on quadratic Bezier)
-        var peakX = midX;
-        var peakY = midY - arcHeight * 0.5;
-        var label = 'Recharging: ' + timeText;
+        const peakX = midX;
+        const peakY = midY - arcHeight * 0.5;
+        const label = 'Recharging: ' + timeText;
 
         ctx.font = 'bold 11px Arial';
-        var textWidth = ctx.measureText(label).width;
-        var padding = 5;
-        var boxWidth = textWidth + padding * 2;
-        var boxHeight = 18;
+        const textWidth = ctx.measureText(label).width;
+        const padding = 5;
+        const boxWidth = textWidth + padding * 2;
+        const boxHeight = 18;
 
         // Background box
         ctx.fillStyle = 'rgba(40, 25, 0, 0.85)';
@@ -170,8 +170,8 @@ class BombardmentManager {
      * Draw arrowhead pointing toward target
      */
     renderArrowhead(ctx, fromX, fromY, toX, toY) {
-        var angle = Math.atan2(toY - fromY, toX - fromX);
-        var arrowSize = 8;
+        const angle = Math.atan2(toY - fromY, toX - fromX);
+        const arrowSize = 8;
 
         ctx.save();
         ctx.translate(toX, toY);

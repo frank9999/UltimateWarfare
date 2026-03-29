@@ -212,7 +212,7 @@ class FleetManager {
         const offsetX = canvasRect.left - containerRect.left;
         const offsetY = canvasRect.top - containerRect.top;
 
-        var activeFleetIds = new Set();
+        const activeFleetIds = new Set();
 
         this.fleets.forEach(fleet => {
             const targetIso = coordToPixel(fleet.targetX, fleet.targetY);
@@ -222,7 +222,7 @@ class FleetManager {
 
             if (screenX < 0 || screenX > canvas.width || screenY < 0 || screenY > canvas.height) {
                 // Off-screen: hide existing element if any
-                var offEl = this.fleetUIMap.get(fleet.id);
+                const offEl = this.fleetUIMap.get(fleet.id);
                 if (offEl) {
                     offEl.style.display = 'none';
                 }
@@ -234,7 +234,7 @@ class FleetManager {
             const posY = screenY + offsetY;
             activeFleetIds.add(fleet.id);
 
-            var existing = this.fleetUIMap.get(fleet.id);
+            const existing = this.fleetUIMap.get(fleet.id);
 
             if (fleet.hasArrived) {
                 if (existing && existing.dataset.fleetState === 'arrived') {
@@ -245,7 +245,7 @@ class FleetManager {
                 } else {
                     // State changed or new — create widget
                     if (existing) existing.remove();
-                    var widget = this.createArrivedFleetWidget(container, fleet, posX, posY);
+                    const widget = this.createArrivedFleetWidget(container, fleet, posX, posY);
                     widget.dataset.fleetState = 'arrived';
                     this.fleetUIMap.set(fleet.id, widget);
                 }
@@ -259,7 +259,7 @@ class FleetManager {
                 } else {
                     // New in-transit fleet
                     if (existing) existing.remove();
-                    var label = this.createETALabel(container, fleet, posX, posY);
+                    const label = this.createETALabel(container, fleet, posX, posY);
                     label.dataset.fleetState = 'transit';
                     this.fleetUIMap.set(fleet.id, label);
                 }
@@ -267,7 +267,7 @@ class FleetManager {
         });
 
         // Remove elements for fleets that no longer exist
-        var self = this;
+        const self = this;
         this.fleetUIMap.forEach(function (el, fleetId) {
             if (!activeFleetIds.has(fleetId)) {
                 el.remove();

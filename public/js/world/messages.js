@@ -17,7 +17,7 @@
     document.getElementById('messagesBtn').addEventListener('click', function (e) {
         e.preventDefault();
         // Close the profile dropdown
-        var dropdown = document.getElementById('profileDropdown');
+        const dropdown = document.getElementById('profileDropdown');
         if (dropdown) dropdown.classList.remove('show');
         showMessagesModal();
     });
@@ -42,13 +42,13 @@
 
     function renderTabs() {
         messagesTabs.innerHTML = '';
-        var tabs = [
+        const tabs = [
             { id: 'inbox', name: 'Inbox' },
             { id: 'outbox', name: 'Outbox' }
         ];
 
         tabs.forEach(function (tab) {
-            var el = document.createElement('div');
+            const el = document.createElement('div');
             el.className = 'build-tab' + (currentTab === tab.id ? ' active' : '');
             el.textContent = tab.name;
             el.onclick = function () {
@@ -68,8 +68,8 @@
         document.getElementById('closeMessagesBtn').onclick = function () { messagesModal.style.display = 'none'; };
 
         try {
-            var response = await fetch('/game/api/message/' + currentTab);
-            var result = await response.json();
+            const response = await fetch('/game/api/message/' + currentTab);
+            const result = await response.json();
 
             if (result.success) {
                 renderMessageList(result.messages);
@@ -88,8 +88,8 @@
             return;
         }
 
-        var isInbox = currentTab === 'inbox';
-        var html = '<table class="messages-table">';
+        const isInbox = currentTab === 'inbox';
+        let html = '<table class="messages-table">';
         html += '<tr class="messages-header">';
         html += '<th>' + (isInbox ? 'From' : 'To') + '</th>';
         html += '<th>Subject</th>';
@@ -98,8 +98,8 @@
         html += '</tr>';
 
         messages.forEach(function (msg) {
-            var rowClass = (isInbox && msg.isNew) ? ' class="message-unread"' : '';
-            var adminTag = (isInbox && msg.isAdmin) ? '<span class="message-admin-tag">Admin</span> ' : '';
+            const rowClass = (isInbox && msg.isNew) ? ' class="message-unread"' : '';
+            const adminTag = (isInbox && msg.isAdmin) ? '<span class="message-admin-tag">Admin</span> ' : '';
             html += '<tr' + rowClass + '>';
             html += '<td style="width: 120px;">' + escapeHtml(isInbox ? msg.from : msg.to) + '</td>';
             html += '<td><a href="#" class="message-subject-link" data-id="' + msg.id + '">' + adminTag + escapeHtml(msg.subject) + '</a></td>';
@@ -133,8 +133,8 @@
         currentView = 'read';
 
         try {
-            var response = await fetch('/game/api/message/' + currentTab + '/' + messageId);
-            var result = await response.json();
+            const response = await fetch('/game/api/message/' + currentTab + '/' + messageId);
+            const result = await response.json();
 
             if (result.success) {
                 renderReadMessage(result.message);
@@ -148,10 +148,10 @@
     }
 
     function renderReadMessage(msg) {
-        var isInbox = currentTab === 'inbox';
-        var adminTag = (msg.isAdmin) ? '<span class="message-admin-tag">Admin</span> ' : '';
+        const isInbox = currentTab === 'inbox';
+        const adminTag = (msg.isAdmin) ? '<span class="message-admin-tag">Admin</span> ' : '';
 
-        var html = '<div class="message-read">';
+        let html = '<div class="message-read">';
         html += '<div class="message-read-header">';
         html += '<p><strong>' + (isInbox ? 'From' : 'To') + ':</strong> ' + escapeHtml(isInbox ? msg.from : msg.to) + '</p>';
         html += '<p><strong>Subject:</strong> ' + adminTag + escapeHtml(msg.subject) + '</p>';
@@ -164,7 +164,7 @@
         messagesModalTitle.textContent = msg.subject;
 
         // Update footer with back and reply buttons
-        var footerHtml = '<button type="button" id="backToListBtn">Back</button>';
+        let footerHtml = '<button type="button" id="backToListBtn">Back</button>';
         if (isInbox) {
             footerHtml += '<button type="button" id="replyMessageBtn">Reply</button>';
         }
@@ -191,10 +191,10 @@
 
     async function deleteMessage(messageId) {
         try {
-            var response = await fetch('/game/api/message/' + currentTab + '/' + messageId, {
+            const response = await fetch('/game/api/message/' + currentTab + '/' + messageId, {
                 method: 'DELETE'
             });
-            var result = await response.json();
+            const result = await response.json();
 
             if (result.success) {
                 showNotification(result.message, 'success');
@@ -210,7 +210,7 @@
     }
 
     function escapeHtml(text) {
-        var div = document.createElement('div');
+        const div = document.createElement('div');
         div.appendChild(document.createTextNode(text));
         return div.innerHTML;
     }

@@ -49,8 +49,8 @@
         selectOperationModal.style.display = 'block';
 
         try {
-            var response = await fetch('/game/api/operation/list/' + enemyRegion.id);
-            var result = await response.json();
+            const response = await fetch('/game/api/operation/list/' + enemyRegion.id);
+            const result = await response.json();
 
             if (!result.success) {
                 operationsContainer.innerHTML = '<div class="build-loading" style="color: #f44336;">' + escapeHtml(result.message) + '</div>';
@@ -70,7 +70,7 @@
     }
 
     function renderOperationsList(operations) {
-        var html = '';
+        let html = '';
         operations.forEach(function (op) {
             html += '<div class="operation-card" data-operation-slug="' + op.slug + '">';
             html += '<div class="operation-card-header">';
@@ -91,8 +91,8 @@
 
         operationsContainer.querySelectorAll('.operation-card').forEach(function (card) {
             card.onclick = function () {
-                var opSlug = this.getAttribute('data-operation-slug');
-                var op = operations.find(function (o) { return o.slug === opSlug; });
+                const opSlug = this.getAttribute('data-operation-slug');
+                const op = operations.find(function (o) { return o.slug === opSlug; });
                 if (op) selectOperationAndHighlight(op);
             };
         });
@@ -105,8 +105,8 @@
         showNotification('Loading eligible regions for ' + operation.name + '...', 'info');
 
         try {
-            var response = await fetch('/game/api/operation/eligible-regions/' + operationTargetRegion.id + '/' + operation.slug);
-            var result = await response.json();
+            const response = await fetch('/game/api/operation/eligible-regions/' + operationTargetRegion.id + '/' + operation.slug);
+            const result = await response.json();
 
             if (!result.success) {
                 showNotification(result.message || 'Failed to load eligible regions', 'error');
@@ -129,7 +129,7 @@
         operationMode = true;
         operationEligibleRegionIds = new Set(eligibleRegions.map(function (r) { return r.regionId; }));
 
-        var worldMap = WorldApp.worldMap;
+        const worldMap = WorldApp.worldMap;
         worldMap.sectors.forEach(function (region) {
             region._attackEligible = operationEligibleRegionIds.has(region.id);
             region._attackTarget = (region.id === operationTargetRegion.id);
@@ -158,7 +158,7 @@
         operationEligibleRegionIds.clear();
         currentOperationSource = null;
 
-        var worldMap = WorldApp.worldMap;
+        const worldMap = WorldApp.worldMap;
         worldMap.sectors.forEach(function (region) {
             delete region._attackEligible;
             delete region._attackTarget;
@@ -180,17 +180,17 @@
             ' &rarr; <strong>Target:</strong> ' + operationTargetRegion.x + ', ' + operationTargetRegion.y +
             ' (' + operationTargetRegion.ownerName + ')';
 
-        var container = document.getElementById('operationUnitsContainer');
+        const container = document.getElementById('operationUnitsContainer');
         container.innerHTML = '<div class="build-loading">Loading...</div>';
         confirmOperationBtn.disabled = false;
         confirmOperationBtn.textContent = 'Launch Operation';
         operationUnitsModal.style.display = 'block';
 
         try {
-            var response = await fetch(
+            const response = await fetch(
                 '/game/api/operation/units/' + operationTargetRegion.id + '/' + selectedOperation.slug + '/' + sourceRegion.id
             );
-            var result = await response.json();
+            const result = await response.json();
 
             if (!result.success) {
                 container.innerHTML = '<div class="build-loading" style="color: #f44336;">' + escapeHtml(result.message) + '</div>';
@@ -205,11 +205,11 @@
     }
 
     function renderOperationUnits(data) {
-        var container = document.getElementById('operationUnitsContainer');
-        var maxAffordable = data.costPerUnit > 0 ? Math.floor(data.playerCash / data.costPerUnit) : data.available;
-        var maxSend = Math.min(data.available, maxAffordable);
+        const container = document.getElementById('operationUnitsContainer');
+        const maxAffordable = data.costPerUnit > 0 ? Math.floor(data.playerCash / data.costPerUnit) : data.available;
+        const maxSend = Math.min(data.available, maxAffordable);
 
-        var html = '<div class="operation-unit-select">';
+        let html = '<div class="operation-unit-select">';
         html += '<p><strong>' + escapeHtml(data.unitName) + '</strong></p>';
         html += '<p>Available: <strong>' + data.available + '</strong></p>';
         html += '<p>Cost: $' + data.costPerUnit.toLocaleString('en-US') + ' per unit</p>';
@@ -226,10 +226,10 @@
 
         container.innerHTML = html;
 
-        var amountInput = document.getElementById('operationAmount');
-        var totalCostEl = document.getElementById('operationTotalCost');
+        const amountInput = document.getElementById('operationAmount');
+        const totalCostEl = document.getElementById('operationTotalCost');
         amountInput.addEventListener('input', function () {
-            var val = parseInt(amountInput.value) || 0;
+            let val = parseInt(amountInput.value) || 0;
             if (val > maxSend) { val = maxSend; amountInput.value = val; }
             if (val < 0) { val = 0; amountInput.value = val; }
             totalCostEl.textContent = 'Total cost: $' + (val * data.costPerUnit).toLocaleString('en-US');
@@ -238,8 +238,8 @@
 
     // Step 4: Execute the operation
     async function executeOperation() {
-        var amountInput = document.getElementById('operationAmount');
-        var amount = parseInt(amountInput.value) || 0;
+        const amountInput = document.getElementById('operationAmount');
+        const amount = parseInt(amountInput.value) || 0;
 
         if (amount < 1) {
             showNotification('Enter at least 1 unit', 'error');
@@ -250,7 +250,7 @@
         confirmOperationBtn.textContent = 'Executing...';
 
         try {
-            var response = await fetch(
+            const response = await fetch(
                 '/game/api/operation/execute/' + operationTargetRegion.id + '/' + selectedOperation.slug + '/' + currentOperationSource.id,
                 {
                     method: 'POST',
@@ -258,14 +258,14 @@
                     body: JSON.stringify({ amount: amount })
                 }
             );
-            var result = await response.json();
+            const result = await response.json();
 
             operationUnitsModal.style.display = 'none';
 
             if (result.success) {
                 // Update cash display
                 if (result.newCash !== undefined) {
-                    var cashElements = document.querySelectorAll('.resource-amount');
+                    const cashElements = document.querySelectorAll('.resource-amount');
                     if (cashElements.length > 0) cashElements[0].textContent = result.newCash.toLocaleString('en-US');
                 }
 
@@ -290,7 +290,7 @@
     }
 
     function showOperationResults(results) {
-        var html = '<div class="operation-results-log">';
+        let html = '<div class="operation-results-log">';
         results.forEach(function (line) {
             html += '<p>' + escapeHtml(line) + '</p>';
         });
@@ -300,7 +300,7 @@
     }
 
     function escapeHtml(text) {
-        var div = document.createElement('div');
+        const div = document.createElement('div');
         div.appendChild(document.createTextNode(text));
         return div.innerHTML;
     }

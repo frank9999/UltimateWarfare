@@ -3,17 +3,17 @@
  * Depends on: notifications.js
  */
 (function () {
-    var profileModal = document.getElementById('profileModal');
-    var profileTabs = document.getElementById('profileTabs');
-    var profileContainer = document.getElementById('profileContainer');
-    var profileFooter = document.getElementById('profileFooter');
+    const profileModal = document.getElementById('profileModal');
+    const profileTabs = document.getElementById('profileTabs');
+    const profileContainer = document.getElementById('profileContainer');
+    const profileFooter = document.getElementById('profileFooter');
 
-    var currentTab = 'info';
-    var profileData = null;
+    let currentTab = 'info';
+    let profileData = null;
 
     document.getElementById('profileBtn').addEventListener('click', function (e) {
         e.preventDefault();
-        var dropdown = document.getElementById('profileDropdown');
+        const dropdown = document.getElementById('profileDropdown');
         if (dropdown) dropdown.classList.remove('show');
         showProfileModal();
     });
@@ -28,14 +28,14 @@
 
     function renderTabs() {
         profileTabs.innerHTML = '';
-        var tabs = [
+        const tabs = [
             { id: 'info', name: 'Account Info' },
             { id: 'password', name: 'Password' },
             { id: 'danger', name: 'Danger Zone' }
         ];
 
         tabs.forEach(function (tab) {
-            var el = document.createElement('div');
+            const el = document.createElement('div');
             el.className = 'build-tab' + (currentTab === tab.id ? ' active' : '');
             el.textContent = tab.name;
             el.onclick = function () {
@@ -51,8 +51,8 @@
         profileContainer.innerHTML = '<div class="build-loading">Loading profile...</div>';
 
         try {
-            var response = await fetch('/game/api/profile');
-            var result = await response.json();
+            const response = await fetch('/game/api/profile');
+            const result = await response.json();
 
             if (result.success) {
                 profileData = result.data;
@@ -79,10 +79,10 @@
     }
 
     function renderInfoTab() {
-        var status = profileData.active ? 'Active' : 'Banned';
-        var statusColor = profileData.active ? '#4caf50' : '#f44336';
+        const status = profileData.active ? 'Active' : 'Banned';
+        const statusColor = profileData.active ? '#4caf50' : '#f44336';
 
-        var html = '<table style="width: 100%; border-collapse: collapse;">';
+        let html = '<table style="width: 100%; border-collapse: collapse;">';
         html += '<tr><td style="padding: 8px; color: #aaa;">Username</td><td style="padding: 8px;">' + escapeHtml(profileData.username) + '</td></tr>';
         html += '<tr><td style="padding: 8px; color: #aaa;">Email</td><td style="padding: 8px;">' + escapeHtml(profileData.email) + '</td></tr>';
         html += '<tr><td style="padding: 8px; color: #aaa;">Signup Date</td><td style="padding: 8px;">' + escapeHtml(profileData.signup) + '</td></tr>';
@@ -96,7 +96,7 @@
     }
 
     function renderPasswordTab() {
-        var html = '<div style="max-width: 400px; margin: 0 auto;">';
+        let html = '<div style="max-width: 400px; margin: 0 auto;">';
         html += '<div style="margin-bottom: 12px;"><label style="display: block; color: #aaa; margin-bottom: 4px;">Current Password</label>';
         html += '<input type="password" id="profileOldPassword" style="width: 100%; padding: 8px; background: #1a1a2e; border: 1px solid #444; color: #eee; border-radius: 4px;"></div>';
         html += '<div style="margin-bottom: 12px;"><label style="display: block; color: #aaa; margin-bottom: 4px;">New Password</label>';
@@ -113,10 +113,10 @@
     }
 
     async function changePassword() {
-        var oldPassword = document.getElementById('profileOldPassword').value;
-        var newPassword = document.getElementById('profileNewPassword').value;
-        var newPasswordRepeat = document.getElementById('profileNewPasswordRepeat').value;
-        var messageDiv = document.getElementById('profilePasswordMessage');
+        const oldPassword = document.getElementById('profileOldPassword').value;
+        const newPassword = document.getElementById('profileNewPassword').value;
+        const newPasswordRepeat = document.getElementById('profileNewPasswordRepeat').value;
+        const messageDiv = document.getElementById('profilePasswordMessage');
 
         if (!oldPassword || !newPassword || !newPasswordRepeat) {
             messageDiv.innerHTML = '<span style="color: #f44336;">All fields are required.</span>';
@@ -129,7 +129,7 @@
         }
 
         try {
-            var response = await fetch('/game/api/profile/change-password', {
+            const response = await fetch('/game/api/profile/change-password', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -138,7 +138,7 @@
                     newPasswordRepeat: newPasswordRepeat
                 })
             });
-            var result = await response.json();
+            const result = await response.json();
 
             if (result.success) {
                 showNotification(result.message, 'success');
@@ -155,7 +155,7 @@
     }
 
     function renderDangerTab() {
-        var html = '<div style="max-width: 400px; margin: 0 auto;">';
+        let html = '<div style="max-width: 400px; margin: 0 auto;">';
         html += '<h3 style="color: #f44336; margin-top: 0;">Danger Zone</h3>';
 
         if (!profileData.canSurrender) {
@@ -189,8 +189,8 @@
     }
 
     async function surrender() {
-        var password = document.getElementById('surrenderPassword').value;
-        var messageDiv = document.getElementById('surrenderMessage');
+        const password = document.getElementById('surrenderPassword').value;
+        const messageDiv = document.getElementById('surrenderMessage');
 
         if (!password) {
             messageDiv.innerHTML = '<span style="color: #f44336;">Password is required.</span>';
@@ -202,12 +202,12 @@
         }
 
         try {
-            var response = await fetch('/game/api/profile/surrender', {
+            const response = await fetch('/game/api/profile/surrender', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ password: password })
             });
-            var result = await response.json();
+            const result = await response.json();
 
             if (result.success) {
                 showNotification(result.message, 'success');
@@ -221,7 +221,7 @@
     }
 
     function escapeHtml(text) {
-        var div = document.createElement('div');
+        const div = document.createElement('div');
         div.appendChild(document.createTextNode(text));
         return div.innerHTML;
     }

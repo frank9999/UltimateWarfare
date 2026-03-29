@@ -15,17 +15,17 @@
     let availableCategories = [];
 
     // ===== Build data cache =====
-    var buildDataCache = {};
-    var CACHE_TTL_MS = 30000;
+    const buildDataCache = {};
+    const CACHE_TTL_MS = 30000;
 
     function getCachedData(regionId) {
-        var entry = buildDataCache[regionId];
+        const entry = buildDataCache[regionId];
         if (!entry) return null;
         return entry;
     }
 
     function isCacheFresh(regionId) {
-        var entry = buildDataCache[regionId];
+        const entry = buildDataCache[regionId];
         if (!entry) return false;
         return (Date.now() - entry.timestamp) < CACHE_TTL_MS;
     }
@@ -35,13 +35,13 @@
     }
 
     async function fetchAllBuildData(regionId) {
-        var response = await fetch('/game/api/world/region/all-build-data/' + regionId);
+        const response = await fetch('/game/api/world/region/all-build-data/' + regionId);
         return await response.json();
     }
 
     async function prefetchBuildData(regionId) {
         try {
-            var result = await fetchAllBuildData(regionId);
+            const result = await fetchAllBuildData(regionId);
             if (result.success) {
                 setCachedData(regionId, result);
             }
@@ -169,17 +169,17 @@
         availableCategories = result.categories;
 
         if (availableCategories.length === 0) {
-            var container = document.getElementById('buildUnitsContainer');
+            const container = document.getElementById('buildUnitsContainer');
             container.innerHTML = '<div class="build-loading">No build options available for this region.</div>';
             return;
         }
 
         selectedGameUnitCategoryId = availableCategories[0].id;
 
-        var tabsContainer = document.getElementById('buildTabs');
+        const tabsContainer = document.getElementById('buildTabs');
         tabsContainer.innerHTML = '';
         availableCategories.forEach(function (cat, index) {
-            var tab = document.createElement('div');
+            const tab = document.createElement('div');
             tab.className = 'build-tab' + (index === 0 ? ' active' : '');
             tab.textContent = cat.name;
             tab.addEventListener('click', function () {
@@ -201,10 +201,10 @@
         document.getElementById('buildRegionCoords').textContent = region.x + ', ' + region.y;
         buildModal.style.display = 'block';
 
-        var container = document.getElementById('buildUnitsContainer');
-        var tabsContainer = document.getElementById('buildTabs');
+        const container = document.getElementById('buildUnitsContainer');
+        const tabsContainer = document.getElementById('buildTabs');
 
-        var cached = getCachedData(region.id);
+        const cached = getCachedData(region.id);
         if (cached) {
             // Render from cache immediately
             renderFromCache(cached.data);
@@ -212,7 +212,7 @@
             // If cache is stale, re-fetch in background and update if data changed
             if (!isCacheFresh(region.id)) {
                 try {
-                    var result = await fetchAllBuildData(region.id);
+                    const result = await fetchAllBuildData(region.id);
                     if (result.success) {
                         setCachedData(region.id, result);
                         // Re-render current tab if modal is still showing this region
@@ -232,7 +232,7 @@
         tabsContainer.innerHTML = '';
 
         try {
-            var result = await fetchAllBuildData(region.id);
+            const result = await fetchAllBuildData(region.id);
             if (result.success) {
                 setCachedData(region.id, result);
                 renderFromCache(result);
@@ -246,10 +246,10 @@
     }
 
     function loadBuildData(gameUnitCategoryId) {
-        var cached = selectedBuildRegion ? getCachedData(selectedBuildRegion.id) : null;
+        const cached = selectedBuildRegion ? getCachedData(selectedBuildRegion.id) : null;
         if (!cached) return;
 
-        var category = cached.data.categories.find(function (c) { return c.id === gameUnitCategoryId; });
+        const category = cached.data.categories.find(function (c) { return c.id === gameUnitCategoryId; });
         if (!category) return;
 
         buildQuantities = {};
@@ -356,7 +356,7 @@
                 buildModal.style.display = 'none';
 
                 // Invalidate cache and prefetch fresh data in background
-                var regionId = selectedBuildRegion.id;
+                const regionId = selectedBuildRegion.id;
                 delete buildDataCache[regionId];
                 prefetchBuildData(regionId);
 

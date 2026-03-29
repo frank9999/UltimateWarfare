@@ -209,8 +209,8 @@ class CameraController {
      * Get world-space bounding rectangle of the current viewport
      */
     getVisibleBounds() {
-        var halfW = this.canvas.width / 2;
-        var halfH = this.canvas.height / 2;
+        const halfW = this.canvas.width / 2;
+        const halfH = this.canvas.height / 2;
         return {
             minX: (-halfW - this.camera.x) / this.camera.zoom,
             maxX: (halfW - this.camera.x) / this.camera.zoom,

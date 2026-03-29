@@ -142,8 +142,8 @@
     confirmSendMessageBtn.onclick = async function () {
         if (isSendingMessage) return;
 
-        var subject = messageSubject.value.trim();
-        var message = messageBody.value.trim();
+        const subject = messageSubject.value.trim();
+        const message = messageBody.value.trim();
 
         if (subject === '') {
             showNotification('Please type a subject', 'error');
@@ -159,7 +159,7 @@
         confirmSendMessageBtn.textContent = 'Sending...';
 
         try {
-            var response = await fetch('/game/api/message/send', {
+            const response = await fetch('/game/api/message/send', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -168,7 +168,7 @@
                     message: message
                 })
             });
-            var result = await response.json();
+            const result = await response.json();
 
             if (result.success) {
                 showNotification(result.message, 'success');

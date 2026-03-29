@@ -2,8 +2,8 @@
  * Player profile modal logic.
  */
 (function () {
-    var playerProfileModal = document.getElementById('playerProfileModal');
-    var playerProfileContainer = document.getElementById('playerProfileContainer');
+    const playerProfileModal = document.getElementById('playerProfileModal');
+    const playerProfileContainer = document.getElementById('playerProfileContainer');
 
     document.getElementById('closePlayerProfileModal').onclick = function () { hide(); };
     document.getElementById('closePlayerProfileBtn').onclick = function () { hide(); };
@@ -21,8 +21,8 @@
         playerProfileContainer.innerHTML = '<div class="build-loading">Loading profile...</div>';
 
         try {
-            var response = await fetch('/game/api/player/profile/' + encodeURIComponent(playerName));
-            var result = await response.json();
+            const response = await fetch('/game/api/player/profile/' + encodeURIComponent(playerName));
+            const result = await response.json();
 
             if (result.success) {
                 renderProfile(result.profile);
@@ -36,7 +36,7 @@
     }
 
     function renderProfile(profile) {
-        var html = '<table style="width: 100%; border-collapse: collapse;">';
+        let html = '<table style="width: 100%; border-collapse: collapse;">';
         html += '<tr style="border-bottom: 1px solid #555;">';
         html += '<td style="padding: 8px;"><strong>Player</strong></td>';
         html += '<td style="padding: 8px;">' + escapeHtml(profile.name) + '</td>';
@@ -66,7 +66,7 @@
     }
 
     function escapeHtml(text) {
-        var div = document.createElement('div');
+        const div = document.createElement('div');
         div.appendChild(document.createTextNode(text));
         return div.innerHTML;
     }

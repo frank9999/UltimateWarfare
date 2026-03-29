@@ -70,41 +70,41 @@
             timerInterval = null;
         }
 
-        var maxCol = 0;
-        var maxRow = 0;
-        for (var key in TREE_LAYOUT) {
+        let maxCol = 0;
+        let maxRow = 0;
+        for (const key in TREE_LAYOUT) {
             if (TREE_LAYOUT[key].col > maxCol) maxCol = TREE_LAYOUT[key].col;
             if (TREE_LAYOUT[key].row > maxRow) maxRow = TREE_LAYOUT[key].row;
         }
 
-        var containerWidth = (maxCol + 1) * COL_GAP + PADDING * 2;
-        var containerHeight = (maxRow + 1) * ROW_GAP + PADDING * 2;
+        const containerWidth = (maxCol + 1) * COL_GAP + PADDING * 2;
+        const containerHeight = (maxRow + 1) * ROW_GAP + PADDING * 2;
 
-        var researchMap = {};
-        for (var i = 0; i < researchList.length; i++) {
+        const researchMap = {};
+        for (let i = 0; i < researchList.length; i++) {
             researchMap[researchList[i].slug] = researchList[i];
         }
 
-        var html = '<div class="research-tree-inner" style="position: relative; width: ' + containerWidth + 'px; height: ' + containerHeight + 'px;">';
+        let html = '<div class="research-tree-inner" style="position: relative; width: ' + containerWidth + 'px; height: ' + containerHeight + 'px;">';
 
         // SVG overlay for connection lines
         html += '<svg class="research-tree-svg" width="' + containerWidth + '" height="' + containerHeight + '">';
 
-        for (var i = 0; i < researchList.length; i++) {
-            var item = researchList[i];
-            var layout = TREE_LAYOUT[item.slug];
+        for (let i = 0; i < researchList.length; i++) {
+            const item = researchList[i];
+            const layout = TREE_LAYOUT[item.slug];
             if (!layout) continue;
 
-            for (var j = 0; j < item.prerequisites.length; j++) {
-                var prereqSlug = item.prerequisites[j];
-                var prereqLayout = TREE_LAYOUT[prereqSlug];
+            for (let j = 0; j < item.prerequisites.length; j++) {
+                const prereqSlug = item.prerequisites[j];
+                const prereqLayout = TREE_LAYOUT[prereqSlug];
                 if (!prereqLayout) continue;
 
-                var prereqItem = researchMap[prereqSlug];
-                var bothCompleted = prereqItem && prereqItem.status === 'completed' && item.status === 'completed';
-                var lineColor = bothCompleted ? '#4CAF50' : '#666';
+                const prereqItem = researchMap[prereqSlug];
+                const bothCompleted = prereqItem && prereqItem.status === 'completed' && item.status === 'completed';
+                const lineColor = bothCompleted ? '#4CAF50' : '#666';
 
-                var x1, y1, x2, y2;
+                let x1, y1, x2, y2;
                 if (prereqLayout.row === layout.row) {
                     // Same row: right edge to left edge
                     x1 = PADDING + prereqLayout.col * COL_GAP + NODE_WIDTH;
@@ -126,13 +126,13 @@
         html += '</svg>';
 
         // Render nodes
-        for (var i = 0; i < researchList.length; i++) {
-            var item = researchList[i];
-            var layout = TREE_LAYOUT[item.slug];
+        for (let i = 0; i < researchList.length; i++) {
+            const item = researchList[i];
+            const layout = TREE_LAYOUT[item.slug];
             if (!layout) continue;
 
-            var x = PADDING + layout.col * COL_GAP;
-            var y = PADDING + layout.row * ROW_GAP;
+            const x = PADDING + layout.col * COL_GAP;
+            const y = PADDING + layout.row * ROW_GAP;
 
             html += '<div class="research-node research-' + item.status + '" style="left: ' + x + 'px; top: ' + y + 'px;">';
             html += '<img class="research-node-image" src="' + WorldApp.imageBasePath + '/research/' + escapeHtml(item.image) + '" alt="' + escapeHtml(item.name) + '">';
@@ -161,16 +161,16 @@
         researchTreeContainer.innerHTML = html;
 
         // Bind click handlers
-        var startBtns = researchTreeContainer.querySelectorAll('.research-start-btn');
-        for (var b = 0; b < startBtns.length; b++) {
+        const startBtns = researchTreeContainer.querySelectorAll('.research-start-btn');
+        for (let b = 0; b < startBtns.length; b++) {
             startBtns[b].addEventListener('click', function (e) {
                 e.stopPropagation();
                 startResearch(this.getAttribute('data-slug'));
             });
         }
 
-        var cancelBtns = researchTreeContainer.querySelectorAll('.research-cancel-btn');
-        for (var b = 0; b < cancelBtns.length; b++) {
+        const cancelBtns = researchTreeContainer.querySelectorAll('.research-cancel-btn');
+        for (let b = 0; b < cancelBtns.length; b++) {
             cancelBtns[b].addEventListener('click', function (e) {
                 e.stopPropagation();
                 cancelResearch(this.getAttribute('data-slug'));
@@ -178,12 +178,12 @@
         }
 
         // Start timer for researching nodes
-        var timerElements = researchTreeContainer.querySelectorAll('.research-timer');
+        const timerElements = researchTreeContainer.querySelectorAll('.research-timer');
         if (timerElements.length > 0) {
             timerInterval = setInterval(function () {
-                for (var t = 0; t < timerElements.length; t++) {
-                    var el = timerElements[t];
-                    var remaining = parseInt(el.getAttribute('data-remaining'), 10);
+                for (let t = 0; t < timerElements.length; t++) {
+                    const el = timerElements[t];
+                    let remaining = parseInt(el.getAttribute('data-remaining'), 10);
                     remaining--;
                     if (remaining <= 0) {
                         clearInterval(timerInterval);
@@ -206,7 +206,7 @@
             if (result.success) {
                 showNotification(result.message, 'success');
                 if (result.newCash !== undefined) {
-                    var cashEl = document.getElementById('resourceCash');
+                    const cashEl = document.getElementById('resourceCash');
                     if (cashEl) {
                         cashEl.textContent = formatNumber(result.newCash);
                     }
@@ -237,7 +237,7 @@
     }
 
     function escapeHtml(text) {
-        var div = document.createElement('div');
+        const div = document.createElement('div');
         div.appendChild(document.createTextNode(text));
         return div.innerHTML;
     }
@@ -248,9 +248,9 @@
 
     function formatDuration(seconds) {
         if (seconds <= 0) return '0s';
-        var d = Math.floor(seconds / 86400);
-        var h = Math.floor((seconds % 86400) / 3600);
-        var m = Math.floor((seconds % 3600) / 60);
+        const d = Math.floor(seconds / 86400);
+        const h = Math.floor((seconds % 86400) / 3600);
+        const m = Math.floor((seconds % 3600) / 60);
         if (d > 0) return d + 'd ' + h + 'h';
         if (h > 0) return h + 'h ' + m + 'm';
         return m + 'm';
@@ -258,10 +258,10 @@
 
     function formatTime(seconds) {
         if (seconds <= 0) return 'Done';
-        var d = Math.floor(seconds / 86400);
-        var h = Math.floor((seconds % 86400) / 3600);
-        var m = Math.floor((seconds % 3600) / 60);
-        var s = seconds % 60;
+        const d = Math.floor(seconds / 86400);
+        const h = Math.floor((seconds % 86400) / 3600);
+        const m = Math.floor((seconds % 3600) / 60);
+        const s = seconds % 60;
         if (d > 0) return d + 'd ' + h + 'h';
         if (h > 0) return h + 'h ' + m + 'm';
         if (m > 0) return m + 'm ' + s + 's';

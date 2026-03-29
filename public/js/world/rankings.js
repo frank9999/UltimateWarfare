@@ -2,12 +2,12 @@
  * Rankings modal logic.
  */
 (function () {
-    var rankingsModal = document.getElementById('rankingsModal');
-    var rankingsContainer = document.getElementById('rankingsContainer');
+    const rankingsModal = document.getElementById('rankingsModal');
+    const rankingsContainer = document.getElementById('rankingsContainer');
 
-    var allRankings = [];
-    var sortColumn = 'regions';
-    var sortAscending = false;
+    let allRankings = [];
+    let sortColumn = 'regions';
+    let sortAscending = false;
 
     document.getElementById('closeRankingsModal').onclick = function () { hide(); };
     document.getElementById('closeRankingsBtn').onclick = function () { hide(); };
@@ -25,8 +25,8 @@
         rankingsContainer.innerHTML = '<div class="build-loading">Loading rankings...</div>';
 
         try {
-            var response = await fetch('/game/api/rankings');
-            var result = await response.json();
+            const response = await fetch('/game/api/rankings');
+            const result = await response.json();
 
             if (result.success) {
                 allRankings = result.rankings;
@@ -42,8 +42,8 @@
 
     function sortRankings() {
         allRankings.sort(function (a, b) {
-            var valA = a[sortColumn];
-            var valB = b[sortColumn];
+            const valA = a[sortColumn];
+            const valB = b[sortColumn];
 
             if (valA < valB) return sortAscending ? -1 : 1;
             if (valA > valB) return sortAscending ? 1 : -1;
@@ -74,7 +74,7 @@
 
         sortRankings();
 
-        var html = '<table style="width: 100%; border-collapse: collapse;">';
+        let html = '<table style="width: 100%; border-collapse: collapse;">';
         html += '<tr style="border-bottom: 2px solid #8B7355;">';
         html += '<th style="padding: 8px; text-align: center; width: 60px;">Rank</th>';
         html += '<th style="padding: 8px; text-align: left;">Player</th>';
@@ -114,7 +114,7 @@
     }
 
     function escapeHtml(text) {
-        var div = document.createElement('div');
+        const div = document.createElement('div');
         div.appendChild(document.createTextNode(text));
         return div.innerHTML;
     }

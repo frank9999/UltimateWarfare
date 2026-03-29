@@ -11,8 +11,8 @@ class TileRenderer {
 
         // Pre-compute hex vertex offsets (pointy-top, 6 vertices at 60° intervals from -30°)
         this.hexVertices = [];
-        for (var i = 0; i < 6; i++) {
-            var angle = (Math.PI / 180) * (60 * i - 30);
+        for (let i = 0; i < 6; i++) {
+            const angle = (Math.PI / 180) * (60 * i - 30);
             this.hexVertices.push({
                 dx: config.hexSize * Math.cos(angle),
                 dy: config.hexSize * Math.sin(angle)
@@ -154,7 +154,7 @@ class TileRenderer {
         this.ctx.strokeStyle = '#000000';
         this.ctx.lineWidth = 2;
 
-        var coordText = region.x + ',' + region.y;
+        const coordText = region.x + ',' + region.y;
         this.ctx.strokeText(coordText, pos.x, pos.y - 8);
         this.ctx.fillText(coordText, pos.x, pos.y - 8);
 
@@ -190,8 +190,8 @@ class TileRenderer {
         this.ctx.strokeStyle = '#000000';
         this.ctx.lineWidth = 3;
 
-        var hoverText = region.x + ', ' + region.y;
-        var labelY = pos.y - this.config.hexSize - 5;
+        const hoverText = region.x + ', ' + region.y;
+        const labelY = pos.y - this.config.hexSize - 5;
         this.ctx.strokeText(hoverText, pos.x, labelY);
         this.ctx.fillText(hoverText, pos.x, labelY);
 
@@ -204,7 +204,7 @@ class TileRenderer {
     renderFallbackTile(region, pos) {
         this.ctx.save();
 
-        var terrainColors = {
+        const terrainColors = {
             deep_water: '#143278',
             water: '#2350a5',
             shallow_water: '#4696c3',
@@ -233,7 +233,7 @@ class TileRenderer {
      * 6 vertices at 60-degree intervals starting at -30 degrees
      */
     drawHex(pos) {
-        var verts = this.hexVertices;
+        const verts = this.hexVertices;
         this.ctx.beginPath();
         this.ctx.moveTo(pos.x + verts[0].dx, pos.y + verts[0].dy);
         this.ctx.lineTo(pos.x + verts[1].dx, pos.y + verts[1].dy);
@@ -261,34 +261,34 @@ class TileRenderer {
             return this.fogCache.get(variant);
         }
 
-        var w = Math.ceil(this.config.hexWidth) + 2;
-        var h = Math.ceil(this.config.hexHeight) + 2;
-        var offscreen = document.createElement('canvas');
+        const w = Math.ceil(this.config.hexWidth) + 2;
+        const h = Math.ceil(this.config.hexHeight) + 2;
+        const offscreen = document.createElement('canvas');
         offscreen.width = w;
         offscreen.height = h;
-        var offCtx = offscreen.getContext('2d');
+        const offCtx = offscreen.getContext('2d');
 
         // Draw centered at (w/2, h/2)
-        var cx = w / 2;
-        var cy = h / 2;
-        var size = this.config.hexSize;
+        const cx = w / 2;
+        const cy = h / 2;
+        const size = this.config.hexSize;
 
         // Dark overlay with radial gradient
-        var gradient = offCtx.createRadialGradient(cx, cy, 0, cx, cy, size);
+        const gradient = offCtx.createRadialGradient(cx, cy, 0, cx, cy, size);
         gradient.addColorStop(0, 'rgba(25, 25, 35, 0.45)');
         gradient.addColorStop(1, 'rgba(15, 15, 25, 0.5)');
         offCtx.fillStyle = gradient;
         offCtx.fillRect(0, 0, w, h);
 
         // Static cloud effects (deterministic from variant)
-        var seed = variant * 137;
-        for (var i = 0; i < 2; i++) {
-            var angle = ((seed + i * 100) % 360) * Math.PI / 180;
-            var offsetX = Math.cos(angle) * 12;
-            var offsetY = Math.sin(angle) * 8;
-            var radius = 25 + ((seed + i * 50) % 10);
+        const seed = variant * 137;
+        for (let i = 0; i < 2; i++) {
+            const angle = ((seed + i * 100) % 360) * Math.PI / 180;
+            const offsetX = Math.cos(angle) * 12;
+            const offsetY = Math.sin(angle) * 8;
+            const radius = 25 + ((seed + i * 50) % 10);
 
-            var cloudGrad = offCtx.createRadialGradient(
+            const cloudGrad = offCtx.createRadialGradient(
                 cx + offsetX, cy + offsetY, 0,
                 cx + offsetX, cy + offsetY, radius
             );
@@ -324,9 +324,9 @@ class TileRenderer {
         this.ctx.clip();
 
         // Blit cached fog variant
-        var seed = tileX * 73 + tileY * 37;
-        var variant = ((seed % 8) + 8) % 8;
-        var fogCanvas = this.getFogCanvas(variant);
+        const seed = tileX * 73 + tileY * 37;
+        const variant = ((seed % 8) + 8) % 8;
+        const fogCanvas = this.getFogCanvas(variant);
         this.ctx.drawImage(
             fogCanvas,
             pos.x - fogCanvas.width / 2,

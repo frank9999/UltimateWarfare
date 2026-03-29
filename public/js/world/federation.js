@@ -2,17 +2,17 @@
  * Federation modal logic.
  */
 (function () {
-    var federationModal = document.getElementById('federationModal');
-    var federationTabs = document.getElementById('federationTabs');
-    var federationContainer = document.getElementById('federationContainer');
+    const federationModal = document.getElementById('federationModal');
+    const federationTabs = document.getElementById('federationTabs');
+    const federationContainer = document.getElementById('federationContainer');
 
-    var currentTab = 'overview';
-    var cachedStatus = null;
+    let currentTab = 'overview';
+    let cachedStatus = null;
 
     document.getElementById('closeFederationModal').onclick = function () { hide(); };
     document.getElementById('closeFederationBtn').onclick = function () { hide(); };
 
-    var RANK_NAMES = {
+    const RANK_NAMES = {
         10: 'General',
         9: 'Staff General',
         8: 'Lieutenant General',
@@ -40,8 +40,8 @@
 
     async function loadStatus() {
         try {
-            var response = await fetch('/game/api/federation/status');
-            var result = await response.json();
+            const response = await fetch('/game/api/federation/status');
+            const result = await response.json();
 
             if (!result.success) {
                 federationContainer.innerHTML = '<div class="build-loading" style="color: #f44336;">' + escapeHtml(result.message || 'Failed to load federation data') + '</div>';
@@ -72,7 +72,7 @@
 
     function renderTabs() {
         federationTabs.innerHTML = '';
-        var tabs = [];
+        let tabs = [];
 
         if (!cachedStatus.hasFederation) {
             tabs = [
@@ -94,7 +94,7 @@
         }
 
         tabs.forEach(function (t) {
-            var tab = document.createElement('div');
+            const tab = document.createElement('div');
             tab.className = 'build-tab' + (currentTab === t.id ? ' active' : '');
             tab.textContent = t.name;
             tab.onclick = function () {
@@ -124,8 +124,8 @@
         federationContainer.innerHTML = '<div class="build-loading">Loading federations...</div>';
 
         try {
-            var response = await fetch('/game/api/federation/list');
-            var result = await response.json();
+            const response = await fetch('/game/api/federation/list');
+            const result = await response.json();
 
             if (!result.success) {
                 federationContainer.innerHTML = '<div class="build-loading" style="color: #f44336;">' + escapeHtml(result.message) + '</div>';
@@ -137,7 +137,7 @@
                 return;
             }
 
-            var html = '<table style="width: 100%; border-collapse: collapse;">';
+            let html = '<table style="width: 100%; border-collapse: collapse;">';
             html += '<tr style="border-bottom: 2px solid #8B7355;">';
             html += '<th style="padding: 8px; text-align: center;">#</th>';
             html += '<th style="padding: 8px; text-align: center;">Name</th>';
@@ -190,15 +190,15 @@
         federationContainer.innerHTML = '<div class="build-loading">Loading federation...</div>';
 
         try {
-            var response = await fetch('/game/api/federation/show/' + federationId);
-            var result = await response.json();
+            const response = await fetch('/game/api/federation/show/' + federationId);
+            const result = await response.json();
 
             if (!result.success) {
                 federationContainer.innerHTML = '<div class="build-loading" style="color: #f44336;">' + escapeHtml(result.message) + '</div>';
                 return;
             }
 
-            var html = '<div style="margin-bottom: 15px;">';
+            let html = '<div style="margin-bottom: 15px;">';
             html += '<button class="market-action-btn" id="fedBackToListBtn" style="margin-bottom: 10px;">Back to list</button>';
             html += '<h3 style="color: #f3e6c1; margin: 0;">' + escapeHtml(result.federation.name) + '</h3>';
             html += '</div>';
@@ -234,7 +234,7 @@
 
     // ===== Send Application =====
     function renderSendApplication(federationId) {
-        var html = '<div style="max-width: 400px; margin: 0 auto; padding: 10px;">';
+        let html = '<div style="max-width: 400px; margin: 0 auto; padding: 10px;">';
         html += '<button class="market-action-btn" id="fedBackToListBtn2" style="margin-bottom: 15px;">Back to list</button>';
         html += '<h3 style="color: #f3e6c1; margin: 0 0 15px 0;">Apply to Join Federation</h3>';
         html += '<div style="margin-bottom: 15px;">';
@@ -251,23 +251,23 @@
         };
 
         document.getElementById('fedSubmitApplicationBtn').onclick = async function () {
-            var text = document.getElementById('fedApplicationText').value.trim();
+            const text = document.getElementById('fedApplicationText').value.trim();
             if (text === '') {
                 showNotification('Please write an application message', 'error');
                 return;
             }
 
-            var btn = document.getElementById('fedSubmitApplicationBtn');
+            const btn = document.getElementById('fedSubmitApplicationBtn');
             btn.disabled = true;
             btn.textContent = 'Sending...';
 
             try {
-                var response = await fetch('/game/api/federation/apply/' + federationId, {
+                const response = await fetch('/game/api/federation/apply/' + federationId, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ application: text })
                 });
-                var result = await response.json();
+                const result = await response.json();
 
                 if (result.success) {
                     showNotification(result.message, 'success');
@@ -288,7 +288,7 @@
 
     // ===== Create Federation =====
     function renderCreateForm() {
-        var html = '<div style="max-width: 400px; margin: 0 auto; padding: 10px;">';
+        let html = '<div style="max-width: 400px; margin: 0 auto; padding: 10px;">';
         html += '<h3 style="color: #f3e6c1; margin: 0 0 15px 0;">Create Federation</h3>';
         html += '<div style="margin-bottom: 15px;">';
         html += '<label style="display: block; margin-bottom: 5px; color: #f3e6c1;">Federation name:</label>';
@@ -300,23 +300,23 @@
         federationContainer.innerHTML = html;
 
         document.getElementById('fedCreateBtn').onclick = async function () {
-            var name = document.getElementById('fedCreateName').value.trim();
+            const name = document.getElementById('fedCreateName').value.trim();
             if (name === '') {
                 showNotification('Please enter a federation name', 'error');
                 return;
             }
 
-            var btn = document.getElementById('fedCreateBtn');
+            const btn = document.getElementById('fedCreateBtn');
             btn.disabled = true;
             btn.textContent = 'Creating...';
 
             try {
-                var response = await fetch('/game/api/federation/create', {
+                const response = await fetch('/game/api/federation/create', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ name: name })
                 });
-                var result = await response.json();
+                const result = await response.json();
 
                 if (result.success) {
                     showNotification(result.message, 'success');
@@ -340,8 +340,8 @@
     function renderOverview() {
         if (!cachedStatus || !cachedStatus.hasFederation) return;
 
-        var fed = cachedStatus.federation;
-        var html = '';
+        const fed = cachedStatus.federation;
+        let html = '';
 
         html += '<h3 style="color: #f3e6c1; margin: 0 0 10px 0;">' + escapeHtml(fed.name) + '</h3>';
 
@@ -391,7 +391,7 @@
         federationContainer.innerHTML = html;
 
         // Bind leave button
-        var leaveBtn = document.getElementById('fedLeaveBtn');
+        const leaveBtn = document.getElementById('fedLeaveBtn');
         if (leaveBtn) {
             leaveBtn.onclick = function () {
                 if (confirm('Are you sure you want to leave the federation?')) {
@@ -406,7 +406,7 @@
         // Bind kick buttons
         federationContainer.querySelectorAll('.fed-kick-btn').forEach(function (btn) {
             btn.onclick = function () {
-                var playerId = parseInt(btn.getAttribute('data-id'), 10);
+                const playerId = parseInt(btn.getAttribute('data-id'), 10);
                 if (confirm('Are you sure you want to kick this player?')) {
                     doPost('/game/api/federation/kick/' + playerId, {}, function () {
                         cachedStatus = null;
@@ -422,8 +422,8 @@
         federationContainer.innerHTML = '<div class="build-loading">Loading news...</div>';
 
         try {
-            var response = await fetch('/game/api/federation/news');
-            var result = await response.json();
+            const response = await fetch('/game/api/federation/news');
+            const result = await response.json();
 
             if (!result.success) {
                 federationContainer.innerHTML = '<div class="build-loading" style="color: #f44336;">' + escapeHtml(result.message) + '</div>';
@@ -435,7 +435,7 @@
                 return;
             }
 
-            var html = '<table style="width: 100%; border-collapse: collapse;">';
+            let html = '<table style="width: 100%; border-collapse: collapse;">';
             html += '<tr style="border-bottom: 2px solid #8B7355;">';
             html += '<th style="padding: 8px; text-align: center; width: 150px;">Date</th>';
             html += '<th style="padding: 8px; text-align: left;">Report</th>';
@@ -457,16 +457,16 @@
     }
 
     // ===== Bank =====
-    var bankMode = 'deposit';
+    let bankMode = 'deposit';
 
     function renderBank() {
         if (!cachedStatus || !cachedStatus.hasFederation) return;
 
-        var fed = cachedStatus.federation;
-        var playerRes = cachedStatus.playerResources;
-        var canWithdraw = cachedStatus.hierarchy >= 5;
+        const fed = cachedStatus.federation;
+        const playerRes = cachedStatus.playerResources;
+        const canWithdraw = cachedStatus.hierarchy >= 5;
 
-        var html = '<div style="text-align: center; margin-bottom: 15px;">';
+        let html = '<div style="text-align: center; margin-bottom: 15px;">';
         html += '<button class="market-action-btn' + (bankMode === 'deposit' ? '' : '') + '" id="fedBankDepositTab" style="margin-right: 5px;' + (bankMode === 'deposit' ? ' background: #8B7355;' : '') + '">Deposit</button>';
         if (canWithdraw) {
             html += '<button class="market-action-btn" id="fedBankWithdrawTab" style="' + (bankMode === 'withdraw' ? ' background: #8B7355;' : '') + '">Withdraw</button>';
@@ -481,7 +481,7 @@
         html += '<th style="padding: 8px; text-align: center;">Amount</th>';
         html += '</tr>';
 
-        var resources = ['cash', 'wood', 'steel', 'food'];
+        const resources = ['cash', 'wood', 'steel', 'food'];
         resources.forEach(function (res) {
             html += '<tr style="border-bottom: 1px solid #555;">';
             html += '<td style="padding: 8px; text-align: center;">' + res.charAt(0).toUpperCase() + res.slice(1) + '</td>';
@@ -503,7 +503,7 @@
             renderBank();
         };
 
-        var withdrawTab = document.getElementById('fedBankWithdrawTab');
+        const withdrawTab = document.getElementById('fedBankWithdrawTab');
         if (withdrawTab) {
             withdrawTab.onclick = function () {
                 bankMode = 'withdraw';
@@ -512,15 +512,15 @@
         }
 
         document.getElementById('fedBankSubmitBtn').onclick = function () {
-            var resData = {};
+            const resData = {};
             resources.forEach(function (res) {
-                var val = document.getElementById('fedBank_' + res).value;
+                const val = document.getElementById('fedBank_' + res).value;
                 if (val && parseInt(val, 10) > 0) {
                     resData[res] = val;
                 }
             });
 
-            var url = bankMode === 'deposit' ? '/game/api/federation/bank/deposit' : '/game/api/federation/bank/withdraw';
+            const url = bankMode === 'deposit' ? '/game/api/federation/bank/deposit' : '/game/api/federation/bank/withdraw';
             doPost(url, { resources: resData }, function () {
                 cachedStatus = null;
                 loadStatus();
@@ -532,10 +532,10 @@
     function renderSendAid() {
         if (!cachedStatus || !cachedStatus.hasFederation) return;
 
-        var members = cachedStatus.federation.members;
-        var playerRes = cachedStatus.playerResources;
+        const members = cachedStatus.federation.members;
+        const playerRes = cachedStatus.playerResources;
 
-        var html = '<div style="max-width: 500px; margin: 0 auto; padding: 10px;">';
+        let html = '<div style="max-width: 500px; margin: 0 auto; padding: 10px;">';
         html += '<h3 style="color: #f3e6c1; margin: 0 0 15px 0;">Send Aid</h3>';
 
         html += '<div style="margin-bottom: 15px;">';
@@ -548,7 +548,7 @@
         html += '</select>';
         html += '</div>';
 
-        var resources = ['cash', 'wood', 'steel', 'food'];
+        const resources = ['cash', 'wood', 'steel', 'food'];
         resources.forEach(function (res) {
             html += '<div style="margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">';
             html += '<label style="width: 60px; color: #f3e6c1;">' + res.charAt(0).toUpperCase() + res.slice(1) + ':</label>';
@@ -563,10 +563,10 @@
         federationContainer.innerHTML = html;
 
         document.getElementById('fedAidSubmitBtn').onclick = function () {
-            var playerId = parseInt(document.getElementById('fedAidPlayer').value, 10);
-            var resData = {};
+            const playerId = parseInt(document.getElementById('fedAidPlayer').value, 10);
+            const resData = {};
             resources.forEach(function (res) {
-                var val = document.getElementById('fedAid_' + res).value;
+                const val = document.getElementById('fedAid_' + res).value;
                 if (val && parseInt(val, 10) > 0) {
                     resData[res] = val;
                 }
@@ -583,10 +583,10 @@
     function renderSettings() {
         if (!cachedStatus || !cachedStatus.hasFederation || cachedStatus.hierarchy < 10) return;
 
-        var fed = cachedStatus.federation;
-        var members = fed.members;
+        const fed = cachedStatus.federation;
+        const members = fed.members;
 
-        var html = '<div style="max-width: 500px; margin: 0 auto; padding: 10px;">';
+        let html = '<div style="max-width: 500px; margin: 0 auto; padding: 10px;">';
 
         // Change Name
         html += '<div style="margin-bottom: 20px; padding: 10px; background: #2a2a2a; border: 1px solid #8B7355; border-radius: 4px;">';
@@ -613,7 +613,7 @@
         });
         html += '</select>';
         html += '<select id="fedRoleRank" style="flex: 1; padding: 6px; background: #1a1a1a; color: #f3e6c1; border: 1px solid #8B7355; border-radius: 4px;">';
-        for (var rank = 10; rank >= 1; rank--) {
+        for (let rank = 10; rank >= 1; rank--) {
             html += '<option value="' + rank + '">' + RANK_NAMES[rank] + '</option>';
         }
         html += '</select>';
@@ -630,7 +630,7 @@
         federationContainer.innerHTML = html;
 
         document.getElementById('fedChangeNameBtn').onclick = function () {
-            var name = document.getElementById('fedNewName').value.trim();
+            const name = document.getElementById('fedNewName').value.trim();
             doPost('/game/api/federation/change-name', { name: name }, function () {
                 cachedStatus = null;
                 loadStatus();
@@ -638,7 +638,7 @@
         };
 
         document.getElementById('fedUpdateMessageBtn').onclick = function () {
-            var message = document.getElementById('fedNewMessage').value;
+            const message = document.getElementById('fedNewMessage').value;
             doPost('/game/api/federation/update-message', { message: message }, function () {
                 cachedStatus = null;
                 loadStatus();
@@ -646,8 +646,8 @@
         };
 
         document.getElementById('fedChangeRoleBtn').onclick = function () {
-            var playerId = parseInt(document.getElementById('fedRolePlayer').value, 10);
-            var role = parseInt(document.getElementById('fedRoleRank').value, 10);
+            const playerId = parseInt(document.getElementById('fedRolePlayer').value, 10);
+            const role = parseInt(document.getElementById('fedRoleRank').value, 10);
             doPost('/game/api/federation/change-role', { playerId: playerId, role: role }, function () {
                 cachedStatus = null;
                 loadStatus();
@@ -669,8 +669,8 @@
         federationContainer.innerHTML = '<div class="build-loading">Loading applications...</div>';
 
         try {
-            var response = await fetch('/game/api/federation/applications');
-            var result = await response.json();
+            const response = await fetch('/game/api/federation/applications');
+            const result = await response.json();
 
             if (!result.success) {
                 federationContainer.innerHTML = '<div class="build-loading" style="color: #f44336;">' + escapeHtml(result.message) + '</div>';
@@ -682,7 +682,7 @@
                 return;
             }
 
-            var html = '';
+            let html = '';
             result.applications.forEach(function (app) {
                 html += '<div style="margin-bottom: 15px; padding: 10px; background: #2a2a2a; border: 1px solid #8B7355; border-radius: 4px;">';
                 html += '<p><strong style="color: #f3e6c1;">Player:</strong> ' + escapeHtml(app.playerName) + '</p>';
@@ -697,7 +697,7 @@
 
             federationContainer.querySelectorAll('.fed-accept-btn').forEach(function (btn) {
                 btn.onclick = function () {
-                    var appId = parseInt(btn.getAttribute('data-id'), 10);
+                    const appId = parseInt(btn.getAttribute('data-id'), 10);
                     doPost('/game/api/federation/application/accept/' + appId, {}, function () {
                         cachedStatus = null;
                         loadStatus();
@@ -707,7 +707,7 @@
 
             federationContainer.querySelectorAll('.fed-reject-btn').forEach(function (btn) {
                 btn.onclick = function () {
-                    var appId = parseInt(btn.getAttribute('data-id'), 10);
+                    const appId = parseInt(btn.getAttribute('data-id'), 10);
                     doPost('/game/api/federation/application/reject/' + appId, {}, function () {
                         renderApplications();
                     });
@@ -722,12 +722,12 @@
     // ===== Helper: POST request =====
     async function doPost(url, data, onSuccess) {
         try {
-            var response = await fetch(url, {
+            const response = await fetch(url, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)
             });
-            var result = await response.json();
+            const result = await response.json();
 
             if (result.success) {
                 showNotification(result.message, 'success');
@@ -742,7 +742,7 @@
     }
 
     function escapeHtml(text) {
-        var div = document.createElement('div');
+        const div = document.createElement('div');
         div.appendChild(document.createTextNode(text));
         return div.innerHTML;
     }

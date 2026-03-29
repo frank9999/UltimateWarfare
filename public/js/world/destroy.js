@@ -3,15 +3,15 @@
  * Depends on: build.js (WorldBuild.invalidateCache), notifications.js (showNotification), WorldApp.imageBasePath.
  */
 (function () {
-    var destroyModal = document.getElementById('destroyModal');
-    var closeDestroyModal = document.getElementById('closeDestroyModal');
-    var closeDestroyBtn = document.getElementById('closeDestroyBtn');
-    var confirmDestroyBtn = document.getElementById('confirmDestroyBtn');
+    const destroyModal = document.getElementById('destroyModal');
+    const closeDestroyModal = document.getElementById('closeDestroyModal');
+    const closeDestroyBtn = document.getElementById('closeDestroyBtn');
+    const confirmDestroyBtn = document.getElementById('confirmDestroyBtn');
 
-    var selectedDestroyRegion = null;
-    var selectedGameUnitCategoryId = null;
-    var destroyQuantities = {};
-    var availableCategories = [];
+    let selectedDestroyRegion = null;
+    let selectedGameUnitCategoryId = null;
+    let destroyQuantities = {};
+    let availableCategories = [];
 
     async function showDestroyModal(region) {
         selectedDestroyRegion = region;
@@ -19,14 +19,14 @@
         document.getElementById('destroyRegionCoords').textContent = region.x + ', ' + region.y;
         destroyModal.style.display = 'block';
 
-        var container = document.getElementById('destroyUnitsContainer');
-        var tabsContainer = document.getElementById('destroyTabs');
+        const container = document.getElementById('destroyUnitsContainer');
+        const tabsContainer = document.getElementById('destroyTabs');
         container.innerHTML = '<div class="build-loading">Loading...</div>';
         tabsContainer.innerHTML = '';
 
         try {
-            var response = await fetch('/game/api/world/region/all-build-data/' + region.id);
-            var result = await response.json();
+            const response = await fetch('/game/api/world/region/all-build-data/' + region.id);
+            const result = await response.json();
 
             if (result.success) {
                 renderCategories(result);
@@ -46,17 +46,17 @@
         });
 
         if (availableCategories.length === 0) {
-            var container = document.getElementById('destroyUnitsContainer');
+            const container = document.getElementById('destroyUnitsContainer');
             container.innerHTML = '<div class="build-loading">No units to destroy in this region.</div>';
             return;
         }
 
         selectedGameUnitCategoryId = availableCategories[0].id;
 
-        var tabsContainer = document.getElementById('destroyTabs');
+        const tabsContainer = document.getElementById('destroyTabs');
         tabsContainer.innerHTML = '';
         availableCategories.forEach(function (cat, index) {
-            var tab = document.createElement('div');
+            const tab = document.createElement('div');
             tab.className = 'build-tab' + (index === 0 ? ' active' : '');
             tab.textContent = cat.name;
             tab.addEventListener('click', function () {
@@ -74,13 +74,13 @@
 
     function loadDestroyData(category) {
         destroyQuantities = {};
-        var units = category.units.filter(function (u) { return u.owned > 0; });
+        const units = category.units.filter(function (u) { return u.owned > 0; });
         renderDestroyUnits(units);
     }
 
     function renderDestroyUnits(units) {
-        var container = document.getElementById('destroyUnitsContainer');
-        var imgBase = WorldApp.imageBasePath;
+        const container = document.getElementById('destroyUnitsContainer');
+        const imgBase = WorldApp.imageBasePath;
 
         if (units.length === 0) {
             container.innerHTML = '<div class="build-loading">No units to destroy in this category</div>';
@@ -89,7 +89,7 @@
 
         container.innerHTML = '';
         units.forEach(function (unit) {
-            var card = document.createElement('div');
+            const card = document.createElement('div');
             card.className = 'build-unit-card';
 
             card.innerHTML =
@@ -115,7 +115,7 @@
     }
 
     async function confirmDestroy() {
-        var hasSelection = Object.values(destroyQuantities).some(function (qty) { return qty > 0; });
+        const hasSelection = Object.values(destroyQuantities).some(function (qty) { return qty > 0; });
         if (!hasSelection) {
             showNotification('Please select at least one unit to destroy', 'error');
             return;
@@ -125,13 +125,13 @@
         confirmDestroyBtn.textContent = 'Destroying...';
 
         try {
-            var response = await fetch('/game/api/world/region/destroy/' + selectedDestroyRegion.id + '/' + selectedGameUnitCategoryId, {
+            const response = await fetch('/game/api/world/region/destroy/' + selectedDestroyRegion.id + '/' + selectedGameUnitCategoryId, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ destroy: destroyQuantities })
             });
 
-            var result = await response.json();
+            const result = await response.json();
 
             if (result.success) {
                 showNotification(result.message, 'success');

@@ -3,13 +3,13 @@
  * Depends on: notifications.js
  */
 (function () {
-    var statisticsModal = document.getElementById('statisticsModal');
-    var statisticsTabs = document.getElementById('statisticsTabs');
-    var statisticsContainer = document.getElementById('statisticsContainer');
-    var statisticsFooter = document.getElementById('statisticsFooter');
+    const statisticsModal = document.getElementById('statisticsModal');
+    const statisticsTabs = document.getElementById('statisticsTabs');
+    const statisticsContainer = document.getElementById('statisticsContainer');
+    const statisticsFooter = document.getElementById('statisticsFooter');
 
-    var currentTab = 'overview';
-    var cachedData = null;
+    let currentTab = 'overview';
+    let cachedData = null;
 
     document.getElementById('closeStatisticsModal').onclick = function () { hide(); };
 
@@ -27,7 +27,7 @@
 
     function renderTabs() {
         statisticsTabs.innerHTML = '';
-        var tabs = [
+        const tabs = [
             { id: 'overview', name: 'Overview' },
             { id: 'income', name: 'Income' },
             { id: 'army', name: 'Army' },
@@ -35,7 +35,7 @@
         ];
 
         tabs.forEach(function (tab) {
-            var el = document.createElement('div');
+            const el = document.createElement('div');
             el.className = 'build-tab' + (currentTab === tab.id ? ' active' : '');
             el.textContent = tab.name;
             el.onclick = function () {
@@ -51,8 +51,8 @@
         statisticsContainer.innerHTML = '<div class="build-loading">Loading statistics...</div>';
 
         try {
-            var response = await fetch('/game/api/statistics');
-            var result = await response.json();
+            const response = await fetch('/game/api/statistics');
+            const result = await response.json();
 
             if (result.success) {
                 cachedData = result.data;
@@ -85,13 +85,13 @@
     }
 
     function renderOverviewTab() {
-        var status = cachedData.status;
-        var warnings = cachedData.warnings;
+        const status = cachedData.status;
+        const warnings = cachedData.warnings;
 
-        var html = '';
+        let html = '';
 
-        for (var i = 0; i < warnings.length; i++) {
-            var w = warnings[i];
+        for (let i = 0; i < warnings.length; i++) {
+            const w = warnings[i];
             html += '<div style="background: #3a1a1a; border: 1px solid #f44336; border-radius: 4px; padding: 10px; margin-bottom: 10px; color: #f44336;">';
             if (w.type === 'food') {
                 if (w.seconds === 0) {
@@ -129,8 +129,8 @@
     }
 
     function renderIncomeTab() {
-        var inc = cachedData.income;
-        var html = '';
+        const inc = cachedData.income;
+        let html = '';
 
         html += '<h3 style="margin-top: 0; color: #ccc;">Cash Income</h3>';
         html += '<table style="width: 100%; border-collapse: collapse;">';
@@ -157,19 +157,19 @@
     }
 
     function renderArmyTab() {
-        var army = cachedData.army;
-        var html = '';
+        const army = cachedData.army;
+        let html = '';
 
-        for (var i = 0; i < army.length; i++) {
-            var group = army[i];
+        for (let i = 0; i < army.length; i++) {
+            const group = army[i];
             html += '<h3 style="' + (i === 0 ? 'margin-top: 0; ' : '') + 'color: #ccc;">' + escapeHtml(group.category) + '</h3>';
 
             if (group.units.length === 0) {
                 html += '<p style="color: #666;">You don\'t have any ' + escapeHtml(group.category) + '</p>';
             } else {
                 html += '<table style="width: 100%; border-collapse: collapse;">';
-                for (var j = 0; j < group.units.length; j++) {
-                    var unit = group.units[j];
+                for (let j = 0; j < group.units.length; j++) {
+                    const unit = group.units[j];
                     html += '<tr><td style="padding: 6px; color: #aaa;">' + escapeHtml(unit.name) + '</td><td style="padding: 6px;">' + formatNumber(unit.amount) + '</td></tr>';
                 }
                 html += '</table>';
@@ -181,19 +181,19 @@
     }
 
     function renderInfrastructureTab() {
-        var infra = cachedData.infrastructure;
-        var html = '';
+        const infra = cachedData.infrastructure;
+        let html = '';
 
-        for (var i = 0; i < infra.length; i++) {
-            var group = infra[i];
+        for (let i = 0; i < infra.length; i++) {
+            const group = infra[i];
             html += '<h3 style="' + (i === 0 ? 'margin-top: 0; ' : '') + 'color: #ccc;">' + escapeHtml(group.category) + '</h3>';
 
             if (group.units.length === 0) {
                 html += '<p style="color: #666;">You don\'t have any ' + escapeHtml(group.category) + '</p>';
             } else {
                 html += '<table style="width: 100%; border-collapse: collapse;">';
-                for (var j = 0; j < group.units.length; j++) {
-                    var unit = group.units[j];
+                for (let j = 0; j < group.units.length; j++) {
+                    const unit = group.units[j];
                     html += '<tr><td style="padding: 6px; color: #aaa;">' + escapeHtml(unit.name) + '</td><td style="padding: 6px;">' + formatNumber(unit.amount) + '</td></tr>';
                 }
                 html += '</table>';
@@ -210,7 +210,7 @@
     }
 
     function escapeHtml(text) {
-        var div = document.createElement('div');
+        const div = document.createElement('div');
         div.appendChild(document.createTextNode(text));
         return div.innerHTML;
     }

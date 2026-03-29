@@ -2,14 +2,14 @@
  * Region overview modal logic.
  */
 (function () {
-    var regionModal = document.getElementById('regionOverviewModal');
-    var regionContainer = document.getElementById('regionOverviewContainer');
+    const regionModal = document.getElementById('regionOverviewModal');
+    const regionContainer = document.getElementById('regionOverviewContainer');
 
-    var allRegions = [];
-    var sortColumn = null;
-    var sortAscending = true;
+    let allRegions = [];
+    let sortColumn = null;
+    let sortAscending = true;
 
-    var categories = [
+    const categories = [
         { key: 1, label: 'Build' },
         { key: 2, label: 'Defense' },
         { key: 3, label: 'Special' },
@@ -36,8 +36,8 @@
         regionContainer.innerHTML = '<div class="build-loading">Loading regions...</div>';
 
         try {
-            var response = await fetch('/game/api/region/overview');
-            var result = await response.json();
+            const response = await fetch('/game/api/region/overview');
+            const result = await response.json();
 
             if (result.success) {
                 allRegions = result.regions;
@@ -55,14 +55,14 @@
         if (sortColumn === null) return;
 
         allRegions.sort(function (a, b) {
-            var valA, valB;
+            let valA, valB;
 
             if (sortColumn === 'position') {
                 valA = a.x * 10000 + a.y;
                 valB = b.x * 10000 + b.y;
             } else {
-                var catA = a.categoryCounts[sortColumn];
-                var catB = b.categoryCounts[sortColumn];
+                const catA = a.categoryCounts[sortColumn];
+                const catB = b.categoryCounts[sortColumn];
                 valA = catA ? catA.count : 0;
                 valB = catB ? catB.count : 0;
             }
@@ -96,7 +96,7 @@
 
         sortRegions();
 
-        var html = '<table style="width: 100%; border-collapse: collapse;">';
+        let html = '<table style="width: 100%; border-collapse: collapse;">';
         html += '<tr style="border-bottom: 2px solid #8B7355;">';
         html += '<th style="padding: 6px; text-align: center; cursor: pointer;" data-sort="position">Pos' + getSortArrow('position') + '</th>';
 
@@ -112,10 +112,10 @@
             html += '<td style="padding: 6px; text-align: center;">' + region.x + ', ' + region.y + '</td>';
 
             categories.forEach(function (cat) {
-                var data = region.categoryCounts[cat.key];
-                var count = data ? data.count : 0;
-                var inConstruction = data ? data.inConstruction : 0;
-                var text = count.toString();
+                const data = region.categoryCounts[cat.key];
+                const count = data ? data.count : 0;
+                const inConstruction = data ? data.inConstruction : 0;
+                let text = count.toString();
                 if (inConstruction > 0) {
                     text += ' (+' + inConstruction + ')';
                 }
@@ -138,15 +138,15 @@
         // Header click handlers for sorting
         regionContainer.querySelectorAll('th[data-sort]').forEach(function (th) {
             th.onclick = function () {
-                var col = th.getAttribute('data-sort');
+                const col = th.getAttribute('data-sort');
                 onHeaderClick(col === 'position' ? 'position' : parseInt(col, 10));
             };
         });
 
         regionContainer.querySelectorAll('.region-build-btn').forEach(function (btn) {
             btn.onclick = function () {
-                var regionId = parseInt(btn.getAttribute('data-id'), 10);
-                var mapRegion = findMapRegion(regionId);
+                const regionId = parseInt(btn.getAttribute('data-id'), 10);
+                const mapRegion = findMapRegion(regionId);
                 if (mapRegion) {
                     hide();
                     WorldBuild.showBuildModal(mapRegion);
@@ -156,8 +156,8 @@
 
         regionContainer.querySelectorAll('.region-destroy-btn').forEach(function (btn) {
             btn.onclick = function () {
-                var regionId = parseInt(btn.getAttribute('data-id'), 10);
-                var mapRegion = findMapRegion(regionId);
+                const regionId = parseInt(btn.getAttribute('data-id'), 10);
+                const mapRegion = findMapRegion(regionId);
                 if (mapRegion) {
                     hide();
                     WorldDestroy.showDestroyModal(mapRegion);
@@ -168,7 +168,7 @@
 
     function findMapRegion(regionId) {
         if (!WorldApp.worldRegions) return null;
-        for (var i = 0; i < WorldApp.worldRegions.length; i++) {
+        for (let i = 0; i < WorldApp.worldRegions.length; i++) {
             if (WorldApp.worldRegions[i].id === regionId) {
                 return WorldApp.worldRegions[i];
             }
@@ -177,7 +177,7 @@
     }
 
     function escapeHtml(text) {
-        var div = document.createElement('div');
+        const div = document.createElement('div');
         div.appendChild(document.createTextNode(text));
         return div.innerHTML;
     }

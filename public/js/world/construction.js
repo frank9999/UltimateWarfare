@@ -31,8 +31,8 @@
         constructionContainer.innerHTML = '<div class="build-loading">Loading construction data...</div>';
 
         try {
-            var response = await fetch('/game/api/construction/overview');
-            var result = await response.json();
+            const response = await fetch('/game/api/construction/overview');
+            const result = await response.json();
 
             if (result.success) {
                 allConstructions = result.constructions;
@@ -51,8 +51,8 @@
     function renderTabs() {
         constructionTabs.innerHTML = '';
 
-        var categories = [{ id: 'all', name: 'All' }];
-        var seen = {};
+        const categories = [{ id: 'all', name: 'All' }];
+        const seen = {};
         allConstructions.forEach(function (c) {
             if (!seen[c.categoryId]) {
                 seen[c.categoryId] = true;
@@ -61,7 +61,7 @@
         });
 
         categories.forEach(function (cat) {
-            var tab = document.createElement('div');
+            const tab = document.createElement('div');
             tab.className = 'build-tab' + (String(currentCategory) === String(cat.id) ? ' active' : '');
             tab.textContent = cat.name;
             tab.onclick = function () {
@@ -74,7 +74,7 @@
     }
 
     function renderConstructions() {
-        var filtered = currentCategory === 'all'
+        const filtered = currentCategory === 'all'
             ? allConstructions
             : allConstructions.filter(function (c) { return c.categoryId === currentCategory; });
 
@@ -83,7 +83,7 @@
             return;
         }
 
-        var html = '<table style="width: 100%; border-collapse: collapse;">';
+        let html = '<table style="width: 100%; border-collapse: collapse;">';
         html += '<tr style="border-bottom: 2px solid #8B7355;">';
         html += '<th style="padding: 8px; text-align: left;">Unit</th>';
         html += '<th style="padding: 8px; text-align: center;">Count</th>';
@@ -118,9 +118,9 @@
         }
 
         timerInterval = setInterval(function () {
-            var timers = constructionContainer.querySelectorAll('.construction-timer');
+            const timers = constructionContainer.querySelectorAll('.construction-timer');
             timers.forEach(function (el) {
-                var timeLeft = parseInt(el.getAttribute('data-timeleft'), 10) - 1;
+                let timeLeft = parseInt(el.getAttribute('data-timeleft'), 10) - 1;
                 if (timeLeft < 0) { timeLeft = 0; }
                 el.setAttribute('data-timeleft', String(timeLeft));
                 el.textContent = formatTime(timeLeft);
@@ -130,10 +130,10 @@
 
     function formatTime(seconds) {
         if (seconds <= 0) { return 'Done'; }
-        var h = Math.floor(seconds / 3600);
-        var m = Math.floor((seconds % 3600) / 60);
-        var s = seconds % 60;
-        var parts = [];
+        const h = Math.floor(seconds / 3600);
+        const m = Math.floor((seconds % 3600) / 60);
+        const s = seconds % 60;
+        const parts = [];
         if (h > 0) { parts.push(h + 'h'); }
         if (m > 0) { parts.push(m + 'm'); }
         parts.push(s + 's');
@@ -141,18 +141,18 @@
     }
 
     function escapeHtml(text) {
-        var div = document.createElement('div');
+        const div = document.createElement('div');
         div.appendChild(document.createTextNode(text));
         return div.innerHTML;
     }
 
     async function cancelConstruction(constructionId) {
         try {
-            var response = await fetch('/game/api/construction/cancel/' + constructionId, {
+            const response = await fetch('/game/api/construction/cancel/' + constructionId, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' }
             });
-            var result = await response.json();
+            const result = await response.json();
 
             if (result.success) {
                 showNotification(result.message, 'success');
