@@ -21,8 +21,12 @@
                             {{ unbanRequest.post }}
                         </td>
                         <td>
-                            <a class="btn btn-primary" href="{{ path('Admin/UnbanRequest/Unban', {'unbanRequestId': unbanRequest.id}) }}"><b>Unban</b></a><br />
-                            <a class="btn btn-danger" href="{{ path('Admin/UnbanRequest/Remove', {'unbanRequestId': unbanRequest.id}) }}"><b>Remove</b></a>
+                            <form method="POST" action="{{ path('Admin/UnbanRequest/Unban', {'unbanRequestId': unbanRequest.id}) }}" style="display:inline">
+                                <button type="submit" class="btn btn-primary"><b>Unban</b></button>
+                            </form><br />
+                            <form method="POST" action="{{ path('Admin/UnbanRequest/Remove', {'unbanRequestId': unbanRequest.id}) }}" style="display:inline">
+                                <button type="submit" class="btn btn-danger"><b>Remove</b></button>
+                            </form>
                         </td>
                     </tr>
                 {% else %}

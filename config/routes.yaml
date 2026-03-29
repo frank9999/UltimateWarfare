@@ -1,194 +1,229 @@
 Admin:
     path:      /admin
     controller: FrankProjects\UltimateWarfare\Controller\Admin\DashboardController::dashboard
+    methods:   [GET]
 
 Admin/Contact/List:
     path:      /admin/contact/list
     controller: FrankProjects\UltimateWarfare\Controller\Admin\ContactController::list
+    methods:   [GET]
 
 Admin/Contact/Read:
     path:      /admin/contact/read/{contactId}
     controller: FrankProjects\UltimateWarfare\Controller\Admin\ContactController::read
+    methods:   [GET]
     requirements:
         contactId: '\d+'
 
 Admin/Contact/Remove:
     path:      /admin/contact/remove/{contactId}
     controller: FrankProjects\UltimateWarfare\Controller\Admin\ContactController::remove
+    methods:   [POST]
     requirements:
         contactId: '\d+'
 
 Admin/ServerLogs:
     path:      /admin/server-logs
     controller: FrankProjects\UltimateWarfare\Controller\Admin\ServerLogsController::showLogs
+    methods:   [GET]
 
 Admin/UnbanRequest/List:
     path:      /admin/unban-request/list
     controller: FrankProjects\UltimateWarfare\Controller\Admin\UnbanRequestController::list
+    methods:   [GET]
 
 Admin/UnbanRequest/Remove:
     path:      /admin/unban-request/remove/{unbanRequestId}
     controller: FrankProjects\UltimateWarfare\Controller\Admin\UnbanRequestController::remove
+    methods:   [POST]
     requirements:
         unbanRequestId: '\d+'
 
 Admin/UnbanRequest/Unban:
     path:      /admin/unban-request/unban/{unbanRequestId}
     controller: FrankProjects\UltimateWarfare\Controller\Admin\UnbanRequestController::unban
+    methods:   [POST]
     requirements:
         unbanRequestId: '\d+'
 
 Admin/User/Ban:
     path:      /admin/user/ban/{userId}
     controller: FrankProjects\UltimateWarfare\Controller\Admin\UserController::ban
+    methods:   [POST]
     requirements:
         userId: '\d+'
 
 Admin/User/Unban:
     path:      /admin/user/unban/{userId}
     controller: FrankProjects\UltimateWarfare\Controller\Admin\UserController::unban
+    methods:   [POST]
     requirements:
         userId: '\d+'
 
 Admin/User/Enable:
     path:      /admin/user/enable/{userId}
     controller: FrankProjects\UltimateWarfare\Controller\Admin\UserController::enable
+    methods:   [POST]
     requirements:
         userId: '\d+'
 
 Admin/User/ForumBan:
     path:      /admin/user/forum-ban/{userId}
     controller: FrankProjects\UltimateWarfare\Controller\Admin\UserController::forumBan
+    methods:   [POST]
     requirements:
         userId: '\d+'
 
 Admin/User/ForumUnban:
     path:      /admin/user/forum-unban/{userId}
     controller: FrankProjects\UltimateWarfare\Controller\Admin\UserController::forumUnban
+    methods:   [POST]
     requirements:
         userId: '\d+'
 
 Admin/User/List:
     path:      /admin/user/list/{filter}
     controller: FrankProjects\UltimateWarfare\Controller\Admin\UserController::list
+    methods:   [GET]
     defaults:
         filter: ''
 
 Admin/User/MakeAdmin:
     path:      /admin/user/make-admin/{userId}
     controller: FrankProjects\UltimateWarfare\Controller\Admin\UserController::makeAdmin
+    methods:   [POST]
     requirements:
         userId: '\d+'
 
 Admin/User/RemoveAdmin:
     path:      /admin/user/remove-admin/{userId}
     controller: FrankProjects\UltimateWarfare\Controller\Admin\UserController::removeAdmin
+    methods:   [POST]
     requirements:
         userId: '\d+'
 
 Admin/User/Read:
     path:      /admin/user/read/{userId}
     controller: FrankProjects\UltimateWarfare\Controller\Admin\UserController::read
+    methods:   [GET]
     requirements:
         userId: '\d+'
 
 Admin/World/Create:
     path:      /admin/world/create
     controller: FrankProjects\UltimateWarfare\Controller\Admin\WorldController::create
+    methods:   [GET, POST]
 
 Admin/World/Generate:
     path:      /admin/world/generate/{worldId}
     controller: FrankProjects\UltimateWarfare\Controller\Admin\WorldController::generate
+    methods:   [GET, POST]
     requirements:
         worldId: '\d+'
 
 Admin/World/List:
     path:      /admin/world/list
     controller: FrankProjects\UltimateWarfare\Controller\Admin\WorldController::list
+    methods:   [GET]
 
 Admin/World/Edit:
     path:      /admin/world/edit/{worldId}
     controller: FrankProjects\UltimateWarfare\Controller\Admin\WorldController::edit
+    methods:   [GET, POST]
     requirements:
         worldId: '\d+'
 
 Admin/World/Remove:
     path:      /admin/world/remove/{worldId}
     controller: FrankProjects\UltimateWarfare\Controller\Admin\WorldController::remove
+    methods:   [POST]
     requirements:
         worldId: '\d+'
 
 Admin/World/Reset:
     path:      /admin/world/reset/{worldId}
     controller: FrankProjects\UltimateWarfare\Controller\Admin\WorldController::reset
+    methods:   [POST]
     requirements:
         worldId: '\d+'
 
 Forum:
     path:      /forum
     controller: FrankProjects\UltimateWarfare\Controller\Forum\ForumController::index
+    methods:   [GET]
 
 Forum/Category:
     path:      /forum/category/{categoryId}
     controller: FrankProjects\UltimateWarfare\Controller\Forum\CategoryController::category
+    methods:   [GET]
     requirements:
         categoryId: '\d+'
 
 Forum/Post/Edit:
     path:      /forum/post/edit/{postId}
     controller: FrankProjects\UltimateWarfare\Controller\Forum\PostController::edit
+    methods:   [GET, POST]
     requirements:
         postId: '\d+'
 
 Forum/Post/Remove:
     path:      /forum/post/remove/{postId}
     controller: FrankProjects\UltimateWarfare\Controller\Forum\PostController::remove
+    methods:   [POST]
     requirements:
         postId: '\d+'
 
 Forum/Topic:
     path:      /forum/topic/{topicId}
     controller: FrankProjects\UltimateWarfare\Controller\Forum\TopicController::topic
+    methods:   [GET, POST]
     requirements:
         topicId: '\d+'
 
 Forum/Topic/Create:
     path:      /forum/topic/create/{categoryId}
     controller: FrankProjects\UltimateWarfare\Controller\Forum\TopicController::create
+    methods:   [GET, POST]
     requirements:
         categoryId: '\d+'
 
 Forum/Topic/Edit:
     path:      /forum/topic/edit/{topicId}
     controller: FrankProjects\UltimateWarfare\Controller\Forum\TopicController::edit
+    methods:   [GET, POST]
     requirements:
         topicId: '\d+'
 
 Forum/Topic/Remove:
     path:      /forum/topic/remove/{topicId}
     controller: FrankProjects\UltimateWarfare\Controller\Forum\TopicController::remove
+    methods:   [POST]
     requirements:
         topicId: '\d+'
 
 Forum/Topic/Sticky:
     path:      /forum/topic/sticky/{topicId}
     controller: FrankProjects\UltimateWarfare\Controller\Forum\TopicController::sticky
+    methods:   [POST]
     requirements:
         topicId: '\d+'
 
 Forum/Topic/Unsticky:
     path:      /forum/topic/unsticky/{topicId}
     controller: FrankProjects\UltimateWarfare\Controller\Forum\TopicController::unsticky
+    methods:   [POST]
     requirements:
         topicId: '\d+'
 
 Game/Login:
     path:      /game/login
     controller: FrankProjects\UltimateWarfare\Controller\Game\LoginController::login
+    methods:   [GET]
 
 Game/Login/Player:
     path:      /game/login/player/{playerId}
     controller: FrankProjects\UltimateWarfare\Controller\Game\LoginController::loginForPlayer
+    methods:   [GET]
     requirements:
         playerId: '\d+'
 
@@ -215,6 +250,7 @@ Game/Api/Worlds:
 Game/Banned:
     path:      /game/banned
     controller: FrankProjects\UltimateWarfare\Controller\Game\UserController::banned
+    methods:   [GET, POST]
 
 Game/Api/Construction/Overview:
     path:      /game/api/construction/overview
@@ -496,10 +532,12 @@ Game/Api/Research/Cancel:
 Game/WorldMap:
     path:      /game/world-map
     controller: FrankProjects\UltimateWarfare\Controller\Game\WorldController::worldMap
+    methods:   [GET]
 
 Game/World/Create:
     path:      /game/world/create
     controller: FrankProjects\UltimateWarfare\Controller\Game\WorldController::create
+    methods:   [GET, POST]
 
 Game/World/Image:
     path:      /game/world/image/{worldId}
@@ -590,22 +628,26 @@ Game/Api/World/Region/SendUnits/Send:
 Game/SelectName:
     path:      /game/select-name/{worldId}
     controller: FrankProjects\UltimateWarfare\Controller\Game\WorldController::selectName
+    methods:   [GET]
     requirements:
         worldId: '\d+'
 
 Game/SelectWorld:
     path:      /game/select-world
     controller: FrankProjects\UltimateWarfare\Controller\Game\WorldController::selectWorld
+    methods:   [GET]
 
 Game/StartWorld:
     path:      /game/start/{worldId}
     controller: FrankProjects\UltimateWarfare\Controller\Game\WorldController::start
+    methods:   [POST]
     requirements:
         worldId: '\d+'
 
 Game/Story/Chapter1:
     path:      /game/story/1/{page}
     controller: FrankProjects\UltimateWarfare\Controller\Game\StoryController::page
+    methods:   [GET]
     requirements:
         page: '\d+'
 
@@ -613,38 +655,47 @@ Game/Story/Chapter1:
 Guide:
     path:      /guide
     controller: FrankProjects\UltimateWarfare\Controller\Site\GuideController::index
+    methods:   [GET]
 
 Guide/Attack:
     path:      /guide/attack
     controller: FrankProjects\UltimateWarfare\Controller\Site\GuideController::attack
+    methods:   [GET]
 
 Guide/Construction:
     path:      /guide/construction
     controller: FrankProjects\UltimateWarfare\Controller\Site\GuideController::construction
+    methods:   [GET]
 
 Guide/Federation:
     path:      /guide/federation
     controller: FrankProjects\UltimateWarfare\Controller\Site\GuideController::federation
+    methods:   [GET]
 
 Guide/Fleet:
     path:      /guide/fleet
     controller: FrankProjects\UltimateWarfare\Controller\Site\GuideController::fleet
+    methods:   [GET]
 
 Guide/Headquarter:
     path:      /guide/headquarter
     controller: FrankProjects\UltimateWarfare\Controller\Site\GuideController::headquarter
+    methods:   [GET]
 
 Guide/ListOperations:
     path:      /guide/list-operations
     controller: FrankProjects\UltimateWarfare\Controller\Site\GuideController::listOperations
+    methods:   [GET]
 
 Guide/ListResearch:
     path:      /guide/list-research
     controller: FrankProjects\UltimateWarfare\Controller\Site\GuideController::listResearch
+    methods:   [GET]
 
 Guide/ListUnits:
     path:      /guide/list-units/{gameUnitCategoryId}
     controller: FrankProjects\UltimateWarfare\Controller\Site\GuideController::listUnits
+    methods:   [GET]
     defaults:
         gameUnitCategoryId: 0
     requirements:
@@ -653,34 +704,42 @@ Guide/ListUnits:
 Guide/Market:
     path:      /guide/market
     controller: FrankProjects\UltimateWarfare\Controller\Site\GuideController::market
+    methods:   [GET]
 
 Guide/Ranking:
     path:      /guide/ranking
     controller: FrankProjects\UltimateWarfare\Controller\Site\GuideController::ranking
+    methods:   [GET]
 
 Guide/Region:
     path:      /guide/region
     controller: FrankProjects\UltimateWarfare\Controller\Site\GuideController::region
+    methods:   [GET]
 
 Guide/Report:
     path:      /guide/report
     controller: FrankProjects\UltimateWarfare\Controller\Site\GuideController::report
+    methods:   [GET]
 
 Guide/Research:
     path:      /guide/research
     controller: FrankProjects\UltimateWarfare\Controller\Site\GuideController::research
+    methods:   [GET]
 
 Guide/Rules:
     path:      /guide/rules
     controller: FrankProjects\UltimateWarfare\Controller\Site\GuideController::rules
+    methods:   [GET]
 
 Guide/Surrender:
     path:      /guide/surrender
     controller: FrankProjects\UltimateWarfare\Controller\Site\GuideController::surrender
+    methods:   [GET]
 
 Guide/GameUnit:
     path:      /guide/unit/{gameUnitId}
     controller: FrankProjects\UltimateWarfare\Controller\Site\GuideController::gameUnit
+    methods:   [GET]
     defaults:
         gameUnitId: 0
     requirements:
@@ -689,42 +748,53 @@ Guide/GameUnit:
 Guide/World:
     path:      /guide/world
     controller: FrankProjects\UltimateWarfare\Controller\Site\GuideController::world
+    methods:   [GET]
 
 Site/About:
     path:      /about
     controller: FrankProjects\UltimateWarfare\Controller\Site\SiteController::about
+    methods:   [GET]
 
 Site/Community:
     path:      /community
     controller: FrankProjects\UltimateWarfare\Controller\Site\SiteController::community
+    methods:   [GET]
 
 Site/Contact:
     path:      /contact
     controller: FrankProjects\UltimateWarfare\Controller\Site\ContactController::contact
+    methods:   [GET, POST]
 
 Site/Homepage:
     path:      /
     controller: FrankProjects\UltimateWarfare\Controller\Site\IndexController::index
+    methods:   [GET]
 
 Site/Login:
     path:      /login
     controller: FrankProjects\UltimateWarfare\Controller\Site\SecurityController::login
+    methods:   [GET]
 
 Site/Logout:
     path:      /logout
+    methods:   [GET]
 
 Site/ResetPassword:
     path:      /reset-password
     controller: FrankProjects\UltimateWarfare\Controller\Site\ResetPasswordController::requestPasswordReset
+    methods:   [GET, POST]
 
 Site/Register:
     path:      /register
     controller: FrankProjects\UltimateWarfare\Controller\Site\RegisterController::register
+    methods:   [GET, POST]
 
 User/Activation:
     path:      /user/activate/{token}
     controller: FrankProjects\UltimateWarfare\Controller\Site\RegisterController::activateUser
+    methods:   [GET]
 
 User/Password/Reset:
     path:      /password/reset/{token}
     controller: FrankProjects\UltimateWarfare\Controller\Site\ResetPasswordController::resetPassword
+    methods:   [GET, POST]

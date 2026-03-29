@@ -71,32 +71,46 @@
                     <td colspan="2">
                         <p>
                             {% if user.active == 1 %}
-                                <a class="btn btn-danger" href="{{ path('Admin/User/Ban', {'userId': user.id}) }}">Ban</a>
+                                <form method="POST" action="{{ path('Admin/User/Ban', {'userId': user.id}) }}" style="display:inline">
+                                    <button type="submit" class="btn btn-danger">Ban</button>
+                                </form>
                             {% else %}
-                                <a class="btn btn-danger" href="{{ path('Admin/User/Unban', {'userId': user.id}) }}">Unban</a>
+                                <form method="POST" action="{{ path('Admin/User/Unban', {'userId': user.id}) }}" style="display:inline">
+                                    <button type="submit" class="btn btn-danger">Unban</button>
+                                </form>
                             {% endif %}
                         </p>
                         {% if uw_forum_enabled == true %}
                             <p>
                                 {% if user.forumBan == 1 %}
-                                    <a class="btn btn-danger" href="{{ path('Admin/User/ForumUnban', {'userId': user.id}) }}">Forum unban</a>
+                                    <form method="POST" action="{{ path('Admin/User/ForumUnban', {'userId': user.id}) }}" style="display:inline">
+                                        <button type="submit" class="btn btn-danger">Forum unban</button>
+                                    </form>
                                 {% else %}
-                                    <a class="btn btn-danger" href="{{ path('Admin/User/ForumBan', {'userId': user.id}) }}">Forum ban</a>
+                                    <form method="POST" action="{{ path('Admin/User/ForumBan', {'userId': user.id}) }}" style="display:inline">
+                                        <button type="submit" class="btn btn-danger">Forum ban</button>
+                                    </form>
                                 {% endif %}
                             </p>
                         {% endif %}
                         {% if user.enabled == 0 %}
                             <p>
-                                <a class="btn btn-danger" href="{{ path('Admin/User/Enable', {'userId': user.id}) }}">Enable account</a>
+                                <form method="POST" action="{{ path('Admin/User/Enable', {'userId': user.id}) }}" style="display:inline">
+                                    <button type="submit" class="btn btn-danger">Enable account</button>
+                                </form>
                             </p>
                         {% endif %}
                         {% if 'ROLE_ADMIN' not in user.roles %}
                             <p>
-                                <a class="btn btn-danger" href="{{ path('Admin/User/MakeAdmin', {'userId': user.id}) }}">Make Admin</a>
+                                <form method="POST" action="{{ path('Admin/User/MakeAdmin', {'userId': user.id}) }}" style="display:inline">
+                                    <button type="submit" class="btn btn-danger">Make Admin</button>
+                                </form>
                             </p>
                         {% else %}
                             <p>
-                                <a class="btn btn-danger" href="{{ path('Admin/User/RemoveAdmin', {'userId': user.id}) }}">Remove Admin</a>
+                                <form method="POST" action="{{ path('Admin/User/RemoveAdmin', {'userId': user.id}) }}" style="display:inline">
+                                    <button type="submit" class="btn btn-danger">Remove Admin</button>
+                                </form>
                             </p>
                         {% endif %}
                     </td>

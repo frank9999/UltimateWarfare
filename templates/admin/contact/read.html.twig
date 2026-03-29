@@ -28,7 +28,9 @@
                         {{ contact.createDateTime|date("Y-m-d H:i:s") }}
                     </td>
                     <td>
-                        <a class="btn btn-danger" href="{{ path('Admin/Contact/Remove', {'contactId': contact.id}) }}"><b>Remove</b></a>
+                        <form method="POST" action="{{ path('Admin/Contact/Remove', {'contactId': contact.id}) }}" style="display:inline">
+                            <button type="submit" class="btn btn-danger"><b>Remove</b></button>
+                        </form>
                     </td>
                 </tr>
                 <tr>
