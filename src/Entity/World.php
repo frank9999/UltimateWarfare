@@ -18,7 +18,8 @@ class World
 
     private int $id;
     private string $name = '';
-    private string $image = '';
+    /** @var resource|string|null */
+    private mixed $imageData = null;
     private string $description = '';
     private int $status = 0;
     private bool $public = false;
@@ -77,14 +78,23 @@ class World
         return $this->name;
     }
 
-    public function setImage(string $image): void
+    public function setImageData(?string $imageData): void
     {
-        $this->image = $image;
+        $this->imageData = $imageData;
     }
 
-    public function getImage(): string
+    public function getImageData(): ?string
     {
-        return $this->image;
+        if (is_resource($this->imageData)) {
+            $contents = stream_get_contents($this->imageData);
+            $this->imageData = $contents !== false ? $contents : null;
+        }
+
+        if (!is_string($this->imageData)) {
+            return null;
+        }
+
+        return $this->imageData;
     }
 
     public function getDescription(): string

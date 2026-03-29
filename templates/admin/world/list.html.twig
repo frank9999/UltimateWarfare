@@ -24,7 +24,7 @@
                             {% endif %}
 
                             <div>
-                                <img src="{{ asset('images/world/' ~ world.image) }}" alt="{{ world.name }}">
+                                <img src="{{ path('Game/World/Image', {'worldId': world.id}) }}" alt="{{ world.name }}">
                             </div>
                         </td>
                         <td class="text-start" width="300">

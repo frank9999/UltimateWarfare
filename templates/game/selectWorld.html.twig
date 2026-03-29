@@ -10,7 +10,7 @@
                 <div style="display: flex; gap: 30px; align-items: flex-start; padding: 15px 0; border-bottom: 1px solid #3a3a3a;">
                     <div>
                         <strong>{{ world.name }}</strong><br />
-                        <img src="{{ asset('images/world/' ~ world.image) }}" alt="{{ world.name }}" style="margin-top: 10px;">
+                        <img src="{{ path('Game/World/Image', {'worldId': world.id}) }}" alt="{{ world.name }}" style="margin-top: 10px;">
                     </div>
                     <div>
                         <strong>Max players:</strong> {{ world.maxplayers }}<br /><br />

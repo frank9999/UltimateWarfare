@@ -16,6 +16,7 @@ use FrankProjects\UltimateWarfare\Service\WorldGeneratorService;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 final class WorldController extends BaseGameController
 {
@@ -152,6 +153,21 @@ final class WorldController extends BaseGameController
         $player = Player::create($user, $name, $world);
         $this->playerRepository->save($player);
         return $this->redirectToRoute('Game/Login', [], 302);
+    }
+
+    public function image(int $worldId): Response
+    {
+        $world = $this->worldRepository->find($worldId);
+        $imageData = $world?->getImageData();
+        if ($imageData === null) {
+            throw new NotFoundHttpException('World image not found');
+        }
+
+        $response = new Response($imageData);
+        $response->headers->set('Content-Type', 'image/jpeg');
+        $response->headers->set('Cache-Control', 'public, max-age=86400');
+
+        return $response;
     }
 
     public function worldMap(): Response

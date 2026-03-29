@@ -501,6 +501,13 @@ Game/World/Create:
     path:      /game/world/create
     controller: FrankProjects\UltimateWarfare\Controller\Game\WorldController::create
 
+Game/World/Image:
+    path:      /game/world/image/{worldId}
+    controller: FrankProjects\UltimateWarfare\Controller\Game\WorldController::image
+    methods:   [GET]
+    requirements:
+        worldId: '\d+'
+
 Game/Api/World/Region/Attack:
     path:      /game/api/world/region/attack-from/{regionId}
     controller: FrankProjects\UltimateWarfare\Controller\Game\AttackController::attackFromRegionsApi

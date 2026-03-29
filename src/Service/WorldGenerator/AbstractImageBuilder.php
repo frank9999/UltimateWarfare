@@ -75,9 +75,16 @@ abstract class AbstractImageBuilder
         ];
     }
 
-    protected function saveImage(string $imagePath): void
+    protected function getImageBinary(): string
     {
-        imagejpeg($this->image, $imagePath);
+        ob_start();
+        imagejpeg($this->image);
+        $data = ob_get_clean();
+        if ($data === false) {
+            throw new RuntimeException("Failed to capture image data");
+        }
+
+        return $data;
     }
 
     protected function ensureGD(): void
