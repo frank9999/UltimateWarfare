@@ -773,7 +773,7 @@ Site/Homepage:
 Site/Login:
     path:      /login
     controller: FrankProjects\UltimateWarfare\Controller\Site\SecurityController::login
-    methods:   [GET]
+    methods:   [GET, POST]
 
 Site/Logout:
     path:      /logout
