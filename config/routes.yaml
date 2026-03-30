@@ -654,7 +654,7 @@ Game/Story/Chapter1:
 
 Guide:
     path:      /guide
-    controller: FrankProjects\UltimateWarfare\Controller\Site\GuideController::index
+    controller: FrankProjects\UltimateWarfare\Controller\Site\GuideController::gettingStarted
     methods:   [GET]
 
 Guide/Attack:
@@ -677,9 +677,9 @@ Guide/Fleet:
     controller: FrankProjects\UltimateWarfare\Controller\Site\GuideController::fleet
     methods:   [GET]
 
-Guide/Headquarter:
-    path:      /guide/headquarter
-    controller: FrankProjects\UltimateWarfare\Controller\Site\GuideController::headquarter
+Guide/GettingStarted:
+    path:      /guide/getting-started
+    controller: FrankProjects\UltimateWarfare\Controller\Site\GuideController::gettingStarted
     methods:   [GET]
 
 Guide/ListOperations:
@@ -706,11 +706,6 @@ Guide/Market:
     controller: FrankProjects\UltimateWarfare\Controller\Site\GuideController::market
     methods:   [GET]
 
-Guide/Ranking:
-    path:      /guide/ranking
-    controller: FrankProjects\UltimateWarfare\Controller\Site\GuideController::ranking
-    methods:   [GET]
-
 Guide/Region:
     path:      /guide/region
     controller: FrankProjects\UltimateWarfare\Controller\Site\GuideController::region
@@ -729,11 +724,6 @@ Guide/Research:
 Guide/Rules:
     path:      /guide/rules
     controller: FrankProjects\UltimateWarfare\Controller\Site\GuideController::rules
-    methods:   [GET]
-
-Guide/Surrender:
-    path:      /guide/surrender
-    controller: FrankProjects\UltimateWarfare\Controller\Site\GuideController::surrender
     methods:   [GET]
 
 Guide/GameUnit:

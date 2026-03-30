@@ -1,12 +1,20 @@
 {% extends 'site/guideBase.html.twig' %}
 {% block content %}
     <div class="uw-card">
+        <div class="uw-card-header">Research</div>
         <div class="uw-card-body">
-            <br />
-                You can use this research system to research new technological advancements to your empire.<br />
-                <br />
-                <b>Note:</b> You need to activate a research with the "researching" link before the research takes effect!
-                <br />
+            <p>
+                Research allows you to unlock new technologies, advanced unit types, and special operations for your empire.
+            </p>
+            <ul>
+                <li>Research costs <b>cash</b> and takes time to complete.</li>
+                <li>You can only have <b>one active research</b> at a time.</li>
+                <li>Some research has <b>prerequisites</b> &mdash; you must complete earlier research before you can start advanced ones.</li>
+                <li>You can <b>cancel</b> an active research and receive a refund.</li>
+            </ul>
+            <p>
+                For a full list of available research and their requirements, see the <a href="{{ url('Guide/ListResearch') }}">Research List</a>.
+            </p>
         </div>
     </div>
 {% endblock %}

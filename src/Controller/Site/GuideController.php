@@ -52,15 +52,11 @@ final class GuideController extends BaseController
         return $this->render('site/guide/fleet.html.twig');
     }
 
-    public function headquarter(): Response
+    public function gettingStarted(): Response
     {
-        return $this->render('site/guide/headquarter.html.twig');
+        return $this->render('site/guide/gettingStarted.html.twig');
     }
 
-    public function index(): Response
-    {
-        return $this->render('site/guide/index.html.twig');
-    }
 
     public function listOperations(OperationRegistry $operationRegistry): Response
     {
@@ -119,11 +115,6 @@ final class GuideController extends BaseController
         return $this->render('site/guide/market.html.twig');
     }
 
-    public function ranking(): Response
-    {
-        return $this->render('site/guide/ranking.html.twig');
-    }
-
     public function region(): Response
     {
         return $this->render('site/guide/region.html.twig');
@@ -142,11 +133,6 @@ final class GuideController extends BaseController
     public function rules(): Response
     {
         return $this->render('site/guide/rules.html.twig');
-    }
-
-    public function surrender(): Response
-    {
-        return $this->render('site/guide/surrender.html.twig');
     }
 
     public function world(): Response
