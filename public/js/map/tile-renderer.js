@@ -8,6 +8,7 @@ class TileRenderer {
         this.config = config;
         this.unitRenderer = new UnitRenderer(ctx);
         this.fogCache = new Map();
+        this.sectorLookup = null;
 
         // Pre-compute hex vertex offsets (pointy-top, 6 vertices at 60° intervals from -30°)
         this.hexVertices = [];
@@ -47,6 +48,9 @@ class TileRenderer {
             this.drawHex(pos);
             this.ctx.stroke();
             this.ctx.restore();
+
+            // Draw territory border for owned regions
+            this.renderTerritoryBorder(region, pos);
 
             // Draw fog of war if region is not visible
             if (region.isVisible === false) {
@@ -225,6 +229,67 @@ class TileRenderer {
 
         this.drawHex(pos);
         this.ctx.fill();
+        this.ctx.restore();
+    }
+
+    setSectorLookup(sectorLookup) {
+        this.sectorLookup = sectorLookup;
+    }
+
+    /**
+     * Render territory border around player-owned regions.
+     * Only draws edges where the neighbor is NOT also owned by the player,
+     * creating a cohesive territory outline.
+     */
+    renderTerritoryBorder(region, pos) {
+        if (!region.isYours || !this.sectorLookup) {
+            return;
+        }
+
+        const isOddRow = region.y % 2 !== 0;
+
+        // Neighbor offsets per edge for odd-r pointy-top hex grid
+        // Edge i connects vertex i to vertex (i+1)%6
+        const neighborOffsets = isOddRow
+            ? [
+                [1, 0],    // Edge 0: Right
+                [1, 1],    // Edge 1: SE
+                [0, 1],    // Edge 2: SW
+                [-1, 0],   // Edge 3: Left
+                [0, -1],   // Edge 4: NW
+                [1, -1],   // Edge 5: NE
+            ]
+            : [
+                [1, 0],    // Edge 0: Right
+                [0, 1],    // Edge 1: SE
+                [-1, 1],   // Edge 2: SW
+                [-1, 0],   // Edge 3: Left
+                [-1, -1],  // Edge 4: NW
+                [0, -1],   // Edge 5: NE
+            ];
+
+        this.ctx.save();
+        this.ctx.strokeStyle = '#22c55e';
+        this.ctx.lineWidth = 3;
+        this.ctx.lineCap = 'round';
+        this.ctx.lineJoin = 'round';
+
+        const verts = this.hexVertices;
+
+        for (let i = 0; i < 6; i++) {
+            const [dx, dy] = neighborOffsets[i];
+            const neighborKey = (region.x + dx) + ',' + (region.y + dy);
+            const neighbor = this.sectorLookup.get(neighborKey);
+
+            if (!neighbor || !neighbor.isYours) {
+                const j = (i + 1) % 6;
+                this.ctx.beginPath();
+                this.ctx.moveTo(pos.x + verts[i].dx, pos.y + verts[i].dy);
+                this.ctx.lineTo(pos.x + verts[j].dx, pos.y + verts[j].dy);
+                this.ctx.stroke();
+            }
+        }
+
         this.ctx.restore();
     }
 

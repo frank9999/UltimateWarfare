@@ -119,6 +119,8 @@ class HexMap {
             this.sectorLookup.set(sector.x + ',' + sector.y, sector);
         });
 
+        this.tileRenderer.setSectorLookup(this.sectorLookup);
+
         return this.loadImages(sectors);
     }
 
