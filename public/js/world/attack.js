@@ -12,8 +12,10 @@
 
     const attackUnitsModal = document.getElementById('attackUnitsModal');
     const confirmAttackUnitsBtn = document.getElementById('confirmAttackUnitsBtn');
+    const attackModeBanner = document.getElementById('attackModeBanner');
 
     confirmAttackUnitsBtn.onclick = sendAttackFleet;
+    document.getElementById('cancelAttackModeBtn').onclick = cancelAttackMode;
 
     function getDefaultTileClick() {
         return WorldApp.defaultTileClick;
@@ -59,10 +61,9 @@
             };
 
             worldMap.render();
-            showNotification(
-                'Select one of your ' + result.eligibleRegions.length + ' highlighted region(s) to attack from. Click the target or press Escape to cancel.',
-                'info'
-            );
+            attackModeBanner.style.display = 'flex';
+            document.getElementById('attackModeText').textContent =
+                'Attack Mode: Select one of ' + result.eligibleRegions.length + ' highlighted region(s) to attack from. Click target or press Escape to cancel.';
         } catch (error) {
             console.error('Error loading attack-from regions:', error);
             showNotification('An error occurred. Please try again.', 'error');
@@ -82,7 +83,7 @@
 
         worldMap.config.onTileClick = getDefaultTileClick();
         worldMap.render();
-        showNotification('Attack cancelled.', 'info');
+        attackModeBanner.style.display = 'none';
     }
 
     async function showAttackUnitsModal(targetRegion, sourceRegion) {

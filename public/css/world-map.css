@@ -59,7 +59,7 @@
     display: block;
     width: 100%;
     background: #1a1a1a;
-    height: calc(100vh - 350px);
+    height: calc(100vh - 150px);
     min-height: 400px;
 }
 
@@ -698,7 +698,7 @@
 .attack-mode-banner {
     display: none;
     position: fixed;
-    top: 0;
+    bottom: 0;
     left: 0;
     width: 100%;
     padding: 12px 20px;
@@ -708,7 +708,7 @@
     text-align: center;
     z-index: 10001;
     font-size: 14px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.5);
 }
 
 .attack-mode-banner button {
