@@ -29,7 +29,7 @@
 
     // Step 1: Show available operations for target region
     async function startOperation(enemyRegion) {
-        var enemyInstance = bootstrap.Modal.getInstance(document.getElementById('enemyRegionModal'));
+        const enemyInstance = bootstrap.Modal.getInstance(document.getElementById('enemyRegionModal'));
         if (enemyInstance) enemyInstance.hide();
         operationTargetRegion = enemyRegion;
 

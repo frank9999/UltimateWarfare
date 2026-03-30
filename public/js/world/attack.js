@@ -20,7 +20,7 @@
     }
 
     async function startAttackFromSelection(enemyRegion) {
-        var enemyInstance = bootstrap.Modal.getInstance(document.getElementById('enemyRegionModal'));
+        const enemyInstance = bootstrap.Modal.getInstance(document.getElementById('enemyRegionModal'));
         if (enemyInstance) enemyInstance.hide();
         showNotification('Loading eligible regions...', 'info');
 

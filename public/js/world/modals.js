@@ -168,7 +168,7 @@
             if (result.success) {
                 showNotification(result.message, 'success');
                 bootstrap.Modal.getInstance(sendMessageModal).hide();
-                var enemyInstance = bootstrap.Modal.getInstance(enemyModal);
+                const enemyInstance = bootstrap.Modal.getInstance(enemyModal);
                 if (enemyInstance) enemyInstance.hide();
             } else {
                 showNotification(result.message || 'Failed to send message', 'error');
@@ -233,7 +233,7 @@
     };
     document.getElementById('sendUnitsBtn').onclick = function () {
         if (selectedYourRegion) {
-            var region = selectedYourRegion;
+            const region = selectedYourRegion;
             bootstrap.Modal.getInstance(yourModal).hide();
             yourModal.addEventListener('hidden.bs.modal', function handler() {
                 yourModal.removeEventListener('hidden.bs.modal', handler);

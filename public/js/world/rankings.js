@@ -104,7 +104,7 @@
         rankingsContainer.querySelectorAll('.player-link').forEach(function (link) {
             link.onclick = function (e) {
                 e.preventDefault();
-                var playerName = link.getAttribute('data-player');
+                const playerName = link.getAttribute('data-player');
                 rankingsModal.addEventListener('hidden.bs.modal', function handler() {
                     rankingsModal.removeEventListener('hidden.bs.modal', handler);
                     WorldPlayerProfile.show(playerName);
