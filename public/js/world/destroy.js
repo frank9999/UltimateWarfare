@@ -4,8 +4,6 @@
  */
 (function () {
     const destroyModal = document.getElementById('destroyModal');
-    const closeDestroyModal = document.getElementById('closeDestroyModal');
-    const closeDestroyBtn = document.getElementById('closeDestroyBtn');
     const confirmDestroyBtn = document.getElementById('confirmDestroyBtn');
 
     let selectedDestroyRegion = null;
@@ -17,7 +15,7 @@
         selectedDestroyRegion = region;
         destroyQuantities = {};
         document.getElementById('destroyRegionCoords').textContent = region.x + ', ' + region.y;
-        destroyModal.style.display = 'block';
+        bootstrap.Modal.getOrCreateInstance(destroyModal).show();
 
         const container = document.getElementById('destroyUnitsContainer');
         const tabsContainer = document.getElementById('destroyTabs');
@@ -135,7 +133,7 @@
 
             if (result.success) {
                 showNotification(result.message, 'success');
-                destroyModal.style.display = 'none';
+                bootstrap.Modal.getInstance(destroyModal).hide();
 
                 // Invalidate build cache so fresh data is loaded next time
                 if (WorldBuild && WorldBuild.invalidateCache) {
@@ -162,12 +160,10 @@
         }
     }
 
-    closeDestroyModal.onclick = function () { destroyModal.style.display = 'none'; selectedDestroyRegion = null; };
-    closeDestroyBtn.onclick = function () { destroyModal.style.display = 'none'; selectedDestroyRegion = null; };
+    destroyModal.addEventListener('hidden.bs.modal', function () { selectedDestroyRegion = null; });
     confirmDestroyBtn.onclick = confirmDestroy;
 
     window.WorldDestroy = {
-        showDestroyModal: showDestroyModal,
-        modal: destroyModal
+        showDestroyModal: showDestroyModal
     };
 })();

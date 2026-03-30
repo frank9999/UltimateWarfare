@@ -1,6 +1,5 @@
 (function () {
     const researchModal = document.getElementById('researchModal');
-    const closeResearchModal = document.getElementById('closeResearchModal');
     const researchTreeContainer = document.getElementById('researchTreeContainer');
 
     let timerInterval = null;
@@ -31,19 +30,16 @@
     const ROW_GAP = 200;
     const PADDING = 20;
 
-    closeResearchModal.onclick = function () { hideModal(); };
-
-    function showResearchModal() {
-        researchModal.style.display = 'block';
-        loadResearchTree();
-    }
-
-    function hideModal() {
-        researchModal.style.display = 'none';
+    researchModal.addEventListener('hidden.bs.modal', function () {
         if (timerInterval) {
             clearInterval(timerInterval);
             timerInterval = null;
         }
+    });
+
+    function showResearchModal() {
+        bootstrap.Modal.getOrCreateInstance(researchModal).show();
+        loadResearchTree();
     }
 
     async function loadResearchTree() {
@@ -269,7 +265,6 @@
     }
 
     window.WorldResearch = {
-        modal: researchModal,
         show: showResearchModal
     };
 })();

@@ -9,8 +9,6 @@
     let currentTab = 'overview';
     let cachedStatus = null;
 
-    document.getElementById('closeFederationModal').onclick = function () { hide(); };
-    document.getElementById('closeFederationBtn').onclick = function () { hide(); };
 
     const RANK_NAMES = {
         10: 'General',
@@ -26,17 +24,16 @@
     };
 
     function show() {
-        federationModal.style.display = 'block';
+        bootstrap.Modal.getOrCreateInstance(federationModal).show();
         federationContainer.innerHTML = '<div class="build-loading">Loading federation data...</div>';
         federationTabs.innerHTML = '';
         cachedStatus = null;
         loadStatus();
     }
 
-    function hide() {
-        federationModal.style.display = 'none';
+    federationModal.addEventListener('hidden.bs.modal', function () {
         cachedStatus = null;
-    }
+    });
 
     async function loadStatus() {
         try {
@@ -748,7 +745,6 @@
     }
 
     window.WorldFederation = {
-        modal: federationModal,
         show: show
     };
 })();

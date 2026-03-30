@@ -4,8 +4,6 @@
  */
 (function () {
     const buildModal = document.getElementById('buildModal');
-    const closeBuildModal = document.getElementById('closeBuildModal');
-    const closeBuildBtn = document.getElementById('closeBuildBtn');
     const confirmBuildBtn = document.getElementById('confirmBuildBtn');
 
     let selectedBuildRegion = null;
@@ -199,7 +197,7 @@
         selectedBuildRegion = region;
         buildQuantities = {};
         document.getElementById('buildRegionCoords').textContent = region.x + ', ' + region.y;
-        buildModal.style.display = 'block';
+        bootstrap.Modal.getOrCreateInstance(buildModal).show();
 
         const container = document.getElementById('buildUnitsContainer');
         const tabsContainer = document.getElementById('buildTabs');
@@ -353,7 +351,7 @@
                 if (result.newSteel !== undefined && amounts[3]) amounts[3].textContent = result.newSteel.toLocaleString('en-US');
 
                 showNotification(result.message, 'success');
-                buildModal.style.display = 'none';
+                bootstrap.Modal.getInstance(buildModal).hide();
 
                 // Invalidate cache and prefetch fresh data in background
                 const regionId = selectedBuildRegion.id;
@@ -374,15 +372,13 @@
         }
     }
 
-    closeBuildModal.onclick = function () { buildModal.style.display = 'none'; selectedBuildRegion = null; };
-    closeBuildBtn.onclick = function () { buildModal.style.display = 'none'; selectedBuildRegion = null; };
+    buildModal.addEventListener('hidden.bs.modal', function () { selectedBuildRegion = null; });
     confirmBuildBtn.onclick = confirmBuild;
 
     // Expose globally
     window.WorldBuild = {
         showBuildModal: showBuildModal,
         prefetchBuildData: prefetchBuildData,
-        invalidateCache: function (regionId) { delete buildDataCache[regionId]; },
-        modal: buildModal
+        invalidateCache: function (regionId) { delete buildDataCache[regionId]; }
     };
 })();

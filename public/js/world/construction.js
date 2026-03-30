@@ -10,21 +10,17 @@
     let allConstructions = [];
     let timerInterval = null;
 
-    document.getElementById('closeConstructionModal').onclick = function () { hide(); };
-    document.getElementById('closeConstructionBtn').onclick = function () { hide(); };
-
-    function show() {
-        constructionModal.style.display = 'block';
-        currentCategory = 'all';
-        loadConstruction();
-    }
-
-    function hide() {
-        constructionModal.style.display = 'none';
+    constructionModal.addEventListener('hidden.bs.modal', function () {
         if (timerInterval) {
             clearInterval(timerInterval);
             timerInterval = null;
         }
+    });
+
+    function show() {
+        bootstrap.Modal.getOrCreateInstance(constructionModal).show();
+        currentCategory = 'all';
+        loadConstruction();
     }
 
     async function loadConstruction() {
@@ -167,7 +163,6 @@
     }
 
     window.WorldConstruction = {
-        modal: constructionModal,
         show: show
     };
 })();

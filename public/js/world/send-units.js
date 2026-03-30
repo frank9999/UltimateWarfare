@@ -18,12 +18,8 @@
     let sendEligibleRegionIds = new Set();
 
     const sendUnitsModal = document.getElementById('sendUnitsModal');
-    const closeSendUnitsModal = document.getElementById('closeSendUnitsModal');
-    const cancelSendUnitsBtn = document.getElementById('cancelSendUnitsBtn');
     const confirmSendUnitsBtn = document.getElementById('confirmSendUnitsBtn');
 
-    closeSendUnitsModal.onclick = function () { sendUnitsModal.style.display = 'none'; };
-    cancelSendUnitsBtn.onclick = function () { sendUnitsModal.style.display = 'none'; };
     confirmSendUnitsBtn.onclick = enterSendTargetSelection;
 
     function getDefaultTileClick() {
@@ -35,7 +31,7 @@
      */
     async function startSendUnits(sourceRegion) {
         // Close the "Your Region" modal
-        document.getElementById('yourRegionModal').style.display = 'none';
+        // yourRegionModal is already closed by modals.js before calling this
 
         sendSourceRegion = sourceRegion;
         sendUnitQuantities = {};
@@ -48,7 +44,7 @@
 
         const container = document.getElementById('sendUnitsContainer');
         container.innerHTML = '<div class="build-loading">Loading available units...</div>';
-        sendUnitsModal.style.display = 'block';
+        bootstrap.Modal.getOrCreateInstance(sendUnitsModal).show();
 
         try {
             const response = await fetch('/game/api/world/region/send-units-data/' + sourceRegion.id);
@@ -121,7 +117,7 @@
             return;
         }
 
-        sendUnitsModal.style.display = 'none';
+        bootstrap.Modal.getInstance(sendUnitsModal).hide();
         showNotification('Loading target regions...', 'info');
 
         try {
@@ -256,7 +252,6 @@
 
     // Expose globally
     window.WorldSendUnits = {
-        startSendUnits: startSendUnits,
-        modal: sendUnitsModal
+        startSendUnits: startSendUnits
     };
 })();

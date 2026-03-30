@@ -8,18 +8,11 @@
 
     let currentTab = 'buy';
 
-    document.getElementById('closeMarketModal').onclick = function () { hide(); };
-    document.getElementById('closeMarketBtn').onclick = function () { hide(); };
-
     function show() {
         currentTab = 'buy';
-        marketModal.style.display = 'block';
+        bootstrap.Modal.getOrCreateInstance(marketModal).show();
         renderTabs();
         loadTab();
-    }
-
-    function hide() {
-        marketModal.style.display = 'none';
     }
 
     function renderTabs() {
@@ -307,7 +300,6 @@
     }
 
     window.WorldMarket = {
-        modal: marketModal,
         show: show
     };
 })();

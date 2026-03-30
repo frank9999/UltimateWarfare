@@ -4,9 +4,7 @@
  */
 (function () {
     const messagesModal = document.getElementById('messagesModal');
-    const messagesModalTitle = document.getElementById('messagesModalTitle');
-    const closeMessagesModal = document.getElementById('closeMessagesModal');
-    const closeMessagesBtn = document.getElementById('closeMessagesBtn');
+    const messagesModalTitle = document.getElementById('messagesModalLabel');
     const messagesContainer = document.getElementById('messagesContainer');
     const messagesTabs = document.getElementById('messagesTabs');
     const messagesFooter = document.getElementById('messagesFooter');
@@ -22,18 +20,8 @@
         showMessagesModal();
     });
 
-    closeMessagesModal.onclick = function () { messagesModal.style.display = 'none'; };
-    closeMessagesBtn.onclick = function () {
-        if (currentView === 'read') {
-            currentView = 'list';
-            loadMessages();
-        } else {
-            messagesModal.style.display = 'none';
-        }
-    };
-
     function showMessagesModal() {
-        messagesModal.style.display = 'block';
+        bootstrap.Modal.getOrCreateInstance(messagesModal).show();
         currentTab = 'inbox';
         currentView = 'list';
         renderTabs();
@@ -64,8 +52,7 @@
     async function loadMessages() {
         messagesContainer.innerHTML = '<div class="build-loading">Loading messages...</div>';
         messagesModalTitle.textContent = currentTab === 'inbox' ? 'Inbox' : 'Outbox';
-        messagesFooter.innerHTML = '<button type="button" id="closeMessagesBtn">Close</button>';
-        document.getElementById('closeMessagesBtn').onclick = function () { messagesModal.style.display = 'none'; };
+        messagesFooter.innerHTML = '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>';
 
         try {
             const response = await fetch('/game/api/message/' + currentTab);
@@ -164,11 +151,11 @@
         messagesModalTitle.textContent = msg.subject;
 
         // Update footer with back and reply buttons
-        let footerHtml = '<button type="button" id="backToListBtn">Back</button>';
+        let footerHtml = '<button type="button" class="btn btn-secondary" id="backToListBtn">Back</button>';
         if (isInbox) {
-            footerHtml += '<button type="button" id="replyMessageBtn">Reply</button>';
+            footerHtml += '<button type="button" class="btn btn-primary" id="replyMessageBtn">Reply</button>';
         }
-        footerHtml += '<button type="button" id="deleteReadMessageBtn" style="background: #c44;">Delete</button>';
+        footerHtml += '<button type="button" class="btn btn-danger" id="deleteReadMessageBtn">Delete</button>';
         messagesFooter.innerHTML = footerHtml;
 
         document.getElementById('backToListBtn').onclick = function () {
@@ -183,8 +170,11 @@
 
         if (isInbox && document.getElementById('replyMessageBtn')) {
             document.getElementById('replyMessageBtn').onclick = function () {
-                messagesModal.style.display = 'none';
-                showSendMessageModalFromMessages(msg.from, 'Re: ' + msg.subject);
+                bootstrap.Modal.getInstance(messagesModal).hide();
+                messagesModal.addEventListener('hidden.bs.modal', function handler() {
+                    messagesModal.removeEventListener('hidden.bs.modal', handler);
+                    showSendMessageModalFromMessages(msg.from, 'Re: ' + msg.subject);
+                });
             };
         }
     }
@@ -222,9 +212,7 @@
         }
     }
 
-    // Expose for outside-click handling and reply integration
     window.WorldMessages = {
-        modal: messagesModal,
         onReply: null,
         show: showMessagesModal
     };

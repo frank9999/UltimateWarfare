@@ -45,7 +45,7 @@
         if (WorldApp.showWelcome) {
             var welcomeModal = document.getElementById('welcomeModal');
             if (welcomeModal) {
-                welcomeModal.style.display = 'block';
+                bootstrap.Modal.getOrCreateInstance(welcomeModal).show();
             }
         }
     }).catch(function (error) {
@@ -85,20 +85,6 @@
             dropdown.classList.remove('show');
         }
     });
-
-    // ===== Welcome Modal =====
-    var closeWelcomeModal = document.getElementById('closeWelcomeModal');
-    var closeWelcomeBtn = document.getElementById('closeWelcomeBtn');
-    if (closeWelcomeModal) {
-        closeWelcomeModal.addEventListener('click', function () {
-            document.getElementById('welcomeModal').style.display = 'none';
-        });
-    }
-    if (closeWelcomeBtn) {
-        closeWelcomeBtn.addEventListener('click', function () {
-            document.getElementById('welcomeModal').style.display = 'none';
-        });
-    }
 
     // ===== Unit Tooltip =====
     const unitTooltip = document.getElementById('unitTooltip');

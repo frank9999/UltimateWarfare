@@ -16,12 +16,9 @@
         showWorldsModal();
     });
 
-    document.getElementById('closeWorldsModal').onclick = function () { worldsModal.style.display = 'none'; };
-    document.getElementById('closeWorldsBtn').onclick = function () { worldsModal.style.display = 'none'; };
-
     function showWorldsModal() {
         currentTab = 'myWorlds';
-        worldsModal.style.display = 'block';
+        bootstrap.Modal.getOrCreateInstance(worldsModal).show();
         loadWorlds();
     }
 

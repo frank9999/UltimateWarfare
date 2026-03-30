@@ -3,8 +3,6 @@
  */
 (function () {
     const reportsModal = document.getElementById('reportsModal');
-    const closeReportsModal = document.getElementById('closeReportsModal');
-    const closeReportsBtn = document.getElementById('closeReportsBtn');
     const reportsContainer = document.getElementById('reportsContainer');
     const reportsTabs = document.getElementById('reportsTabs');
     const reportsPagination = document.getElementById('reportsPagination');
@@ -17,8 +15,6 @@
     let reportsTotalPages = 1;
     let reportsCategories = [];
 
-    closeReportsModal.onclick = function () { reportsModal.style.display = 'none'; };
-    closeReportsBtn.onclick = function () { reportsModal.style.display = 'none'; };
 
     reportsPrevBtn.onclick = function () {
         if (currentReportsPage > 1) {
@@ -35,7 +31,7 @@
     };
 
     function showReportsModal() {
-        reportsModal.style.display = 'block';
+        bootstrap.Modal.getOrCreateInstance(reportsModal).show();
         currentReportsPage = 1;
         currentReportsType = 'all';
         loadReports();
@@ -117,9 +113,7 @@
         reportsNextBtn.style.opacity = pagination.currentPage >= pagination.totalPages ? '0.5' : '1';
     }
 
-    // Expose for outside-click handling
     window.WorldReports = {
-        modal: reportsModal,
         show: showReportsModal
     };
 })();

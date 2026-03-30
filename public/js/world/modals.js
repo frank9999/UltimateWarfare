@@ -7,8 +7,6 @@
 
     // ===== Buy Region Modal =====
     const modal = document.getElementById('buyRegionModal');
-    const closeModal = document.getElementById('closeModal');
-    const cancelBtn = document.getElementById('cancelBtn');
     const confirmBuyBtn = document.getElementById('confirmBuyBtn');
     let selectedRegion = null;
     let isBuyingRegion = false;
@@ -28,11 +26,10 @@
             '<p style="margin-top: 10px;">Do you want to buy this region?</p>' +
             '<p style="color: #ffa500; font-size: 11px; margin-top: 5px;">Note: The price increases with each region you own.</p>' +
             '</div></div>';
-        modal.style.display = 'block';
+        bootstrap.Modal.getOrCreateInstance(modal).show();
     }
 
-    closeModal.onclick = function () { modal.style.display = 'none'; selectedRegion = null; };
-    cancelBtn.onclick = function () { modal.style.display = 'none'; selectedRegion = null; };
+    modal.addEventListener('hidden.bs.modal', function () { selectedRegion = null; });
 
     confirmBuyBtn.onclick = async function () {
         if (!selectedRegion || isBuyingRegion) return;
@@ -67,8 +64,7 @@
 
                 worldMap.setSectors(WorldApp.worldRegions).then(function () { worldMap.render(); });
                 showNotification(result.message, 'success');
-                modal.style.display = 'none';
-                selectedRegion = null;
+                bootstrap.Modal.getInstance(modal).hide();
             } else {
                 showNotification(result.message || 'Failed to buy region', 'error');
             }
@@ -84,7 +80,6 @@
 
     // ===== Enemy Region Modal =====
     const enemyModal = document.getElementById('enemyRegionModal');
-    const closeEnemyModal = document.getElementById('closeEnemyModal');
     let selectedEnemyRegion = null;
 
     function showEnemyRegionModal(region) {
@@ -99,16 +94,19 @@
             '<p><strong>Type:</strong> ' + region.type + '</p>' +
             '<p><strong>Owner:</strong> <a href="#" id="enemyOwnerLink" style="color: #ff6b6b; text-decoration: underline; cursor: pointer;">' + region.ownerName + '</a></p>' +
             '</div></div>';
-        enemyModal.style.display = 'block';
+        bootstrap.Modal.getOrCreateInstance(enemyModal).show();
 
         document.getElementById('enemyOwnerLink').onclick = function (e) {
             e.preventDefault();
-            enemyModal.style.display = 'none';
-            WorldPlayerProfile.show(region.ownerName);
+            bootstrap.Modal.getInstance(enemyModal).hide();
+            enemyModal.addEventListener('hidden.bs.modal', function handler() {
+                enemyModal.removeEventListener('hidden.bs.modal', handler);
+                WorldPlayerProfile.show(region.ownerName);
+            });
         };
     }
 
-    closeEnemyModal.onclick = function () { enemyModal.style.display = 'none'; selectedEnemyRegion = null; };
+    enemyModal.addEventListener('hidden.bs.modal', function () { selectedEnemyRegion = null; });
 
     // ===== Send Message Modal =====
     const sendMessageModal = document.getElementById('sendMessageModal');
@@ -126,7 +124,7 @@
         messageBody.value = '';
         confirmSendMessageBtn.disabled = false;
         confirmSendMessageBtn.textContent = 'Send Message';
-        sendMessageModal.style.display = 'block';
+        bootstrap.Modal.getOrCreateInstance(sendMessageModal).show();
     }
 
     // Allow messages.js to trigger reply
@@ -135,9 +133,6 @@
             showSendMessageModal(playerName, subject);
         };
     }
-
-    document.getElementById('closeSendMessageModal').onclick = function () { sendMessageModal.style.display = 'none'; };
-    document.getElementById('cancelSendMessageBtn').onclick = function () { sendMessageModal.style.display = 'none'; };
 
     confirmSendMessageBtn.onclick = async function () {
         if (isSendingMessage) return;
@@ -172,8 +167,9 @@
 
             if (result.success) {
                 showNotification(result.message, 'success');
-                sendMessageModal.style.display = 'none';
-                enemyModal.style.display = 'none';
+                bootstrap.Modal.getInstance(sendMessageModal).hide();
+                var enemyInstance = bootstrap.Modal.getInstance(enemyModal);
+                if (enemyInstance) enemyInstance.hide();
             } else {
                 showNotification(result.message || 'Failed to send message', 'error');
             }
@@ -199,7 +195,6 @@
 
     // ===== Your Region Modal =====
     const yourModal = document.getElementById('yourRegionModal');
-    const closeYourModal = document.getElementById('closeYourModal');
     let selectedYourRegion = null;
 
     function showYourRegionModal(region) {
@@ -214,23 +209,36 @@
             '<p><strong>Type:</strong> ' + region.type + '</p>' +
             '<p><strong>Owner:</strong> <span style="color: #6bafff;">You</span></p>' +
             '</div></div>';
-        yourModal.style.display = 'block';
+        bootstrap.Modal.getOrCreateInstance(yourModal).show();
 
         // Preload build data while user views region info
         WorldBuild.prefetchBuildData(region.id);
     }
 
-    closeYourModal.onclick = function () { yourModal.style.display = 'none'; selectedYourRegion = null; };
+    yourModal.addEventListener('hidden.bs.modal', function () { selectedYourRegion = null; });
+
+    let pendingBuildRegion = null;
     document.getElementById('buildBtn').onclick = function () {
         if (selectedYourRegion) {
-            yourModal.style.display = 'none';
-            WorldBuild.showBuildModal(selectedYourRegion);
+            pendingBuildRegion = selectedYourRegion;
+            bootstrap.Modal.getInstance(yourModal).hide();
+            yourModal.addEventListener('hidden.bs.modal', function handler() {
+                yourModal.removeEventListener('hidden.bs.modal', handler);
+                if (pendingBuildRegion) {
+                    WorldBuild.showBuildModal(pendingBuildRegion);
+                    pendingBuildRegion = null;
+                }
+            });
         }
     };
     document.getElementById('sendUnitsBtn').onclick = function () {
         if (selectedYourRegion) {
-            yourModal.style.display = 'none';
-            WorldSendUnits.startSendUnits(selectedYourRegion);
+            var region = selectedYourRegion;
+            bootstrap.Modal.getInstance(yourModal).hide();
+            yourModal.addEventListener('hidden.bs.modal', function handler() {
+                yourModal.removeEventListener('hidden.bs.modal', handler);
+                WorldSendUnits.startSendUnits(region);
+            });
         }
     };
 
@@ -253,31 +261,10 @@
     document.getElementById('navRankingsBtn').onclick = function (e) { e.preventDefault(); closeNavMenu(); WorldRankings.show(); };
     document.getElementById('navStatisticsBtn').onclick = function (e) { e.preventDefault(); closeNavMenu(); WorldStatistics.show(); };
 
-    // ===== Close modals on outside click =====
-    window.onclick = function (event) {
-        if (event.target === modal) { modal.style.display = 'none'; selectedRegion = null; }
-        if (event.target === enemyModal) { enemyModal.style.display = 'none'; selectedEnemyRegion = null; }
-        if (event.target === yourModal) { yourModal.style.display = 'none'; selectedYourRegion = null; }
-        if (event.target === sendMessageModal) { sendMessageModal.style.display = 'none'; }
-        if (event.target === WorldBuild.modal) { WorldBuild.modal.style.display = 'none'; }
-        if (event.target === WorldReports.modal) { WorldReports.modal.style.display = 'none'; }
-        if (event.target === WorldConstruction.modal) { WorldConstruction.modal.style.display = 'none'; }
-        if (event.target === WorldFleetOverview.modal) { WorldFleetOverview.modal.style.display = 'none'; }
-        if (event.target === WorldSendUnits.modal) { WorldSendUnits.modal.style.display = 'none'; }
-        if (event.target === WorldMessages.modal) { WorldMessages.modal.style.display = 'none'; }
-        if (event.target === WorldOperations.selectOperationModal) { WorldOperations.selectOperationModal.style.display = 'none'; }
-        if (event.target === WorldOperations.operationUnitsModal) { WorldOperations.operationUnitsModal.style.display = 'none'; }
-        if (event.target === WorldOperations.operationResultsModal) { WorldOperations.operationResultsModal.style.display = 'none'; }
-        if (event.target === WorldRegionOverview.modal) { WorldRegionOverview.modal.style.display = 'none'; }
-        if (event.target === WorldResearch.modal) { WorldResearch.modal.style.display = 'none'; }
-        if (event.target === WorldMarket.modal) { WorldMarket.modal.style.display = 'none'; }
-        if (event.target === WorldFederation.modal) { WorldFederation.modal.style.display = 'none'; }
-        if (event.target === WorldRankings.modal) { WorldRankings.modal.style.display = 'none'; }
-        if (event.target === WorldPlayerProfile.modal) { WorldPlayerProfile.modal.style.display = 'none'; }
-
-        // Close nav dropdown on outside click
+    // ===== Close nav dropdown on outside click =====
+    window.addEventListener('click', function (event) {
         if (navMenu.classList.contains('show')) { closeNavMenu(); }
-    };
+    });
 
     // ===== Default tile click handler =====
     WorldApp.defaultTileClick = function (region) {

@@ -8,20 +8,16 @@
     let allFleets = [];
     let timerInterval = null;
 
-    document.getElementById('closeFleetOverviewModal').onclick = function () { hide(); };
-    document.getElementById('closeFleetOverviewBtn').onclick = function () { hide(); };
-
-    function show() {
-        fleetModal.style.display = 'block';
-        loadFleets();
-    }
-
-    function hide() {
-        fleetModal.style.display = 'none';
+    fleetModal.addEventListener('hidden.bs.modal', function () {
         if (timerInterval) {
             clearInterval(timerInterval);
             timerInterval = null;
         }
+    });
+
+    function show() {
+        bootstrap.Modal.getOrCreateInstance(fleetModal).show();
+        loadFleets();
     }
 
     async function loadFleets() {
@@ -204,7 +200,6 @@
     }
 
     window.WorldFleetOverview = {
-        modal: fleetModal,
         show: show
     };
 })();

@@ -9,16 +9,13 @@
     let sortColumn = 'regions';
     let sortAscending = false;
 
-    document.getElementById('closeRankingsModal').onclick = function () { hide(); };
-    document.getElementById('closeRankingsBtn').onclick = function () { hide(); };
-
     function show() {
-        rankingsModal.style.display = 'block';
+        bootstrap.Modal.getOrCreateInstance(rankingsModal).show();
         loadRankings();
     }
 
     function hide() {
-        rankingsModal.style.display = 'none';
+        bootstrap.Modal.getInstance(rankingsModal).hide();
     }
 
     async function loadRankings() {
@@ -107,8 +104,12 @@
         rankingsContainer.querySelectorAll('.player-link').forEach(function (link) {
             link.onclick = function (e) {
                 e.preventDefault();
+                var playerName = link.getAttribute('data-player');
+                rankingsModal.addEventListener('hidden.bs.modal', function handler() {
+                    rankingsModal.removeEventListener('hidden.bs.modal', handler);
+                    WorldPlayerProfile.show(playerName);
+                });
                 hide();
-                WorldPlayerProfile.show(link.getAttribute('data-player'));
             };
         });
     }
@@ -120,7 +121,6 @@
     }
 
     window.WorldRankings = {
-        modal: rankingsModal,
         show: show
     };
 })();

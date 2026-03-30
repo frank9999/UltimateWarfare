@@ -424,6 +424,11 @@ a:hover {
 
 /* ===== Tables (for guide data pages) ===== */
 .table {
+    --bs-table-bg: #2a2a2a;
+    --bs-table-color: #f3e6c1;
+    --bs-table-border-color: #3a3a3a;
+    --bs-table-hover-bg: #333;
+    --bs-table-hover-color: #f3e6c1;
     background-color: #2a2a2a;
     color: #f3e6c1;
     margin-bottom: 5px;

@@ -11,12 +11,8 @@
     let currentAttackTarget = null;
 
     const attackUnitsModal = document.getElementById('attackUnitsModal');
-    const closeAttackUnitsModal = document.getElementById('closeAttackUnitsModal');
-    const cancelAttackUnitsBtn = document.getElementById('cancelAttackUnitsBtn');
     const confirmAttackUnitsBtn = document.getElementById('confirmAttackUnitsBtn');
 
-    closeAttackUnitsModal.onclick = function () { attackUnitsModal.style.display = 'none'; };
-    cancelAttackUnitsBtn.onclick = function () { attackUnitsModal.style.display = 'none'; };
     confirmAttackUnitsBtn.onclick = sendAttackFleet;
 
     function getDefaultTileClick() {
@@ -24,7 +20,8 @@
     }
 
     async function startAttackFromSelection(enemyRegion) {
-        document.getElementById('enemyRegionModal').style.display = 'none';
+        var enemyInstance = bootstrap.Modal.getInstance(document.getElementById('enemyRegionModal'));
+        if (enemyInstance) enemyInstance.hide();
         showNotification('Loading eligible regions...', 'info');
 
         try {
@@ -102,7 +99,7 @@
 
         const container = document.getElementById('attackUnitsContainer');
         container.innerHTML = '<div class="build-loading">Loading available units...</div>';
-        attackUnitsModal.style.display = 'block';
+        bootstrap.Modal.getOrCreateInstance(attackUnitsModal).show();
 
         try {
             const response = await fetch('/game/api/world/region/attack-units/' + targetRegion.id + '/' + sourceRegion.id);
@@ -181,7 +178,7 @@
             const result = await response.json();
 
             if (result.success) {
-                attackUnitsModal.style.display = 'none';
+                bootstrap.Modal.getInstance(attackUnitsModal).hide();
                 cancelAttackMode();
 
                 // Update source region units on the map
@@ -215,7 +212,6 @@
 
     // Expose globally
     window.WorldAttack = {
-        startAttackFromSelection: startAttackFromSelection,
-        modal: attackUnitsModal
+        startAttackFromSelection: startAttackFromSelection
     };
 })();

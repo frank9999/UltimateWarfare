@@ -5,16 +5,9 @@
     const playerProfileModal = document.getElementById('playerProfileModal');
     const playerProfileContainer = document.getElementById('playerProfileContainer');
 
-    document.getElementById('closePlayerProfileModal').onclick = function () { hide(); };
-    document.getElementById('closePlayerProfileBtn').onclick = function () { hide(); };
-
     function show(playerName) {
-        playerProfileModal.style.display = 'block';
+        bootstrap.Modal.getOrCreateInstance(playerProfileModal).show();
         loadProfile(playerName);
-    }
-
-    function hide() {
-        playerProfileModal.style.display = 'none';
     }
 
     async function loadProfile(playerName) {
@@ -72,7 +65,6 @@
     }
 
     window.WorldPlayerProfile = {
-        modal: playerProfileModal,
         show: show
     };
 })();

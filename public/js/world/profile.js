@@ -18,11 +18,9 @@
         showProfileModal();
     });
 
-    document.getElementById('closeProfileModal').onclick = function () { profileModal.style.display = 'none'; };
-
     function showProfileModal() {
         currentTab = 'info';
-        profileModal.style.display = 'block';
+        bootstrap.Modal.getOrCreateInstance(profileModal).show();
         loadProfile();
     }
 
@@ -91,8 +89,7 @@
         html += '</table>';
 
         profileContainer.innerHTML = html;
-        profileFooter.innerHTML = '<button type="button" id="closeProfileBtn">Close</button>';
-        document.getElementById('closeProfileBtn').onclick = function () { profileModal.style.display = 'none'; };
+        profileFooter.innerHTML = '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>';
     }
 
     function renderPasswordTab() {
@@ -107,8 +104,7 @@
         html += '</div>';
 
         profileContainer.innerHTML = html;
-        profileFooter.innerHTML = '<button type="button" id="closeProfileBtn">Close</button> <button type="button" id="savePasswordBtn">Change Password</button>';
-        document.getElementById('closeProfileBtn').onclick = function () { profileModal.style.display = 'none'; };
+        profileFooter.innerHTML = '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button> <button type="button" class="btn btn-primary" id="savePasswordBtn">Change Password</button>';
         document.getElementById('savePasswordBtn').onclick = changePassword;
     }
 
@@ -162,8 +158,7 @@
             html += '<p style="color: #aaa;">You cannot surrender for the first 48 hours after joining a world.</p>';
             html += '</div>';
             profileContainer.innerHTML = html;
-            profileFooter.innerHTML = '<button type="button" id="closeProfileBtn">Close</button>';
-            document.getElementById('closeProfileBtn').onclick = function () { profileModal.style.display = 'none'; };
+            profileFooter.innerHTML = '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>';
             return;
         }
 
@@ -171,8 +166,7 @@
             html += '<p style="color: #aaa;">You cannot surrender while you are a Federation founder. Please disband your Federation first.</p>';
             html += '</div>';
             profileContainer.innerHTML = html;
-            profileFooter.innerHTML = '<button type="button" id="closeProfileBtn">Close</button>';
-            document.getElementById('closeProfileBtn').onclick = function () { profileModal.style.display = 'none'; };
+            profileFooter.innerHTML = '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>';
             return;
         }
 
@@ -183,8 +177,7 @@
         html += '</div>';
 
         profileContainer.innerHTML = html;
-        profileFooter.innerHTML = '<button type="button" id="closeProfileBtn">Close</button> <button type="button" id="surrenderBtn" style="background: #f44336; color: #fff;">Surrender</button>';
-        document.getElementById('closeProfileBtn').onclick = function () { profileModal.style.display = 'none'; };
+        profileFooter.innerHTML = '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button> <button type="button" class="btn btn-danger" id="surrenderBtn">Surrender</button>';
         document.getElementById('surrenderBtn').onclick = surrender;
     }
 

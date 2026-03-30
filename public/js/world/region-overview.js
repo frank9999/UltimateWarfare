@@ -20,16 +20,13 @@
         { key: 9, label: 'Missiles' }
     ];
 
-    document.getElementById('closeRegionOverviewModal').onclick = function () { hide(); };
-    document.getElementById('closeRegionOverviewBtn').onclick = function () { hide(); };
-
     function show() {
-        regionModal.style.display = 'block';
+        bootstrap.Modal.getOrCreateInstance(regionModal).show();
         loadRegions();
     }
 
     function hide() {
-        regionModal.style.display = 'none';
+        bootstrap.Modal.getInstance(regionModal).hide();
     }
 
     async function loadRegions() {
@@ -148,8 +145,11 @@
                 const regionId = parseInt(btn.getAttribute('data-id'), 10);
                 const mapRegion = findMapRegion(regionId);
                 if (mapRegion) {
+                    regionModal.addEventListener('hidden.bs.modal', function handler() {
+                        regionModal.removeEventListener('hidden.bs.modal', handler);
+                        WorldBuild.showBuildModal(mapRegion);
+                    });
                     hide();
-                    WorldBuild.showBuildModal(mapRegion);
                 }
             };
         });
@@ -159,8 +159,11 @@
                 const regionId = parseInt(btn.getAttribute('data-id'), 10);
                 const mapRegion = findMapRegion(regionId);
                 if (mapRegion) {
+                    regionModal.addEventListener('hidden.bs.modal', function handler() {
+                        regionModal.removeEventListener('hidden.bs.modal', handler);
+                        WorldDestroy.showDestroyModal(mapRegion);
+                    });
                     hide();
-                    WorldDestroy.showDestroyModal(mapRegion);
                 }
             };
         });
@@ -183,7 +186,6 @@
     }
 
     window.WorldRegionOverview = {
-        modal: regionModal,
         show: show
     };
 })();

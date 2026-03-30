@@ -19,16 +19,6 @@
     const operationResultsModal = document.getElementById('operationResultsModal');
     const operationResultsContainer = document.getElementById('operationResultsContainer');
 
-    // Close handlers
-    document.getElementById('closeSelectOperationModal').onclick = function () { selectOperationModal.style.display = 'none'; };
-    document.getElementById('cancelSelectOperationBtn').onclick = function () { selectOperationModal.style.display = 'none'; };
-
-    document.getElementById('closeOperationUnitsModal').onclick = function () { operationUnitsModal.style.display = 'none'; };
-    document.getElementById('cancelOperationUnitsBtn').onclick = function () { operationUnitsModal.style.display = 'none'; };
-
-    document.getElementById('closeOperationResultsModal').onclick = function () { operationResultsModal.style.display = 'none'; };
-    document.getElementById('closeOperationResultsBtn').onclick = function () { operationResultsModal.style.display = 'none'; };
-
     document.getElementById('cancelOperationModeBtn').onclick = cancelOperationMode;
 
     confirmOperationBtn.onclick = executeOperation;
@@ -39,14 +29,15 @@
 
     // Step 1: Show available operations for target region
     async function startOperation(enemyRegion) {
-        document.getElementById('enemyRegionModal').style.display = 'none';
+        var enemyInstance = bootstrap.Modal.getInstance(document.getElementById('enemyRegionModal'));
+        if (enemyInstance) enemyInstance.hide();
         operationTargetRegion = enemyRegion;
 
         document.getElementById('operationTargetInfo').textContent =
             enemyRegion.x + ',' + enemyRegion.y + ' (' + enemyRegion.ownerName + ')';
 
         operationsContainer.innerHTML = '<div class="build-loading">Loading operations...</div>';
-        selectOperationModal.style.display = 'block';
+        bootstrap.Modal.getOrCreateInstance(selectOperationModal).show();
 
         try {
             const response = await fetch('/game/api/operation/list/' + enemyRegion.id);
@@ -100,7 +91,7 @@
 
     // Step 2: Select operation, fetch eligible regions, highlight them
     async function selectOperationAndHighlight(operation) {
-        selectOperationModal.style.display = 'none';
+        bootstrap.Modal.getInstance(selectOperationModal).hide();
         selectedOperation = operation;
         showNotification('Loading eligible regions for ' + operation.name + '...', 'info');
 
@@ -184,7 +175,7 @@
         container.innerHTML = '<div class="build-loading">Loading...</div>';
         confirmOperationBtn.disabled = false;
         confirmOperationBtn.textContent = 'Launch Operation';
-        operationUnitsModal.style.display = 'block';
+        bootstrap.Modal.getOrCreateInstance(operationUnitsModal).show();
 
         try {
             const response = await fetch(
@@ -260,7 +251,7 @@
             );
             const result = await response.json();
 
-            operationUnitsModal.style.display = 'none';
+            bootstrap.Modal.getInstance(operationUnitsModal).hide();
 
             if (result.success) {
                 // Update cash display
@@ -296,7 +287,7 @@
         });
         html += '</div>';
         operationResultsContainer.innerHTML = html;
-        operationResultsModal.style.display = 'block';
+        bootstrap.Modal.getOrCreateInstance(operationResultsModal).show();
     }
 
     function escapeHtml(text) {
@@ -314,9 +305,6 @@
 
     // Expose globally
     window.WorldOperations = {
-        startOperation: startOperation,
-        selectOperationModal: selectOperationModal,
-        operationUnitsModal: operationUnitsModal,
-        operationResultsModal: operationResultsModal
+        startOperation: startOperation
     };
 })();

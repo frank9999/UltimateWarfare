@@ -11,18 +11,15 @@
     let currentTab = 'overview';
     let cachedData = null;
 
-    document.getElementById('closeStatisticsModal').onclick = function () { hide(); };
+    statisticsModal.addEventListener('hidden.bs.modal', function () {
+        cachedData = null;
+    });
 
     function show() {
         currentTab = 'overview';
         cachedData = null;
-        statisticsModal.style.display = 'block';
+        bootstrap.Modal.getOrCreateInstance(statisticsModal).show();
         loadStatistics();
-    }
-
-    function hide() {
-        statisticsModal.style.display = 'none';
-        cachedData = null;
     }
 
     function renderTabs() {
@@ -205,8 +202,7 @@
     }
 
     function renderFooter() {
-        statisticsFooter.innerHTML = '<button type="button" id="closeStatisticsBtn">Close</button>';
-        document.getElementById('closeStatisticsBtn').onclick = function () { hide(); };
+        statisticsFooter.innerHTML = '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>';
     }
 
     function escapeHtml(text) {
@@ -216,7 +212,6 @@
     }
 
     window.WorldStatistics = {
-        modal: statisticsModal,
         show: show
     };
 })();
