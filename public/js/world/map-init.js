@@ -41,6 +41,13 @@
         worldMap.setBombardments(playerBombardments);
         centerOnHomeRegion();
         console.log('World map loaded successfully with ' + worldRegions.length + ' regions!');
+
+        if (WorldApp.showWelcome) {
+            var welcomeModal = document.getElementById('welcomeModal');
+            if (welcomeModal) {
+                welcomeModal.style.display = 'block';
+            }
+        }
     }).catch(function (error) {
         console.error('Failed to load world map:', error);
         showNotification('Failed to load world map. Please check the console for details.', 'error');
@@ -78,6 +85,20 @@
             dropdown.classList.remove('show');
         }
     });
+
+    // ===== Welcome Modal =====
+    var closeWelcomeModal = document.getElementById('closeWelcomeModal');
+    var closeWelcomeBtn = document.getElementById('closeWelcomeBtn');
+    if (closeWelcomeModal) {
+        closeWelcomeModal.addEventListener('click', function () {
+            document.getElementById('welcomeModal').style.display = 'none';
+        });
+    }
+    if (closeWelcomeBtn) {
+        closeWelcomeBtn.addEventListener('click', function () {
+            document.getElementById('welcomeModal').style.display = 'none';
+        });
+    }
 
     // ===== Unit Tooltip =====
     const unitTooltip = document.getElementById('unitTooltip');

@@ -50,6 +50,7 @@
             imageBasePath: '{{ asset('images') }}',
             playerName: {{ player.name|json_encode|raw }},
             regionPrice: {{ player.regionPrice }},
+            showWelcome: {{ showWelcome ? 'true' : 'false' }},
             worldMap: null,
             defaultTileClick: null,
             worldRegions: [

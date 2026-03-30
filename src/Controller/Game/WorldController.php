@@ -12,9 +12,11 @@ use FrankProjects\UltimateWarfare\Repository\GameUnitRegistry;
 use FrankProjects\UltimateWarfare\Repository\PlayerRepository;
 use FrankProjects\UltimateWarfare\Repository\FleetRepository;
 use FrankProjects\UltimateWarfare\Repository\WorldRepository;
+use FrankProjects\UltimateWarfare\Service\PlayerSetupService;
 use FrankProjects\UltimateWarfare\Service\WorldGeneratorService;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -128,8 +130,12 @@ final class WorldController extends BaseGameController
         );
     }
 
-    public function start(Request $request, int $worldId): Response
-    {
+    public function start(
+        Request $request,
+        int $worldId,
+        PlayerSetupService $playerSetupService,
+        RequestStack $requestStack
+    ): Response {
         $name = (string) $request->request->get('name');
 
         $user = $this->getGameUser();
@@ -152,7 +158,11 @@ final class WorldController extends BaseGameController
 
         $player = Player::create($user, $name, $world);
         $this->playerRepository->save($player);
-        return $this->redirectToRoute('Game/Login', [], 302);
+
+        $playerSetupService->setupNewPlayer($player, $world);
+        $requestStack->getSession()->set('playerId', $player->getId());
+
+        return $this->redirectToRoute('Game/WorldMap', ['welcome' => 1], 302);
     }
 
     public function image(int $worldId): Response
@@ -170,7 +180,7 @@ final class WorldController extends BaseGameController
         return $response;
     }
 
-    public function worldMap(): Response
+    public function worldMap(Request $request): Response
     {
         $player = $this->getPlayer();
         $world = $player->getWorld();
@@ -186,6 +196,7 @@ final class WorldController extends BaseGameController
                 'player' => $player,
                 'fleets' => $fleets,
                 'bombardments' => $bombardments,
+                'showWelcome' => $request->query->getBoolean('welcome'),
             ]
         );
     }

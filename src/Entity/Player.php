@@ -26,7 +26,7 @@ class Player
     private int $federationHierarchy = 0;
     private User $user;
     private World $world;
-    private ?Federation $federation;
+    private ?Federation $federation = null;
 
     /** @var Collection<int, Report> */
     private Collection $reports;
