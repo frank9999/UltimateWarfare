@@ -1,4 +1,11 @@
-{% block re_captcha_row %}
-    <div id="{{ id }}" data-toggle="recaptcha" data-type="{{ type }}">
+{% block captcha_row %}
+    <div class="mb-3">
+        <label class="form-label">Solve the math problem</label>
+        <div class="d-flex align-items-center gap-3 mb-2">
+            <img id="captcha-image" src="{{ path('Site/Captcha') }}" alt="CAPTCHA" style="height: 70px;">
+            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="document.getElementById('captcha-image').src='{{ path('Site/Captcha') }}?t='+Date.now()">&#8635; Refresh</button>
+        </div>
+        {{ form_widget(form) }}
+        {{ form_errors(form) }}
     </div>
 {% endblock %}
