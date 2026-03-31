@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace FrankProjects\UltimateWarfare\EventSubscriber;
 
 use FrankProjects\UltimateWarfare\Repository\UserRepository;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -61,6 +63,14 @@ final class UserSubscriber extends AbstractUserSubscriber implements EventSubscr
         }
 
         if (str_contains($event->getRequest()->getRequestUri(), '/game/banned')) {
+            return;
+        }
+
+        if (str_starts_with($event->getRequest()->getPathInfo(), '/game/api/')) {
+            $event->setResponse(new JsonResponse(
+                ['success' => false, 'message' => 'Your account has been banned.'],
+                Response::HTTP_FORBIDDEN
+            ));
             return;
         }
 
