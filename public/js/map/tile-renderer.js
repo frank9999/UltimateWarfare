@@ -57,6 +57,9 @@ class TileRenderer {
                 this.renderFogOfWar(pos, region.x, region.y);
             }
 
+            // Draw visibility border on visible regions adjacent to fog
+            this.renderVisibilityBorder(region, pos);
+
             // Add ownership overlay if enabled
             if (this.config.overlaysEnabled) {
                 this.renderOwnershipOverlay(region, pos);
@@ -282,6 +285,60 @@ class TileRenderer {
             const neighbor = this.sectorLookup.get(neighborKey);
 
             if (!neighbor || !neighbor.isYours) {
+                const j = (i + 1) % 6;
+                this.ctx.beginPath();
+                this.ctx.moveTo(pos.x + verts[i].dx, pos.y + verts[i].dy);
+                this.ctx.lineTo(pos.x + verts[j].dx, pos.y + verts[j].dy);
+                this.ctx.stroke();
+            }
+        }
+
+        this.ctx.restore();
+    }
+
+    /**
+     * Render visibility border on visible regions adjacent to fog of war.
+     * Draws thick red edges where a visible region borders a non-visible one.
+     */
+    renderVisibilityBorder(region, pos) {
+        if (region.isVisible === false || !this.sectorLookup) {
+            return;
+        }
+
+        const isOddRow = region.y % 2 !== 0;
+
+        const neighborOffsets = isOddRow
+            ? [
+                [1, 0],    // Edge 0: Right
+                [1, 1],    // Edge 1: SE
+                [0, 1],    // Edge 2: SW
+                [-1, 0],   // Edge 3: Left
+                [0, -1],   // Edge 4: NW
+                [1, -1],   // Edge 5: NE
+            ]
+            : [
+                [1, 0],    // Edge 0: Right
+                [0, 1],    // Edge 1: SE
+                [-1, 1],   // Edge 2: SW
+                [-1, 0],   // Edge 3: Left
+                [-1, -1],  // Edge 4: NW
+                [0, -1],   // Edge 5: NE
+            ];
+
+        this.ctx.save();
+        this.ctx.strokeStyle = '#dc2626';
+        this.ctx.lineWidth = 4;
+        this.ctx.lineCap = 'round';
+        this.ctx.lineJoin = 'round';
+
+        const verts = this.hexVertices;
+
+        for (let i = 0; i < 6; i++) {
+            const [dx, dy] = neighborOffsets[i];
+            const neighborKey = (region.x + dx) + ',' + (region.y + dy);
+            const neighbor = this.sectorLookup.get(neighborKey);
+
+            if (!neighbor || neighbor.isVisible === false) {
                 const j = (i + 1) % 6;
                 this.ctx.beginPath();
                 this.ctx.moveTo(pos.x + verts[i].dx, pos.y + verts[i].dy);
