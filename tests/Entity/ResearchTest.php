@@ -158,11 +158,11 @@ class ResearchTest extends TestCase
         self::assertSame([ResearchLevel1Research::class], $research->getPrerequisites());
     }
 
-    public function testSpyTechnologyRequiresLevel2AndSpecialOps(): void
+    public function testSpyTechnologyRequiresSpecialOps(): void
     {
         $research = new SpyTechnologyResearch();
         self::assertSame(
-            [ResearchLevel2Research::class, SpecialOperationsResearch::class],
+            [SpecialOperationsResearch::class],
             $research->getPrerequisites()
         );
     }

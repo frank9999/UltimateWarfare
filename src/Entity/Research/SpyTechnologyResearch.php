@@ -17,7 +17,7 @@ final readonly class SpyTechnologyResearch extends Research
             timestamp: 7200,
             description: 'Spy technology can be used to spy on enemy countries',
             enabled: true,
-            prerequisites: [ResearchLevel2Research::class, SpecialOperationsResearch::class],
+            prerequisites: [SpecialOperationsResearch::class],
         );
     }
 

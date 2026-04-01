@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace FrankProjects\UltimateWarfare\Repository;
 
 use FrankProjects\UltimateWarfare\Entity\Research;
+use FrankProjects\UltimateWarfare\Entity\Research\AdvancedSpy2TechnologyResearch;
 use FrankProjects\UltimateWarfare\Entity\Research\AdvancedSpyTechnologyResearch;
 use FrankProjects\UltimateWarfare\Entity\Research\NuclearTechnologyResearch;
 use FrankProjects\UltimateWarfare\Entity\Research\ResearchLevel10Research;
@@ -47,6 +48,7 @@ final class ResearchRegistry
             new SpecialOperations4Research(),
             new SpyTechnologyResearch(),
             new AdvancedSpyTechnologyResearch(),
+            new AdvancedSpy2TechnologyResearch(),
             new NuclearTechnologyResearch(),
         ];
 

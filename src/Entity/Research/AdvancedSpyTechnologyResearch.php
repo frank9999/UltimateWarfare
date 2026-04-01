@@ -17,7 +17,7 @@ final readonly class AdvancedSpyTechnologyResearch extends Research
             timestamp: 150000,
             description: 'Advanced Spy Technology allows you to get more information about an enemy country',
             enabled: true,
-            prerequisites: [SpyTechnologyResearch::class],
+            prerequisites: [SpyTechnologyResearch::class, SpecialOperations2Research::class],
         );
     }
 

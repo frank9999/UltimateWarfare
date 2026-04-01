@@ -8,7 +8,7 @@ use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitCategory;
 use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitEnum;
 use FrankProjects\UltimateWarfare\Service\OperationEngine\OperationProcessor;
 
-final class StealthBomberAttack extends OperationProcessor
+final class BomberAttack extends OperationProcessor
 {
     protected const int BUILDINGS_DESTROYED_PER_BOMBER = 5;
 
@@ -50,7 +50,7 @@ final class StealthBomberAttack extends OperationProcessor
             }
 
             $this->addToOperationLog("You destroyed all special buildings!");
-            $reportText = "Somebody launched a Stealth Bomber attack"
+            $reportText = "Somebody launched a Bomber attack"
                 . " against region {$this->region->getX()}, {$this->region->getY()}"
                 . " and destroyed all special buildings.";
             $this->reportCreator->createReport($this->getTargetRegionPlayer(), time(), $reportText);
@@ -68,7 +68,7 @@ final class StealthBomberAttack extends OperationProcessor
                 }
             }
 
-            $reportText = "Somebody launched a Stealth Bomber attack"
+            $reportText = "Somebody launched a Bomber attack"
                 . " against region {$this->region->getX()}, {$this->region->getY()}"
                 . " and destroyed {$buildingsDestroyed} buildings.";
             $this->reportCreator->createReport($this->getTargetRegionPlayer(), time(), $reportText);
@@ -78,7 +78,7 @@ final class StealthBomberAttack extends OperationProcessor
     public function processFailed(): void
     {
         $specialOpsLost = intval($this->getSpecialOps() * 0.05);
-        $stealthBombersLost = intval($this->amount * 0.1);
+        $bombersLost = intval($this->amount * 0.1);
 
         foreach ($this->playerRegion->getWorldRegionUnits() as $worldRegionUnit) {
             if ($worldRegionUnit->getGameUnit() === GameUnitEnum::SABOTEUR) {
@@ -86,19 +86,19 @@ final class StealthBomberAttack extends OperationProcessor
                 $this->worldRegionUnitRepository->save($worldRegionUnit);
             }
 
-            if ($worldRegionUnit->getGameUnit() === GameUnitEnum::STRATEGIC_BOMBER) {
-                $worldRegionUnit->setAmount(intval($worldRegionUnit->getAmount() - $stealthBombersLost));
+            if ($worldRegionUnit->getGameUnit() === GameUnitEnum::BOMBER) {
+                $worldRegionUnit->setAmount(intval($worldRegionUnit->getAmount() - $bombersLost));
                 $this->worldRegionUnitRepository->save($worldRegionUnit);
             }
         }
 
-        $reportText = "{$this->getPlayerRegionPlayer()->getName()} tried to launch a Stealth Bomber attack"
+        $reportText = "{$this->getPlayerRegionPlayer()->getName()} tried to launch a Bomber attack"
             . " against region {$this->region->getX()}, {$this->region->getY()} but failed.";
         $this->reportCreator->createReport($this->getTargetRegionPlayer(), time(), $reportText);
 
         $this->addToOperationLog(
-            "We failed our Stealth Bomber attack and lost {$specialOpsLost} Special Ops"
-            . " and {$stealthBombersLost} Stealth Bombers"
+            "We failed our Bomber attack and lost {$specialOpsLost} Special Ops"
+            . " and {$bombersLost} Bombers"
         );
     }
 

@@ -7,11 +7,12 @@ namespace FrankProjects\UltimateWarfare\Tests\Entity;
 use FrankProjects\UltimateWarfare\Entity\Operation;
 use FrankProjects\UltimateWarfare\Entity\Operation\AdvancedSpy2Operation;
 use FrankProjects\UltimateWarfare\Entity\Operation\AdvancedSpyOperation;
+use FrankProjects\UltimateWarfare\Entity\Operation\BomberAttackOperation;
 use FrankProjects\UltimateWarfare\Entity\Operation\MissileAttackOperation;
 use FrankProjects\UltimateWarfare\Entity\Operation\NuclearMissileAttackOperation;
 use FrankProjects\UltimateWarfare\Entity\Operation\SniperAttackOperation;
 use FrankProjects\UltimateWarfare\Entity\Operation\SpyOperation;
-use FrankProjects\UltimateWarfare\Entity\Operation\StealthBomberAttackOperation;
+use FrankProjects\UltimateWarfare\Entity\Operation\StrategicBomberAttackOperation;
 use FrankProjects\UltimateWarfare\Entity\Operation\SubmarineAttackOperation;
 use FrankProjects\UltimateWarfare\Entity\Research;
 use FrankProjects\UltimateWarfare\Service\OperationEngine\OperationInterface;
@@ -32,7 +33,8 @@ class OperationTest extends TestCase
             'sniper-attack' => [SniperAttackOperation::class, 'sniper-attack'],
             'missile-attack' => [MissileAttackOperation::class, 'missile-attack'],
             'submarine-attack' => [SubmarineAttackOperation::class, 'submarine-attack'],
-            'stealth-bomber-attack' => [StealthBomberAttackOperation::class, 'stealth-bomber-attack'],
+            'bomber-attack' => [BomberAttackOperation::class, 'bomber-attack'],
+            'strategic-bomber-attack' => [StrategicBomberAttackOperation::class, 'strategic-bomber-attack'],
             'nuclear-missile-attack' => [NuclearMissileAttackOperation::class, 'nuclear-missile-attack'],
         ];
     }

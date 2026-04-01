@@ -8,11 +8,12 @@ use FrankProjects\UltimateWarfare\Entity\Operation;
 use FrankProjects\UltimateWarfare\Entity\Operation\AdvancedSpy2Operation;
 use FrankProjects\UltimateWarfare\Entity\Operation\AdvancedSpyOperation;
 use FrankProjects\UltimateWarfare\Entity\Operation\ArtilleryBombardmentOperation;
+use FrankProjects\UltimateWarfare\Entity\Operation\BomberAttackOperation;
 use FrankProjects\UltimateWarfare\Entity\Operation\MissileAttackOperation;
 use FrankProjects\UltimateWarfare\Entity\Operation\NuclearMissileAttackOperation;
 use FrankProjects\UltimateWarfare\Entity\Operation\SniperAttackOperation;
 use FrankProjects\UltimateWarfare\Entity\Operation\SpyOperation;
-use FrankProjects\UltimateWarfare\Entity\Operation\StealthBomberAttackOperation;
+use FrankProjects\UltimateWarfare\Entity\Operation\StrategicBomberAttackOperation;
 use FrankProjects\UltimateWarfare\Entity\Operation\SubmarineAttackOperation;
 use FrankProjects\UltimateWarfare\Entity\Player;
 
@@ -26,7 +27,8 @@ final class OperationRegistry
         $operationList = [
             new ArtilleryBombardmentOperation(),
             new MissileAttackOperation(),
-            new StealthBomberAttackOperation(),
+            new BomberAttackOperation(),
+            new StrategicBomberAttackOperation(),
             new SpyOperation(),
             new SniperAttackOperation(),
             new NuclearMissileAttackOperation(),
