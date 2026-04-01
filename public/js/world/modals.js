@@ -5,6 +5,41 @@
 (function () {
     const imgBase = WorldApp.imageBasePath;
 
+    /**
+     * Recalculate visibility on all sectors (owned regions + 6 hex neighbors).
+     * Mirrors the PHP calculateVisibleRegions logic using odd-r offset hex grid.
+     */
+    function recalculateVisibility(sectors) {
+        const visibleCoords = {};
+
+        sectors.forEach(function (s) {
+            if (!s.isYours) return;
+            const x = s.x;
+            const y = s.y;
+            const key = x + ',' + y;
+            visibleCoords[key] = true;
+
+            visibleCoords[(x - 1) + ',' + y] = true;
+            visibleCoords[(x + 1) + ',' + y] = true;
+
+            if (y % 2 === 0) {
+                visibleCoords[(x - 1) + ',' + (y - 1)] = true;
+                visibleCoords[x + ',' + (y - 1)] = true;
+                visibleCoords[(x - 1) + ',' + (y + 1)] = true;
+                visibleCoords[x + ',' + (y + 1)] = true;
+            } else {
+                visibleCoords[x + ',' + (y - 1)] = true;
+                visibleCoords[(x + 1) + ',' + (y - 1)] = true;
+                visibleCoords[x + ',' + (y + 1)] = true;
+                visibleCoords[(x + 1) + ',' + (y + 1)] = true;
+            }
+        });
+
+        sectors.forEach(function (s) {
+            s.isVisible = !!visibleCoords[s.x + ',' + s.y];
+        });
+    }
+
     // ===== Buy Region Modal =====
     const modal = document.getElementById('buyRegionModal');
     const confirmBuyBtn = document.getElementById('confirmBuyBtn');
@@ -51,6 +86,19 @@
                     worldMap.sectors[regionIndex].hasOwner = true;
                     worldMap.sectors[regionIndex].isYours = true;
                     worldMap.sectors[regionIndex].ownerName = WorldApp.playerName;
+                }
+
+                // Recalculate fog of war with new ownership
+                recalculateVisibility(WorldApp.worldRegions);
+
+                // Apply masked enemy unit data for newly visible neighbors
+                if (result.newlyVisibleEnemyUnits) {
+                    Object.keys(result.newlyVisibleEnemyUnits).forEach(function (id) {
+                        const sector = WorldApp.worldRegions.find(function (s) { return s.id === parseInt(id); });
+                        if (sector && !sector.isYours) {
+                            sector.units = result.newlyVisibleEnemyUnits[id];
+                        }
+                    });
                 }
 
                 if (result.newCash !== undefined) {

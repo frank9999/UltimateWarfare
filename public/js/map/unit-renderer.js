@@ -272,24 +272,44 @@ class UnitRenderer {
      * Render unit indicators on a tile
      */
     renderUnitIndicators(region, isoX, isoY, tileHeight) {
-        if (!region.isYours || !region.units) {
+        if (!region.units) {
             return;
         }
 
         const units = region.units;
+        const isMasked = !!units.masked;
+
+        // Only render for own regions or visible enemy regions with masked data
+        if (!region.isYours && !isMasked) {
+            return;
+        }
+
         const iconSize = 10;
         const spacing = 14;
-        
-        // Collect active unit types with color palette
+
+        const categories = [
+            { key: 'buildings', color: '#3d5a80', label: 'Buildings' },
+            { key: 'defences', color: '#7b6d8d', label: 'Defences' },
+            { key: 'special', color: '#d4a03c', label: 'Special' },
+            { key: 'specialUnits', color: '#c75146', label: 'Elite Units' },
+            { key: 'troops', color: '#5a8c5a', label: 'Troops' },
+            { key: 'navalUnits', color: '#4a7ba7', label: 'Naval Units' },
+            { key: 'airUnits', color: '#87ceeb', label: 'Air Units' },
+            { key: 'missiles', color: '#d64545', label: 'Missiles' },
+        ];
+
+        // Collect active unit types
         const activeTypes = [];
-        if (units.buildings > 0) activeTypes.push({ type: 'buildings', count: units.buildings, color: '#3d5a80', label: 'Buildings' });
-        if (units.defences > 0) activeTypes.push({ type: 'defences', count: units.defences, color: '#7b6d8d', label: 'Defences' });
-        if (units.special > 0) activeTypes.push({ type: 'special', count: units.special, color: '#d4a03c', label: 'Special' });
-        if (units.specialUnits > 0) activeTypes.push({ type: 'specialUnits', count: units.specialUnits, color: '#c75146', label: 'Elite Units' });
-        if (units.troops > 0) activeTypes.push({ type: 'troops', count: units.troops, color: '#5a8c5a', label: 'Troops' });
-        if (units.navalUnits > 0) activeTypes.push({ type: 'navalUnits', count: units.navalUnits, color: '#4a7ba7', label: 'Naval Units' });
-        if (units.airUnits > 0) activeTypes.push({ type: 'airUnits', count: units.airUnits, color: '#87ceeb', label: 'Air Units' });
-        if (units.missiles > 0) activeTypes.push({ type: 'missiles', count: units.missiles, color: '#d64545', label: 'Missiles' });
+        categories.forEach(function (cat) {
+            if (units[cat.key] && units[cat.key] !== 0) {
+                activeTypes.push({
+                    type: cat.key,
+                    count: isMasked ? '?' : units[cat.key],
+                    color: cat.color,
+                    label: cat.label
+                });
+            }
+        });
 
         if (activeTypes.length === 0) {
             return;
@@ -316,9 +336,9 @@ class UnitRenderer {
                 details: units.details ? units.details[item.type] : null
             });
 
-            // Draw background circle
+            // Draw background circle (red tint for enemy regions)
             this.ctx.save();
-            this.ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+            this.ctx.fillStyle = isMasked ? 'rgba(80, 0, 0, 0.5)' : 'rgba(0, 0, 0, 0.6)';
             this.ctx.beginPath();
             this.ctx.arc(iconX, iconY, iconSize * 0.8, 0, Math.PI * 2);
             this.ctx.fill();

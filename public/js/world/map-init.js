@@ -121,17 +121,26 @@
 
             if (foundIcon) {
                 const fi = foundIcon.icon;
+                const region = foundIcon.region;
+                const isMasked = region.units && region.units.masked;
+
                 let tooltipHtml = '<div class="tooltip-title" style="color: ' + fi.color + '">' + fi.label + '</div>';
 
-                if (fi.details && fi.details.length > 0) {
-                    fi.details.forEach(function (unit) {
-                        tooltipHtml += '<div class="tooltip-item">' +
-                            '<span class="unit-name">' + unit.name + '</span>' +
-                            '<span class="unit-count">' + unit.amount + '</span></div>';
-                    });
+                if (isMasked) {
+                    tooltipHtml += '<div class="tooltip-item">' +
+                        '<span class="unit-name">Unknown composition</span>' +
+                        '<span class="unit-count">?</span></div>';
+                    tooltipHtml += '<div class="tooltip-total">Total: ?</div>';
+                } else {
+                    if (fi.details && fi.details.length > 0) {
+                        fi.details.forEach(function (unit) {
+                            tooltipHtml += '<div class="tooltip-item">' +
+                                '<span class="unit-name">' + unit.name + '</span>' +
+                                '<span class="unit-count">' + unit.amount + '</span></div>';
+                        });
+                    }
+                    tooltipHtml += '<div class="tooltip-total">Total: ' + fi.count + '</div>';
                 }
-
-                tooltipHtml += '<div class="tooltip-total">Total: ' + fi.count + '</div>';
 
                 unitTooltip.innerHTML = tooltipHtml;
                 unitTooltip.style.display = 'block';

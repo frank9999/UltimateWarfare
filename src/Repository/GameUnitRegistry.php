@@ -198,4 +198,43 @@ final class GameUnitRegistry
 
         return $summary;
     }
+
+    /**
+     * Get which unit categories are present in a region (without revealing counts).
+     * Used for showing enemy unit indicators with hidden amounts.
+     *
+     * @return array<string, bool>
+     */
+    public function getRegionUnitCategoriesPresence(WorldRegion $region): array
+    {
+        $presence = [
+            'buildings' => false,
+            'defences' => false,
+            'special' => false,
+            'specialUnits' => false,
+            'troops' => false,
+            'navalUnits' => false,
+            'airUnits' => false,
+            'missiles' => false,
+        ];
+
+        foreach ($region->getWorldRegionUnits() as $worldRegionUnit) {
+            if ($worldRegionUnit->getAmount() > 0) {
+                $gameUnit = $this->find($worldRegionUnit->getGameUnit());
+                $key = match ($gameUnit->getGameUnitCategory()) {
+                    GameUnitCategory::BUILDINGS => 'buildings',
+                    GameUnitCategory::DEFENSE_BUILDINGS => 'defences',
+                    GameUnitCategory::SPECIAL_BUILDINGS => 'special',
+                    GameUnitCategory::SPECIAL_UNITS => 'specialUnits',
+                    GameUnitCategory::TROOPS => 'troops',
+                    GameUnitCategory::NAVAL_UNITS => 'navalUnits',
+                    GameUnitCategory::AIR_UNITS => 'airUnits',
+                    GameUnitCategory::MISSILES => 'missiles',
+                };
+                $presence[$key] = true;
+            }
+        }
+
+        return $presence;
+    }
 }
