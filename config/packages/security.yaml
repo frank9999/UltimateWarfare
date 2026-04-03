@@ -28,6 +28,7 @@ security:
                 default_target_path: /game/login
                 login_path: /login
                 check_path: /login
+                success_handler: FrankProjects\UltimateWarfare\Security\ApiAwareAuthenticationSuccessHandler
             logout:       true
 
     access_control:
