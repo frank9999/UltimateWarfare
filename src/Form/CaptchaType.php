@@ -32,7 +32,7 @@ class CaptchaType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver
-            ->setDefault('invalid_message', 'The captcha answer is incorrect. Please try again.');
+            ->setDefault('invalid_message', 'captcha.invalid');
     }
 
     public function getParent(): string
