@@ -1,10 +1,9 @@
 {% extends 'site.html.twig' %}
+{% trans_default_domain 'login' %}
 
-{% block title %}Ultimate Warfare - Login{% endblock title %}
+{% block title %}{{ 'page.title'|trans }}{% endblock title %}
 
 {% block content %}
-    {% trans_default_domain 'login' %}
-
     {% if error %}
         <div class="alert alert-danger" role="alert">
             {{ error.messageKey|trans(error.messageData, 'security') }}
@@ -13,7 +12,7 @@
 
     <div class="form-card-wrapper">
         <div class="uw-card">
-            <div class="uw-card-header">Login</div>
+            <div class="uw-card-header">{{ 'page.header'|trans }}</div>
             <div class="uw-card-body">
                 <form method="post" action="{{ path("Site/Login") }}">
                     <div class="mb-3">
