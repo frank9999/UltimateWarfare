@@ -1,15 +1,14 @@
 {% extends 'site.html.twig' %}
+{% trans_default_domain 'site' %}
 
-{% block title %}Ultimate Warfare - Contact{% endblock title %}
+{% block title %}{{ 'contact_page.title'|trans }}{% endblock title %}
 
 {% block content %}
     <div class="form-card-wrapper">
         <div class="uw-card">
-            <div class="uw-card-header">Contact</div>
+            <div class="uw-card-header">{{ 'contact_page.header'|trans }}</div>
             <div class="uw-card-body">
-                <p class="text-center">
-                    Your feedback helps us improve Ultimate Warfare. Whether you have a suggestion, a question, or want to report an issue, we'd love to hear from you.
-                </p>
+                <p class="text-center">{{ 'contact_page.intro'|trans }}</p>
 
                 {{ form_start(form) }}
                 {{ form_widget(form) }}

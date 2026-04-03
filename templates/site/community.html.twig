@@ -1,27 +1,22 @@
 {% extends 'site.html.twig' %}
+{% trans_default_domain 'site' %}
 
-{% block title %}Ultimate Warfare - Community{% endblock title %}
+{% block title %}{{ 'community.title'|trans }}{% endblock title %}
 
 {% block content %}
     <div class="uw-card">
-        <div class="uw-card-header">Community</div>
+        <div class="uw-card-header">{{ 'community.header'|trans }}</div>
         <div class="uw-card-body text-center">
+            <p>{{ 'community.intro'|trans }}</p>
             <p>
-                Ultimate Warfare is a free and open-source online multiplayer browser based strategy game.
-            </p>
-            <p>
-                <a class="btn btn-primary" href="https://github.com/FrankProjects/UltimateWarfare">Check it out on GitHub</a>
+                <a class="btn btn-primary" href="https://github.com/FrankProjects/UltimateWarfare">{{ 'community.github_cta'|trans }}</a>
             </p>
 
-            <h3>Support Ultimate Warfare</h3>
+            <h3>{{ 'community.support.heading'|trans }}</h3>
+            <p>{{ 'community.support.paragraph_1'|trans }}</p>
+            <p>{{ 'community.support.paragraph_2'|trans }}</p>
             <p>
-                Ultimate-Warfare is and will always be free to play, but far from free to develop, run and maintain. Please consider supporting us with a donation.
-            </p>
-            <p>
-                Donations are currently accepted through Paypal.
-            </p>
-            <p>
-                <a href="https://www.paypal.me/frankschreuder"><img src="{{ asset('images/donate.gif') }}" alt="Donate" /></a>
+                <a href="https://www.paypal.me/frankschreuder"><img src="{{ asset('images/donate.gif') }}" alt="{{ 'community.support.donate_alt'|trans }}" /></a>
             </p>
         </div>
     </div>
