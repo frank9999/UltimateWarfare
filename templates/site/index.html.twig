@@ -1,29 +1,33 @@
 {% extends 'site.html.twig' %}
+{% trans_default_domain 'homepage' %}
+
+{% block title %}{{ 'title'|trans }}{% endblock %}
+
 {% block content %}
     <div class="uw-hero" style="background-image: url('{{ asset('images/uw_background.jpg') }}');">
         <div class="uw-hero-overlay">
             <h1>Ultimate Warfare</h1>
-            <p class="tagline">Compete for world domination in this free multiplayer strategy game</p>
-            <a class="btn-cta" href="{{ path('Site/Register') }}">Play Now - Free</a>
+            <p class="tagline">{{ 'hero.tagline'|trans }}</p>
+            <a class="btn-cta" href="{{ path('Site/Register') }}">{{ 'hero.cta'|trans }}</a>
         </div>
     </div>
 
     <div class="features-grid">
         <div class="feature-item">
-            <strong>Free to Play</strong>
-            <span>Browser based MMORPG, no download required</span>
+            <strong>{{ 'features.free_to_play.title'|trans }}</strong>
+            <span>{{ 'features.free_to_play.text'|trans }}</span>
         </div>
         <div class="feature-item">
-            <strong>PVP Battles</strong>
-            <span>Player vs Player and Federation warfare</span>
+            <strong>{{ 'features.pvp.title'|trans }}</strong>
+            <span>{{ 'features.pvp.text'|trans }}</span>
         </div>
         <div class="feature-item">
-            <strong>World Map</strong>
-            <span>Conquer regions on an interactive hex map</span>
+            <strong>{{ 'features.world_map.title'|trans }}</strong>
+            <span>{{ 'features.world_map.text'|trans }}</span>
         </div>
         <div class="feature-item">
-            <strong>Strategy</strong>
-            <span>Research, build, and command your armies</span>
+            <strong>{{ 'features.strategy.title'|trans }}</strong>
+            <span>{{ 'features.strategy.text'|trans }}</span>
         </div>
     </div>
 {% endblock %}
