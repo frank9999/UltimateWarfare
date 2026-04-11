@@ -29,7 +29,7 @@ final class Sniper extends GameUnit
             behaviorClass: null,
             cost: new Cost(cash: 2500, food: 0, wood: 1, steel: 5),
             income: new Income(cash: 0, food: 0, wood: 0, steel: 0),
-            upkeep: new Upkeep(cash: 0, food: 0, wood: 0, steel: 0),
+            upkeep: new Upkeep(cash: 2, food: 2, wood: 0, steel: 0),
             battleStats: new BattleStats(health: 0, armor: 0),
             researchClass: AdvancedOpticsResearch::class,
         );

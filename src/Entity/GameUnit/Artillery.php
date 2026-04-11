@@ -23,7 +23,7 @@ final class Artillery extends GameUnit
             rowName: 'artillery',
             image: 'gu_artillery.jpg',
             netWorth: 10,
-            timestamp: 10800,
+            timestamp: 14400,
             description: '',
             gameUnitCategory: GameUnitCategory::TROOPS,
             behaviorClass: null,
