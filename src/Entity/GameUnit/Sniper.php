@@ -21,7 +21,7 @@ final class Sniper extends GameUnit
             name: 'Sniper',
             nameMulti: 'Snipers',
             rowName: 'sniper',
-            image: 'sniper.gif',
+            image: 'gu_sniper.jpg',
             netWorth: 1,
             timestamp: 7200,
             description: 'Snipers can be sent to enemy countries to take down enemy soldiers',

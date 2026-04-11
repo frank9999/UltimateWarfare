@@ -21,7 +21,7 @@ final class Artillery extends GameUnit
             name: 'Artillery',
             nameMulti: 'Artillery',
             rowName: 'artillery',
-            image: 'tank.gif',
+            image: 'gu_artillery.jpg',
             netWorth: 10,
             timestamp: 10800,
             description: '',

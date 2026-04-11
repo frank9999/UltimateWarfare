@@ -21,7 +21,7 @@ final class Tank extends GameUnit
             name: 'Tank',
             nameMulti: 'Tanks',
             rowName: 'tank',
-            image: 'tank.gif',
+            image: 'gu_tank.jpg',
             netWorth: 10,
             timestamp: 10800,
             description: '',

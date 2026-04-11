@@ -21,7 +21,7 @@ final class Soldier extends GameUnit
             name: 'Soldier',
             nameMulti: 'Soldiers',
             rowName: 'soldier',
-            image: 'soldier.gif',
+            image: 'gu_soldier.jpg',
             netWorth: 1,
             timestamp: 1800,
             description: '',

@@ -21,7 +21,7 @@ final class MineSweeper extends GameUnit
             name: 'Mine Sweeper',
             nameMulti: 'Mine Sweepers',
             rowName: 'minesweeper',
-            image: 'minesweeper.gif',
+            image: 'gu_minesweeper.jpg',
             netWorth: 1,
             timestamp: 3600,
             description: 'This Soldier is trained to find and disarm mines.',
