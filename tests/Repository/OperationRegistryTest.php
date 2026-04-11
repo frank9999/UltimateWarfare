@@ -35,7 +35,7 @@ class OperationRegistryTest extends TestCase
     public function testFindAllReturnsAllOperations(): void
     {
         $operations = $this->registry->findAll();
-        self::assertCount(10, $operations);
+        self::assertCount(11, $operations);
     }
 
     public function testFindEnabledReturnsOnlyEnabledOperations(): void

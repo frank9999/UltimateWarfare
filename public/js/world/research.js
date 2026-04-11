@@ -5,23 +5,29 @@
     let timerInterval = null;
 
     const TREE_LAYOUT = {
-        'research-level-1':        { col: 0, row: 0 },
-        'research-level-2':        { col: 1, row: 0 },
-        'research-level-3':        { col: 2, row: 0 },
-        'research-level-4':        { col: 3, row: 0 },
-        'research-level-5':        { col: 4, row: 0 },
-        'research-level-6':        { col: 5, row: 0 },
-        'research-level-7':        { col: 6, row: 0 },
-        'research-level-8':        { col: 7, row: 0 },
-        'research-level-9':        { col: 8, row: 0 },
-        'research-level-10':       { col: 9, row: 0 },
-        'special-operations':      { col: 0, row: 1 },
-        'special-operations-2':    { col: 1, row: 1 },
-        'special-operations-3':    { col: 2, row: 1 },
-        'special-operations-4':    { col: 3, row: 1 },
-        'spy-technology':          { col: 1, row: 2 },
-        'advanced-spy-technology': { col: 2, row: 2 },
-        'nuclear-technology':      { col: 6, row: 1 }
+        'research-level-1':              { col: 0, row: 0 },
+        'research-level-2':              { col: 1, row: 0 },
+        'research-level-3':              { col: 2, row: 0 },
+        'research-level-4':              { col: 3, row: 0 },
+        'research-level-5':              { col: 4, row: 0 },
+        'research-level-6':              { col: 5, row: 0 },
+        'research-level-7':              { col: 6, row: 0 },
+        'research-level-8':              { col: 7, row: 0 },
+        'research-level-9':              { col: 8, row: 0 },
+        'research-level-10':             { col: 9, row: 0 },
+        'special-operations':            { col: 0, row: 1 },
+        'special-operations-2':          { col: 1, row: 1 },
+        'special-operations-3':          { col: 2, row: 1 },
+        'special-operations-4':          { col: 3, row: 1 },
+        'spy-technology':                { col: 1, row: 2 },
+        'advanced-spy-technology':       { col: 2, row: 2 },
+        'nuclear-technology':            { col: 6, row: 1 },
+        'factory-blueprint':             { col: 1, row: 3 },
+        'advanced-optics':               { col: 2, row: 3 },
+        'submarine-technology':          { col: 3, row: 3 },
+        'ballistic-missile-technology':  { col: 4, row: 3 },
+        'radar-technology':              { col: 5, row: 3 },
+        'naval-bombardment':             { col: 6, row: 3 }
     };
 
     const NODE_WIDTH = 160;

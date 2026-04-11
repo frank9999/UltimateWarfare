@@ -11,6 +11,7 @@ use FrankProjects\UltimateWarfare\Entity\BattleStats;
 use FrankProjects\UltimateWarfare\Entity\GameResources\Cost;
 use FrankProjects\UltimateWarfare\Entity\GameResources\Income;
 use FrankProjects\UltimateWarfare\Entity\GameResources\Upkeep;
+use FrankProjects\UltimateWarfare\Entity\Research\AdvancedOpticsResearch;
 
 final class Sniper extends GameUnit
 {
@@ -30,6 +31,7 @@ final class Sniper extends GameUnit
             income: new Income(cash: 0, food: 0, wood: 0, steel: 0),
             upkeep: new Upkeep(cash: 0, food: 0, wood: 0, steel: 0),
             battleStats: new BattleStats(health: 0, armor: 0),
+            researchClass: AdvancedOpticsResearch::class,
         );
     }
 

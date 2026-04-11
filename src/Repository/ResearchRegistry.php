@@ -5,9 +5,15 @@ declare(strict_types=1);
 namespace FrankProjects\UltimateWarfare\Repository;
 
 use FrankProjects\UltimateWarfare\Entity\Research;
+use FrankProjects\UltimateWarfare\Entity\Research\AdvancedOpticsResearch;
 use FrankProjects\UltimateWarfare\Entity\Research\AdvancedSpy2TechnologyResearch;
 use FrankProjects\UltimateWarfare\Entity\Research\AdvancedSpyTechnologyResearch;
+use FrankProjects\UltimateWarfare\Entity\Research\BallisticMissileTechnologyResearch;
+use FrankProjects\UltimateWarfare\Entity\Research\FactoryBlueprintResearch;
+use FrankProjects\UltimateWarfare\Entity\Research\NavalBombardmentResearch;
 use FrankProjects\UltimateWarfare\Entity\Research\NuclearTechnologyResearch;
+use FrankProjects\UltimateWarfare\Entity\Research\RadarTechnologyResearch;
+use FrankProjects\UltimateWarfare\Entity\Research\SubmarineTechnologyResearch;
 use FrankProjects\UltimateWarfare\Entity\Research\ResearchLevel10Research;
 use FrankProjects\UltimateWarfare\Entity\Research\ResearchLevel1Research;
 use FrankProjects\UltimateWarfare\Entity\Research\ResearchLevel2Research;
@@ -50,6 +56,12 @@ final class ResearchRegistry
             new AdvancedSpyTechnologyResearch(),
             new AdvancedSpy2TechnologyResearch(),
             new NuclearTechnologyResearch(),
+            new FactoryBlueprintResearch(),
+            new AdvancedOpticsResearch(),
+            new SubmarineTechnologyResearch(),
+            new BallisticMissileTechnologyResearch(),
+            new RadarTechnologyResearch(),
+            new NavalBombardmentResearch(),
         ];
 
         $this->researches = [];

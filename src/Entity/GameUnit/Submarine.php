@@ -14,6 +14,7 @@ use FrankProjects\UltimateWarfare\Entity\GameResources\Upkeep;
 use FrankProjects\UltimateWarfare\Entity\BattleStats\AirBattleStats;
 use FrankProjects\UltimateWarfare\Entity\BattleStats\GroundBattleStats;
 use FrankProjects\UltimateWarfare\Entity\BattleStats\SeaBattleStats;
+use FrankProjects\UltimateWarfare\Entity\Research\SubmarineTechnologyResearch;
 use FrankProjects\UltimateWarfare\Service\GameUnit\Behavior\NavalUnitBehavior;
 
 final class Submarine extends GameUnit
@@ -41,6 +42,7 @@ final class Submarine extends GameUnit
                 seaBattleStats: new SeaBattleStats(attack: 200, attackSpeed: 150, defence: 230, defenceSpeed: 160),
                 groundBattleStats: new GroundBattleStats(attack: 160, attackSpeed: 40),
             ),
+            researchClass: SubmarineTechnologyResearch::class,
         );
     }
 

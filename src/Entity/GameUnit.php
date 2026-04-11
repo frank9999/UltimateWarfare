@@ -12,6 +12,9 @@ use FrankProjects\UltimateWarfare\Entity\GameResources\Upkeep;
 
 abstract class GameUnit
 {
+    /**
+     * @param class-string<Research>|null $researchClass
+     */
     public function __construct(
         private readonly string $name,
         private readonly string $nameMulti,
@@ -26,6 +29,7 @@ abstract class GameUnit
         private readonly Income $income,
         private readonly Upkeep $upkeep,
         private readonly BattleStats $battleStats,
+        private readonly ?string $researchClass = null,
     ) {
     }
 
@@ -94,5 +98,31 @@ abstract class GameUnit
     public function getBattleStats(): BattleStats
     {
         return $this->battleStats;
+    }
+
+    /**
+     * @return class-string<Research>|null
+     */
+    public function getResearchClass(): ?string
+    {
+        return $this->researchClass;
+    }
+
+    public function getResearchSlug(): ?string
+    {
+        if ($this->researchClass === null) {
+            return null;
+        }
+
+        return (new $this->researchClass())->getSlug();
+    }
+
+    public function getResearchName(): ?string
+    {
+        if ($this->researchClass === null) {
+            return null;
+        }
+
+        return (new $this->researchClass())->getName();
     }
 }

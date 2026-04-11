@@ -10,6 +10,7 @@ use FrankProjects\UltimateWarfare\Entity\Operation\AdvancedSpyOperation;
 use FrankProjects\UltimateWarfare\Entity\Operation\ArtilleryBombardmentOperation;
 use FrankProjects\UltimateWarfare\Entity\Operation\BomberAttackOperation;
 use FrankProjects\UltimateWarfare\Entity\Operation\MissileAttackOperation;
+use FrankProjects\UltimateWarfare\Entity\Operation\NavalBombardmentOperation;
 use FrankProjects\UltimateWarfare\Entity\Operation\NuclearMissileAttackOperation;
 use FrankProjects\UltimateWarfare\Entity\Operation\SniperAttackOperation;
 use FrankProjects\UltimateWarfare\Entity\Operation\SpyOperation;
@@ -35,6 +36,7 @@ final class OperationRegistry
             new SubmarineAttackOperation(),
             new AdvancedSpyOperation(),
             new AdvancedSpy2Operation(),
+            new NavalBombardmentOperation(),
         ];
 
         $this->operations = [];

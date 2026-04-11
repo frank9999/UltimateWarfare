@@ -270,6 +270,14 @@ final class ConstructionController extends BaseGameController
         $spaceLeft = $this->constructionActionService->getBuildingSpaceLeft(GameUnitCategory::BUILDINGS, $worldRegion);
         $player = $this->getPlayer();
 
+        // Build player's completed research slugs for research gating
+        $completedResearchSlugs = [];
+        foreach ($player->getPlayerResearch() as $playerResearch) {
+            if ($playerResearch->getActive() === true) {
+                $completedResearchSlugs[] = $playerResearch->getResearchSlug();
+            }
+        }
+
         $categories = [];
         foreach ($availableCategories as $gameUnitCategory) {
             $gameUnits = $this->gameUnitRegistry->findByCategory($gameUnitCategory);
@@ -294,10 +302,24 @@ final class ConstructionController extends BaseGameController
 
                 $behavior = $this->behaviorFactory->create($gameUnit);
                 $canBuild = $behavior->canBuild($worldRegion, $player);
+                $buildRequirement = '';
 
                 // Filter tanks from troops when no factory
                 if ($gameUnitCategory === GameUnitCategory::TROOPS && $rowName === 'tank' && !$hasFactory) {
                     $canBuild = false;
+                    $buildRequirement = 'Requires a Factory';
+                }
+
+                // Check research gating
+                $researchSlug = $gameUnit->getResearchSlug();
+                $hasRequiredResearch = $researchSlug === null
+                    || in_array($researchSlug, $completedResearchSlugs, true);
+
+                if (!$hasRequiredResearch) {
+                    $canBuild = false;
+                    $buildRequirement = 'Requires ' . $gameUnit->getResearchName() . ' research';
+                } elseif (!$canBuild && $buildRequirement === '') {
+                    $buildRequirement = $behavior->getBuildRequirementDescription();
                 }
 
                 $units[] = [
@@ -321,11 +343,7 @@ final class ConstructionController extends BaseGameController
                     'netWorth' => $gameUnit->getNetWorth(),
                     'timestamp' => $gameUnit->getTimestamp(),
                     'canBuild' => $canBuild,
-                    'buildRequirement' => $canBuild ? '' : (
-                        $gameUnitCategory === GameUnitCategory::TROOPS && $rowName === 'tank' && !$hasFactory
-                            ? 'Requires a Factory'
-                            : $behavior->getBuildRequirementDescription()
-                    ),
+                    'buildRequirement' => $buildRequirement,
                     'owned' => $gameUnitData[$gameUnit->getGameUnitEnum()->value] ?? 0,
                     'inConstruction' => $constructionData[$gameUnit->getGameUnitEnum()->value] ?? 0,
                 ];

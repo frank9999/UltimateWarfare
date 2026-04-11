@@ -88,6 +88,13 @@ final class ConstructionActionService
                 );
             }
 
+            $researchSlug = $gameUnit->getResearchSlug();
+            if ($researchSlug !== null && !$this->playerHasResearch($player, $researchSlug)) {
+                throw new RuntimeException(
+                    "Cannot build {$gameUnit->getName()}: requires {$gameUnit->getResearchName()} research"
+                );
+            }
+
             $priceCash = $priceCash + ($amount * $gameUnit->getCost()->getCash());
             $priceWood = $priceWood + ($amount * $gameUnit->getCost()->getWood());
             $priceSteel = $priceSteel + ($amount * $gameUnit->getCost()->getSteel());
@@ -303,6 +310,17 @@ final class ConstructionActionService
         }
 
         return $regionBuildings;
+    }
+
+    private function playerHasResearch(Player $player, string $researchSlug): bool
+    {
+        foreach ($player->getPlayerResearch() as $playerResearch) {
+            if ($playerResearch->getActive() === true && $playerResearch->getResearchSlug() === $researchSlug) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private function removeGameUnitsFromWorldRegion(WorldRegion $worldRegion, GameUnit $gameUnit, int $amount): void

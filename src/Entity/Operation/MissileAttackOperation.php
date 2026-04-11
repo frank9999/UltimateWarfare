@@ -6,7 +6,7 @@ namespace FrankProjects\UltimateWarfare\Entity\Operation;
 
 use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitEnum;
 use FrankProjects\UltimateWarfare\Entity\Operation;
-use FrankProjects\UltimateWarfare\Entity\Research\SpecialOperationsResearch;
+use FrankProjects\UltimateWarfare\Entity\Research\BallisticMissileTechnologyResearch;
 use FrankProjects\UltimateWarfare\Service\OperationEngine\OperationProcessor\MissileAttack;
 
 final readonly class MissileAttackOperation extends Operation
@@ -23,7 +23,7 @@ final readonly class MissileAttackOperation extends Operation
             enabled: true,
             difficulty: 0.5,
             maxDistance: 3,
-            researchClass: SpecialOperationsResearch::class,
+            researchClass: BallisticMissileTechnologyResearch::class,
             gameUnit: GameUnitEnum::ROCKET,
         );
     }

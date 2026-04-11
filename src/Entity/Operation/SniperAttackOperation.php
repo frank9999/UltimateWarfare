@@ -6,7 +6,7 @@ namespace FrankProjects\UltimateWarfare\Entity\Operation;
 
 use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitEnum;
 use FrankProjects\UltimateWarfare\Entity\Operation;
-use FrankProjects\UltimateWarfare\Entity\Research\SpecialOperationsResearch;
+use FrankProjects\UltimateWarfare\Entity\Research\AdvancedOpticsResearch;
 use FrankProjects\UltimateWarfare\Service\OperationEngine\OperationProcessor\SniperAttack;
 
 final readonly class SniperAttackOperation extends Operation
@@ -24,7 +24,7 @@ final readonly class SniperAttackOperation extends Operation
             enabled: true,
             difficulty: 0.5,
             maxDistance: 2,
-            researchClass: SpecialOperationsResearch::class,
+            researchClass: AdvancedOpticsResearch::class,
             gameUnit: GameUnitEnum::SNIPER,
         );
     }

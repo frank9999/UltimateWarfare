@@ -6,7 +6,7 @@ namespace FrankProjects\UltimateWarfare\Entity\Operation;
 
 use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitEnum;
 use FrankProjects\UltimateWarfare\Entity\Operation;
-use FrankProjects\UltimateWarfare\Entity\Research\SpecialOperationsResearch;
+use FrankProjects\UltimateWarfare\Entity\Research\SubmarineTechnologyResearch;
 use FrankProjects\UltimateWarfare\Service\OperationEngine\OperationProcessor\SubmarineAttack;
 
 final readonly class SubmarineAttackOperation extends Operation
@@ -24,7 +24,7 @@ final readonly class SubmarineAttackOperation extends Operation
             enabled: true,
             difficulty: 0.5,
             maxDistance: 4,
-            researchClass: SpecialOperationsResearch::class,
+            researchClass: SubmarineTechnologyResearch::class,
             gameUnit: GameUnitEnum::SUBMARINE,
         );
     }
