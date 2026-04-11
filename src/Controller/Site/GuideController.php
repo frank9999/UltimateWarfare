@@ -84,14 +84,7 @@ final class GuideController extends BaseController
     {
         $gameUnitCategory = GameUnitCategory::fromInteger($gameUnitCategoryId);
         if ($gameUnitCategory === null) {
-            $gameUnitCategories = GameUnitCategory::getAll();
-
-            return $this->render(
-                'site/guide/selectGameUnitCategory.html.twig',
-                [
-                    'gameUnitCategories' => $gameUnitCategories
-                ]
-            );
+            $gameUnitCategory = GameUnitCategory::BUILDINGS;
         }
 
         $gameUnits = $gameUnitRegistry->findByCategory($gameUnitCategory);
@@ -100,6 +93,7 @@ final class GuideController extends BaseController
             'site/guide/listGameUnits.html.twig',
             [
                 'gameUnitCategory' => $gameUnitCategory,
+                'gameUnitCategories' => GameUnitCategory::getAll(),
                 'gameUnits' => $gameUnits
             ]
         );
@@ -118,11 +112,6 @@ final class GuideController extends BaseController
     public function region(): Response
     {
         return $this->render('site/guide/region.html.twig');
-    }
-
-    public function report(): Response
-    {
-        return $this->render('site/guide/report.html.twig');
     }
 
     public function research(): Response

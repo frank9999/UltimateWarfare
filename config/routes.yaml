@@ -711,11 +711,6 @@ Guide/Region:
     controller: FrankProjects\UltimateWarfare\Controller\Site\GuideController::region
     methods:   [GET]
 
-Guide/Report:
-    path:      /guide/report
-    controller: FrankProjects\UltimateWarfare\Controller\Site\GuideController::report
-    methods:   [GET]
-
 Guide/Research:
     path:      /guide/research
     controller: FrankProjects\UltimateWarfare\Controller\Site\GuideController::research

@@ -1,0 +1,75 @@
+{% macro clock_icon() %}
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/>
+        <polyline points="12 6 12 12 16 14"/>
+    </svg>
+{% endmacro %}
+
+{% macro format_time(seconds) %}
+    {{- '%02d' | format((seconds // 3600)) }}:{{ '%02d' | format(((seconds % 3600) // 60)) }}:{{ '%02d' | format((seconds % 60)) -}}
+{% endmacro %}
+
+{% macro resource_row(icon, value, cssClass) %}
+    {% if value != 0 %}
+        <span class="guide-resource-item {{ cssClass }}">
+            <img src="{{ asset('images/icons/' ~ icon) }}" width="20" height="20" alt="">
+            {% if cssClass == 'guide-income' %}+{% endif %}{% if cssClass == 'guide-upkeep' %}-{% endif %}{{ value | number_format }}
+        </span>
+    {% endif %}
+{% endmacro %}
+
+{% macro cost_section(cost) %}
+    {% from _self import resource_row %}
+    {% if cost.cash != 0 or cost.wood != 0 or cost.steel != 0 or cost.food != 0 %}
+        <div class="guide-unit-section">
+            <div class="guide-section-label">Cost</div>
+            <div class="guide-resource-list">
+                {{ resource_row('resource_cash.jpg', cost.cash, '') }}
+                {{ resource_row('resource_wood.jpg', cost.wood, '') }}
+                {{ resource_row('resource_steel.jpg', cost.steel, '') }}
+                {{ resource_row('resource_food.jpg', cost.food, '') }}
+            </div>
+        </div>
+    {% endif %}
+{% endmacro %}
+
+{% macro income_section(income) %}
+    {% from _self import resource_row %}
+    {% if income.cash != 0 or income.wood != 0 or income.steel != 0 or income.food != 0 %}
+        <div class="guide-unit-section">
+            <div class="guide-section-label">Income <small>(per hour)</small></div>
+            <div class="guide-resource-list">
+                {{ resource_row('resource_cash.jpg', income.cash, 'guide-income') }}
+                {{ resource_row('resource_wood.jpg', income.wood, 'guide-income') }}
+                {{ resource_row('resource_steel.jpg', income.steel, 'guide-income') }}
+                {{ resource_row('resource_food.jpg', income.food, 'guide-income') }}
+            </div>
+        </div>
+    {% endif %}
+{% endmacro %}
+
+{% macro upkeep_section(upkeep) %}
+    {% from _self import resource_row %}
+    {% if upkeep.cash != 0 or upkeep.wood != 0 or upkeep.steel != 0 or upkeep.food != 0 %}
+        <div class="guide-unit-section">
+            <div class="guide-section-label">Upkeep <small>(per hour)</small></div>
+            <div class="guide-resource-list">
+                {{ resource_row('resource_cash.jpg', upkeep.cash, 'guide-upkeep') }}
+                {{ resource_row('resource_wood.jpg', upkeep.wood, 'guide-upkeep') }}
+                {{ resource_row('resource_steel.jpg', upkeep.steel, 'guide-upkeep') }}
+                {{ resource_row('resource_food.jpg', upkeep.food, 'guide-upkeep') }}
+            </div>
+        </div>
+    {% endif %}
+{% endmacro %}
+
+{% macro build_time(seconds) %}
+    {% from _self import clock_icon, format_time %}
+    <div class="guide-unit-section">
+        <div class="guide-section-label">Construction Time</div>
+        <div class="guide-build-time">
+            {{ clock_icon() }}
+            {{ format_time(seconds) }}
+        </div>
+    </div>
+{% endmacro %}

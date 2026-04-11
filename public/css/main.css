@@ -422,6 +422,147 @@ a:hover {
     }
 }
 
+/* ===== Guide Tabs ===== */
+.guide-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #8B7355;
+    padding-bottom: 5px;
+}
+
+.guide-tab {
+    padding: 8px 15px;
+    background: #3a3a3a;
+    color: #f3e6c1;
+    border: 1px solid #8B7355;
+    border-radius: 4px 4px 0 0;
+    font-size: 13px;
+    text-decoration: none;
+    transition: background 0.2s;
+}
+
+.guide-tab:hover {
+    background: #4a4a4a;
+    color: #f3e6c1;
+}
+
+.guide-tab.active {
+    background: #8B7355;
+    font-weight: bold;
+    color: #f3e6c1;
+}
+
+/* ===== Guide Unit Cards ===== */
+.guide-units-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 15px;
+}
+
+.guide-unit-card {
+    background: #3a3a3a;
+    border: 2px solid #8B7355;
+    border-radius: 6px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.guide-unit-image {
+    width: 200px;
+    height: 175px;
+    border: 1px solid #8B7355;
+    border-radius: 3px;
+    object-fit: cover;
+    display: block;
+    margin: 0 auto;
+}
+
+.guide-unit-name {
+    font-weight: bold;
+    font-size: 16px;
+    text-align: center;
+}
+
+.guide-unit-name a {
+    color: #f3e6c1;
+    text-decoration: none;
+}
+
+.guide-unit-name a:hover {
+    text-decoration: underline;
+}
+
+.guide-unit-description {
+    font-size: 13px;
+    color: #c0b090;
+}
+
+.guide-unit-details {
+    font-size: 13px;
+}
+
+.guide-unit-detail {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.guide-unit-section {
+    margin-bottom: 6px;
+}
+
+.guide-section-label {
+    font-weight: bold;
+    margin-bottom: 2px;
+    color: #ffcc66;
+    font-size: 12px;
+}
+
+.guide-section-label small {
+    font-weight: normal;
+    color: #a0a0a0;
+}
+
+.guide-resource-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 12px;
+}
+
+.guide-resource-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.guide-resource-item img {
+    vertical-align: middle;
+}
+
+.guide-income {
+    color: #4CAF50;
+}
+
+.guide-upkeep {
+    color: #f44336;
+}
+
+.guide-build-time {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: #f3e6c1;
+}
+
+.guide-build-time svg {
+    width: 16px;
+    height: 16px;
+}
+
 /* ===== Tables (for guide data pages) ===== */
 .table {
     --bs-table-bg: #2a2a2a;

@@ -20,7 +20,7 @@ final class Mine extends GameUnit
             name: 'Mine',
             nameMulti: 'Mines',
             rowName: 'mine',
-            image: 'mine.gif',
+            image: 'gu_iron_mine.jpg',
             netWorth: 1,
             timestamp: 18000,
             description: 'A Mine makes 1 Steel per hour.',

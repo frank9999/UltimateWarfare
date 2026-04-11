@@ -20,7 +20,7 @@ final class House extends GameUnit
             name: 'House',
             nameMulti: 'Houses',
             rowName: 'house',
-            image: 'house.gif',
+            image: 'gu_house.jpg',
             netWorth: 1,
             timestamp: 900,
             description: 'This house can keep a population of 500.',

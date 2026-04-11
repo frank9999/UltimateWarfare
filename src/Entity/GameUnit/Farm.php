@@ -20,7 +20,7 @@ final class Farm extends GameUnit
             name: 'Farm',
             nameMulti: 'Farms',
             rowName: 'farm',
-            image: 'farm.gif',
+            image: 'gu_farm.jpg',
             netWorth: 1,
             timestamp: 3600,
             description: 'A farm makes 50 food per hour.',

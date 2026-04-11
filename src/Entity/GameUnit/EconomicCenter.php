@@ -20,7 +20,7 @@ final class EconomicCenter extends GameUnit
             name: 'Economic Center',
             nameMulti: 'Economic Centers',
             rowName: 'economic',
-            image: 'ec.gif',
+            image: 'gu_economic_center.jpg',
             netWorth: 1,
             timestamp: 7200,
             description: 'An Economic Center makes 15 cash per hour.',

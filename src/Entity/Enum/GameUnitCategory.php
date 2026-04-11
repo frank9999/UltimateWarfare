@@ -18,7 +18,6 @@ enum GameUnitCategory: int
     public function getImageDir(): string
     {
         return match ($this) {
-            self::BUILDINGS => 'units/buildings/',
             self::DEFENSE_BUILDINGS => 'units/defense_buildings/',
             self::SPECIAL_BUILDINGS => 'units/special_buildings/',
             default => 'units/'

@@ -20,7 +20,7 @@ final class Woodcutter extends GameUnit
             name: 'Woodcutter',
             nameMulti: 'Woodcutters',
             rowName: 'woodcutter',
-            image: 'wc.gif',
+            image: 'gu_woodcutter.jpg',
             netWorth: 1,
             timestamp: 3600,
             description: 'A woodcutter makes 1 wood per hour.',
