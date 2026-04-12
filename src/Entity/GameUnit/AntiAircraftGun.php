@@ -23,7 +23,7 @@ final class AntiAircraftGun extends GameUnit
             name: 'Anti Aircraft Gun',
             nameMulti: 'Anti Aircraft Guns',
             rowName: 'anti_aircraft_gun',
-            image: 'gu_anti_air.jpg',
+            image: 'gu_anti_aircraft_gun.jpg',
             netWorth: 0,
             timestamp: 14400,
             description: 'Anti Aircraft Guns have 1% chance of taking an enemy aircraft down.',

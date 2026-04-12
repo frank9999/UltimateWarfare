@@ -21,7 +21,7 @@ final class LandMine extends GameUnit
             name: 'Land Mine',
             nameMulti: 'Land Mines',
             rowName: 'land_mine',
-            image: 'landmine.gif',
+            image: 'gu_land_mine.jpg',
             netWorth: 0,
             timestamp: 3600,
             description: 'Landmines have 0.5% chance of destroying a soldier or a tank.',

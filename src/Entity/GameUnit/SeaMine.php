@@ -21,7 +21,7 @@ final class SeaMine extends GameUnit
             name: 'Sea Mine',
             nameMulti: 'Sea Mines',
             rowName: 'sea_mine',
-            image: 'seamine.gif',
+            image: 'gu_sea_mine.jpg',
             netWorth: 0,
             timestamp: 7200,
             description: 'Seamines have 0.01% chance of sinking an enemy ship.',

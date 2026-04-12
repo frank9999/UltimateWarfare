@@ -21,7 +21,7 @@ final class Bunker extends GameUnit
             name: 'Bunker',
             nameMulti: 'Bunkers',
             rowName: 'bunker',
-            image: 'bunker.gif',
+            image: 'gu_bunker.jpg',
             netWorth: 0,
             timestamp: 900,
             description: 'Every bunker can hold 100 soldiers and gives them 200% Defence bonus.',
