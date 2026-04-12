@@ -20,7 +20,7 @@ final class Harbor extends GameUnit
             name: 'Harbor',
             nameMulti: 'Harbors',
             rowName: 'harbor',
-            image: 'harbor.gif',
+            image: 'gu_harbor.jpg',
             netWorth: 15,
             timestamp: 28800,
             description: 'An harbor can send 1 ship to your neighbour countries '

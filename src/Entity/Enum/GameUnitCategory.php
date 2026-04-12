@@ -19,7 +19,6 @@ enum GameUnitCategory: int
     {
         return match ($this) {
             self::DEFENSE_BUILDINGS => 'units/defense_buildings/',
-            self::SPECIAL_BUILDINGS => 'units/special_buildings/',
             default => 'units/'
         };
     }

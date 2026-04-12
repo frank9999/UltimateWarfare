@@ -158,9 +158,13 @@ final class ConstructionActionService
         match ($gameUnitCategory) {
             GameUnitCategory::TROOPS,
             GameUnitCategory::SPECIAL_UNITS => $this->requireBuilding($buildingIndex, 'barrack', 'a Barrack'),
-            GameUnitCategory::AIR_UNITS => $this->requireBuilding($buildingIndex, 'airport', 'an Airport'),
+            GameUnitCategory::AIR_UNITS => $this->requireBuilding($buildingIndex, 'airfield', 'an Airfield'),
             GameUnitCategory::NAVAL_UNITS => $this->requireBuilding($buildingIndex, 'harbor', 'a Harbor'),
-            GameUnitCategory::MISSILES => $this->requireBuilding($buildingIndex, 'missile_silo', 'a Missile Silo'),
+            GameUnitCategory::MISSILES => $this->requireBuilding(
+                $buildingIndex,
+                'missile_factory',
+                'a Missile Factory'
+            ),
             GameUnitCategory::BUILDINGS,
             GameUnitCategory::DEFENSE_BUILDINGS,
             GameUnitCategory::SPECIAL_BUILDINGS => null, // Always allowed at category level

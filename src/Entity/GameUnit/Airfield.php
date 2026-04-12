@@ -11,32 +11,31 @@ use FrankProjects\UltimateWarfare\Entity\BattleStats;
 use FrankProjects\UltimateWarfare\Entity\GameResources\Cost;
 use FrankProjects\UltimateWarfare\Entity\GameResources\Income;
 use FrankProjects\UltimateWarfare\Entity\GameResources\Upkeep;
-use FrankProjects\UltimateWarfare\Entity\Research\BallisticMissileTechnologyResearch;
 
-final class MissileSilo extends GameUnit
+final class Airfield extends GameUnit
 {
     public function __construct()
     {
         parent::__construct(
-            name: 'Missile Silo',
-            nameMulti: 'Missile Silos',
-            rowName: 'missle_silo',
-            image: 'misile_silo.gif',
-            netWorth: 10,
-            timestamp: 10800,
-            description: 'Used to build and launch missiles',
+            name: 'Airfield',
+            nameMulti: 'Airfields',
+            rowName: 'airfield',
+            image: 'gu_airfield.jpg',
+            netWorth: 20,
+            timestamp: 14400,
+            description: 'An airfield can send 10 planes to your neighbour countries '
+                . 'and help them defending when they are under attack.',
             gameUnitCategory: GameUnitCategory::SPECIAL_BUILDINGS,
             behaviorClass: null,
-            cost: new Cost(cash: 50000, food: 0, wood: 2500, steel: 5000),
+            cost: new Cost(cash: 15000, food: 0, wood: 50, steel: 75),
             income: new Income(cash: 0, food: 0, wood: 0, steel: 0),
             upkeep: new Upkeep(cash: 0, food: 0, wood: 0, steel: 0),
             battleStats: new BattleStats(health: 0, armor: 0),
-            researchClass: BallisticMissileTechnologyResearch::class,
         );
     }
 
     public function getGameUnitEnum(): GameUnitEnum
     {
-        return GameUnitEnum::MISSILE_SILO;
+        return GameUnitEnum::AIRFIELD;
     }
 }

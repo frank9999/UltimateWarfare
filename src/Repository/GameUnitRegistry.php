@@ -8,8 +8,8 @@ use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitCategory;
 use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitEnum;
 use FrankProjects\UltimateWarfare\Entity\GameUnit;
 use FrankProjects\UltimateWarfare\Entity\WorldRegion;
-use FrankProjects\UltimateWarfare\Entity\GameUnit\AntiAirMissile;
-use FrankProjects\UltimateWarfare\Entity\GameUnit\Airport;
+use FrankProjects\UltimateWarfare\Entity\GameUnit\AntiAircraftGun;
+use FrankProjects\UltimateWarfare\Entity\GameUnit\Airfield;
 use FrankProjects\UltimateWarfare\Entity\GameUnit\Artillery;
 use FrankProjects\UltimateWarfare\Entity\GameUnit\Barrack;
 use FrankProjects\UltimateWarfare\Entity\GameUnit\Bomber;
@@ -25,10 +25,10 @@ use FrankProjects\UltimateWarfare\Entity\GameUnit\Guard;
 use FrankProjects\UltimateWarfare\Entity\GameUnit\Harbor;
 use FrankProjects\UltimateWarfare\Entity\GameUnit\House;
 use FrankProjects\UltimateWarfare\Entity\GameUnit\LandMine;
-use FrankProjects\UltimateWarfare\Entity\GameUnit\Mine;
+use FrankProjects\UltimateWarfare\Entity\GameUnit\IronMine;
 use FrankProjects\UltimateWarfare\Entity\GameUnit\MineCountermeasuresShip;
 use FrankProjects\UltimateWarfare\Entity\GameUnit\MineSweeper;
-use FrankProjects\UltimateWarfare\Entity\GameUnit\MissileSilo;
+use FrankProjects\UltimateWarfare\Entity\GameUnit\MissileFactory;
 use FrankProjects\UltimateWarfare\Entity\GameUnit\NuclearMissile;
 use FrankProjects\UltimateWarfare\Entity\GameUnit\PatrolBoat;
 use FrankProjects\UltimateWarfare\Entity\GameUnit\RadarStation;
@@ -54,20 +54,20 @@ final class GameUnitRegistry
         $gameUnitList = [
             new EconomicCenter(),
             new Farm(),
-            new Mine(),
+            new IronMine(),
             new Woodcutter(),
             new House(),
             new SeaMine(),
             new LandMine(),
             new Bunker(),
-            new AntiAirMissile(),
-            new Airport(),
+            new AntiAircraftGun(),
+            new Airfield(),
             new Harbor(),
             new TrainStation(),
             new Barrack(),
             new Factory(),
             new RadarStation(),
-            new MissileSilo(),
+            new MissileFactory(),
             new Guard(),
             new Saboteur(),
             new Spy(),

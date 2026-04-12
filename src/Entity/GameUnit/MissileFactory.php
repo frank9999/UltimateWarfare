@@ -11,30 +11,32 @@ use FrankProjects\UltimateWarfare\Entity\BattleStats;
 use FrankProjects\UltimateWarfare\Entity\GameResources\Cost;
 use FrankProjects\UltimateWarfare\Entity\GameResources\Income;
 use FrankProjects\UltimateWarfare\Entity\GameResources\Upkeep;
+use FrankProjects\UltimateWarfare\Entity\Research\BallisticMissileTechnologyResearch;
 
-final class Mine extends GameUnit
+final class MissileFactory extends GameUnit
 {
     public function __construct()
     {
         parent::__construct(
-            name: 'Mine',
-            nameMulti: 'Mines',
-            rowName: 'mine',
-            image: 'gu_iron_mine.jpg',
-            netWorth: 1,
-            timestamp: 18000,
-            description: 'A Mine makes 1 Steel per hour.',
-            gameUnitCategory: GameUnitCategory::BUILDINGS,
+            name: 'Missile Factory',
+            nameMulti: 'Missile Factories',
+            rowName: 'missile_factory',
+            image: 'gu_missile_factory.jpg',
+            netWorth: 10,
+            timestamp: 72000,
+            description: 'Used to build and launch missiles',
+            gameUnitCategory: GameUnitCategory::SPECIAL_BUILDINGS,
             behaviorClass: null,
-            cost: new Cost(cash: 1500, food: 0, wood: 50, steel: 0),
-            income: new Income(cash: 0, food: 0, wood: 0, steel: 1),
+            cost: new Cost(cash: 50000, food: 0, wood: 2500, steel: 5000),
+            income: new Income(cash: 0, food: 0, wood: 0, steel: 0),
             upkeep: new Upkeep(cash: 0, food: 0, wood: 0, steel: 0),
             battleStats: new BattleStats(health: 0, armor: 0),
+            researchClass: BallisticMissileTechnologyResearch::class,
         );
     }
 
     public function getGameUnitEnum(): GameUnitEnum
     {
-        return GameUnitEnum::MINE;
+        return GameUnitEnum::MISSILE_FACTORY;
     }
 }

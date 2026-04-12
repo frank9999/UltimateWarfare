@@ -12,23 +12,22 @@ use FrankProjects\UltimateWarfare\Entity\GameResources\Cost;
 use FrankProjects\UltimateWarfare\Entity\GameResources\Income;
 use FrankProjects\UltimateWarfare\Entity\GameResources\Upkeep;
 
-final class Airport extends GameUnit
+final class IronMine extends GameUnit
 {
     public function __construct()
     {
         parent::__construct(
-            name: 'Airport',
-            nameMulti: 'Airports',
-            rowName: 'airport',
-            image: 'airport.gif',
-            netWorth: 20,
-            timestamp: 14400,
-            description: 'An airport can send 10 planes to your neighbour countries '
-                . 'and help them defending when they are under attack.',
-            gameUnitCategory: GameUnitCategory::SPECIAL_BUILDINGS,
+            name: 'Iron Mine',
+            nameMulti: 'Iron Mines',
+            rowName: 'iron_mine',
+            image: 'gu_iron_mine.jpg',
+            netWorth: 1,
+            timestamp: 18000,
+            description: 'An Iron Mine makes 1 Steel per hour.',
+            gameUnitCategory: GameUnitCategory::BUILDINGS,
             behaviorClass: null,
-            cost: new Cost(cash: 15000, food: 0, wood: 50, steel: 75),
-            income: new Income(cash: 0, food: 0, wood: 0, steel: 0),
+            cost: new Cost(cash: 1500, food: 0, wood: 50, steel: 0),
+            income: new Income(cash: 0, food: 0, wood: 0, steel: 1),
             upkeep: new Upkeep(cash: 0, food: 0, wood: 0, steel: 0),
             battleStats: new BattleStats(health: 0, armor: 0),
         );
@@ -36,6 +35,6 @@ final class Airport extends GameUnit
 
     public function getGameUnitEnum(): GameUnitEnum
     {
-        return GameUnitEnum::AIRPORT;
+        return GameUnitEnum::IRON_MINE;
     }
 }

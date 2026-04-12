@@ -20,7 +20,7 @@ final class TrainStation extends GameUnit
             name: 'Train Station',
             nameMulti: 'Train Stations',
             rowName: 'station',
-            image: 'station.gif',
+            image: 'gu_train_station.jpg',
             netWorth: 10,
             timestamp: 10800,
             description: 'An Train station can send 25 soldiers and 1 tank to your neighbour countries '

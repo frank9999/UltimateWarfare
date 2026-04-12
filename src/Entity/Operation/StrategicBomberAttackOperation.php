@@ -19,7 +19,7 @@ final readonly class StrategicBomberAttackOperation extends Operation
             cost: 45000,
             description: "Launch a strategic bombing run against an enemy country with your Strategic Bombers."
                 . " Every Strategic Bomber is able to hit 5 buildings"
-                . " (train stations, airports or harbors).\n(Airforce Only)\n\n"
+                . " (train stations, airfields or harbors).\n(Airforce Only)\n\n"
                 . "\"Your enemy will receive a report about this attack if you succeed or fail."
                 . " But it will hide your name if you succeed.\"",
             enabled: true,

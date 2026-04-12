@@ -9,7 +9,7 @@ enum GameUnitEnum: int
     // Buildings (Category 1)
     case ECONOMIC_CENTER = 1;
     case FARM = 2;
-    case MINE = 3;
+    case IRON_MINE = 3;
     case WOODCUTTER = 4;
     case HOUSE = 5;
 
@@ -17,16 +17,16 @@ enum GameUnitEnum: int
     case SEA_MINE = 100;
     case LAND_MINE = 101;
     case BUNKER = 102;
-    case ANTI_AIR_MISSILE = 103;
+    case ANTI_AIRCRAFT_GUN = 103;
 
     // Special Buildings (Category 3)
-    case AIRPORT = 200;
+    case AIRFIELD = 200;
     case HARBOR = 201;
     case TRAIN_STATION = 202;
     case BARRACK = 203;
     case FACTORY = 204;
     case RADAR_STATION = 205;
-    case MISSILE_SILO = 206;
+    case MISSILE_FACTORY = 206;
 
     // Special Units (Category 5)
     case GUARD = 400;

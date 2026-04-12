@@ -20,7 +20,7 @@ final class Barrack extends GameUnit
             name: 'Barrack',
             nameMulti: 'Baracks',
             rowName: 'barrack',
-            image: 'barrack.gif',
+            image: 'gu_barrack.jpg',
             netWorth: 10,
             timestamp: 3600,
             description: 'Within a barrack you can train troops.',

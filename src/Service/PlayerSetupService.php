@@ -115,7 +115,7 @@ final class PlayerSetupService
         $startingUnits = [
             [GameUnitEnum::ECONOMIC_CENTER, 1000],
             [GameUnitEnum::FARM, 100],
-            [GameUnitEnum::MINE, 100],
+            [GameUnitEnum::IRON_MINE, 100],
             [GameUnitEnum::WOODCUTTER, 250],
             [GameUnitEnum::SOLDIER, 10],
         ];

@@ -15,18 +15,18 @@ use FrankProjects\UltimateWarfare\Entity\BattleStats\AirBattleStats;
 use FrankProjects\UltimateWarfare\Entity\BattleStats\GroundBattleStats;
 use FrankProjects\UltimateWarfare\Entity\BattleStats\SeaBattleStats;
 
-final class AntiAirMissile extends GameUnit
+final class AntiAircraftGun extends GameUnit
 {
     public function __construct()
     {
         parent::__construct(
-            name: 'Anti Air Missile',
-            nameMulti: 'Anti Air Missiles',
-            rowName: 'anti_air_missile',
-            image: 'anti_air_missile.gif',
+            name: 'Anti Aircraft Gun',
+            nameMulti: 'Anti Aircraft Guns',
+            rowName: 'anti_aircraft_gun',
+            image: 'gu_anti_air.jpg',
             netWorth: 0,
             timestamp: 14400,
-            description: 'Anti Air Missile have 1% chance of taking an enemy aircraft down.',
+            description: 'Anti Aircraft Guns have 1% chance of taking an enemy aircraft down.',
             gameUnitCategory: GameUnitCategory::DEFENSE_BUILDINGS,
             behaviorClass: null,
             cost: new Cost(cash: 25000, food: 0, wood: 150, steel: 350),
@@ -44,6 +44,6 @@ final class AntiAirMissile extends GameUnit
 
     public function getGameUnitEnum(): GameUnitEnum
     {
-        return GameUnitEnum::ANTI_AIR_MISSILE;
+        return GameUnitEnum::ANTI_AIRCRAFT_GUN;
     }
 }

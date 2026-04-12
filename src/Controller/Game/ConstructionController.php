@@ -212,9 +212,9 @@ final class ConstructionController extends BaseGameController
         // Detect relevant buildings in this region (units + constructions in progress)
         $hasBarrack = false;
         $hasFactory = false;
-        $hasAirport = false;
+        $hasAirfield = false;
         $hasHarbor = false;
-        $hasMissileSilo = false;
+        $hasMissileFactory = false;
 
         foreach ($worldRegion->getWorldRegionUnits() as $worldRegionUnit) {
             $gameUnitEnum = $worldRegionUnit->getGameUnit();
@@ -225,9 +225,9 @@ final class ConstructionController extends BaseGameController
             match ($gameUnitEnum) {
                 GameUnitEnum::BARRACK => $hasBarrack = true,
                 GameUnitEnum::FACTORY => $hasFactory = true,
-                GameUnitEnum::AIRPORT => $hasAirport = true,
+                GameUnitEnum::AIRFIELD => $hasAirfield = true,
                 GameUnitEnum::HARBOR => $hasHarbor = true,
-                GameUnitEnum::MISSILE_SILO => $hasMissileSilo = true,
+                GameUnitEnum::MISSILE_FACTORY => $hasMissileFactory = true,
                 default => null,
             };
         }
@@ -236,9 +236,9 @@ final class ConstructionController extends BaseGameController
             match ($construction->getGameUnit()) {
                 GameUnitEnum::BARRACK => $hasBarrack = true,
                 GameUnitEnum::FACTORY => $hasFactory = true,
-                GameUnitEnum::AIRPORT => $hasAirport = true,
+                GameUnitEnum::AIRFIELD => $hasAirfield = true,
                 GameUnitEnum::HARBOR => $hasHarbor = true,
-                GameUnitEnum::MISSILE_SILO => $hasMissileSilo = true,
+                GameUnitEnum::MISSILE_FACTORY => $hasMissileFactory = true,
                 default => null,
             };
         }
@@ -254,13 +254,13 @@ final class ConstructionController extends BaseGameController
             $availableCategories[] = GameUnitCategory::TROOPS;
             $availableCategories[] = GameUnitCategory::SPECIAL_UNITS;
         }
-        if ($hasAirport) {
+        if ($hasAirfield) {
             $availableCategories[] = GameUnitCategory::AIR_UNITS;
         }
         if ($hasHarbor) {
             $availableCategories[] = GameUnitCategory::NAVAL_UNITS;
         }
-        if ($hasMissileSilo) {
+        if ($hasMissileFactory) {
             $availableCategories[] = GameUnitCategory::MISSILES;
         }
 
