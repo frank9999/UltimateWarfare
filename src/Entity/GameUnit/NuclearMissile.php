@@ -20,7 +20,7 @@ final class NuclearMissile extends GameUnit
             name: 'Nuclear Missile',
             nameMulti: 'Nuclear Missiles',
             rowName: 'nuclear_missile',
-            image: 'nuclear.gif',
+            image: 'gu_nuclear_missile.jpg',
             netWorth: 10,
             timestamp: 36000,
             description: '',
