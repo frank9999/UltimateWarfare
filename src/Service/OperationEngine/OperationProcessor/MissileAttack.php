@@ -5,21 +5,24 @@ declare(strict_types=1);
 namespace FrankProjects\UltimateWarfare\Service\OperationEngine\OperationProcessor;
 
 use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitCategory;
-use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitEnum;
 use FrankProjects\UltimateWarfare\Service\OperationEngine\OperationProcessor;
 
 final class MissileAttack extends OperationProcessor
 {
+    private const float BASE_SUCCESS = 0.62;
+
     public function getFormula(): float
     {
-        $specialOps = $this->getSpecialOps();
-        $guards = $this->getGuards();
-        $total_units = $specialOps + $guards + 1;
+        $rtLevel = $this->getAttackerResearchLevel('research-tier');
+        $defNetLevel = $this->getTargetResearchLevel('defensive-network');
 
-        return (3 * $specialOps / (2 * $total_units))
-            - (3 * $guards / (2 * $total_units))
-            - $this->operation->getDifficulty()
-            + $this->getRandomChance();
+        $probability = self::BASE_SUCCESS
+            + 0.05 * max(0, $rtLevel - 1)
+            - 0.12 * $defNetLevel;
+
+        $probability = max(0.05, min(0.95, $probability));
+
+        return $probability - mt_rand(0, 1000) / 1000.0;
     }
 
     public function processPreOperation(): void
@@ -81,20 +84,13 @@ final class MissileAttack extends OperationProcessor
 
     public function processFailed(): void
     {
-        $troopsLost = intval($this->getSpecialOps() * 0.05);
-
-        foreach ($this->playerRegion->getWorldRegionUnits() as $worldRegionUnit) {
-            if ($worldRegionUnit->getGameUnit() === GameUnitEnum::SABOTEUR) {
-                $worldRegionUnit->setAmount(intval($worldRegionUnit->getAmount() - $troopsLost));
-                $this->worldRegionUnitRepository->save($worldRegionUnit);
-            }
-        }
-
         $reportText = "{$this->getPlayerRegionPlayer()->getName()} tried to launch a missile attack"
             . " against region {$this->region->getX()}, {$this->region->getY()} but failed.";
         $this->reportCreator->createReport($this->getTargetRegionPlayer(), time(), $reportText);
 
-        $this->addToOperationLog("We failed our Missile Attack and lost {$troopsLost} Special Ops");
+        $this->addToOperationLog(
+            "We failed our Missile Attack - the missiles were intercepted before reaching the target"
+        );
     }
 
     public function processPostOperation(): void

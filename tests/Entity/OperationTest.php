@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace FrankProjects\UltimateWarfare\Tests\Entity;
 
 use FrankProjects\UltimateWarfare\Entity\Operation;
-use FrankProjects\UltimateWarfare\Entity\Operation\AdvancedSpy2Operation;
 use FrankProjects\UltimateWarfare\Entity\Operation\AdvancedSpyOperation;
+use FrankProjects\UltimateWarfare\Entity\Operation\ArtilleryBombardmentOperation;
 use FrankProjects\UltimateWarfare\Entity\Operation\BomberAttackOperation;
 use FrankProjects\UltimateWarfare\Entity\Operation\MissileAttackOperation;
 use FrankProjects\UltimateWarfare\Entity\Operation\NuclearMissileAttackOperation;
@@ -29,7 +29,6 @@ class OperationTest extends TestCase
         return [
             'spy' => [SpyOperation::class, 'spy'],
             'advanced-spy' => [AdvancedSpyOperation::class, 'advanced-spy'],
-            'advanced-spy-2' => [AdvancedSpy2Operation::class, 'advanced-spy-2'],
             'sniper-attack' => [SniperAttackOperation::class, 'sniper-attack'],
             'missile-attack' => [MissileAttackOperation::class, 'missile-attack'],
             'submarine-attack' => [SubmarineAttackOperation::class, 'submarine-attack'],
@@ -115,7 +114,9 @@ class OperationTest extends TestCase
         self::assertGreaterThanOrEqual(0.0, $operation->getDifficulty());
         self::assertLessThanOrEqual(1.0, $operation->getDifficulty());
         self::assertGreaterThan(0, $operation->getMaxDistance());
-        self::assertGreaterThan(0, $operation->getGameUnit()->value);
+        if ($operation->getGameUnit() !== null) {
+            self::assertGreaterThan(0, $operation->getGameUnit()->value);
+        }
     }
 
     public function testAllOperationsHaveUniqueSlugs(): void
@@ -137,30 +138,39 @@ class OperationTest extends TestCase
     {
         $operation = new SpyOperation();
 
-        self::assertSame('Spy Technology', $operation->getName());
-        self::assertSame(150, $operation->getCost());
+        self::assertSame('Spy Operation', $operation->getName());
+        self::assertSame(5000, $operation->getCost());
         self::assertSame(0.1, $operation->getDifficulty());
         self::assertSame(3, $operation->getMaxDistance());
-        self::assertSame(407, $operation->getGameUnit()->value);
+        self::assertNull($operation->getGameUnit());
         self::assertTrue($operation->isEnabled());
         self::assertSame(1, $operation->getResearchMinLevel());
     }
 
-    public function testAdvancedSpyOperationsRequireHigherSpyTechnologyLevel(): void
+    public function testAdvancedSpyOperationRequiresHigherSpyTechnologyLevel(): void
     {
         self::assertSame(2, (new AdvancedSpyOperation())->getResearchMinLevel());
         self::assertSame('spy-technology', (new AdvancedSpyOperation())->getResearchSlug());
-
-        self::assertSame(3, (new AdvancedSpy2Operation())->getResearchMinLevel());
-        self::assertSame('spy-technology', (new AdvancedSpy2Operation())->getResearchSlug());
     }
 
-    public function testSpecialOperationsBomberTiers(): void
+    public function testSpecialOperationResearchSlugs(): void
     {
-        self::assertSame(3, (new BomberAttackOperation())->getResearchMinLevel());
-        self::assertSame('special-operations', (new BomberAttackOperation())->getResearchSlug());
+        self::assertSame(1, (new ArtilleryBombardmentOperation())->getResearchMinLevel());
+        self::assertSame(
+            'special-operation-artillery-bombardment',
+            (new ArtilleryBombardmentOperation())->getResearchSlug()
+        );
 
-        self::assertSame(4, (new StrategicBomberAttackOperation())->getResearchMinLevel());
-        self::assertSame('special-operations', (new StrategicBomberAttackOperation())->getResearchSlug());
+        self::assertSame(1, (new BomberAttackOperation())->getResearchMinLevel());
+        self::assertSame(
+            'special-operation-bomber-attack',
+            (new BomberAttackOperation())->getResearchSlug()
+        );
+
+        self::assertSame(1, (new StrategicBomberAttackOperation())->getResearchMinLevel());
+        self::assertSame(
+            'special-operation-strategic-bomber-attack',
+            (new StrategicBomberAttackOperation())->getResearchSlug()
+        );
     }
 }

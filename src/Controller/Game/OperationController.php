@@ -62,17 +62,19 @@ final class OperationController extends BaseGameController
 
         $operationsData = [];
         foreach ($operations as $operation) {
-            $gameUnit = $this->gameUnitRegistry->find($operation->getGameUnit());
+            $gameUnitEnum = $operation->getGameUnit();
+            $gameUnit = $gameUnitEnum === null ? null : $this->gameUnitRegistry->find($gameUnitEnum);
             $operationsData[] = [
                 'slug' => $operation->getSlug(),
                 'name' => $operation->getName(),
                 'image' => $operation->getImage(),
                 'cost' => $operation->getCost(),
+                'totalCost' => $operation->calculateCost($worldRegion, 1),
                 'description' => $operation->getDescription(),
                 'difficulty' => $operation->getDifficulty(),
                 'maxDistance' => $operation->getMaxDistance(),
-                'unitName' => $gameUnit->getName(),
-                'unitImage' => $gameUnit->getImage(),
+                'unitName' => $gameUnit?->getName(),
+                'unitImage' => $gameUnit?->getImage(),
             ];
         }
 
@@ -121,20 +123,22 @@ final class OperationController extends BaseGameController
                 continue;
             }
 
-            // Check if region has the required unit type
-            $hasUnit = false;
-            foreach ($playerRegion->getWorldRegionUnits() as $worldRegionUnit) {
-                if (
-                    $worldRegionUnit->getGameUnit() === $requiredGameUnitId
-                    && $worldRegionUnit->getAmount() > 0
-                ) {
-                    $hasUnit = true;
-                    break;
+            // Check if region has the required unit type (skip the check for unit-less ops like spy)
+            if ($requiredGameUnitId !== null) {
+                $hasUnit = false;
+                foreach ($playerRegion->getWorldRegionUnits() as $worldRegionUnit) {
+                    if (
+                        $worldRegionUnit->getGameUnit() === $requiredGameUnitId
+                        && $worldRegionUnit->getAmount() > 0
+                    ) {
+                        $hasUnit = true;
+                        break;
+                    }
                 }
-            }
 
-            if (!$hasUnit) {
-                continue;
+                if (!$hasUnit) {
+                    continue;
+                }
             }
 
             // Skip regions with active bombardment cooldowns
@@ -180,22 +184,29 @@ final class OperationController extends BaseGameController
 
         $requiredGameUnitId = $operation->getGameUnit();
         $availableAmount = 0;
+        $unitName = null;
+        $unitImage = null;
 
-        foreach ($playerRegion->getWorldRegionUnits() as $worldRegionUnit) {
-            if ($worldRegionUnit->getGameUnit() === $requiredGameUnitId) {
-                $availableAmount = $worldRegionUnit->getAmount();
-                break;
+        if ($requiredGameUnitId !== null) {
+            foreach ($playerRegion->getWorldRegionUnits() as $worldRegionUnit) {
+                if ($worldRegionUnit->getGameUnit() === $requiredGameUnitId) {
+                    $availableAmount = $worldRegionUnit->getAmount();
+                    break;
+                }
             }
-        }
 
-        $gameUnit = $this->gameUnitRegistry->find($requiredGameUnitId);
+            $gameUnit = $this->gameUnitRegistry->find($requiredGameUnitId);
+            $unitName = $gameUnit->getName();
+            $unitImage = $gameUnit->getImage();
+        }
 
         return new JsonResponse([
             'success' => true,
-            'unitName' => $gameUnit->getName(),
-            'unitImage' => $gameUnit->getImage(),
+            'unitName' => $unitName,
+            'unitImage' => $unitImage,
             'available' => $availableAmount,
             'costPerUnit' => $operation->getCost(),
+            'totalCost' => $operation->calculateCost($worldRegion, 1),
             'playerCash' => $player->getResources()->getCash(),
         ]);
     }

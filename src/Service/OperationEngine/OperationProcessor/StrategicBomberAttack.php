@@ -11,17 +11,20 @@ use FrankProjects\UltimateWarfare\Service\OperationEngine\OperationProcessor;
 final class StrategicBomberAttack extends OperationProcessor
 {
     protected const int BUILDINGS_DESTROYED_PER_BOMBER = 5;
+    private const float BASE_SUCCESS = 0.62;
 
     public function getFormula(): float
     {
-        $specialOps = $this->getSpecialOps();
-        $guards = $this->getGuards();
-        $total_units = $specialOps + $guards + 1;
+        $rtLevel = $this->getAttackerResearchLevel('research-tier');
+        $defNetLevel = $this->getTargetResearchLevel('defensive-network');
 
-        return (3 * $specialOps / (2 * $total_units))
-            - (3 * $guards / (2 * $total_units))
-            - $this->operation->getDifficulty()
-            + $this->getRandomChance();
+        $probability = self::BASE_SUCCESS
+            + 0.05 * max(0, $rtLevel - 1)
+            - 0.12 * $defNetLevel;
+
+        $probability = max(0.05, min(0.95, $probability));
+
+        return $probability - mt_rand(0, 1000) / 1000.0;
     }
 
     public function processPreOperation(): void
@@ -77,15 +80,9 @@ final class StrategicBomberAttack extends OperationProcessor
 
     public function processFailed(): void
     {
-        $specialOpsLost = intval($this->getSpecialOps() * 0.05);
-        $strategicBombersLost = intval($this->amount * 0.1);
+        $strategicBombersLost = intval($this->amount * 0.05);
 
         foreach ($this->playerRegion->getWorldRegionUnits() as $worldRegionUnit) {
-            if ($worldRegionUnit->getGameUnit() === GameUnitEnum::SABOTEUR) {
-                $worldRegionUnit->setAmount(intval($worldRegionUnit->getAmount() - $specialOpsLost));
-                $this->worldRegionUnitRepository->save($worldRegionUnit);
-            }
-
             if ($worldRegionUnit->getGameUnit() === GameUnitEnum::STRATEGIC_BOMBER) {
                 $worldRegionUnit->setAmount(intval($worldRegionUnit->getAmount() - $strategicBombersLost));
                 $this->worldRegionUnitRepository->save($worldRegionUnit);
@@ -97,8 +94,7 @@ final class StrategicBomberAttack extends OperationProcessor
         $this->reportCreator->createReport($this->getTargetRegionPlayer(), time(), $reportText);
 
         $this->addToOperationLog(
-            "We failed our Strategic Bomber attack and lost {$specialOpsLost} Special Ops"
-            . " and {$strategicBombersLost} Strategic Bombers"
+            "We failed our Strategic Bomber attack and lost {$strategicBombersLost} Strategic Bombers"
         );
     }
 

@@ -71,9 +71,14 @@
             html += '</div>';
             html += '</div>';
             html += '<div class="operation-card-stats">';
-            html += '<span>Cost: $' + op.cost.toLocaleString('en-US') + '/unit</span>';
-            html += '<span>Range: ' + op.maxDistance + '</span>';
-            html += '<span>Unit: ' + escapeHtml(op.unitName) + '</span>';
+            if (op.unitName) {
+                html += '<span>Cost: $' + op.cost.toLocaleString('en-US') + '/unit</span>';
+                html += '<span>Range: ' + op.maxDistance + '</span>';
+                html += '<span>Unit: ' + escapeHtml(op.unitName) + '</span>';
+            } else {
+                html += '<span>Cost: $' + op.totalCost.toLocaleString('en-US') + '</span>';
+                html += '<span>Range: ' + op.maxDistance + '</span>';
+            }
             html += '</div>';
             html += '</div>';
         });
@@ -105,7 +110,20 @@
             }
 
             if (result.eligibleRegions.length === 0) {
-                showNotification('No regions in range with the required units (' + operation.unitName + '). Move units closer or build more.', 'error');
+                const message = operation.unitName
+                    ? 'No regions in range with the required units (' + operation.unitName + '). Move units closer or build more.'
+                    : 'No regions in range. The target is beyond your operation\'s maximum distance of ' + operation.maxDistance + '.';
+                showNotification(message, 'error');
+                return;
+            }
+
+            // Unit-less ops (spy operations): auto-pick the closest source region and skip the
+            // on-map source-pick step entirely — there's no decision for the player to make.
+            if (!operation.unitName) {
+                const closest = result.eligibleRegions.reduce(function (best, r) {
+                    return r.distance < best.distance ? r : best;
+                });
+                showOperationUnitsModal({ id: closest.regionId, x: closest.x, y: closest.y });
                 return;
             }
 
@@ -143,6 +161,7 @@
     }
 
     function cancelOperationMode() {
+        const wasOperationMode = operationMode;
         operationMode = false;
         operationTargetRegion = null;
         selectedOperation = null;
@@ -158,7 +177,9 @@
         worldMap.config.onTileClick = getDefaultTileClick();
         worldMap.render();
         operationModeBanner.style.display = 'none';
-        showNotification('Operation cancelled.', 'info');
+        if (wasOperationMode) {
+            showNotification('Operation cancelled.', 'info');
+        }
     }
 
     // Step 3: Show unit selection for chosen source region
@@ -197,6 +218,16 @@
 
     function renderOperationUnits(data) {
         const container = document.getElementById('operationUnitsContainer');
+
+        if (!data.unitName) {
+            let html = '<div class="operation-unit-select">';
+            html += '<p>Cost: <strong>$' + data.totalCost.toLocaleString('en-US') + '</strong></p>';
+            html += '<input type="hidden" id="operationAmount" value="1">';
+            html += '</div>';
+            container.innerHTML = html;
+            return;
+        }
+
         const maxAffordable = data.costPerUnit > 0 ? Math.floor(data.playerCash / data.costPerUnit) : data.available;
         const maxSend = Math.min(data.available, maxAffordable);
 
@@ -280,13 +311,113 @@
         }
     }
 
-    function showOperationResults(results) {
-        let html = '<div class="operation-results-log">';
-        results.forEach(function (line) {
-            html += '<p>' + escapeHtml(line) + '</p>';
+    function formatRelativeTime(unixSeconds) {
+        const diff = Math.max(0, Math.floor(Date.now() / 1000) - unixSeconds);
+        if (diff < 60) return 'just now';
+        if (diff < 3600) {
+            const m = Math.floor(diff / 60);
+            return m + (m === 1 ? ' minute ago' : ' minutes ago');
+        }
+        if (diff < 86400) {
+            const h = Math.floor(diff / 3600);
+            return h + (h === 1 ? ' hour ago' : ' hours ago');
+        }
+        const d = Math.floor(diff / 86400);
+        return d + (d === 1 ? ' day ago' : ' days ago');
+    }
+
+    function showOperationResults(entries) {
+        const root = document.createElement('div');
+        root.className = 'operation-results-log';
+
+        let currentSection = null;
+        let currentTable = null;
+
+        function closeSection() {
+            currentSection = null;
+            currentTable = null;
+        }
+
+        entries.forEach(function (entry) {
+            if (!entry || typeof entry !== 'object') return;
+            const type = entry.type;
+
+            if (type === 'line') {
+                closeSection();
+                const p = document.createElement('p');
+                p.className = 'op-line';
+                p.textContent = entry.text || '';
+                root.appendChild(p);
+                return;
+            }
+
+            if (type === 'section') {
+                closeSection();
+                currentSection = document.createElement('div');
+                currentSection.className = 'op-section';
+                const title = document.createElement('div');
+                title.className = 'op-section-title';
+                title.textContent = entry.title || '';
+                currentSection.appendChild(title);
+                root.appendChild(currentSection);
+                return;
+            }
+
+            if (type === 'row') {
+                if (currentSection === null) return;
+                if (currentTable === null) {
+                    currentTable = document.createElement('table');
+                    currentTable.className = 'op-section-table';
+                    currentSection.appendChild(currentTable);
+                }
+                const tr = document.createElement('tr');
+                const tdLabel = document.createElement('td');
+                tdLabel.textContent = entry.label || '';
+                const tdValue = document.createElement('td');
+                tdValue.textContent = entry.value || '';
+                tr.appendChild(tdLabel);
+                tr.appendChild(tdValue);
+                currentTable.appendChild(tr);
+                return;
+            }
+
+            if (type === 'empty') {
+                if (currentSection === null) return;
+                const div = document.createElement('div');
+                div.className = 'op-section-empty';
+                div.textContent = entry.text || '';
+                currentSection.appendChild(div);
+                return;
+            }
+
+            if (type === 'report') {
+                if (currentSection === null) return;
+                const card = document.createElement('div');
+                card.className = 'op-report';
+                const time = document.createElement('div');
+                time.className = 'op-report-time';
+                time.textContent = formatRelativeTime(entry.timestamp || 0);
+                const text = document.createElement('div');
+                text.className = 'op-report-text';
+                text.textContent = entry.text || '';
+                card.appendChild(time);
+                card.appendChild(text);
+                currentSection.appendChild(card);
+                return;
+            }
+
+            if (type === 'failure') {
+                closeSection();
+                const p = document.createElement('p');
+                p.className = 'op-failure';
+                p.textContent = entry.text || '';
+                root.appendChild(p);
+                return;
+            }
         });
-        html += '</div>';
-        operationResultsContainer.innerHTML = html;
+
+        operationResultsContainer.innerHTML = '';
+        operationResultsContainer.appendChild(root);
         bootstrap.Modal.getOrCreateInstance(operationResultsModal).show();
     }
 

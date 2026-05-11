@@ -6,7 +6,7 @@ namespace FrankProjects\UltimateWarfare\Entity\Operation;
 
 use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitEnum;
 use FrankProjects\UltimateWarfare\Entity\Operation;
-use FrankProjects\UltimateWarfare\Entity\Research\SpecialOperationsResearch;
+use FrankProjects\UltimateWarfare\Entity\Research\StrategicBomberAttackResearch;
 use FrankProjects\UltimateWarfare\Service\OperationEngine\OperationProcessor\StrategicBomberAttack;
 
 final readonly class StrategicBomberAttackOperation extends Operation
@@ -25,9 +25,9 @@ final readonly class StrategicBomberAttackOperation extends Operation
             enabled: true,
             difficulty: 0.5,
             maxDistance: 10,
-            researchClass: SpecialOperationsResearch::class,
+            researchClass: StrategicBomberAttackResearch::class,
             gameUnit: GameUnitEnum::STRATEGIC_BOMBER,
-            researchMinLevel: 4,
+            researchMinLevel: 1,
         );
     }
 

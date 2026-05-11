@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace FrankProjects\UltimateWarfare\Service\OperationEngine\OperationProcessor;
 
 use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitCategory;
-use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitEnum;
 use FrankProjects\UltimateWarfare\Entity\Report;
 use FrankProjects\UltimateWarfare\Service\OperationEngine\OperationProcessor;
 
@@ -13,13 +12,16 @@ final class Spy extends OperationProcessor
 {
     public function getFormula(): float
     {
-        $guards = $this->getGuards();
-        $total_units = $this->amount + $guards + 1;
+        $spyLevel = $this->getAttackerResearchLevel('spy-technology');
+        $counterEspionageLevel = $this->getTargetResearchLevel('counter-espionage');
 
-        return (3 * $this->amount / (2 * $total_units))
-            - (3 * $guards / (2 * $total_units))
-            - $this->operation->getDifficulty()
-            + $this->getRandomChance();
+        $probability = 0.50
+            + 0.10 * ($spyLevel - $counterEspionageLevel)
+            - $this->operation->getDifficulty();
+
+        $probability = max(0.05, min(0.95, $probability));
+
+        return $probability - mt_rand(0, 1000) / 1000.0;
     }
 
     public function processPreOperation(): void
@@ -29,55 +31,60 @@ final class Spy extends OperationProcessor
 
     public function processSuccess(): void
     {
-        $this->addToOperationLog("Searching for buildings...");
-        $buildingsFound = false;
+        /** @var array<int, array<int, array{name: string, amount: int}>> $unitsByCategory */
+        $unitsByCategory = [];
         foreach ($this->region->getWorldRegionUnits() as $worldRegionUnit) {
             $resolvedUnit = $this->gameUnitRegistry->find($worldRegionUnit->getGameUnit());
-            if ($resolvedUnit->getGameUnitCategory() === GameUnitCategory::BUILDINGS) {
-                $this->addToOperationLog("- {$worldRegionUnit->getAmount()} {$resolvedUnit->getNameMulti()}");
-                $buildingsFound = true;
+            $categoryValue = $resolvedUnit->getGameUnitCategory()->value;
+            $unitsByCategory[$categoryValue][] = [
+                'name' => $resolvedUnit->getNameMulti(),
+                'amount' => $worldRegionUnit->getAmount(),
+            ];
+        }
+
+        $alwaysShow = [
+            GameUnitCategory::TROOPS,
+            GameUnitCategory::BUILDINGS,
+            GameUnitCategory::DEFENSE_BUILDINGS,
+        ];
+        $optional = [
+            GameUnitCategory::SPECIAL_BUILDINGS,
+            GameUnitCategory::NAVAL_UNITS,
+            GameUnitCategory::AIR_UNITS,
+            GameUnitCategory::MISSILES,
+        ];
+
+        foreach ($alwaysShow as $category) {
+            $this->addSection($category->getLabel());
+            $entries = $unitsByCategory[$category->value] ?? [];
+            if (count($entries) === 0) {
+                $this->addEmpty('No ' . strtolower($category->getLabel()) . ' detected in this region.');
+                continue;
+            }
+            foreach ($entries as $entry) {
+                $this->addRow($entry['name'], number_format($entry['amount'], 0, '.', ','));
             }
         }
 
-        if ($buildingsFound === false) {
-            $this->addToOperationLog(
-                "No buildings found"
-            );
-        }
-
-        $this->addToOperationLog("Searching for units...");
-        $unitsFound = false;
-        foreach ($this->region->getWorldRegionUnits() as $worldRegionUnit) {
-            $resolvedUnit = $this->gameUnitRegistry->find($worldRegionUnit->getGameUnit());
-            if ($resolvedUnit->getGameUnitCategory() === GameUnitCategory::TROOPS) {
-                $this->addToOperationLog("- {$worldRegionUnit->getAmount()} {$resolvedUnit->getNameMulti()}");
-                $unitsFound = true;
+        foreach ($optional as $category) {
+            $entries = $unitsByCategory[$category->value] ?? [];
+            if (count($entries) === 0) {
+                continue;
             }
-        }
-
-        if ($unitsFound === false) {
-            $this->addToOperationLog(
-                "No units found"
-            );
+            $this->addSection($category->getLabel());
+            foreach ($entries as $entry) {
+                $this->addRow($entry['name'], number_format($entry['amount'], 0, '.', ','));
+            }
         }
     }
 
     public function processFailed(): void
     {
-        $spiesLost = intval($this->amount * 0.05);
-
-        foreach ($this->playerRegion->getWorldRegionUnits() as $worldRegionUnit) {
-            if ($worldRegionUnit->getGameUnit() === GameUnitEnum::SPY) {
-                $worldRegionUnit->setAmount(intval($worldRegionUnit->getAmount() - $spiesLost));
-                $this->worldRegionUnitRepository->save($worldRegionUnit);
-            }
-        }
-
         $reportText = "{$this->getPlayerRegionPlayer()->getName()} tried to spy"
             . " on region {$this->region->getX()}, {$this->region->getY()} but failed.";
         $this->reportCreator->createReport($this->getTargetRegionPlayer(), time(), $reportText, Report::TYPE_GENERAL);
 
-        $this->addToOperationLog("We failed to spy and lost {$spiesLost} spies");
+        $this->addFailure("Our spies were caught. The enemy's defenses spotted us and an alert has been raised.");
     }
 
     public function processPostOperation(): void

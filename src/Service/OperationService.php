@@ -54,7 +54,7 @@ final class OperationService
     }
 
     /**
-     * @return array<int, string>
+     * @return array<int, array<string, mixed>>
      */
     public function executeOperation(
         WorldRegion $region,
@@ -71,7 +71,7 @@ final class OperationService
             throw new RuntimeException("Region has no owner");
         }
 
-        $player->getResources()->addCash(-($operation->getCost() * $amount));
+        $player->getResources()->addCash(-$operation->calculateCost($region, $amount));
         $this->playerRepository->save($player);
 
         $operationProcessor = OperationProcessor::factory(
@@ -128,7 +128,7 @@ final class OperationService
             throw new RuntimeException("You can not attack yourself");
         }
 
-        if ($playerRegion->getPlayer()->getResources()->getCash() < $operation->getCost() * $amount) {
+        if ($playerRegion->getPlayer()->getResources()->getCash() < $operation->calculateCost($region, $amount)) {
             throw new RuntimeException("You do not have enough cash");
         }
 
@@ -146,6 +146,11 @@ final class OperationService
 
     private function hasWorldRegionGameUnitAmount(WorldRegion $region, Operation $operation, int $amount): void
     {
+        // Unit-less operations (e.g., spy ops) skip the unit-count check.
+        if ($operation->getGameUnit() === null) {
+            return;
+        }
+
         if ($amount < 1) {
             throw new RuntimeException("Can not send negative game units");
         }

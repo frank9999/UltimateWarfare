@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace FrankProjects\UltimateWarfare\Service\OperationEngine;
 
-use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitEnum;
 use FrankProjects\UltimateWarfare\Entity\Operation;
 use FrankProjects\UltimateWarfare\Entity\Player;
 use FrankProjects\UltimateWarfare\Entity\WorldRegion;
@@ -29,7 +28,7 @@ abstract class OperationProcessor implements OperationInterface
     protected ConstructionRepository $constructionRepository;
     protected GameUnitRegistry $gameUnitRegistry;
     /**
-     * @var array <int, string>
+     * @var array<int, array<string, mixed>>
      */
     protected array $operationLog = [];
 
@@ -89,7 +88,7 @@ abstract class OperationProcessor implements OperationInterface
     }
 
     /**
-     * @return array<int, string>
+     * @return array<int, array<string, mixed>>
      */
     public function execute(): array
     {
@@ -114,28 +113,6 @@ abstract class OperationProcessor implements OperationInterface
         return ($random - 1) / 10;
     }
 
-    protected function getSpecialOps(): int
-    {
-        foreach ($this->playerRegion->getWorldRegionUnits() as $worldRegionUnit) {
-            if ($worldRegionUnit->getGameUnit() === GameUnitEnum::SABOTEUR) {
-                return $worldRegionUnit->getAmount();
-            }
-        }
-
-        return 0;
-    }
-
-    protected function getGuards(): int
-    {
-        foreach ($this->region->getWorldRegionUnits() as $worldRegionUnit) {
-            if ($worldRegionUnit->getGameUnit() === GameUnitEnum::GUARD) {
-                return $worldRegionUnit->getAmount();
-            }
-        }
-
-        return 0;
-    }
-
     protected function hasResearched(string $researchSlug): bool
     {
         foreach ($this->getPlayerRegionPlayer()->getPlayerResearch() as $playerResearch) {
@@ -151,8 +128,41 @@ abstract class OperationProcessor implements OperationInterface
         return false;
     }
 
+    protected function getAttackerResearchLevel(string $researchSlug): int
+    {
+        return $this->highestCompletedResearchLevel($this->getPlayerRegionPlayer(), $researchSlug);
+    }
+
+    protected function getTargetResearchLevel(string $researchSlug): int
+    {
+        $targetPlayer = $this->region->getPlayer();
+        if ($targetPlayer === null) {
+            return 0;
+        }
+
+        return $this->highestCompletedResearchLevel($targetPlayer, $researchSlug);
+    }
+
+    private function highestCompletedResearchLevel(Player $player, string $researchSlug): int
+    {
+        $highest = 0;
+        foreach ($player->getPlayerResearch() as $playerResearch) {
+            if ($playerResearch->getActive() === false) {
+                continue;
+            }
+            if ($playerResearch->getResearchSlug() !== $researchSlug) {
+                continue;
+            }
+            if ($playerResearch->getLevel() > $highest) {
+                $highest = $playerResearch->getLevel();
+            }
+        }
+
+        return $highest;
+    }
+
     /**
-     * @return array<int, string>
+     * @return array<int, array<string, mixed>>
      */
     public function getOperationLog(): array
     {
@@ -161,7 +171,32 @@ abstract class OperationProcessor implements OperationInterface
 
     protected function addToOperationLog(string $log): void
     {
-        $this->operationLog[] = $log;
+        $this->operationLog[] = ['type' => 'line', 'text' => $log];
+    }
+
+    protected function addSection(string $title): void
+    {
+        $this->operationLog[] = ['type' => 'section', 'title' => $title];
+    }
+
+    protected function addRow(string $label, string $value): void
+    {
+        $this->operationLog[] = ['type' => 'row', 'label' => $label, 'value' => $value];
+    }
+
+    protected function addEmpty(string $text): void
+    {
+        $this->operationLog[] = ['type' => 'empty', 'text' => $text];
+    }
+
+    protected function addReportEntry(int $timestamp, string $text): void
+    {
+        $this->operationLog[] = ['type' => 'report', 'timestamp' => $timestamp, 'text' => $text];
+    }
+
+    protected function addFailure(string $text): void
+    {
+        $this->operationLog[] = ['type' => 'failure', 'text' => $text];
     }
 
     protected function getTargetRegionPlayer(): Player

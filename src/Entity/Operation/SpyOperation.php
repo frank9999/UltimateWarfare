@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace FrankProjects\UltimateWarfare\Entity\Operation;
 
-use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitEnum;
 use FrankProjects\UltimateWarfare\Entity\Operation;
 use FrankProjects\UltimateWarfare\Entity\Research\SpyTechnologyResearch;
 use FrankProjects\UltimateWarfare\Service\OperationEngine\OperationProcessor\Spy;
@@ -14,9 +13,9 @@ final readonly class SpyOperation extends Operation
     public function __construct()
     {
         parent::__construct(
-            name: 'Spy Technology',
+            name: 'Spy Operation',
             image: 'spy.gif',
-            cost: 150,
+            cost: 5000,
             description: "Spy on an enemy country and retrieve important data"
                 . " like buildings and units.\n\n"
                 . "\"If you fail, your enemy recieves an report about your spy attack\"",
@@ -24,7 +23,7 @@ final readonly class SpyOperation extends Operation
             difficulty: 0.1,
             maxDistance: 3,
             researchClass: SpyTechnologyResearch::class,
-            gameUnit: GameUnitEnum::SPY,
+            gameUnit: null,
         );
     }
 

@@ -20,7 +20,7 @@ abstract readonly class Operation
         private float $difficulty,
         private int $maxDistance,
         private string $researchClass,
-        private GameUnitEnum $gameUnit,
+        private ?GameUnitEnum $gameUnit,
         private int $researchMinLevel = 1,
     ) {
     }
@@ -82,7 +82,7 @@ abstract readonly class Operation
         return (new $this->researchClass())->getName();
     }
 
-    public function getGameUnit(): GameUnitEnum
+    public function getGameUnit(): ?GameUnitEnum
     {
         return $this->gameUnit;
     }
@@ -95,5 +95,10 @@ abstract readonly class Operation
     public function hasCooldown(): bool
     {
         return false;
+    }
+
+    public function calculateCost(WorldRegion $targetRegion, int $amount): int
+    {
+        return $this->cost * max(1, $amount);
     }
 }

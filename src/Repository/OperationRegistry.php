@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace FrankProjects\UltimateWarfare\Repository;
 
 use FrankProjects\UltimateWarfare\Entity\Operation;
-use FrankProjects\UltimateWarfare\Entity\Operation\AdvancedSpy2Operation;
 use FrankProjects\UltimateWarfare\Entity\Operation\AdvancedSpyOperation;
 use FrankProjects\UltimateWarfare\Entity\Operation\ArtilleryBombardmentOperation;
 use FrankProjects\UltimateWarfare\Entity\Operation\BomberAttackOperation;
@@ -35,7 +34,6 @@ final class OperationRegistry
             new NuclearMissileAttackOperation(),
             new SubmarineAttackOperation(),
             new AdvancedSpyOperation(),
-            new AdvancedSpy2Operation(),
             new NavalBombardmentOperation(),
         ];
 

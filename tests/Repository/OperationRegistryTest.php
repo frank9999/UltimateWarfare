@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace FrankProjects\UltimateWarfare\Tests\Repository;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use FrankProjects\UltimateWarfare\Entity\Operation\AdvancedSpy2Operation;
 use FrankProjects\UltimateWarfare\Entity\Operation\AdvancedSpyOperation;
 use FrankProjects\UltimateWarfare\Entity\Operation\SpyOperation;
 use FrankProjects\UltimateWarfare\Entity\Player;
@@ -37,7 +36,7 @@ class OperationRegistryTest extends TestCase
     public function testFindAllReturnsAllOperations(): void
     {
         $operations = $this->registry->findAll();
-        self::assertCount(11, $operations);
+        self::assertCount(10, $operations);
     }
 
     public function testFindEnabledReturnsOnlyEnabledOperations(): void
@@ -58,23 +57,20 @@ class OperationRegistryTest extends TestCase
 
         self::assertContains('spy', $slugs);
         self::assertNotContains('advanced-spy', $slugs);
-        self::assertNotContains('advanced-spy-2', $slugs);
     }
 
-    public function testFindAvailableForPlayerUnlocksAdvancedOpsAtHigherLevel(): void
+    public function testFindAvailableForPlayerUnlocksAdvancedOpAtHigherLevel(): void
     {
-        $player = $this->createPlayerWithResearch('spy-technology', 3);
+        $player = $this->createPlayerWithResearch('spy-technology', 2);
 
         $operations = $this->registry->findAvailableForPlayer($player);
         $slugs = array_map(static fn ($o) => $o->getSlug(), $operations);
 
         self::assertContains('spy', $slugs);
         self::assertContains('advanced-spy', $slugs);
-        self::assertContains('advanced-spy-2', $slugs);
 
-        // Sanity check the advanced ops are wired to the consolidated research
+        // Sanity check the advanced op is wired to the consolidated research
         self::assertSame('spy-technology', (new AdvancedSpyOperation())->getResearchSlug());
-        self::assertSame('spy-technology', (new AdvancedSpy2Operation())->getResearchSlug());
     }
 
     public function testFindAvailableForPlayerReturnsEmptyWhenNoResearch(): void

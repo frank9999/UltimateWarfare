@@ -134,7 +134,11 @@ final class NavalBombardment extends OperationProcessor
 
     private function getCruiserGroundAttack(): int
     {
-        $gameUnit = $this->gameUnitRegistry->find($this->operation->getGameUnit());
+        $gameUnitEnum = $this->operation->getGameUnit();
+        if ($gameUnitEnum === null) {
+            throw new \RuntimeException('Naval Bombardment requires a game unit');
+        }
+        $gameUnit = $this->gameUnitRegistry->find($gameUnitEnum);
         return $gameUnit->getBattleStats()->getGroundBattleStats()->getAttack();
     }
 
