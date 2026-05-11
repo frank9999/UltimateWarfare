@@ -39,11 +39,11 @@ final class AdvancedSpy extends OperationProcessor
         }
 
         $this->addSection('Enemy Resources');
-        $this->addRow('Cash', '$' . number_format($resources->getCash(), 0, '.', ','));
-        $this->addRow('Food', number_format($resources->getFood(), 0, '.', ','));
-        $this->addRow('Wood', number_format($resources->getWood(), 0, '.', ','));
-        $this->addRow('Steel', number_format($resources->getSteel(), 0, '.', ','));
-        $this->addRow('Population', number_format($population, 0, '.', ','));
+        $this->addRow('Cash', '$' . number_format($resources->getCash()));
+        $this->addRow('Food', number_format($resources->getFood()));
+        $this->addRow('Wood', number_format($resources->getWood()));
+        $this->addRow('Steel', number_format($resources->getSteel()));
+        $this->addRow('Population', number_format($population));
 
         $this->addSection('Recent Reports (last 24h)');
         $cutoff = time() - 86400;

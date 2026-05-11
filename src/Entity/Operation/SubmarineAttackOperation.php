@@ -15,12 +15,11 @@ final readonly class SubmarineAttackOperation extends Operation
     {
         parent::__construct(
             name: 'Submarine Attack',
-            image: 'submarine.gif',
+            image: 'op_submarine_attack.jpg',
             cost: 25000,
-            description: "Send an Submarine behind enemy lines and sink enemy ships!"
-                . " Every submarine is able to sink at least 1 ship!\n(Navy Only)\n\n"
-                . "\"Your enemy will recieve an report about this attack if you succeed and fail."
-                . " The report includes your empire name if you fail, else not.\"",
+            description: "Send submarines to sink enemy destroyers. Each submarine sinks 1 destroyer."
+                . " On failure, you lose 5% of the deployed submarines."
+                . " The enemy always receives a report; your name is hidden on success.",
             enabled: true,
             difficulty: 0.5,
             maxDistance: 4,

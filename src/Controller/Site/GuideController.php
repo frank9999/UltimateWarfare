@@ -58,12 +58,23 @@ final class GuideController extends BaseController
     }
 
 
-    public function listOperations(OperationRegistry $operationRegistry): Response
+    public function listOperations(OperationRegistry $operationRegistry, GameUnitRegistry $gameUnitRegistry): Response
     {
+        $operations = $operationRegistry->findEnabled();
+
+        $gameUnitNames = [];
+        foreach ($operations as $operation) {
+            $gameUnit = $operation->getGameUnit();
+            if ($gameUnit !== null && !isset($gameUnitNames[$gameUnit->value])) {
+                $gameUnitNames[$gameUnit->value] = $gameUnitRegistry->find($gameUnit)->getName();
+            }
+        }
+
         return $this->render(
             'site/guide/listOperations.html.twig',
             [
-                'operations' => $operationRegistry->findEnabled(),
+                'operations' => $operations,
+                'gameUnitNames' => $gameUnitNames,
             ]
         );
     }

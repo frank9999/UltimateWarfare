@@ -15,9 +15,11 @@ final readonly class NuclearMissileAttackOperation extends Operation
     {
         parent::__construct(
             name: 'Nuclear Missile Attack',
-            image: 'op_nuclear.gif',
+            image: 'op_nuclear_missile_attack.jpg',
             cost: 2500000,
-            description: 'Launch an Nuclear Missile Attack against an enemy region.',
+            description: "Annihilate an enemy region with a nuclear strike. On success, every unit and"
+                . " building is destroyed, the region is rendered uninhabitable, and the enemy"
+                . " permanently loses ownership of it. Your name is always shown to the target.",
             enabled: true,
             difficulty: 0.9,
             maxDistance: 3,

@@ -8,6 +8,10 @@ use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitEnum;
 
 abstract readonly class Operation
 {
+    public const string COST_FLAT = 'flat';
+    public const string COST_PER_UNIT = 'per_unit';
+    public const string COST_PER_TARGET_REGION = 'per_target_region';
+
     /**
      * @param class-string<Research> $researchClass
      */
@@ -95,6 +99,11 @@ abstract readonly class Operation
     public function hasCooldown(): bool
     {
         return false;
+    }
+
+    public function getCostType(): string
+    {
+        return $this->gameUnit === null ? self::COST_FLAT : self::COST_PER_UNIT;
     }
 
     public function calculateCost(WorldRegion $targetRegion, int $amount): int

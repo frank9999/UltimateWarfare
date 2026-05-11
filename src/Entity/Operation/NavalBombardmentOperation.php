@@ -15,12 +15,12 @@ final readonly class NavalBombardmentOperation extends Operation
     {
         parent::__construct(
             name: 'Naval Bombardment',
-            image: 'ship.gif',
+            image: 'op_naval_bombardment.jpg',
             cost: 25,
-            description: "Bombard an enemy coastal region with naval gunfire from your cruisers."
-                . " Damages all units in the target region, with military targets taking heavier losses."
-                . " Cruisers are not consumed but enter a 10-minute cooldown after firing.\n\n"
-                . "\"Your enemy will receive a report about this bombardment.\"",
+            description: "Bombard a coastal enemy region with cruisers. Damage is split 75% military units"
+                . " / 25% buildings, with diminishing returns at high volumes. Cruisers are not consumed"
+                . " but enter a 10-minute cooldown after firing."
+                . " The enemy always receives a report.",
             enabled: true,
             difficulty: 0,
             maxDistance: 3,

@@ -15,11 +15,11 @@ final readonly class MissileAttackOperation extends Operation
     {
         parent::__construct(
             name: 'Missile Attack',
-            image: 'op_rocket.gif',
+            image: 'op_missile_attack.jpg',
             cost: 50,
-            description: "Launch an Missile attack against an enemy country."
-                . " Every rocket has 50% chance in destroying an building.\n\n"
-                . "\"Your enemy will recieve an report about this attack if you succeed and fail.\"",
+            description: "Launch ballistic missiles at an enemy region. On average, each missile destroys"
+                . " half a building (regular buildings only, not special ones)."
+                . " The enemy always receives a report and sees your name.",
             enabled: true,
             difficulty: 0.5,
             maxDistance: 3,

@@ -687,3 +687,121 @@ hr {
     width: 95%;
     opacity: 1;
 }
+
+/* ===== Guide Operations List ===== */
+.guide-operations-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.guide-operation-card {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    background: #3a3a3a;
+    border: 2px solid #8B7355;
+    border-radius: 6px;
+    padding: 20px;
+}
+
+.guide-operation-image {
+    display: flex;
+    justify-content: center;
+}
+
+.guide-operation-image img {
+    display: block;
+    width: 400px;
+    max-width: 100%;
+    height: auto;
+    border: 1px solid #8B7355;
+    border-radius: 4px;
+}
+
+.guide-operation-body {
+    color: #f3e6c1;
+}
+
+.guide-operation-title {
+    margin: 0 0 8px;
+    font-size: 22px;
+    color: #f3e6c1;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #8B7355;
+}
+
+.guide-operation-description {
+    font-size: 14px;
+    line-height: 1.55;
+    color: #d8c9a5;
+    margin: 0 0 16px;
+}
+
+.guide-operation-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 14px 24px;
+    margin: 0;
+}
+
+.guide-operation-stats > div {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+}
+
+.guide-operation-stats dt {
+    font-size: 11px;
+    color: #ffcc66;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.guide-operation-stats dd {
+    margin: 0;
+    font-size: 14px;
+    color: #f3e6c1;
+}
+
+.guide-cost-amount { font-weight: bold; }
+.guide-cost-type   { color: #a0a0a0; font-size: 12px; margin-left: 4px; }
+
+.guide-difficulty-badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: bold;
+    color: #1a1a1a;
+}
+
+.guide-difficulty-bar {
+    width: 100%;
+    max-width: 140px;
+    height: 6px;
+    margin-top: 4px;
+    background: #1a1a1a;
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.guide-difficulty-bar-fill {
+    height: 100%;
+    border-radius: 3px;
+}
+
+.guide-difficulty-badge.tier-0,
+.guide-difficulty-bar-fill.tier-0 { background: #6cc24a; }
+.guide-difficulty-badge.tier-1,
+.guide-difficulty-bar-fill.tier-1 { background: #b6d94c; }
+.guide-difficulty-badge.tier-2,
+.guide-difficulty-bar-fill.tier-2 { background: #f0c419; }
+.guide-difficulty-badge.tier-3,
+.guide-difficulty-bar-fill.tier-3 { background: #e67e22; }
+.guide-difficulty-badge.tier-4,
+.guide-difficulty-bar-fill.tier-4 {
+    background: #d63838;
+    color: #f3e6c1;
+}

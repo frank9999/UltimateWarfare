@@ -15,12 +15,11 @@ final readonly class SniperAttackOperation extends Operation
     {
         parent::__construct(
             name: 'Sniper Team',
-            image: 'sniper.gif',
+            image: 'op_sniper_attack.jpg',
             cost: 250,
-            description: "Deploy a Sniper Team behind the enemy lines and take out an ammount"
-                . " of enemy soldiers. Every sniper can kill 5 soldiers, but when you fail,"
-                . " you lose 20% of your snipers!\n(Army Only)\n\n"
-                . "\"Your enemy will recieve an report about this attack if you succeed or fail.\"",
+            description: "Deploy snipers behind enemy lines. Each sniper kills 5 enemy soldiers."
+                . " On failure, you lose 5% of the deployed snipers."
+                . " The enemy always receives a report; your name is hidden on success.",
             enabled: true,
             difficulty: 0.5,
             maxDistance: 2,

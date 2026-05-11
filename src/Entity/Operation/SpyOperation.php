@@ -14,11 +14,10 @@ final readonly class SpyOperation extends Operation
     {
         parent::__construct(
             name: 'Spy Operation',
-            image: 'spy.gif',
+            image: 'op_spy.jpg',
             cost: 5000,
-            description: "Spy on an enemy country and retrieve important data"
-                . " like buildings and units.\n\n"
-                . "\"If you fail, your enemy recieves an report about your spy attack\"",
+            description: "Send a spy team into an enemy region to reveal their full unit, building,"
+                . " and defense layout. On failure, the enemy is alerted.",
             enabled: true,
             difficulty: 0.1,
             maxDistance: 3,

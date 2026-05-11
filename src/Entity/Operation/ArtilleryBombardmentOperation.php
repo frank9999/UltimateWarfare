@@ -15,12 +15,12 @@ final readonly class ArtilleryBombardmentOperation extends Operation
     {
         parent::__construct(
             name: 'Artillery Bombardment',
-            image: 'op_rocket.gif',
+            image: 'op_artillery_bombardment.jpg',
             cost: 25,
-            description: "Bombard an adjacent enemy region with artillery fire."
-                . " Damages all units in the target region, with military targets taking heavier losses."
-                . " Artillery units are not consumed but enter a 10-minute cooldown after firing.\n\n"
-                . "\"Your enemy will receive a report about this bombardment.\"",
+            description: "Bombard an adjacent enemy region. Damage is split 75% military units / 25%"
+                . " buildings, with diminishing returns at high volumes. No artillery is consumed,"
+                . " but each piece enters a 10-minute cooldown after firing."
+                . " The enemy always receives a report.",
             enabled: true,
             difficulty: 0,
             maxDistance: 2,
