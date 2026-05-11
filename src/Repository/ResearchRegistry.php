@@ -6,14 +6,21 @@ namespace FrankProjects\UltimateWarfare\Repository;
 
 use FrankProjects\UltimateWarfare\Entity\Research;
 use FrankProjects\UltimateWarfare\Entity\Research\AdvancedOpticsResearch;
+use FrankProjects\UltimateWarfare\Entity\Research\AdvancedWoodProcessingResearch;
+use FrankProjects\UltimateWarfare\Entity\Research\ArtilleryBombardmentResearch;
 use FrankProjects\UltimateWarfare\Entity\Research\BallisticMissileTechnologyResearch;
+use FrankProjects\UltimateWarfare\Entity\Research\BomberAttackResearch;
+use FrankProjects\UltimateWarfare\Entity\Research\CounterEspionageResearch;
+use FrankProjects\UltimateWarfare\Entity\Research\DefensiveNetworkResearch;
+use FrankProjects\UltimateWarfare\Entity\Research\EfficientBuildingTechnologyResearch;
 use FrankProjects\UltimateWarfare\Entity\Research\FactoryBlueprintResearch;
 use FrankProjects\UltimateWarfare\Entity\Research\NavalBombardmentResearch;
 use FrankProjects\UltimateWarfare\Entity\Research\NuclearTechnologyResearch;
+use FrankProjects\UltimateWarfare\Entity\Research\OreExtractionImprovementsResearch;
 use FrankProjects\UltimateWarfare\Entity\Research\RadarTechnologyResearch;
-use FrankProjects\UltimateWarfare\Entity\Research\ResearchLevelResearch;
-use FrankProjects\UltimateWarfare\Entity\Research\SpecialOperationsResearch;
+use FrankProjects\UltimateWarfare\Entity\Research\ResearchTierResearch;
 use FrankProjects\UltimateWarfare\Entity\Research\SpyTechnologyResearch;
+use FrankProjects\UltimateWarfare\Entity\Research\StrategicBomberAttackResearch;
 use FrankProjects\UltimateWarfare\Entity\Research\SubmarineTechnologyResearch;
 
 final class ResearchRegistry
@@ -24,9 +31,13 @@ final class ResearchRegistry
     public function __construct()
     {
         $researchList = [
-            new ResearchLevelResearch(),
-            new SpecialOperationsResearch(),
+            new ResearchTierResearch(),
             new SpyTechnologyResearch(),
+            new CounterEspionageResearch(),
+            new DefensiveNetworkResearch(),
+            new OreExtractionImprovementsResearch(),
+            new AdvancedWoodProcessingResearch(),
+            new EfficientBuildingTechnologyResearch(),
             new NuclearTechnologyResearch(),
             new FactoryBlueprintResearch(),
             new AdvancedOpticsResearch(),
@@ -34,6 +45,9 @@ final class ResearchRegistry
             new BallisticMissileTechnologyResearch(),
             new RadarTechnologyResearch(),
             new NavalBombardmentResearch(),
+            new ArtilleryBombardmentResearch(),
+            new BomberAttackResearch(),
+            new StrategicBomberAttackResearch(),
         ];
 
         $this->researches = [];

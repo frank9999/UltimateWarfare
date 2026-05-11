@@ -6,17 +6,17 @@ namespace FrankProjects\UltimateWarfare\Entity\Research;
 
 use FrankProjects\UltimateWarfare\Entity\Research;
 
-final readonly class AdvancedOpticsResearch extends Research
+final readonly class ArtilleryBombardmentResearch extends Research
 {
     public function __construct()
     {
         parent::__construct(
-            name: 'Advanced Optics',
-            image: 'research.gif',
-            description: 'Unlock the ability to train snipers and perform sniper attack operations',
+            name: 'Special Operation: Artillery Bombardment',
+            image: 'tech_special_operations.gif',
+            description: 'Unlock the ability to launch artillery bombardment operations',
             enabled: true,
-            costPerLevel: [1 => 35000],
-            timestampPerLevel: [1 => 86400],
+            costPerLevel: [1 => 25000],
+            timestampPerLevel: [1 => 7200],
             prerequisitesPerLevel: [
                 1 => [ResearchTierResearch::class => 2],
             ],
@@ -25,6 +25,6 @@ final readonly class AdvancedOpticsResearch extends Research
 
     public function getSlug(): string
     {
-        return 'advanced-optics';
+        return 'special-operation-artillery-bombardment';
     }
 }

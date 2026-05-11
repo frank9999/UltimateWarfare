@@ -82,33 +82,33 @@ class ResearchActionServiceTest extends TestCase
         $this->researchPlayerRepository->expects(self::once())
             ->method('save')
             ->with(self::callback(static fn (ResearchPlayer $rp): bool =>
-                $rp->getResearchSlug() === 'research-level' && $rp->getLevel() === 1));
+                $rp->getResearchSlug() === 'research-tier' && $rp->getLevel() === 1));
 
-        $this->service->performResearch('research-level', $player);
+        $this->service->performResearch('research-tier', $player);
 
         self::assertEquals(2500, $player->getResources()->getCash());
     }
 
     public function testPerformResearchUpgradesToNextLevel(): void
     {
-        $level1 = $this->createCompletedResearch('research-level', 1);
-        $player = $this->createPlayer(20000, [$level1]);
+        $level1 = $this->createCompletedResearch('research-tier', 1);
+        $player = $this->createPlayer(60000, [$level1]);
 
         $this->researchPlayerRepository->expects(self::once())
             ->method('save')
             ->with(self::callback(static fn (ResearchPlayer $rp): bool =>
-                $rp->getResearchSlug() === 'research-level' && $rp->getLevel() === 2));
+                $rp->getResearchSlug() === 'research-tier' && $rp->getLevel() === 2));
 
-        $this->service->performResearch('research-level', $player);
+        $this->service->performResearch('research-tier', $player);
 
-        self::assertEquals(5000, $player->getResources()->getCash());
+        self::assertEquals(10000, $player->getResources()->getCash());
     }
 
     public function testPerformResearchFailsWhenAtMaxLevel(): void
     {
         $completed = [];
-        for ($level = 1; $level <= 10; $level++) {
-            $completed[] = $this->createCompletedResearch('research-level', $level);
+        for ($level = 1; $level <= 5; $level++) {
+            $completed[] = $this->createCompletedResearch('research-tier', $level);
         }
 
         $player = $this->createPlayer(1000000000, $completed);
@@ -116,7 +116,7 @@ class ResearchActionServiceTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('This technology is already at its maximum level!');
 
-        $this->service->performResearch('research-level', $player);
+        $this->service->performResearch('research-tier', $player);
     }
 
     public function testPerformResearchFailsWhenResearchNotFound(): void
@@ -131,13 +131,13 @@ class ResearchActionServiceTest extends TestCase
 
     public function testPerformResearchFailsWhenAnotherResearchInProgress(): void
     {
-        $ongoing = $this->createOngoingResearch('research-level', 2);
+        $ongoing = $this->createOngoingResearch('research-tier', 2);
         $player = $this->createPlayer(100000, [$ongoing]);
 
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('You can only research 1 technology at a time!');
 
-        $this->service->performResearch('special-operations', $player);
+        $this->service->performResearch('special-operation-artillery-bombardment', $player);
     }
 
     public function testPerformResearchFailsWhenPrerequisiteLevelNotMet(): void
@@ -147,7 +147,7 @@ class ResearchActionServiceTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('You do not have all required technologies!');
 
-        $this->service->performResearch('special-operations', $player);
+        $this->service->performResearch('special-operation-artillery-bombardment', $player);
     }
 
     public function testPerformResearchFailsWhenCannotAfford(): void
@@ -157,39 +157,39 @@ class ResearchActionServiceTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('You can not afford that!');
 
-        $this->service->performResearch('research-level', $player);
+        $this->service->performResearch('research-tier', $player);
     }
 
     public function testPerformResearchSucceedsWithPrerequisiteLevelMet(): void
     {
-        $researchLevel1 = $this->createCompletedResearch('research-level', 1);
-        $player = $this->createPlayer(10000, [$researchLevel1]);
+        $researchTier2 = $this->createCompletedResearch('research-tier', 2);
+        $player = $this->createPlayer(50000, [$researchTier2]);
 
         $this->researchPlayerRepository->expects(self::once())->method('save');
 
-        $this->service->performResearch('special-operations', $player);
+        $this->service->performResearch('special-operation-artillery-bombardment', $player);
 
-        self::assertEquals(5000, $player->getResources()->getCash());
+        self::assertEquals(25000, $player->getResources()->getCash());
     }
 
     public function testPerformCancelRemovesInProgressUpgrade(): void
     {
-        $ongoing = $this->createOngoingResearch('research-level', 2);
+        $ongoing = $this->createOngoingResearch('research-tier', 2);
         $player = $this->createPlayer(0, [$ongoing]);
 
         $this->researchPlayerRepository->expects(self::once())->method('remove')->with($ongoing);
 
-        $this->service->performCancel('research-level', $player);
+        $this->service->performCancel('research-tier', $player);
     }
 
     public function testPerformCancelDoesNotRemoveCompletedLevels(): void
     {
-        $completed = $this->createCompletedResearch('research-level', 1);
+        $completed = $this->createCompletedResearch('research-tier', 1);
         $player = $this->createPlayer(0, [$completed]);
 
         $this->researchPlayerRepository->expects(self::never())->method('remove');
 
-        $this->service->performCancel('research-level', $player);
+        $this->service->performCancel('research-tier', $player);
     }
 
     public function testPerformCancelFailsWhenResearchNotFound(): void
@@ -208,6 +208,6 @@ class ResearchActionServiceTest extends TestCase
 
         $this->researchPlayerRepository->expects(self::never())->method('remove');
 
-        $this->service->performCancel('research-level', $player);
+        $this->service->performCancel('research-tier', $player);
     }
 }

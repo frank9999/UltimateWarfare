@@ -6,18 +6,17 @@ namespace FrankProjects\UltimateWarfare\Entity\Research;
 
 use FrankProjects\UltimateWarfare\Entity\Research;
 
-final readonly class SubmarineTechnologyResearch extends Research
+final readonly class BomberAttackResearch extends Research
 {
     public function __construct()
     {
         parent::__construct(
-            name: 'Submarine Technology',
-            image: 'research.gif',
-            description: 'Unlock the ability to construct submarines in harbors'
-                . ' and perform submarine attack operations',
+            name: 'Special Operation: Bomber Attack',
+            image: 'tech_special_operations.gif',
+            description: 'Unlock the ability to launch bomber attack operations',
             enabled: true,
-            costPerLevel: [1 => 50000],
-            timestampPerLevel: [1 => 86400],
+            costPerLevel: [1 => 100000],
+            timestampPerLevel: [1 => 15000],
             prerequisitesPerLevel: [
                 1 => [ResearchTierResearch::class => 3],
             ],
@@ -26,6 +25,6 @@ final readonly class SubmarineTechnologyResearch extends Research
 
     public function getSlug(): string
     {
-        return 'submarine-technology';
+        return 'special-operation-bomber-attack';
     }
 }

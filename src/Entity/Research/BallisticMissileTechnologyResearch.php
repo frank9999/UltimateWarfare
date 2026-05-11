@@ -19,7 +19,7 @@ final readonly class BallisticMissileTechnologyResearch extends Research
             costPerLevel: [1 => 75000],
             timestampPerLevel: [1 => 172800],
             prerequisitesPerLevel: [
-                1 => [ResearchLevelResearch::class => 2],
+                1 => [ResearchTierResearch::class => 4],
             ],
         );
     }

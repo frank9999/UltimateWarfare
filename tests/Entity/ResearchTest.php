@@ -6,14 +6,21 @@ namespace FrankProjects\UltimateWarfare\Tests\Entity;
 
 use FrankProjects\UltimateWarfare\Entity\Research;
 use FrankProjects\UltimateWarfare\Entity\Research\AdvancedOpticsResearch;
+use FrankProjects\UltimateWarfare\Entity\Research\AdvancedWoodProcessingResearch;
+use FrankProjects\UltimateWarfare\Entity\Research\ArtilleryBombardmentResearch;
 use FrankProjects\UltimateWarfare\Entity\Research\BallisticMissileTechnologyResearch;
+use FrankProjects\UltimateWarfare\Entity\Research\BomberAttackResearch;
+use FrankProjects\UltimateWarfare\Entity\Research\CounterEspionageResearch;
+use FrankProjects\UltimateWarfare\Entity\Research\DefensiveNetworkResearch;
+use FrankProjects\UltimateWarfare\Entity\Research\EfficientBuildingTechnologyResearch;
 use FrankProjects\UltimateWarfare\Entity\Research\FactoryBlueprintResearch;
 use FrankProjects\UltimateWarfare\Entity\Research\NavalBombardmentResearch;
 use FrankProjects\UltimateWarfare\Entity\Research\NuclearTechnologyResearch;
+use FrankProjects\UltimateWarfare\Entity\Research\OreExtractionImprovementsResearch;
 use FrankProjects\UltimateWarfare\Entity\Research\RadarTechnologyResearch;
-use FrankProjects\UltimateWarfare\Entity\Research\ResearchLevelResearch;
-use FrankProjects\UltimateWarfare\Entity\Research\SpecialOperationsResearch;
+use FrankProjects\UltimateWarfare\Entity\Research\ResearchTierResearch;
 use FrankProjects\UltimateWarfare\Entity\Research\SpyTechnologyResearch;
+use FrankProjects\UltimateWarfare\Entity\Research\StrategicBomberAttackResearch;
 use FrankProjects\UltimateWarfare\Entity\Research\SubmarineTechnologyResearch;
 use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -27,9 +34,13 @@ class ResearchTest extends TestCase
     public static function researchProvider(): array
     {
         return [
-            'research-level' => [ResearchLevelResearch::class],
-            'special-operations' => [SpecialOperationsResearch::class],
+            'research-tier' => [ResearchTierResearch::class],
             'spy-technology' => [SpyTechnologyResearch::class],
+            'counter-espionage' => [CounterEspionageResearch::class],
+            'defensive-network' => [DefensiveNetworkResearch::class],
+            'ore-extraction-improvements' => [OreExtractionImprovementsResearch::class],
+            'advanced-wood-processing' => [AdvancedWoodProcessingResearch::class],
+            'efficient-building-technology' => [EfficientBuildingTechnologyResearch::class],
             'nuclear-technology' => [NuclearTechnologyResearch::class],
             'factory-blueprint' => [FactoryBlueprintResearch::class],
             'advanced-optics' => [AdvancedOpticsResearch::class],
@@ -37,6 +48,9 @@ class ResearchTest extends TestCase
             'ballistic-missile-technology' => [BallisticMissileTechnologyResearch::class],
             'radar-technology' => [RadarTechnologyResearch::class],
             'naval-bombardment' => [NavalBombardmentResearch::class],
+            'special-operation-artillery-bombardment' => [ArtilleryBombardmentResearch::class],
+            'special-operation-bomber-attack' => [BomberAttackResearch::class],
+            'special-operation-strategic-bomber-attack' => [StrategicBomberAttackResearch::class],
         ];
     }
 
@@ -90,7 +104,7 @@ class ResearchTest extends TestCase
 
     public function testInvalidLevelThrows(): void
     {
-        $research = new ResearchLevelResearch();
+        $research = new ResearchTierResearch();
 
         $this->expectException(InvalidArgumentException::class);
         $research->getCost($research->getMaxLevel() + 1);
@@ -111,43 +125,43 @@ class ResearchTest extends TestCase
         self::assertCount(count($slugs), array_unique($slugs), 'Duplicate research slugs found');
     }
 
-    public function testResearchLevelLevel1HasNoPrerequisites(): void
+    public function testResearchTierLevel1HasNoPrerequisites(): void
     {
-        $research = new ResearchLevelResearch();
+        $research = new ResearchTierResearch();
         self::assertEmpty($research->getPrerequisites(1));
     }
 
-    public function testResearchLevelHasTenLevels(): void
+    public function testResearchTierHasFiveLevels(): void
     {
-        self::assertSame(10, (new ResearchLevelResearch())->getMaxLevel());
+        self::assertSame(5, (new ResearchTierResearch())->getMaxLevel());
     }
 
-    public function testSpecialOperationsLevel3RequiresResearchLevel3(): void
-    {
-        $research = new SpecialOperationsResearch();
-        self::assertSame(
-            [ResearchLevelResearch::class => 3],
-            $research->getPrerequisites(3)
-        );
-    }
-
-    public function testSpyTechnologyLevel1RequiresSpecialOps1(): void
+    public function testSpyTechnologyLevel1RequiresResearchTier2(): void
     {
         $research = new SpyTechnologyResearch();
         self::assertSame(
-            [SpecialOperationsResearch::class => 1],
+            [ResearchTierResearch::class => 2],
+            $research->getPrerequisites(1)
+        );
+    }
+
+    public function testStrategicBomberAttackRequiresResearchTier4(): void
+    {
+        $research = new StrategicBomberAttackResearch();
+        self::assertSame(
+            [ResearchTierResearch::class => 4],
             $research->getPrerequisites(1)
         );
     }
 
     public function testGetPrerequisiteDescriptionsReturnsSlugAndName(): void
     {
-        $research = new SpecialOperationsResearch();
-        $descriptions = $research->getPrerequisiteDescriptions(2);
+        $research = new ArtilleryBombardmentResearch();
+        $descriptions = $research->getPrerequisiteDescriptions(1);
 
         self::assertCount(1, $descriptions);
-        self::assertSame('research-level', $descriptions[0]['slug']);
-        self::assertSame('Research', $descriptions[0]['name']);
+        self::assertSame('research-tier', $descriptions[0]['slug']);
+        self::assertSame('Research Tier', $descriptions[0]['name']);
         self::assertSame(2, $descriptions[0]['minLevel']);
     }
 }

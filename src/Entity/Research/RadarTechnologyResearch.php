@@ -18,7 +18,7 @@ final readonly class RadarTechnologyResearch extends Research
             costPerLevel: [1 => 40000],
             timestampPerLevel: [1 => 43200],
             prerequisitesPerLevel: [
-                1 => [ResearchLevelResearch::class => 2],
+                1 => [ResearchTierResearch::class => 2],
             ],
         );
     }

@@ -18,7 +18,7 @@ final readonly class NavalBombardmentResearch extends Research
             costPerLevel: [1 => 60000],
             timestampPerLevel: [1 => 129600],
             prerequisitesPerLevel: [
-                1 => [ResearchLevelResearch::class => 2],
+                1 => [ResearchTierResearch::class => 4],
             ],
         );
     }

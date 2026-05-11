@@ -18,7 +18,7 @@ final readonly class NuclearTechnologyResearch extends Research
             costPerLevel: [1 => 500000000],
             timestampPerLevel: [1 => 604800],
             prerequisitesPerLevel: [
-                1 => [ResearchLevelResearch::class => 7],
+                1 => [ResearchTierResearch::class => 5],
             ],
         );
     }

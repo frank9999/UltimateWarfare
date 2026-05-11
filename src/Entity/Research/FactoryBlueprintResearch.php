@@ -18,7 +18,7 @@ final readonly class FactoryBlueprintResearch extends Research
             costPerLevel: [1 => 25000],
             timestampPerLevel: [1 => 21600],
             prerequisitesPerLevel: [
-                1 => [ResearchLevelResearch::class => 2],
+                1 => [ResearchTierResearch::class => 1],
             ],
         );
     }
