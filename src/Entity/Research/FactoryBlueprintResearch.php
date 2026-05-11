@@ -13,11 +13,13 @@ final readonly class FactoryBlueprintResearch extends Research
         parent::__construct(
             name: 'Factory Blueprint',
             image: 'research.gif',
-            cost: 25000,
-            timestamp: 21600,
             description: 'Unlock the ability to construct factories on your regions',
             enabled: true,
-            prerequisites: [ResearchLevel2Research::class],
+            costPerLevel: [1 => 25000],
+            timestampPerLevel: [1 => 21600],
+            prerequisitesPerLevel: [
+                1 => [ResearchLevelResearch::class => 2],
+            ],
         );
     }
 

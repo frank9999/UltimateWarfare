@@ -82,6 +82,27 @@ final class DoctrineResearchPlayerRepository implements ResearchPlayerRepository
         )->getResult();
     }
 
+    /**
+     * @return array<string, int>
+     */
+    public function getCompletedLevelsBySlug(Player $player): array
+    {
+        $levels = [];
+        foreach ($player->getPlayerResearch() as $playerResearch) {
+            if ($playerResearch->getActive() !== true) {
+                continue;
+            }
+
+            $slug = $playerResearch->getResearchSlug();
+            $level = $playerResearch->getLevel();
+            if (!isset($levels[$slug]) || $level > $levels[$slug]) {
+                $levels[$slug] = $level;
+            }
+        }
+
+        return $levels;
+    }
+
     public function remove(ResearchPlayer $researchPlayer): void
     {
         $this->entityManager->remove($researchPlayer);

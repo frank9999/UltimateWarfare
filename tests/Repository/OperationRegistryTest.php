@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace FrankProjects\UltimateWarfare\Tests\Repository;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use FrankProjects\UltimateWarfare\Entity\Operation\AdvancedSpy2Operation;
+use FrankProjects\UltimateWarfare\Entity\Operation\AdvancedSpyOperation;
 use FrankProjects\UltimateWarfare\Entity\Operation\SpyOperation;
 use FrankProjects\UltimateWarfare\Entity\Player;
 use FrankProjects\UltimateWarfare\Entity\ResearchPlayer;
@@ -47,21 +49,32 @@ class OperationRegistryTest extends TestCase
         }
     }
 
-    public function testFindAvailableForPlayerFiltersOnActiveResearch(): void
+    public function testFindAvailableForPlayerReturnsBaseOpsAtLowestLevel(): void
     {
-        $researchPlayer = $this->createMock(ResearchPlayer::class);
-        $researchPlayer->method('getActive')->willReturn(true);
-        $researchPlayer->method('getResearchSlug')->willReturn('spy-technology');
-
-        $player = $this->createMock(Player::class);
-        $player->method('getPlayerResearch')->willReturn(new ArrayCollection([$researchPlayer]));
+        $player = $this->createPlayerWithResearch('spy-technology', 1);
 
         $operations = $this->registry->findAvailableForPlayer($player);
+        $slugs = array_map(static fn ($o) => $o->getSlug(), $operations);
 
-        self::assertNotEmpty($operations);
-        foreach ($operations as $operation) {
-            self::assertSame('spy-technology', $operation->getResearchSlug());
-        }
+        self::assertContains('spy', $slugs);
+        self::assertNotContains('advanced-spy', $slugs);
+        self::assertNotContains('advanced-spy-2', $slugs);
+    }
+
+    public function testFindAvailableForPlayerUnlocksAdvancedOpsAtHigherLevel(): void
+    {
+        $player = $this->createPlayerWithResearch('spy-technology', 3);
+
+        $operations = $this->registry->findAvailableForPlayer($player);
+        $slugs = array_map(static fn ($o) => $o->getSlug(), $operations);
+
+        self::assertContains('spy', $slugs);
+        self::assertContains('advanced-spy', $slugs);
+        self::assertContains('advanced-spy-2', $slugs);
+
+        // Sanity check the advanced ops are wired to the consolidated research
+        self::assertSame('spy-technology', (new AdvancedSpyOperation())->getResearchSlug());
+        self::assertSame('spy-technology', (new AdvancedSpy2Operation())->getResearchSlug());
     }
 
     public function testFindAvailableForPlayerReturnsEmptyWhenNoResearch(): void
@@ -79,6 +92,7 @@ class OperationRegistryTest extends TestCase
         $researchPlayer = $this->createMock(ResearchPlayer::class);
         $researchPlayer->method('getActive')->willReturn(false);
         $researchPlayer->method('getResearchSlug')->willReturn('spy-technology');
+        $researchPlayer->method('getLevel')->willReturn(1);
 
         $player = $this->createMock(Player::class);
         $player->method('getPlayerResearch')->willReturn(new ArrayCollection([$researchPlayer]));
@@ -86,5 +100,22 @@ class OperationRegistryTest extends TestCase
         $operations = $this->registry->findAvailableForPlayer($player);
 
         self::assertEmpty($operations);
+    }
+
+    private function createPlayerWithResearch(string $slug, int $maxLevel): Player
+    {
+        $rows = [];
+        for ($level = 1; $level <= $maxLevel; $level++) {
+            $rp = $this->createMock(ResearchPlayer::class);
+            $rp->method('getActive')->willReturn(true);
+            $rp->method('getResearchSlug')->willReturn($slug);
+            $rp->method('getLevel')->willReturn($level);
+            $rows[] = $rp;
+        }
+
+        $player = $this->createMock(Player::class);
+        $player->method('getPlayerResearch')->willReturn(new ArrayCollection($rows));
+
+        return $player;
     }
 }

@@ -12,13 +12,18 @@
                         <td class="text-start" width="450">
                             {{ research.description }}<br /><br />
                             Name: {{ research.name }}<br />
-                            Cash: {{ research.cost }}<br />
-                            Research time: {{ research.timestamp }}<br /><br />
+                            Max level: {{ research.maxLevel }}<br /><br />
 
-                            <b>Requirements:</b><br />
-
-                            {% for name in research.prerequisiteNames %}
-                                - {{ name }}<br />
+                            {% for level in 1..research.maxLevel %}
+                                <b>Level {{ level }}:</b> Cost ${{ research.getCost(level) }}, Time {{ research.getTimestamp(level) }}s
+                                {% set prereqs = research.getPrerequisiteDescriptions(level) %}
+                                {% if prereqs|length > 0 %}
+                                    &mdash; Requires:
+                                    {% for prereq in prereqs %}
+                                        {{ prereq.name }} lvl {{ prereq.minLevel }}{% if not loop.last %}, {% endif %}
+                                    {% endfor %}
+                                {% endif %}
+                                <br />
                             {% endfor %}
                         </td>
                 {% endfor %}

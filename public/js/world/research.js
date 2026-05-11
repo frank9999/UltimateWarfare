@@ -5,35 +5,22 @@
     let timerInterval = null;
 
     const TREE_LAYOUT = {
-        'research-level-1':              { col: 0, row: 0 },
-        'research-level-2':              { col: 1, row: 0 },
-        'research-level-3':              { col: 2, row: 0 },
-        'research-level-4':              { col: 3, row: 0 },
-        'research-level-5':              { col: 4, row: 0 },
-        'research-level-6':              { col: 5, row: 0 },
-        'research-level-7':              { col: 6, row: 0 },
-        'research-level-8':              { col: 7, row: 0 },
-        'research-level-9':              { col: 8, row: 0 },
-        'research-level-10':             { col: 9, row: 0 },
-        'special-operations':            { col: 0, row: 1 },
-        'special-operations-2':          { col: 1, row: 1 },
-        'special-operations-3':          { col: 2, row: 1 },
-        'special-operations-4':          { col: 3, row: 1 },
-        'spy-technology':                { col: 1, row: 2 },
-        'advanced-spy-technology':       { col: 2, row: 2 },
+        'research-level':                { col: 0, row: 0 },
+        'special-operations':            { col: 2, row: 1 },
+        'spy-technology':                { col: 4, row: 1 },
         'nuclear-technology':            { col: 6, row: 1 },
-        'factory-blueprint':             { col: 1, row: 3 },
-        'advanced-optics':               { col: 2, row: 3 },
-        'submarine-technology':          { col: 3, row: 3 },
-        'ballistic-missile-technology':  { col: 4, row: 3 },
-        'radar-technology':              { col: 5, row: 3 },
-        'naval-bombardment':             { col: 6, row: 3 }
+        'factory-blueprint':             { col: 0, row: 3 },
+        'advanced-optics':               { col: 1, row: 3 },
+        'submarine-technology':          { col: 2, row: 3 },
+        'ballistic-missile-technology':  { col: 3, row: 3 },
+        'radar-technology':              { col: 4, row: 3 },
+        'naval-bombardment':             { col: 5, row: 3 }
     };
 
     const NODE_WIDTH = 160;
-    const NODE_HEIGHT = 170;
+    const NODE_HEIGHT = 200;
     const COL_GAP = 190;
-    const ROW_GAP = 200;
+    const ROW_GAP = 230;
     const PADDING = 20;
 
     researchModal.addEventListener('hidden.bs.modal', function () {
@@ -97,24 +84,23 @@
             const layout = TREE_LAYOUT[item.slug];
             if (!layout) continue;
 
-            for (let j = 0; j < item.prerequisites.length; j++) {
-                const prereqSlug = item.prerequisites[j];
-                const prereqLayout = TREE_LAYOUT[prereqSlug];
+            const prereqs = item.prerequisites || [];
+            for (let j = 0; j < prereqs.length; j++) {
+                const prereq = prereqs[j];
+                const prereqLayout = TREE_LAYOUT[prereq.slug];
                 if (!prereqLayout) continue;
 
-                const prereqItem = researchMap[prereqSlug];
-                const bothCompleted = prereqItem && prereqItem.status === 'completed' && item.status === 'completed';
-                const lineColor = bothCompleted ? '#4CAF50' : '#666';
+                const prereqItem = researchMap[prereq.slug];
+                const prereqMet = prereqItem && prereqItem.currentLevel >= prereq.minLevel;
+                const lineColor = prereqMet ? '#4CAF50' : '#666';
 
                 let x1, y1, x2, y2;
                 if (prereqLayout.row === layout.row) {
-                    // Same row: right edge to left edge
                     x1 = PADDING + prereqLayout.col * COL_GAP + NODE_WIDTH;
                     y1 = PADDING + prereqLayout.row * ROW_GAP + NODE_HEIGHT / 2;
                     x2 = PADDING + layout.col * COL_GAP;
                     y2 = PADDING + layout.row * ROW_GAP + NODE_HEIGHT / 2;
                 } else {
-                    // Cross row: bottom center to top center
                     x1 = PADDING + prereqLayout.col * COL_GAP + NODE_WIDTH / 2;
                     y1 = PADDING + prereqLayout.row * ROW_GAP + NODE_HEIGHT;
                     x2 = PADDING + layout.col * COL_GAP + NODE_WIDTH / 2;
@@ -135,25 +121,37 @@
 
             const x = PADDING + layout.col * COL_GAP;
             const y = PADDING + layout.row * ROW_GAP;
+            const showsLevels = item.maxLevel > 1;
+            const levelLabel = showsLevels ? ' (Lvl ' + item.currentLevel + '/' + item.maxLevel + ')' : '';
 
             html += '<div class="research-node research-' + item.status + '" style="left: ' + x + 'px; top: ' + y + 'px;">';
             html += '<img class="research-node-image" src="' + WorldApp.imageBasePath + '/research/' + escapeHtml(item.image) + '" alt="' + escapeHtml(item.name) + '">';
-            html += '<div class="research-node-name">' + escapeHtml(item.name) + '</div>';
+            html += '<div class="research-node-name">' + escapeHtml(item.name) + escapeHtml(levelLabel) + '</div>';
             html += '<div class="research-node-desc">' + escapeHtml(item.description) + '</div>';
-            html += '<div class="research-node-info">';
-            html += '<span>$' + formatNumber(item.cost) + '</span>';
-            html += '<span>' + formatDuration(item.duration) + '</span>';
-            html += '</div>';
+
+            if (item.nextCost !== null && item.nextDuration !== null) {
+                html += '<div class="research-node-info">';
+                html += '<span>$' + formatNumber(item.nextCost) + '</span>';
+                html += '<span>' + formatDuration(item.nextDuration) + '</span>';
+                html += '</div>';
+            }
 
             if (item.status === 'available') {
-                html += '<div class="research-node-action"><button class="research-start-btn" data-slug="' + item.slug + '">Research</button></div>';
+                const buttonLabel = showsLevels
+                    ? 'Upgrade to Lvl ' + (item.currentLevel + 1)
+                    : 'Research';
+                html += '<div class="research-node-action"><button class="research-start-btn" data-slug="' + item.slug + '">' + escapeHtml(buttonLabel) + '</button></div>';
             } else if (item.status === 'researching') {
+                const targetLabel = showsLevels && item.targetLevel !== null
+                    ? 'Lvl ' + item.targetLevel + ' '
+                    : '';
                 html += '<div class="research-node-action">';
-                html += '<span class="research-timer" data-remaining="' + item.remainingSeconds + '">' + formatTime(item.remainingSeconds) + '</span>';
+                html += '<span class="research-timer" data-remaining="' + item.remainingSeconds + '">' + escapeHtml(targetLabel) + formatTime(item.remainingSeconds) + '</span>';
                 html += '<button class="research-cancel-btn" data-slug="' + item.slug + '">Cancel</button>';
                 html += '</div>';
-            } else if (item.status === 'completed') {
-                html += '<div class="research-node-status">Completed</div>';
+            } else if (item.status === 'maxed') {
+                const maxedLabel = showsLevels ? 'Maxed (Lvl ' + item.maxLevel + ')' : 'Completed';
+                html += '<div class="research-node-status">' + escapeHtml(maxedLabel) + '</div>';
             }
 
             html += '</div>';
@@ -194,7 +192,8 @@
                         return;
                     }
                     el.setAttribute('data-remaining', remaining);
-                    el.textContent = formatTime(remaining);
+                    const prefix = el.textContent.match(/^Lvl \d+ /);
+                    el.textContent = (prefix ? prefix[0] : '') + formatTime(remaining);
                 }
             }, 1000);
         }

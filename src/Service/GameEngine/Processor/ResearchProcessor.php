@@ -50,7 +50,10 @@ final class ResearchProcessor implements Processor
             $research = $this->researchRegistry->find($researchPlayer->getResearchSlug());
             $researchName = $research !== null ? $research->getName() : $researchPlayer->getResearchSlug();
             $finishedTimestamp = $researchPlayer->getCompletionTimestamp();
-            $message = "You successfully researched a new technology: {$researchName}";
+            $level = $researchPlayer->getLevel();
+            $message = $research !== null && $research->getMaxLevel() > 1
+                ? "You successfully researched {$researchName} level {$level}"
+                : "You successfully researched a new technology: {$researchName}";
             $report = Report::createForPlayer($player, $finishedTimestamp, 2, $message);
 
             $this->reportRepository->save($report);

@@ -13,11 +13,13 @@ final readonly class NuclearTechnologyResearch extends Research
         parent::__construct(
             name: 'Nuclear Technology',
             image: 'tech_nuclear.gif',
-            cost: 500000000,
-            timestamp: 604800,
             description: 'Unlocks the ability of Nuclear weapons',
             enabled: true,
-            prerequisites: [ResearchLevel7Research::class],
+            costPerLevel: [1 => 500000000],
+            timestampPerLevel: [1 => 604800],
+            prerequisitesPerLevel: [
+                1 => [ResearchLevelResearch::class => 7],
+            ],
         );
     }
 

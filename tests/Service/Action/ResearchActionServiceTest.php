@@ -7,8 +7,6 @@ namespace FrankProjects\UltimateWarfare\Tests\Service\Action;
 use Doctrine\Common\Collections\ArrayCollection;
 use FrankProjects\UltimateWarfare\Entity\Player;
 use FrankProjects\UltimateWarfare\Entity\Player\Resources as PlayerResources;
-use FrankProjects\UltimateWarfare\Entity\Research\ResearchLevel1Research;
-use FrankProjects\UltimateWarfare\Entity\Research\ResearchLevel2Research;
 use FrankProjects\UltimateWarfare\Entity\ResearchPlayer;
 use FrankProjects\UltimateWarfare\Repository\PlayerRepository;
 use FrankProjects\UltimateWarfare\Repository\ResearchPlayerRepository;
@@ -38,50 +36,87 @@ class ResearchActionServiceTest extends TestCase
         );
     }
 
-    private function createPlayer(int $cash = 1000): Player
+    /**
+     * @param ResearchPlayer[] $playerResearch
+     */
+    private function createPlayer(int $cash = 1000, array $playerResearch = []): Player
     {
         $playerResources = new PlayerResources();
         $playerResources->setCash($cash);
 
         $player = $this->createMock(Player::class);
         $player->method('getResources')->willReturn($playerResources);
-        $player->method('getPlayerResearch')->willReturn(new ArrayCollection());
+        $player->method('getPlayerResearch')->willReturn(new ArrayCollection($playerResearch));
 
         return $player;
     }
 
-    private function createResearchPlayer(string $researchSlug, bool $active = false): ResearchPlayer
+    private function createCompletedResearch(string $slug, int $level): ResearchPlayer
     {
         $researchPlayer = new ResearchPlayer();
-        $researchPlayer->setResearchSlug($researchSlug);
-        $researchPlayer->setActive($active);
+        $researchPlayer->setResearchSlug($slug);
+        $researchPlayer->setLevel($level);
+        $researchPlayer->setActive(true);
+        $researchPlayer->setTimestamp(time());
+        $researchPlayer->setCompletionTimestamp(time() - 1);
+
+        return $researchPlayer;
+    }
+
+    private function createOngoingResearch(string $slug, int $level): ResearchPlayer
+    {
+        $researchPlayer = new ResearchPlayer();
+        $researchPlayer->setResearchSlug($slug);
+        $researchPlayer->setLevel($level);
+        $researchPlayer->setActive(false);
         $researchPlayer->setTimestamp(time());
         $researchPlayer->setCompletionTimestamp(time() + 180);
 
         return $researchPlayer;
     }
 
-    // ========== PERFORM RESEARCH TESTS ==========
-
-    public function testPerformResearchSuccess(): void
+    public function testPerformResearchStartsLevel1WhenPlayerHasNothing(): void
     {
         $player = $this->createPlayer(5000);
 
-        $this->playerRepository->expects(self::once())->method('save');
-        $this->researchPlayerRepository->expects(self::once())->method('save');
+        $this->researchPlayerRepository->expects(self::once())
+            ->method('save')
+            ->with(self::callback(static fn (ResearchPlayer $rp): bool =>
+                $rp->getResearchSlug() === 'research-level' && $rp->getLevel() === 1));
 
-        $this->service->performResearch('research-level-1', $player);
+        $this->service->performResearch('research-level', $player);
 
         self::assertEquals(2500, $player->getResources()->getCash());
     }
 
-    public function testPerformResearchDeductsFullCost(): void
+    public function testPerformResearchUpgradesToNextLevel(): void
     {
-        $player = $this->createPlayer(2500);
+        $level1 = $this->createCompletedResearch('research-level', 1);
+        $player = $this->createPlayer(20000, [$level1]);
 
-        $this->service->performResearch('research-level-1', $player);
+        $this->researchPlayerRepository->expects(self::once())
+            ->method('save')
+            ->with(self::callback(static fn (ResearchPlayer $rp): bool =>
+                $rp->getResearchSlug() === 'research-level' && $rp->getLevel() === 2));
 
-        self::assertEquals(0, $player->getResources()->getCash());
+        $this->service->performResearch('research-level', $player);
+
+        self::assertEquals(5000, $player->getResources()->getCash());
+    }
+
+    public function testPerformResearchFailsWhenAtMaxLevel(): void
+    {
+        $completed = [];
+        for ($level = 1; $level <= 10; $level++) {
+            $completed[] = $this->createCompletedResearch('research-level', $level);
+        }
+
+        $player = $this->createPlayer(1000000000, $completed);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('This technology is already at its maximum level!');
+
+        $this->service->performResearch('research-level', $player);
     }
 
     public function testPerformResearchFailsWhenResearchNotFound(): void
@@ -94,46 +129,25 @@ class ResearchActionServiceTest extends TestCase
         $this->service->performResearch('nonexistent-research', $player);
     }
 
-    public function testPerformResearchFailsWhenResearchInProgress(): void
+    public function testPerformResearchFailsWhenAnotherResearchInProgress(): void
     {
-        $inProgressResearchPlayer = $this->createResearchPlayer('research-level-2', false);
-
-        $player = $this->createMock(Player::class);
-        $playerResources = new PlayerResources();
-        $playerResources->setCash(100000);
-        $player->method('getResources')->willReturn($playerResources);
-        $player->method('getPlayerResearch')->willReturn(new ArrayCollection([$inProgressResearchPlayer]));
+        $ongoing = $this->createOngoingResearch('research-level', 2);
+        $player = $this->createPlayer(100000, [$ongoing]);
 
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('You can only research 1 technology at a time!');
 
-        $this->service->performResearch('research-level-1', $player);
+        $this->service->performResearch('special-operations', $player);
     }
 
-    public function testPerformResearchFailsWhenAlreadyResearched(): void
-    {
-        $completedResearchPlayer = $this->createResearchPlayer('research-level-1', true);
-
-        $player = $this->createMock(Player::class);
-        $playerResources = new PlayerResources();
-        $playerResources->setCash(100000);
-        $player->method('getResources')->willReturn($playerResources);
-        $player->method('getPlayerResearch')->willReturn(new ArrayCollection([$completedResearchPlayer]));
-
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('This technology has already been researched!');
-
-        $this->service->performResearch('research-level-1', $player);
-    }
-
-    public function testPerformResearchFailsWhenPrerequisitesNotMet(): void
+    public function testPerformResearchFailsWhenPrerequisiteLevelNotMet(): void
     {
         $player = $this->createPlayer(100000);
 
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('You do not have all required technologies!');
 
-        $this->service->performResearch('research-level-2', $player);
+        $this->service->performResearch('special-operations', $player);
     }
 
     public function testPerformResearchFailsWhenCannotAfford(): void
@@ -143,52 +157,39 @@ class ResearchActionServiceTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('You can not afford that!');
 
-        $this->service->performResearch('research-level-1', $player);
+        $this->service->performResearch('research-level', $player);
     }
 
-    public function testPerformResearchSucceedsWithPrerequisitesMet(): void
+    public function testPerformResearchSucceedsWithPrerequisiteLevelMet(): void
     {
-        $completedPrereq = $this->createResearchPlayer('research-level-1', true);
+        $researchLevel1 = $this->createCompletedResearch('research-level', 1);
+        $player = $this->createPlayer(10000, [$researchLevel1]);
 
-        $player = $this->createMock(Player::class);
-        $playerResources = new PlayerResources();
-        $playerResources->setCash(100000);
-        $player->method('getResources')->willReturn($playerResources);
-        $player->method('getPlayerResearch')->willReturn(new ArrayCollection([$completedPrereq]));
-
-        $this->playerRepository->expects(self::once())->method('save');
         $this->researchPlayerRepository->expects(self::once())->method('save');
 
-        $this->service->performResearch('research-level-2', $player);
+        $this->service->performResearch('special-operations', $player);
 
-        self::assertEquals(85000, $playerResources->getCash());
+        self::assertEquals(5000, $player->getResources()->getCash());
     }
 
-    // ========== PERFORM CANCEL TESTS ==========
-
-    public function testPerformCancelRemovesInProgressResearch(): void
+    public function testPerformCancelRemovesInProgressUpgrade(): void
     {
-        $inProgressResearchPlayer = $this->createResearchPlayer('research-level-1', false);
+        $ongoing = $this->createOngoingResearch('research-level', 2);
+        $player = $this->createPlayer(0, [$ongoing]);
 
-        $player = $this->createMock(Player::class);
-        $player->method('getPlayerResearch')->willReturn(new ArrayCollection([$inProgressResearchPlayer]));
+        $this->researchPlayerRepository->expects(self::once())->method('remove')->with($ongoing);
 
-        $this->researchPlayerRepository->expects(self::once())->method('remove')->with($inProgressResearchPlayer);
-
-        $this->service->performCancel('research-level-1', $player);
+        $this->service->performCancel('research-level', $player);
     }
 
-    public function testPerformCancelFailsWhenResearchCompleted(): void
+    public function testPerformCancelDoesNotRemoveCompletedLevels(): void
     {
-        $completedResearchPlayer = $this->createResearchPlayer('research-level-1', true);
+        $completed = $this->createCompletedResearch('research-level', 1);
+        $player = $this->createPlayer(0, [$completed]);
 
-        $player = $this->createMock(Player::class);
-        $player->method('getPlayerResearch')->willReturn(new ArrayCollection([$completedResearchPlayer]));
+        $this->researchPlayerRepository->expects(self::never())->method('remove');
 
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Research project is already completed!');
-
-        $this->service->performCancel('research-level-1', $player);
+        $this->service->performCancel('research-level', $player);
     }
 
     public function testPerformCancelFailsWhenResearchNotFound(): void
@@ -203,11 +204,10 @@ class ResearchActionServiceTest extends TestCase
 
     public function testPerformCancelDoesNothingWhenPlayerHasNoMatchingResearch(): void
     {
-        $player = $this->createMock(Player::class);
-        $player->method('getPlayerResearch')->willReturn(new ArrayCollection());
+        $player = $this->createPlayer(0);
 
         $this->researchPlayerRepository->expects(self::never())->method('remove');
 
-        $this->service->performCancel('research-level-1', $player);
+        $this->service->performCancel('research-level', $player);
     }
 }

@@ -135,7 +135,8 @@ final class OperationService
         foreach ($playerRegion->getPlayer()->getPlayerResearch() as $playerResearch) {
             if (
                 $playerResearch->getResearchSlug() === $operation->getResearchSlug() &&
-                $playerResearch->getActive() === true
+                $playerResearch->getActive() === true &&
+                $playerResearch->getLevel() >= $operation->getResearchMinLevel()
             ) {
                 return;
             }

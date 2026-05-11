@@ -6,7 +6,7 @@ namespace FrankProjects\UltimateWarfare\Entity\Operation;
 
 use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitEnum;
 use FrankProjects\UltimateWarfare\Entity\Operation;
-use FrankProjects\UltimateWarfare\Entity\Research\AdvancedSpyTechnologyResearch;
+use FrankProjects\UltimateWarfare\Entity\Research\SpyTechnologyResearch;
 use FrankProjects\UltimateWarfare\Service\OperationEngine\OperationProcessor\AdvancedSpy;
 
 final readonly class AdvancedSpyOperation extends Operation
@@ -23,8 +23,9 @@ final readonly class AdvancedSpyOperation extends Operation
             enabled: true,
             difficulty: 0.3,
             maxDistance: 6,
-            researchClass: AdvancedSpyTechnologyResearch::class,
+            researchClass: SpyTechnologyResearch::class,
             gameUnit: GameUnitEnum::SPY,
+            researchMinLevel: 2,
         );
     }
 

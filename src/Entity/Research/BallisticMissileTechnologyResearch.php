@@ -13,12 +13,14 @@ final readonly class BallisticMissileTechnologyResearch extends Research
         parent::__construct(
             name: 'Ballistic Missile Technology',
             image: 'research.gif',
-            cost: 75000,
-            timestamp: 172800,
             description: 'Unlock the ability to construct missile silos, build rockets,'
                 . ' and perform missile attack operations',
             enabled: true,
-            prerequisites: [ResearchLevel2Research::class],
+            costPerLevel: [1 => 75000],
+            timestampPerLevel: [1 => 172800],
+            prerequisitesPerLevel: [
+                1 => [ResearchLevelResearch::class => 2],
+            ],
         );
     }
 

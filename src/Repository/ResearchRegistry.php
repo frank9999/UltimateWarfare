@@ -6,29 +6,15 @@ namespace FrankProjects\UltimateWarfare\Repository;
 
 use FrankProjects\UltimateWarfare\Entity\Research;
 use FrankProjects\UltimateWarfare\Entity\Research\AdvancedOpticsResearch;
-use FrankProjects\UltimateWarfare\Entity\Research\AdvancedSpy2TechnologyResearch;
-use FrankProjects\UltimateWarfare\Entity\Research\AdvancedSpyTechnologyResearch;
 use FrankProjects\UltimateWarfare\Entity\Research\BallisticMissileTechnologyResearch;
 use FrankProjects\UltimateWarfare\Entity\Research\FactoryBlueprintResearch;
 use FrankProjects\UltimateWarfare\Entity\Research\NavalBombardmentResearch;
 use FrankProjects\UltimateWarfare\Entity\Research\NuclearTechnologyResearch;
 use FrankProjects\UltimateWarfare\Entity\Research\RadarTechnologyResearch;
-use FrankProjects\UltimateWarfare\Entity\Research\SubmarineTechnologyResearch;
-use FrankProjects\UltimateWarfare\Entity\Research\ResearchLevel10Research;
-use FrankProjects\UltimateWarfare\Entity\Research\ResearchLevel1Research;
-use FrankProjects\UltimateWarfare\Entity\Research\ResearchLevel2Research;
-use FrankProjects\UltimateWarfare\Entity\Research\ResearchLevel3Research;
-use FrankProjects\UltimateWarfare\Entity\Research\ResearchLevel4Research;
-use FrankProjects\UltimateWarfare\Entity\Research\ResearchLevel5Research;
-use FrankProjects\UltimateWarfare\Entity\Research\ResearchLevel6Research;
-use FrankProjects\UltimateWarfare\Entity\Research\ResearchLevel7Research;
-use FrankProjects\UltimateWarfare\Entity\Research\ResearchLevel8Research;
-use FrankProjects\UltimateWarfare\Entity\Research\ResearchLevel9Research;
-use FrankProjects\UltimateWarfare\Entity\Research\SpecialOperations2Research;
-use FrankProjects\UltimateWarfare\Entity\Research\SpecialOperations3Research;
-use FrankProjects\UltimateWarfare\Entity\Research\SpecialOperations4Research;
+use FrankProjects\UltimateWarfare\Entity\Research\ResearchLevelResearch;
 use FrankProjects\UltimateWarfare\Entity\Research\SpecialOperationsResearch;
 use FrankProjects\UltimateWarfare\Entity\Research\SpyTechnologyResearch;
+use FrankProjects\UltimateWarfare\Entity\Research\SubmarineTechnologyResearch;
 
 final class ResearchRegistry
 {
@@ -38,23 +24,9 @@ final class ResearchRegistry
     public function __construct()
     {
         $researchList = [
-            new ResearchLevel1Research(),
-            new ResearchLevel2Research(),
-            new ResearchLevel3Research(),
-            new ResearchLevel4Research(),
-            new ResearchLevel5Research(),
-            new ResearchLevel6Research(),
-            new ResearchLevel7Research(),
-            new ResearchLevel8Research(),
-            new ResearchLevel9Research(),
-            new ResearchLevel10Research(),
+            new ResearchLevelResearch(),
             new SpecialOperationsResearch(),
-            new SpecialOperations2Research(),
-            new SpecialOperations3Research(),
-            new SpecialOperations4Research(),
             new SpyTechnologyResearch(),
-            new AdvancedSpyTechnologyResearch(),
-            new AdvancedSpy2TechnologyResearch(),
             new NuclearTechnologyResearch(),
             new FactoryBlueprintResearch(),
             new AdvancedOpticsResearch(),
@@ -94,23 +66,30 @@ final class ResearchRegistry
     }
 
     /**
-     * @param string[] $completedSlugs
+     * Returns researches whose next upgrade level is unlocked for the player.
+     *
+     * @param array<string,int> $completedLevelsBySlug Highest completed level per research slug.
      * @return Research[]
      */
-    public function findAvailableForPlayer(array $completedSlugs): array
+    public function findAvailableForPlayer(array $completedLevelsBySlug): array
     {
         return array_values(
-            array_filter($this->researches, static function (Research $research) use ($completedSlugs): bool {
+            array_filter($this->researches, static function (Research $research) use ($completedLevelsBySlug): bool {
                 if (!$research->isEnabled()) {
                     return false;
                 }
 
-                if (in_array($research->getSlug(), $completedSlugs, true)) {
+                $currentLevel = $completedLevelsBySlug[$research->getSlug()] ?? 0;
+                $targetLevel = $currentLevel + 1;
+
+                if ($targetLevel > $research->getMaxLevel()) {
                     return false;
                 }
 
-                foreach ($research->getPrerequisiteSlugs() as $prerequisiteSlug) {
-                    if (!in_array($prerequisiteSlug, $completedSlugs, true)) {
+                foreach ($research->getPrerequisites($targetLevel) as $prereqClass => $minLevel) {
+                    $prereqSlug = (new $prereqClass())->getSlug();
+                    $playerLevel = $completedLevelsBySlug[$prereqSlug] ?? 0;
+                    if ($playerLevel < $minLevel) {
                         return false;
                     }
                 }

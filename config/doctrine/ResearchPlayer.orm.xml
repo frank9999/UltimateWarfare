@@ -18,6 +18,12 @@
       </options>
     </field>
     <field name="researchSlug" type="string" column="research_slug" length="100"/>
+    <field name="level" type="smallint" column="level">
+      <options>
+        <option name="unsigned">1</option>
+        <option name="default">1</option>
+      </options>
+    </field>
     <field name="completionTimestamp" type="integer" column="completion_timestamp">
       <options>
         <option name="unsigned">1</option>

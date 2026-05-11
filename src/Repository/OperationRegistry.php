@@ -73,18 +73,29 @@ final class OperationRegistry
      */
     public function findAvailableForPlayer(Player $player): array
     {
-        $activeResearchSlugs = [];
+        $completedLevels = [];
         foreach ($player->getPlayerResearch() as $playerResearch) {
-            if ($playerResearch->getActive() === true) {
-                $activeResearchSlugs[] = $playerResearch->getResearchSlug();
+            if ($playerResearch->getActive() !== true) {
+                continue;
+            }
+
+            $slug = $playerResearch->getResearchSlug();
+            $level = $playerResearch->getLevel();
+            if (!isset($completedLevels[$slug]) || $level > $completedLevels[$slug]) {
+                $completedLevels[$slug] = $level;
             }
         }
 
         return array_values(
             array_filter(
                 $this->operations,
-                static fn (Operation $o): bool => $o->isEnabled()
-                    && in_array($o->getResearchSlug(), $activeResearchSlugs, true)
+                static function (Operation $o) use ($completedLevels): bool {
+                    if (!$o->isEnabled()) {
+                        return false;
+                    }
+                    $playerLevel = $completedLevels[$o->getResearchSlug()] ?? 0;
+                    return $playerLevel >= $o->getResearchMinLevel();
+                }
             )
         );
     }

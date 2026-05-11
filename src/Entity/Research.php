@@ -4,19 +4,28 @@ declare(strict_types=1);
 
 namespace FrankProjects\UltimateWarfare\Entity;
 
+use InvalidArgumentException;
+
 abstract readonly class Research
 {
     /**
-     * @param array<class-string<Research>> $prerequisites
+     * @param array<int,int>                                  $costPerLevel          1-indexed map level => cost
+     * @param array<int,int>                                  $timestampPerLevel     1-indexed map level => seconds
+     * @param array<int, array<class-string<Research>, int>>  $prerequisitesPerLevel 1-indexed; for each level, a map
+     *                                                                               of prerequisite research class to
+     *                                                                               its required minimum level. The
+     *                                                                               implicit "previous level of this
+     *                                                                               same research" prerequisite is
+     *                                                                               enforced by sequential progression.
      */
     public function __construct(
         private string $name,
         private string $image,
-        private int $cost,
-        private int $timestamp,
         private string $description,
         private bool $enabled,
-        private array $prerequisites = [],
+        private array $costPerLevel,
+        private array $timestampPerLevel,
+        private array $prerequisitesPerLevel = [],
     ) {
     }
 
@@ -32,16 +41,6 @@ abstract readonly class Research
         return $this->image;
     }
 
-    public function getCost(): int
-    {
-        return $this->cost;
-    }
-
-    public function getTimestamp(): int
-    {
-        return $this->timestamp;
-    }
-
     public function getDescription(): string
     {
         return $this->description;
@@ -52,39 +51,56 @@ abstract readonly class Research
         return $this->enabled;
     }
 
-    /**
-     * @return array<class-string<Research>>
-     */
-    public function getPrerequisites(): array
+    public function getMaxLevel(): int
     {
-        return $this->prerequisites;
+        return count($this->costPerLevel);
+    }
+
+    public function getCost(int $level): int
+    {
+        $this->assertValidLevel($level);
+        return $this->costPerLevel[$level];
+    }
+
+    public function getTimestamp(int $level): int
+    {
+        $this->assertValidLevel($level);
+        return $this->timestampPerLevel[$level];
     }
 
     /**
-     * @return string[]
+     * @return array<class-string<Research>, int>
      */
-    public function getPrerequisiteNames(): array
+    public function getPrerequisites(int $level): array
     {
-        $names = [];
-        foreach ($this->prerequisites as $prerequisiteClass) {
-            $prerequisite = new $prerequisiteClass();
-            $names[] = $prerequisite->getName();
-        }
-
-        return $names;
+        $this->assertValidLevel($level);
+        return $this->prerequisitesPerLevel[$level] ?? [];
     }
 
     /**
-     * @return string[]
+     * @return array<array{slug: string, name: string, minLevel: int}>
      */
-    public function getPrerequisiteSlugs(): array
+    public function getPrerequisiteDescriptions(int $level): array
     {
-        $slugs = [];
-        foreach ($this->prerequisites as $prerequisiteClass) {
+        $descriptions = [];
+        foreach ($this->getPrerequisites($level) as $prerequisiteClass => $minLevel) {
             $prerequisite = new $prerequisiteClass();
-            $slugs[] = $prerequisite->getSlug();
+            $descriptions[] = [
+                'slug' => $prerequisite->getSlug(),
+                'name' => $prerequisite->getName(),
+                'minLevel' => $minLevel,
+            ];
         }
 
-        return $slugs;
+        return $descriptions;
+    }
+
+    private function assertValidLevel(int $level): void
+    {
+        if (!isset($this->costPerLevel[$level]) || !isset($this->timestampPerLevel[$level])) {
+            throw new InvalidArgumentException(
+                sprintf('Level %d is not defined for research %s', $level, $this->getSlug())
+            );
+        }
     }
 }

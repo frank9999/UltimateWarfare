@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace FrankProjects\UltimateWarfare\Controller\Game;
 
 use FrankProjects\UltimateWarfare\Entity\Player;
+use FrankProjects\UltimateWarfare\Entity\Research;
 use FrankProjects\UltimateWarfare\Repository\ResearchPlayerRepository;
 use FrankProjects\UltimateWarfare\Repository\ResearchRegistry;
 use FrankProjects\UltimateWarfare\Service\Action\ResearchActionService;
@@ -27,26 +28,10 @@ final class ResearchController extends BaseGameController
         $this->researchActionService = $researchActionService;
     }
 
-    /**
-     * @return string[]
-     */
-    private function getCompletedResearchSlugs(Player $player): array
-    {
-        $completedSlugs = [];
-
-        foreach ($player->getPlayerResearch() as $researchPlayer) {
-            if ($researchPlayer->getActive()) {
-                $completedSlugs[] = $researchPlayer->getResearchSlug();
-            }
-        }
-
-        return $completedSlugs;
-    }
-
     public function researchTreeApi(): JsonResponse
     {
         $player = $this->getPlayer();
-        $completedSlugs = $this->getCompletedResearchSlugs($player);
+        $completedLevels = $this->researchPlayerRepository->getCompletedLevelsBySlug($player);
         $ongoingResearchPlayers = $this->researchPlayerRepository->findOngoingByPlayer($player);
 
         $ongoingMap = [];
@@ -59,44 +44,7 @@ final class ResearchController extends BaseGameController
         $researchData = [];
 
         foreach ($allResearch as $research) {
-            $slug = $research->getSlug();
-
-            if (in_array($slug, $completedSlugs, true)) {
-                $status = 'completed';
-            } elseif (isset($ongoingMap[$slug])) {
-                $status = 'researching';
-            } else {
-                $prerequisiteSlugs = $research->getPrerequisiteSlugs();
-                $allPrerequisitesMet = true;
-                foreach ($prerequisiteSlugs as $prereqSlug) {
-                    if (!in_array($prereqSlug, $completedSlugs, true)) {
-                        $allPrerequisitesMet = false;
-                        break;
-                    }
-                }
-                $status = $allPrerequisitesMet ? 'available' : 'locked';
-            }
-
-            $item = [
-                'slug' => $slug,
-                'name' => $research->getName(),
-                'description' => $research->getDescription(),
-                'image' => $research->getImage(),
-                'cost' => $research->getCost(),
-                'duration' => $research->getTimestamp(),
-                'status' => $status,
-                'prerequisites' => $research->getPrerequisiteSlugs(),
-                'completionTimestamp' => null,
-                'remainingSeconds' => null,
-            ];
-
-            if ($status === 'researching') {
-                $rp = $ongoingMap[$slug];
-                $item['completionTimestamp'] = $rp->getCompletionTimestamp();
-                $item['remainingSeconds'] = max(0, $rp->getCompletionTimestamp() - $now);
-            }
-
-            $researchData[] = $item;
+            $researchData[] = $this->buildResearchPayload($research, $completedLevels, $ongoingMap, $now);
         }
 
         return new JsonResponse([
@@ -140,5 +88,75 @@ final class ResearchController extends BaseGameController
                 'message' => $e->getMessage(),
             ]);
         }
+    }
+
+    /**
+     * @param array<string, int>                                     $completedLevels
+     * @param array<string, \FrankProjects\UltimateWarfare\Entity\ResearchPlayer> $ongoingMap
+     * @return array<string, mixed>
+     */
+    private function buildResearchPayload(
+        Research $research,
+        array $completedLevels,
+        array $ongoingMap,
+        int $now,
+    ): array {
+        $slug = $research->getSlug();
+        $currentLevel = $completedLevels[$slug] ?? 0;
+        $maxLevel = $research->getMaxLevel();
+        $nextLevel = $currentLevel + 1;
+        $isOngoing = isset($ongoingMap[$slug]);
+        $isMaxed = $currentLevel >= $maxLevel;
+
+        if ($isOngoing) {
+            $status = 'researching';
+        } elseif ($isMaxed) {
+            $status = 'maxed';
+        } else {
+            $status = $this->arePrerequisitesMet($research, $nextLevel, $completedLevels)
+                ? 'available'
+                : 'locked';
+        }
+
+        $payload = [
+            'slug' => $slug,
+            'name' => $research->getName(),
+            'description' => $research->getDescription(),
+            'image' => $research->getImage(),
+            'currentLevel' => $currentLevel,
+            'maxLevel' => $maxLevel,
+            'status' => $status,
+            'nextCost' => $isMaxed ? null : $research->getCost($nextLevel),
+            'nextDuration' => $isMaxed ? null : $research->getTimestamp($nextLevel),
+            'prerequisites' => $isMaxed ? [] : $research->getPrerequisiteDescriptions($nextLevel),
+            'targetLevel' => null,
+            'completionTimestamp' => null,
+            'remainingSeconds' => null,
+        ];
+
+        if ($isOngoing) {
+            $rp = $ongoingMap[$slug];
+            $payload['targetLevel'] = $rp->getLevel();
+            $payload['completionTimestamp'] = $rp->getCompletionTimestamp();
+            $payload['remainingSeconds'] = max(0, $rp->getCompletionTimestamp() - $now);
+        }
+
+        return $payload;
+    }
+
+    /**
+     * @param array<string, int> $completedLevels
+     */
+    private function arePrerequisitesMet(Research $research, int $level, array $completedLevels): bool
+    {
+        foreach ($research->getPrerequisites($level) as $prereqClass => $minLevel) {
+            $prereqSlug = (new $prereqClass())->getSlug();
+            $playerLevel = $completedLevels[$prereqSlug] ?? 0;
+            if ($playerLevel < $minLevel) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

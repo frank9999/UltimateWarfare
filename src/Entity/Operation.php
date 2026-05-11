@@ -21,6 +21,7 @@ abstract readonly class Operation
         private int $maxDistance,
         private string $researchClass,
         private GameUnitEnum $gameUnit,
+        private int $researchMinLevel = 1,
     ) {
     }
 
@@ -84,6 +85,11 @@ abstract readonly class Operation
     public function getGameUnit(): GameUnitEnum
     {
         return $this->gameUnit;
+    }
+
+    public function getResearchMinLevel(): int
+    {
+        return $this->researchMinLevel;
     }
 
     public function hasCooldown(): bool

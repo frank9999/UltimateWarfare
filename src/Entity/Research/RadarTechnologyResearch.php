@@ -13,11 +13,13 @@ final readonly class RadarTechnologyResearch extends Research
         parent::__construct(
             name: 'Radar Technology',
             image: 'research.gif',
-            cost: 40000,
-            timestamp: 43200,
             description: 'Unlock the ability to construct radar stations on your regions',
             enabled: true,
-            prerequisites: [ResearchLevel2Research::class],
+            costPerLevel: [1 => 40000],
+            timestampPerLevel: [1 => 43200],
+            prerequisitesPerLevel: [
+                1 => [ResearchLevelResearch::class => 2],
+            ],
         );
     }
 

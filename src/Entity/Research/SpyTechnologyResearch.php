@@ -13,11 +13,23 @@ final readonly class SpyTechnologyResearch extends Research
         parent::__construct(
             name: 'Spy Technology',
             image: 'spy.gif',
-            cost: 20000,
-            timestamp: 7200,
-            description: 'Spy technology can be used to spy on enemy countries',
+            description: 'Spy technology can be used to spy on enemy countries and retrieve increasingly detailed data',
             enabled: true,
-            prerequisites: [SpecialOperationsResearch::class],
+            costPerLevel: [
+                1 => 20000,
+                2 => 5000000,
+                3 => 10000000,
+            ],
+            timestampPerLevel: [
+                1 => 7200,
+                2 => 150000,
+                3 => 300000,
+            ],
+            prerequisitesPerLevel: [
+                1 => [SpecialOperationsResearch::class => 1],
+                2 => [SpecialOperationsResearch::class => 2],
+                3 => [SpecialOperationsResearch::class => 3],
+            ],
         );
     }
 

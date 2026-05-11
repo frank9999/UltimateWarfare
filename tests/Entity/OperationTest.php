@@ -143,5 +143,24 @@ class OperationTest extends TestCase
         self::assertSame(3, $operation->getMaxDistance());
         self::assertSame(407, $operation->getGameUnit()->value);
         self::assertTrue($operation->isEnabled());
+        self::assertSame(1, $operation->getResearchMinLevel());
+    }
+
+    public function testAdvancedSpyOperationsRequireHigherSpyTechnologyLevel(): void
+    {
+        self::assertSame(2, (new AdvancedSpyOperation())->getResearchMinLevel());
+        self::assertSame('spy-technology', (new AdvancedSpyOperation())->getResearchSlug());
+
+        self::assertSame(3, (new AdvancedSpy2Operation())->getResearchMinLevel());
+        self::assertSame('spy-technology', (new AdvancedSpy2Operation())->getResearchSlug());
+    }
+
+    public function testSpecialOperationsBomberTiers(): void
+    {
+        self::assertSame(3, (new BomberAttackOperation())->getResearchMinLevel());
+        self::assertSame('special-operations', (new BomberAttackOperation())->getResearchSlug());
+
+        self::assertSame(4, (new StrategicBomberAttackOperation())->getResearchMinLevel());
+        self::assertSame('special-operations', (new StrategicBomberAttackOperation())->getResearchSlug());
     }
 }
