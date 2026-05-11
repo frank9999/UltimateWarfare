@@ -37,6 +37,8 @@ abstract class BattlePhase implements IBattlePhase
 
     protected GameUnitRegistry $gameUnitRegistry;
 
+    protected float $defenderDamageMultiplier;
+
     /**
      * @param FleetUnit[] $attackerGameUnits
      * @param WorldRegionUnit[] $defenderGameUnits
@@ -45,12 +47,14 @@ abstract class BattlePhase implements IBattlePhase
         string $name,
         array $attackerGameUnits,
         array $defenderGameUnits,
-        GameUnitRegistry $gameUnitRegistry
+        GameUnitRegistry $gameUnitRegistry,
+        float $defenderDamageMultiplier = 1.0
     ) {
         $this->name = $name;
         $this->attackerGameUnits = $attackerGameUnits;
         $this->defenderGameUnits = $defenderGameUnits;
         $this->gameUnitRegistry = $gameUnitRegistry;
+        $this->defenderDamageMultiplier = $defenderDamageMultiplier;
     }
 
     /**
@@ -61,14 +65,21 @@ abstract class BattlePhase implements IBattlePhase
         string $battlePhaseName,
         array $attackerGameUnits,
         array $defenderGameUnits,
-        GameUnitRegistry $gameUnitRegistry
+        GameUnitRegistry $gameUnitRegistry,
+        float $defenderDamageMultiplier = 1.0
     ): BattlePhase {
         $className = "FrankProjects\\UltimateWarfare\\Service\\BattleEngine\\BattlePhase\\" . ucfirst($battlePhaseName);
         if (!class_exists($className) || is_subclass_of($className, __CLASS__) === false) {
             throw new RuntimeException("Unknown BattlePhase {$battlePhaseName}");
         }
 
-        return new $className($battlePhaseName, $attackerGameUnits, $defenderGameUnits, $gameUnitRegistry);
+        return new $className(
+            $battlePhaseName,
+            $attackerGameUnits,
+            $defenderGameUnits,
+            $gameUnitRegistry,
+            $defenderDamageMultiplier
+        );
     }
 
     public function getName(): string
@@ -119,7 +130,13 @@ abstract class BattlePhase implements IBattlePhase
             $this->attackerGameUnits = $this->processBattlePhase($defensePower, $this->attackerGameUnits, 'attacking');
         }
 
-        $attackPower = $this->getAttackPower();
+        $rawAttackPower = $this->getAttackPower();
+        $attackPower = (int) ($rawAttackPower * $this->defenderDamageMultiplier);
+        if ($this->defenderDamageMultiplier < 1.0 && $rawAttackPower > 0) {
+            $this->addToBattleLog(
+                "Defender's defensive network reduces incoming damage from {$rawAttackPower} to {$attackPower}"
+            );
+        }
         $this->addToBattleLog("Attacker starts with {$attackPower} attack power");
 
         if ($attackPower > 0) {

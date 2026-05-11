@@ -153,7 +153,6 @@ final class FleetController extends BaseGameController
                 GameUnitCategory::TROOPS,
                 GameUnitCategory::AIR_UNITS,
                 GameUnitCategory::NAVAL_UNITS,
-                GameUnitCategory::SPECIAL_UNITS,
                 ], true)
             ) {
                 continue;

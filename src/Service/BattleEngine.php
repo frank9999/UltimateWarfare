@@ -6,6 +6,7 @@ namespace FrankProjects\UltimateWarfare\Service;
 
 use FrankProjects\UltimateWarfare\Entity\Fleet;
 use FrankProjects\UltimateWarfare\Entity\FleetUnit;
+use FrankProjects\UltimateWarfare\Entity\Player;
 use FrankProjects\UltimateWarfare\Entity\WorldRegionUnit;
 use FrankProjects\UltimateWarfare\Repository\GameUnitRegistry;
 use FrankProjects\UltimateWarfare\Service\BattleEngine\BattlePhase;
@@ -50,6 +51,9 @@ final class BattleEngine
 
         $attackerGameUnits = $fleet->getFleetUnits()->toArray();
         $defenderGameUnits = $fleet->getTargetWorldRegion()->getWorldRegionUnits()->toArray();
+        $defenderDamageMultiplier = $this->getDefenderDamageMultiplier(
+            $fleet->getTargetWorldRegion()->getPlayer()
+        );
 
         $battlePhaseResults = [];
         foreach ($this->getBattlePhases() as $battlePhaseName) {
@@ -57,7 +61,8 @@ final class BattleEngine
                 $battlePhaseName,
                 $attackerGameUnits,
                 $defenderGameUnits,
-                $this->gameUnitRegistry
+                $this->gameUnitRegistry,
+                $defenderDamageMultiplier
             );
             $battlePhase->startBattlePhase();
 
@@ -84,6 +89,28 @@ final class BattleEngine
             BattlePhase::SEA_PHASE,
             BattlePhase::GROUND_PHASE
         ];
+    }
+
+    private function getDefenderDamageMultiplier(?Player $defender): float
+    {
+        if ($defender === null) {
+            return 1.0;
+        }
+
+        $level = 0;
+        foreach ($defender->getPlayerResearch() as $playerResearch) {
+            if ($playerResearch->getActive() !== true) {
+                continue;
+            }
+            if ($playerResearch->getResearchSlug() !== 'defensive-network') {
+                continue;
+            }
+            if ($playerResearch->getLevel() > $level) {
+                $level = $playerResearch->getLevel();
+            }
+        }
+
+        return $level === 0 ? 1.0 : pow(0.75, $level);
     }
 
     private function ensureCanAttack(Fleet $fleet): void

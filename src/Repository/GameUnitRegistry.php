@@ -21,7 +21,6 @@ use FrankProjects\UltimateWarfare\Entity\GameUnit\EconomicCenter;
 use FrankProjects\UltimateWarfare\Entity\GameUnit\Factory;
 use FrankProjects\UltimateWarfare\Entity\GameUnit\Farm;
 use FrankProjects\UltimateWarfare\Entity\GameUnit\Fighter;
-use FrankProjects\UltimateWarfare\Entity\GameUnit\Guard;
 use FrankProjects\UltimateWarfare\Entity\GameUnit\Harbor;
 use FrankProjects\UltimateWarfare\Entity\GameUnit\House;
 use FrankProjects\UltimateWarfare\Entity\GameUnit\LandMine;
@@ -33,11 +32,9 @@ use FrankProjects\UltimateWarfare\Entity\GameUnit\NuclearMissile;
 use FrankProjects\UltimateWarfare\Entity\GameUnit\PatrolBoat;
 use FrankProjects\UltimateWarfare\Entity\GameUnit\RadarStation;
 use FrankProjects\UltimateWarfare\Entity\GameUnit\Rocket;
-use FrankProjects\UltimateWarfare\Entity\GameUnit\Saboteur;
 use FrankProjects\UltimateWarfare\Entity\GameUnit\SeaMine;
 use FrankProjects\UltimateWarfare\Entity\GameUnit\Sniper;
 use FrankProjects\UltimateWarfare\Entity\GameUnit\Soldier;
-use FrankProjects\UltimateWarfare\Entity\GameUnit\Spy;
 use FrankProjects\UltimateWarfare\Entity\GameUnit\StrategicBomber;
 use FrankProjects\UltimateWarfare\Entity\GameUnit\Submarine;
 use FrankProjects\UltimateWarfare\Entity\GameUnit\Tank;
@@ -68,9 +65,6 @@ final class GameUnitRegistry
             new Factory(),
             new RadarStation(),
             new MissileFactory(),
-            new Guard(),
-            new Saboteur(),
-            new Spy(),
             new Soldier(),
             new Sniper(),
             new Tank(),
@@ -160,7 +154,6 @@ final class GameUnitRegistry
             'buildings' => 0,
             'defences' => 0,
             'special' => 0,
-            'specialUnits' => 0,
             'troops' => 0,
             'navalUnits' => 0,
             'airUnits' => 0,
@@ -169,7 +162,6 @@ final class GameUnitRegistry
                 'buildings' => [],
                 'defences' => [],
                 'special' => [],
-                'specialUnits' => [],
                 'troops' => [],
                 'navalUnits' => [],
                 'airUnits' => [],
@@ -185,7 +177,6 @@ final class GameUnitRegistry
                 GameUnitCategory::BUILDINGS => 'buildings',
                 GameUnitCategory::DEFENSE_BUILDINGS => 'defences',
                 GameUnitCategory::SPECIAL_BUILDINGS => 'special',
-                GameUnitCategory::SPECIAL_UNITS => 'specialUnits',
                 GameUnitCategory::TROOPS => 'troops',
                 GameUnitCategory::NAVAL_UNITS => 'navalUnits',
                 GameUnitCategory::AIR_UNITS => 'airUnits',
@@ -211,7 +202,6 @@ final class GameUnitRegistry
             'buildings' => false,
             'defences' => false,
             'special' => false,
-            'specialUnits' => false,
             'troops' => false,
             'navalUnits' => false,
             'airUnits' => false,
@@ -225,7 +215,6 @@ final class GameUnitRegistry
                     GameUnitCategory::BUILDINGS => 'buildings',
                     GameUnitCategory::DEFENSE_BUILDINGS => 'defences',
                     GameUnitCategory::SPECIAL_BUILDINGS => 'special',
-                    GameUnitCategory::SPECIAL_UNITS => 'specialUnits',
                     GameUnitCategory::TROOPS => 'troops',
                     GameUnitCategory::NAVAL_UNITS => 'navalUnits',
                     GameUnitCategory::AIR_UNITS => 'airUnits',

@@ -9,7 +9,6 @@ enum GameUnitCategory: int
     case BUILDINGS = 1;
     case DEFENSE_BUILDINGS = 2;
     case SPECIAL_BUILDINGS = 3;
-    case SPECIAL_UNITS = 5;
     case TROOPS = 6;
     case NAVAL_UNITS = 7;
     case AIR_UNITS = 8;
@@ -26,7 +25,6 @@ enum GameUnitCategory: int
             self::BUILDINGS => 'Buildings',
             self::DEFENSE_BUILDINGS => 'Defense Buildings',
             self::SPECIAL_BUILDINGS => 'Special Buildings',
-            self::SPECIAL_UNITS => 'Elite Units',
             self::TROOPS => 'Troops',
             self::NAVAL_UNITS => 'Naval Units',
             self::AIR_UNITS => 'Air Units',
@@ -65,7 +63,6 @@ enum GameUnitCategory: int
             self::BUILDINGS,
             self::DEFENSE_BUILDINGS,
             self::SPECIAL_BUILDINGS,
-            self::SPECIAL_UNITS,
             self::TROOPS,
             self::NAVAL_UNITS,
             self::AIR_UNITS,
@@ -76,7 +73,6 @@ enum GameUnitCategory: int
     public function isSendable(): bool
     {
         return in_array($this, [
-            self::SPECIAL_UNITS,
             self::TROOPS,
             self::NAVAL_UNITS,
             self::AIR_UNITS,
@@ -89,7 +85,7 @@ enum GameUnitCategory: int
         return match ($this) {
             self::BUILDINGS, self::DEFENSE_BUILDINGS, self::SPECIAL_BUILDINGS,
             self::NAVAL_UNITS, self::AIR_UNITS, self::MISSILES => 'built',
-            self::SPECIAL_UNITS, self::TROOPS => 'trained'
+            self::TROOPS => 'trained'
         };
     }
 
@@ -98,7 +94,7 @@ enum GameUnitCategory: int
         return match ($this) {
             self::BUILDINGS, self::DEFENSE_BUILDINGS, self::SPECIAL_BUILDINGS,
             self::NAVAL_UNITS, self::AIR_UNITS, self::MISSILES => 'destroyed',
-            self::SPECIAL_UNITS, self::TROOPS => 'disbanded'
+            self::TROOPS => 'disbanded'
         };
     }
 }

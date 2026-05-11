@@ -109,7 +109,7 @@ final class ConstructionActionService
         if ($gameUnitCategory === GameUnitCategory::BUILDINGS) {
             $buildingsInConstruction = $this->getCountGameUnitsInConstruction($region, $gameUnitCategory);
             $regionBuildings = $this->getCountGameUnitsInWorldRegion($region, $gameUnitCategory);
-            $totalSpace = $region->getSpace() - $regionBuildings - $buildingsInConstruction;
+            $totalSpace = $this->getEffectiveSpace($region, $player) - $regionBuildings - $buildingsInConstruction;
 
             if ($totalBuild > $totalSpace) {
                 throw new RuntimeException('You do not have that much building space.');
@@ -156,8 +156,7 @@ final class ConstructionActionService
         $buildingIndex = $this->getRegionBuildingIndex($region);
 
         match ($gameUnitCategory) {
-            GameUnitCategory::TROOPS,
-            GameUnitCategory::SPECIAL_UNITS => $this->requireBuilding($buildingIndex, 'barrack', 'a Barrack'),
+            GameUnitCategory::TROOPS => $this->requireBuilding($buildingIndex, 'barrack', 'a Barrack'),
             GameUnitCategory::AIR_UNITS => $this->requireBuilding($buildingIndex, 'airfield', 'an Airfield'),
             GameUnitCategory::NAVAL_UNITS => $this->requireBuilding($buildingIndex, 'harbor', 'a Harbor'),
             GameUnitCategory::MISSILES => $this->requireBuilding(
@@ -292,7 +291,34 @@ final class ConstructionActionService
         $buildingsInConstruction = $this->getCountGameUnitsInConstruction($worldRegion, $gameUnitCategory);
         $regionBuildings = $this->getCountGameUnitsInWorldRegion($worldRegion, $gameUnitCategory);
 
-        return $worldRegion->getSpace() - $regionBuildings - $buildingsInConstruction;
+        return $this->getEffectiveSpace($worldRegion, $worldRegion->getPlayer())
+            - $regionBuildings - $buildingsInConstruction;
+    }
+
+    private function getEffectiveSpace(WorldRegion $worldRegion, ?Player $player): int
+    {
+        if ($player === null) {
+            return $worldRegion->getSpace();
+        }
+
+        $level = 0;
+        foreach ($player->getPlayerResearch() as $playerResearch) {
+            if ($playerResearch->getActive() !== true) {
+                continue;
+            }
+            if ($playerResearch->getResearchSlug() !== 'efficient-building-technology') {
+                continue;
+            }
+            if ($playerResearch->getLevel() > $level) {
+                $level = $playerResearch->getLevel();
+            }
+        }
+
+        if ($level === 0) {
+            return $worldRegion->getSpace();
+        }
+
+        return (int) ($worldRegion->getSpace() * (1.0 + 0.10 * $level));
     }
 
     public function getCountGameUnitsInConstruction(WorldRegion $worldRegion, GameUnitCategory $gameUnitCategory): int

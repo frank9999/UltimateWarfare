@@ -252,7 +252,6 @@ final class ConstructionController extends BaseGameController
 
         if ($hasBarrack) {
             $availableCategories[] = GameUnitCategory::TROOPS;
-            $availableCategories[] = GameUnitCategory::SPECIAL_UNITS;
         }
         if ($hasAirfield) {
             $availableCategories[] = GameUnitCategory::AIR_UNITS;

@@ -28,11 +28,6 @@ enum GameUnitEnum: int
     case RADAR_STATION = 205;
     case MISSILE_FACTORY = 206;
 
-    // Special Units (Category 5)
-    case GUARD = 400;
-    case SABOTEUR = 401;
-    case SPY = 407;
-
     // Troops (Category 6)
     case SOLDIER = 600;
     case SNIPER = 601;
