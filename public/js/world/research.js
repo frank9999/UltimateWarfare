@@ -55,8 +55,8 @@
     // Sub-columns each category lane needs (max col + 1 across all of TREE_LAYOUT).
     const LANE_COLS = { espionage: 1, economy: 1, military: 3 };
 
-    const NODE_WIDTH = 170;
-    const NODE_HEIGHT = 230;
+    const NODE_WIDTH = 220;
+    const NODE_HEIGHT = 420;
     const NODE_H_GAP = 16;
     const NODE_V_GAP = 28;
     const LANE_GAP = 24;
