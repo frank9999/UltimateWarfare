@@ -12,7 +12,7 @@ final readonly class SpyTechnologyResearch extends Research
     {
         parent::__construct(
             name: 'Spy Technology',
-            image: 'spy.gif',
+            image: 'research_spy_technology.jpg',
             description: 'Spy technology can be used to spy on enemy countries and retrieve detailed data.'
                 . ' Level 1 unlocks the Spy Operation, level 2 unlocks the Advanced Spy Operation,'
                 . ' and each additional level (3-10) further increases the success rate of all spy operations.',

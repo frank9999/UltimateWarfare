@@ -7,6 +7,7 @@ namespace FrankProjects\UltimateWarfare\Controller\Site;
 use FrankProjects\UltimateWarfare\Controller\BaseController;
 use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitCategory;
 use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitEnum;
+use FrankProjects\UltimateWarfare\Entity\Research\ResearchTierResearch;
 use FrankProjects\UltimateWarfare\Repository\GameUnitRegistry;
 use FrankProjects\UltimateWarfare\Repository\OperationRegistry;
 use FrankProjects\UltimateWarfare\Repository\ResearchRegistry;
@@ -83,10 +84,34 @@ final class GuideController extends BaseController
     {
         $researches = $researchRegistry->findEnabled();
 
+        $researchTier = null;
+        $researchesByTier = [];
+        foreach ($researches as $research) {
+            if ($research instanceof ResearchTierResearch) {
+                $researchTier = $research;
+                continue;
+            }
+            $tier = 0;
+            for ($level = 1; $level <= $research->getMaxLevel(); $level++) {
+                foreach ($research->getPrerequisites($level) as $prerequisiteClass => $minLevel) {
+                    if ($prerequisiteClass === ResearchTierResearch::class) {
+                        $tier = max($tier, $minLevel);
+                    }
+                }
+            }
+            $researchesByTier[$tier][] = $research;
+        }
+        ksort($researchesByTier);
+        foreach ($researchesByTier as &$bucket) {
+            usort($bucket, static fn ($a, $b) => strcmp($a->getName(), $b->getName()));
+        }
+        unset($bucket);
+
         return $this->render(
             'site/guide/listResearch.html.twig',
             [
-                'researches' => $researches
+                'researchTier' => $researchTier,
+                'researchesByTier' => $researchesByTier,
             ]
         );
     }

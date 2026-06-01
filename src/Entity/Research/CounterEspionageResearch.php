@@ -12,8 +12,9 @@ final readonly class CounterEspionageResearch extends Research
     {
         parent::__construct(
             name: 'Counter Espionage',
-            image: 'spy.gif',
-            description: 'Train counter-intelligence to defend against enemy spy operations',
+            image: 'research_counter_espionage.jpg',
+            description: 'Train counter-intelligence to defend against enemy spy operations.'
+                . ' Each level reduces the success rate of incoming Spy and Advanced Spy operations by 10%.',
             enabled: true,
             costPerLevel: [
                 1 => 500000,

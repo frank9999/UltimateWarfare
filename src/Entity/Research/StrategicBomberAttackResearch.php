@@ -12,8 +12,9 @@ final readonly class StrategicBomberAttackResearch extends Research
     {
         parent::__construct(
             name: 'Special Operation: Strategic Bomber Attack',
-            image: 'tech_special_operations.gif',
-            description: 'Unlock the ability to launch strategic bomber attack operations',
+            image: 'research_strategic_bomber_attack.jpg',
+            description: 'Unlock the Strategic Bomber Attack operation — the long-range version of'
+                . ' the Bomber Attack, reaching targets up to 10 regions away.',
             enabled: true,
             costPerLevel: [1 => 2500000],
             timestampPerLevel: [1 => 45000],

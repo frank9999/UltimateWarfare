@@ -12,8 +12,10 @@ final readonly class DefensiveNetworkResearch extends Research
     {
         parent::__construct(
             name: 'Defensive Network',
-            image: 'research.gif',
-            description: 'Build a defensive network that reduces incoming damage to your troops',
+            image: 'research_defensive_network.jpg',
+            description: 'A two-layer defense. In ground battles, each level multiplies incoming damage'
+                . ' by 0.75 (lvl 5 = enemy deals only ~24%). It also reduces the success rate of'
+                . ' incoming sniper, bomber, missile, and submarine operations by 12% per level.',
             enabled: true,
             costPerLevel: [
                 1 => 5000,

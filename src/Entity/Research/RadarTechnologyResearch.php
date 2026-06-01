@@ -12,8 +12,9 @@ final readonly class RadarTechnologyResearch extends Research
     {
         parent::__construct(
             name: 'Radar Technology',
-            image: 'research.gif',
-            description: 'Unlock the ability to construct radar stations on your regions',
+            image: 'research_radar_technology.jpg',
+            description: "Unlock the Radar Station building, which detects enemy troop movements"
+                . " in the region it's built in.",
             enabled: true,
             costPerLevel: [1 => 40000],
             timestampPerLevel: [1 => 43200],

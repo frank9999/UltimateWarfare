@@ -12,7 +12,7 @@ final readonly class SubmarineTechnologyResearch extends Research
     {
         parent::__construct(
             name: 'Submarine Technology',
-            image: 'research.gif',
+            image: 'research_submarine_attack.jpg',
             description: 'Unlock the ability to construct submarines in harbors'
                 . ' and perform submarine attack operations',
             enabled: true,

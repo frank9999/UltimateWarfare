@@ -12,8 +12,8 @@ final readonly class FactoryBlueprintResearch extends Research
     {
         parent::__construct(
             name: 'Factory Blueprint',
-            image: 'research.gif',
-            description: 'Unlock the ability to construct factories on your regions',
+            image: 'research_factory_blueprint.jpg',
+            description: 'Unlock the Factory building, which enables tank production in your regions.',
             enabled: true,
             costPerLevel: [1 => 25000],
             timestampPerLevel: [1 => 21600],

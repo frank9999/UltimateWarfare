@@ -12,7 +12,7 @@ final readonly class ResearchTierResearch extends Research
     {
         parent::__construct(
             name: 'Research Tier',
-            image: 'research.gif',
+            image: 'research_tiers.jpg',
             description: 'Advance your research tier to unlock new branches of technology',
             enabled: true,
             costPerLevel: [

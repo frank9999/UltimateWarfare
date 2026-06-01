@@ -12,8 +12,9 @@ final readonly class NuclearTechnologyResearch extends Research
     {
         parent::__construct(
             name: 'Nuclear Technology',
-            image: 'tech_nuclear.gif',
-            description: 'Unlocks the ability of Nuclear weapons',
+            image: 'research_nuclear_missile_attack.jpg',
+            description: 'Unlocks Nuclear Missile production and the Nuclear Missile Attack operation'
+                . ' — the ultimate weapon, capable of annihilating an entire enemy region.',
             enabled: true,
             costPerLevel: [1 => 500000000],
             timestampPerLevel: [1 => 604800],

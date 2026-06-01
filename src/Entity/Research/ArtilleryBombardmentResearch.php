@@ -12,8 +12,9 @@ final readonly class ArtilleryBombardmentResearch extends Research
     {
         parent::__construct(
             name: 'Special Operation: Artillery Bombardment',
-            image: 'tech_special_operations.gif',
-            description: 'Unlock the ability to launch artillery bombardment operations',
+            image: 'research_artillery_bombardment.jpg',
+            description: 'Unlock the Artillery Bombardment operation — bombard adjacent enemy regions'
+                . ' with your artillery units.',
             enabled: true,
             costPerLevel: [1 => 25000],
             timestampPerLevel: [1 => 7200],

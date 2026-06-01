@@ -12,7 +12,7 @@ final readonly class AdvancedOpticsResearch extends Research
     {
         parent::__construct(
             name: 'Advanced Optics',
-            image: 'research.gif',
+            image: 'research_advanced_optics.jpg',
             description: 'Unlock the ability to train snipers and perform sniper attack operations',
             enabled: true,
             costPerLevel: [1 => 35000],

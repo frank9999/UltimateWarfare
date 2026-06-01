@@ -12,8 +12,8 @@ final readonly class OreExtractionImprovementsResearch extends Research
     {
         parent::__construct(
             name: 'Ore Extraction Improvements',
-            image: 'research.gif',
-            description: 'Increase metal income by 10% per level',
+            image: 'research_ore_extraction_improvements.jpg',
+            description: 'Increase steel income by 10% per level (lvl 10 = +100%).',
             enabled: true,
             costPerLevel: [
                 1 => 30000,

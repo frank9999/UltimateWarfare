@@ -12,8 +12,9 @@ final readonly class BomberAttackResearch extends Research
     {
         parent::__construct(
             name: 'Special Operation: Bomber Attack',
-            image: 'tech_special_operations.gif',
-            description: 'Unlock the ability to launch bomber attack operations',
+            image: 'research_bomber_attack.jpg',
+            description: 'Unlock the Bomber Attack operation — destroy enemy special buildings'
+                . ' (train stations, airfields, harbors) with bomber raids.',
             enabled: true,
             costPerLevel: [1 => 100000],
             timestampPerLevel: [1 => 15000],

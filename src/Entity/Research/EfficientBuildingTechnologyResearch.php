@@ -12,8 +12,9 @@ final readonly class EfficientBuildingTechnologyResearch extends Research
     {
         parent::__construct(
             name: 'Efficient Building Technology',
-            image: 'research.gif',
-            description: 'Increase region building capacity by 10% per level',
+            image: 'research_efficient_building_technology.jpg',
+            description: "Increase each region's building capacity by 10% per level"
+                . ' (lvl 10 = +100% buildable space).',
             enabled: true,
             costPerLevel: [
                 1 => 500000,

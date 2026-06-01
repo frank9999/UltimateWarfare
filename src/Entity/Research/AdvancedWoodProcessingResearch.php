@@ -12,8 +12,8 @@ final readonly class AdvancedWoodProcessingResearch extends Research
     {
         parent::__construct(
             name: 'Advanced Wood Processing',
-            image: 'research.gif',
-            description: 'Increase wood income by 10% per level',
+            image: 'research_advanced_wood_processing.jpg',
+            description: 'Increase wood income by 10% per level (lvl 10 = +100%).',
             enabled: true,
             costPerLevel: [
                 1 => 100000,

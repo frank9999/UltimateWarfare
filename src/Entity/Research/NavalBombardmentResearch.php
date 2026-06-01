@@ -12,7 +12,7 @@ final readonly class NavalBombardmentResearch extends Research
     {
         parent::__construct(
             name: 'Naval Bombardment',
-            image: 'research.gif',
+            image: 'research_naval_bombardment.jpg',
             description: 'Unlock the ability to perform naval bombardment operations using cruisers',
             enabled: true,
             costPerLevel: [1 => 60000],

@@ -805,3 +805,119 @@ hr {
     background: #d63838;
     color: #f3e6c1;
 }
+
+/* ===== Guide Research ===== */
+.guide-research-section {
+    margin-bottom: 32px;
+}
+
+.guide-research-section-title {
+    color: #ffcc66;
+    font-size: 18px;
+    margin: 0 0 14px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #8B7355;
+    letter-spacing: 0.5px;
+}
+
+.guide-research-card {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    background: #3a3a3a;
+    border: 2px solid #8B7355;
+    border-radius: 6px;
+    padding: 20px;
+    margin-bottom: 16px;
+}
+
+.guide-research-image {
+    display: flex;
+    justify-content: center;
+}
+
+.guide-research-image img {
+    display: block;
+    width: 400px;
+    max-width: 100%;
+    height: auto;
+    border: 1px solid #8B7355;
+    border-radius: 4px;
+}
+
+.guide-research-body {
+    color: #f3e6c1;
+}
+
+.guide-research-title {
+    margin: 0 0 8px;
+    font-size: 22px;
+    color: #f3e6c1;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #8B7355;
+}
+
+.guide-research-description {
+    font-size: 14px;
+    line-height: 1.55;
+    color: #d8c9a5;
+    margin: 0 0 16px;
+}
+
+.guide-research-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 14px 24px;
+    margin: 0 0 16px;
+}
+
+.guide-research-stats > div {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+}
+
+.guide-research-stats dt {
+    font-size: 11px;
+    color: #ffcc66;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.guide-research-stats dd {
+    margin: 0;
+    font-size: 14px;
+    color: #f3e6c1;
+}
+
+.guide-research-levels {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.guide-research-levels thead th {
+    text-align: left;
+    padding: 8px 12px;
+    background: #2a2a2a;
+    color: #ffcc66;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid #8B7355;
+}
+
+.guide-research-levels tbody td {
+    padding: 6px 12px;
+    color: #f3e6c1;
+    border-bottom: 1px solid #2a2a2a;
+}
+
+.guide-research-levels tbody tr:nth-child(even) td {
+    background: #333333;
+}
+
+.guide-research-levels tbody tr:last-child td {
+    border-bottom: none;
+}
