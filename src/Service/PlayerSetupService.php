@@ -8,29 +8,29 @@ use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitEnum;
 use FrankProjects\UltimateWarfare\Entity\Player;
 use FrankProjects\UltimateWarfare\Entity\World;
 use FrankProjects\UltimateWarfare\Entity\WorldRegion;
-use FrankProjects\UltimateWarfare\Entity\WorldRegionUnit;
+use FrankProjects\UltimateWarfare\Entity\WorldRegionStackableUnit;
 use FrankProjects\UltimateWarfare\Repository\WorldRegionRepository;
-use FrankProjects\UltimateWarfare\Repository\WorldRegionUnitRepository;
+use FrankProjects\UltimateWarfare\Repository\WorldRegionStackableUnitRepository;
 use FrankProjects\UltimateWarfare\Util\DistanceCalculator;
 use RuntimeException;
 
 final class PlayerSetupService
 {
     private WorldRegionRepository $worldRegionRepository;
-    private WorldRegionUnitRepository $worldRegionUnitRepository;
+    private WorldRegionStackableUnitRepository $worldRegionStackableUnitRepository;
     private DistanceCalculator $distanceCalculator;
     private NetWorthUpdaterService $netWorthUpdaterService;
     private IncomeUpdaterService $incomeUpdaterService;
 
     public function __construct(
         WorldRegionRepository $worldRegionRepository,
-        WorldRegionUnitRepository $worldRegionUnitRepository,
+        WorldRegionStackableUnitRepository $worldRegionStackableUnitRepository,
         DistanceCalculator $distanceCalculator,
         NetWorthUpdaterService $netWorthUpdaterService,
         IncomeUpdaterService $incomeUpdaterService
     ) {
         $this->worldRegionRepository = $worldRegionRepository;
-        $this->worldRegionUnitRepository = $worldRegionUnitRepository;
+        $this->worldRegionStackableUnitRepository = $worldRegionStackableUnitRepository;
         $this->distanceCalculator = $distanceCalculator;
         $this->netWorthUpdaterService = $netWorthUpdaterService;
         $this->incomeUpdaterService = $incomeUpdaterService;
@@ -121,8 +121,8 @@ final class PlayerSetupService
         ];
 
         foreach ($startingUnits as [$gameUnit, $amount]) {
-            $worldRegionUnit = WorldRegionUnit::create($region, $gameUnit, $amount);
-            $this->worldRegionUnitRepository->save($worldRegionUnit);
+            $worldRegionStackableUnit = WorldRegionStackableUnit::create($region, $gameUnit, $amount);
+            $this->worldRegionStackableUnitRepository->save($worldRegionStackableUnit);
         }
     }
 }

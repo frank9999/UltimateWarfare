@@ -70,6 +70,18 @@ enum GameUnitCategory: int
         ];
     }
 
+    /**
+     * Leveled buildings are built once and then upgraded in levels (max 10) instead of
+     * being stacked by amount. Their strength/durability is driven by level and health.
+     */
+    public function isLeveled(): bool
+    {
+        return in_array($this, [
+            self::DEFENSE_BUILDINGS,
+            self::SPECIAL_BUILDINGS,
+        ], true);
+    }
+
     public function isSendable(): bool
     {
         return in_array($this, [

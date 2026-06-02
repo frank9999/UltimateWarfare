@@ -27,10 +27,10 @@ final class MissileAttack extends OperationProcessor
 
     public function processPreOperation(): void
     {
-        foreach ($this->playerRegion->getWorldRegionUnits() as $worldRegionUnit) {
-            if ($worldRegionUnit->getGameUnit() === $this->operation->getGameUnit()) {
-                $worldRegionUnit->setAmount($worldRegionUnit->getAmount() - $this->amount);
-                $this->worldRegionUnitRepository->save($worldRegionUnit);
+        foreach ($this->playerRegion->getWorldRegionStackableUnits() as $worldRegionStackableUnit) {
+            if ($worldRegionStackableUnit->getGameUnit() === $this->operation->getGameUnit()) {
+                $worldRegionStackableUnit->setAmount($worldRegionStackableUnit->getAmount() - $this->amount);
+                $this->worldRegionStackableUnitRepository->save($worldRegionStackableUnit);
             }
         }
     }
@@ -38,19 +38,19 @@ final class MissileAttack extends OperationProcessor
     public function processSuccess(): void
     {
         $totalBuildings = 0;
-        foreach ($this->region->getWorldRegionUnits() as $worldRegionUnit) {
-            $gameUnit = $this->gameUnitRegistry->find($worldRegionUnit->getGameUnit());
+        foreach ($this->region->getWorldRegionStackableUnits() as $worldRegionStackableUnit) {
+            $gameUnit = $this->gameUnitRegistry->find($worldRegionStackableUnit->getGameUnit());
             if ($gameUnit->getGameUnitCategory() === GameUnitCategory::BUILDINGS) {
-                $totalBuildings = $totalBuildings + $worldRegionUnit->getAmount();
+                $totalBuildings = $totalBuildings + $worldRegionStackableUnit->getAmount();
             }
         }
 
         if (($this->amount / 2) > $totalBuildings) {
             $buildingsDestroyed = $totalBuildings;
-            foreach ($this->region->getWorldRegionUnits() as $worldRegionUnit) {
-                $gameUnit = $this->gameUnitRegistry->find($worldRegionUnit->getGameUnit());
+            foreach ($this->region->getWorldRegionStackableUnits() as $worldRegionStackableUnit) {
+                $gameUnit = $this->gameUnitRegistry->find($worldRegionStackableUnit->getGameUnit());
                 if ($gameUnit->getGameUnitCategory() === GameUnitCategory::BUILDINGS) {
-                    $this->worldRegionUnitRepository->remove($worldRegionUnit);
+                    $this->worldRegionStackableUnitRepository->remove($worldRegionStackableUnit);
                     $unitName = $gameUnit->getName();
                     $this->addToOperationLog("You destroyed all {$unitName} buildings!");
                 }
@@ -61,13 +61,13 @@ final class MissileAttack extends OperationProcessor
             $this->reportCreator->createReport($this->getTargetRegionPlayer(), time(), $reportText);
         } else {
             $buildingsDestroyed = intval($this->amount / 2);
-            foreach ($this->region->getWorldRegionUnits() as $worldRegionUnit) {
-                $gameUnit = $this->gameUnitRegistry->find($worldRegionUnit->getGameUnit());
+            foreach ($this->region->getWorldRegionStackableUnits() as $worldRegionStackableUnit) {
+                $gameUnit = $this->gameUnitRegistry->find($worldRegionStackableUnit->getGameUnit());
                 if ($gameUnit->getGameUnitCategory() === GameUnitCategory::BUILDINGS) {
-                    $percentage = $worldRegionUnit->getAmount() / $totalBuildings;
+                    $percentage = $worldRegionStackableUnit->getAmount() / $totalBuildings;
                     $destroyed = intval($buildingsDestroyed * $percentage);
-                    $worldRegionUnit->setAmount($worldRegionUnit->getAmount() - $destroyed);
-                    $this->worldRegionUnitRepository->save($worldRegionUnit);
+                    $worldRegionStackableUnit->setAmount($worldRegionStackableUnit->getAmount() - $destroyed);
+                    $this->worldRegionStackableUnitRepository->save($worldRegionStackableUnit);
                     $unitName = $gameUnit->getName();
                     $this->addToOperationLog("You destroyed {$destroyed} {$unitName} buildings!");
                 }

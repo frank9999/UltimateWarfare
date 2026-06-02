@@ -24,7 +24,8 @@ final class Bunker extends GameUnit
             image: 'gu_bunker.jpg',
             netWorth: 0,
             timestamp: 900,
-            description: 'Every bunker can hold 100 soldiers and gives them 200% Defence bonus.',
+            description: 'Bunkers fortify this region against ground assaults. Each level '
+                . 'reinforces the bunker, increasing both its ground defence and durability.',
             gameUnitCategory: GameUnitCategory::DEFENSE_BUILDINGS,
             behaviorClass: null,
             cost: new Cost(cash: 8500, food: 50, wood: 150, steel: 150),

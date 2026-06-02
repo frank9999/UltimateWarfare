@@ -24,7 +24,8 @@ final class SeaMine extends GameUnit
             image: 'gu_sea_mine.jpg',
             netWorth: 0,
             timestamp: 7200,
-            description: 'Seamines have 0.01% chance of sinking an enemy ship.',
+            description: 'Sea mines damage ships attacking this region. Each level lays an '
+                . 'additional layer of mines, increasing both their sea defence and durability.',
             gameUnitCategory: GameUnitCategory::DEFENSE_BUILDINGS,
             behaviorClass: null,
             cost: new Cost(cash: 3500, food: 0, wood: 0, steel: 1),

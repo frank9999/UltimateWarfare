@@ -11,6 +11,7 @@ class Construction
     private int $id;
     private int $number;
     private int $timestamp;
+    private int $duration;
     private Player $player;
     private WorldRegion $worldRegion;
     private GameUnitEnum $gameUnit;
@@ -43,6 +44,20 @@ class Construction
     public function getTimestamp(): int
     {
         return $this->timestamp;
+    }
+
+    public function setDuration(int $duration): void
+    {
+        $this->duration = $duration;
+    }
+
+    /**
+     * Effective build time in seconds, with any special-building build-speed bonus
+     * already applied and locked in at the moment the construction was queued.
+     */
+    public function getDuration(): int
+    {
+        return $this->duration;
     }
 
     public function getPlayer(): Player
@@ -79,7 +94,8 @@ class Construction
         WorldRegion $worldRegion,
         Player $player,
         GameUnitEnum $gameUnit,
-        int $amount
+        int $amount,
+        int $duration
     ): Construction {
         $construction = new Construction();
         $construction->setWorldRegion($worldRegion);
@@ -87,6 +103,7 @@ class Construction
         $construction->setGameUnit($gameUnit);
         $construction->setNumber($amount);
         $construction->setTimestamp(time());
+        $construction->setDuration($duration);
 
         return $construction;
     }

@@ -10,16 +10,16 @@ use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitCategory;
 use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitEnum;
 use FrankProjects\UltimateWarfare\Entity\Player;
 use FrankProjects\UltimateWarfare\Entity\WorldRegion;
-use FrankProjects\UltimateWarfare\Entity\WorldRegionUnit;
+use FrankProjects\UltimateWarfare\Entity\WorldRegionStackableUnit;
 use FrankProjects\UltimateWarfare\Repository\GameUnitRegistry;
-use FrankProjects\UltimateWarfare\Repository\WorldRegionUnitRepository;
+use FrankProjects\UltimateWarfare\Repository\WorldRegionStackableUnitRepository;
 
-final class DoctrineWorldRegionUnitRepository implements WorldRegionUnitRepository
+final class DoctrineWorldRegionStackableUnitRepository implements WorldRegionStackableUnitRepository
 {
     private EntityManagerInterface $entityManager;
 
     /**
-     * @var EntityRepository<WorldRegionUnit>
+     * @var EntityRepository<WorldRegionStackableUnit>
      */
     private EntityRepository $repository;
 
@@ -28,11 +28,11 @@ final class DoctrineWorldRegionUnitRepository implements WorldRegionUnitReposito
     public function __construct(EntityManagerInterface $entityManager, GameUnitRegistry $gameUnitRegistry)
     {
         $this->entityManager = $entityManager;
-        $this->repository = $this->entityManager->getRepository(WorldRegionUnit::class);
+        $this->repository = $this->entityManager->getRepository(WorldRegionStackableUnit::class);
         $this->gameUnitRegistry = $gameUnitRegistry;
     }
 
-    public function find(int $id): ?WorldRegionUnit
+    public function find(int $id): ?WorldRegionStackableUnit
     {
         return $this->repository->find($id);
     }
@@ -44,9 +44,9 @@ final class DoctrineWorldRegionUnitRepository implements WorldRegionUnitReposito
     public function findAmountAndNetWorthByPlayer(Player $player): array
     {
         $results = $this->entityManager->createQuery(
-            'SELECT wru.gameUnit, wru.amount
-              FROM ' . WorldRegionUnit::class . ' wru
-              JOIN ' . WorldRegion::class . ' wr ON wru.worldRegion = wr
+            'SELECT wrsu.gameUnit, wrsu.amount
+              FROM ' . WorldRegionStackableUnit::class . ' wrsu
+              JOIN ' . WorldRegion::class . ' wr ON wrsu.worldRegion = wr
               WHERE wr.player = :player'
         )->setParameter(
             'player',
@@ -86,11 +86,11 @@ final class DoctrineWorldRegionUnitRepository implements WorldRegionUnitReposito
 
         $results = $this->entityManager
             ->createQuery(
-                'SELECT wru.gameUnit, sum(wru.amount) as total
-              FROM ' . WorldRegionUnit::class . ' wru
-              JOIN ' . WorldRegion::class . ' wr ON wru.worldRegion = wr
-              WHERE wr.player = :player AND wru.gameUnit IN (:unitIds)
-              GROUP BY wru.gameUnit'
+                'SELECT wrsu.gameUnit, sum(wrsu.amount) as total
+              FROM ' . WorldRegionStackableUnit::class . ' wrsu
+              JOIN ' . WorldRegion::class . ' wr ON wrsu.worldRegion = wr
+              WHERE wr.player = :player AND wrsu.gameUnit IN (:unitIds)
+              GROUP BY wrsu.gameUnit'
             )->setParameter('player', $player)
             ->setParameter('unitIds', $unitIds)
             ->getArrayResult();
@@ -104,15 +104,15 @@ final class DoctrineWorldRegionUnitRepository implements WorldRegionUnitReposito
         return $gameUnits;
     }
 
-    public function remove(WorldRegionUnit $worldRegionUnit): void
+    public function remove(WorldRegionStackableUnit $worldRegionStackableUnit): void
     {
-        $this->entityManager->remove($worldRegionUnit);
+        $this->entityManager->remove($worldRegionStackableUnit);
         $this->entityManager->flush();
     }
 
-    public function save(WorldRegionUnit $worldRegionUnit): void
+    public function save(WorldRegionStackableUnit $worldRegionStackableUnit): void
     {
-        $this->entityManager->persist($worldRegionUnit);
+        $this->entityManager->persist($worldRegionStackableUnit);
         $this->entityManager->flush();
     }
 }

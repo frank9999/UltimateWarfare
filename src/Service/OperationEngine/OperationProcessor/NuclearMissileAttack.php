@@ -26,18 +26,18 @@ final class NuclearMissileAttack extends OperationProcessor
 
     public function processPreOperation(): void
     {
-        foreach ($this->playerRegion->getWorldRegionUnits() as $worldRegionUnit) {
-            if ($worldRegionUnit->getGameUnit() === $this->operation->getGameUnit()) {
-                $worldRegionUnit->setAmount($worldRegionUnit->getAmount() - $this->amount);
-                $this->worldRegionUnitRepository->save($worldRegionUnit);
+        foreach ($this->playerRegion->getWorldRegionStackableUnits() as $worldRegionStackableUnit) {
+            if ($worldRegionStackableUnit->getGameUnit() === $this->operation->getGameUnit()) {
+                $worldRegionStackableUnit->setAmount($worldRegionStackableUnit->getAmount() - $this->amount);
+                $this->worldRegionStackableUnitRepository->save($worldRegionStackableUnit);
             }
         }
     }
 
     public function processSuccess(): void
     {
-        foreach ($this->region->getWorldRegionUnits() as $worldRegionUnit) {
-            $this->worldRegionUnitRepository->remove($worldRegionUnit);
+        foreach ($this->region->getWorldRegionStackableUnits() as $worldRegionStackableUnit) {
+            $this->worldRegionStackableUnitRepository->remove($worldRegionStackableUnit);
         }
 
         foreach ($this->region->getConstructions() as $construction) {

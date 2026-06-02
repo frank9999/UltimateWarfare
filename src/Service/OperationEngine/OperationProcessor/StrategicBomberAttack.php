@@ -34,22 +34,20 @@ final class StrategicBomberAttack extends OperationProcessor
 
     public function processSuccess(): void
     {
-        $totalBuildings = 0;
-        foreach ($this->region->getWorldRegionUnits() as $worldRegionUnit) {
-            $gameUnit = $this->gameUnitRegistry->find($worldRegionUnit->getGameUnit());
-            if ($gameUnit->getGameUnitCategory() === GameUnitCategory::SPECIAL_BUILDINGS) {
-                $totalBuildings = $totalBuildings + $worldRegionUnit->getAmount();
-            }
+        // Special buildings are leveled; their level represents how much building there is
+        // to destroy. Strategic bomber damage is measured in levels.
+        $totalLevels = 0;
+        foreach ($this->getTargetSpecialBuildings() as $leveledUnit) {
+            $totalLevels += $leveledUnit->getLevel();
         }
 
-        if (($this->amount * self::BUILDINGS_DESTROYED_PER_BOMBER) > $totalBuildings) {
-            foreach ($this->region->getWorldRegionUnits() as $worldRegionUnit) {
-                $gameUnit = $this->gameUnitRegistry->find($worldRegionUnit->getGameUnit());
-                if ($gameUnit->getGameUnitCategory() === GameUnitCategory::SPECIAL_BUILDINGS) {
-                    $this->worldRegionUnitRepository->remove($worldRegionUnit);
-                    $unitName = $gameUnit->getName();
-                    $this->addToOperationLog("You destroyed all {$unitName} buildings!");
-                }
+        $levelsToDestroy = $this->amount * self::BUILDINGS_DESTROYED_PER_BOMBER;
+
+        if ($levelsToDestroy > $totalLevels) {
+            foreach ($this->getTargetSpecialBuildings() as $leveledUnit) {
+                $gameUnit = $this->gameUnitRegistry->find($leveledUnit->getGameUnit());
+                $this->worldRegionLeveledUnitRepository->remove($leveledUnit);
+                $this->addToOperationLog("You destroyed the {$gameUnit->getName()}!");
             }
 
             $this->addToOperationLog("You destroyed all special buildings!");
@@ -58,34 +56,56 @@ final class StrategicBomberAttack extends OperationProcessor
                 . " and destroyed all special buildings.";
             $this->reportCreator->createReport($this->getTargetRegionPlayer(), time(), $reportText);
         } else {
-            $buildingsDestroyed = $this->amount * self::BUILDINGS_DESTROYED_PER_BOMBER;
-            foreach ($this->region->getWorldRegionUnits() as $worldRegionUnit) {
-                $gameUnit = $this->gameUnitRegistry->find($worldRegionUnit->getGameUnit());
-                if ($gameUnit->getGameUnitCategory() === GameUnitCategory::SPECIAL_BUILDINGS) {
-                    $percentage = $worldRegionUnit->getAmount() / $totalBuildings;
-                    $destroyed = round($buildingsDestroyed * $percentage);
-                    $worldRegionUnit->setAmount((int) ($worldRegionUnit->getAmount() - $destroyed));
-                    $this->worldRegionUnitRepository->save($worldRegionUnit);
-                    $unitName = $gameUnit->getName();
-                    $this->addToOperationLog("You destroyed {$destroyed} {$unitName} buildings!");
+            foreach ($this->getTargetSpecialBuildings() as $leveledUnit) {
+                $gameUnit = $this->gameUnitRegistry->find($leveledUnit->getGameUnit());
+                $percentage = $leveledUnit->getLevel() / $totalLevels;
+                $destroyed = (int) round($levelsToDestroy * $percentage);
+                $newLevel = $leveledUnit->getLevel() - $destroyed;
+
+                if ($newLevel <= 0) {
+                    $this->worldRegionLeveledUnitRepository->remove($leveledUnit);
+                    $this->addToOperationLog("You destroyed the {$gameUnit->getName()}!");
+                } else {
+                    $leveledUnit->setLevel($newLevel);
+                    $leveledUnit->setHealth($gameUnit->getBattleStats()->getHealth() * $newLevel);
+                    $this->worldRegionLeveledUnitRepository->save($leveledUnit);
+                    $this->addToOperationLog("You destroyed {$destroyed} levels of {$gameUnit->getName()}!");
                 }
             }
 
             $reportText = "Somebody launched a Strategic Bomber attack"
                 . " against region {$this->region->getX()}, {$this->region->getY()}"
-                . " and destroyed {$buildingsDestroyed} buildings.";
+                . " and destroyed {$levelsToDestroy} building levels.";
             $this->reportCreator->createReport($this->getTargetRegionPlayer(), time(), $reportText);
         }
+    }
+
+    /**
+     * @return array<int, \FrankProjects\UltimateWarfare\Entity\WorldRegionLeveledUnit>
+     */
+    private function getTargetSpecialBuildings(): array
+    {
+        $buildings = [];
+        foreach ($this->region->getWorldRegionLeveledUnits() as $leveledUnit) {
+            $gameUnit = $this->gameUnitRegistry->find($leveledUnit->getGameUnit());
+            if ($gameUnit->getGameUnitCategory() === GameUnitCategory::SPECIAL_BUILDINGS) {
+                $buildings[] = $leveledUnit;
+            }
+        }
+
+        return $buildings;
     }
 
     public function processFailed(): void
     {
         $strategicBombersLost = intval($this->amount * 0.05);
 
-        foreach ($this->playerRegion->getWorldRegionUnits() as $worldRegionUnit) {
-            if ($worldRegionUnit->getGameUnit() === GameUnitEnum::STRATEGIC_BOMBER) {
-                $worldRegionUnit->setAmount(intval($worldRegionUnit->getAmount() - $strategicBombersLost));
-                $this->worldRegionUnitRepository->save($worldRegionUnit);
+        foreach ($this->playerRegion->getWorldRegionStackableUnits() as $worldRegionStackableUnit) {
+            if ($worldRegionStackableUnit->getGameUnit() === GameUnitEnum::STRATEGIC_BOMBER) {
+                $worldRegionStackableUnit->setAmount(
+                    intval($worldRegionStackableUnit->getAmount() - $strategicBombersLost)
+                );
+                $this->worldRegionStackableUnitRepository->save($worldRegionStackableUnit);
             }
         }
 

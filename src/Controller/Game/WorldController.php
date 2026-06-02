@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace FrankProjects\UltimateWarfare\Controller\Game;
 
+use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitEnum;
 use FrankProjects\UltimateWarfare\Entity\Player;
 use FrankProjects\UltimateWarfare\Entity\World;
 use FrankProjects\UltimateWarfare\Entity\WorldRegion;
@@ -211,7 +212,7 @@ final class WorldController extends BaseGameController
     private function getWorldRegionsData(World $world, Player $player): array
     {
         $playerRegions = $this->getPlayerRegionCoordinates($player);
-        $visibleRegions = $this->calculateVisibleRegions($playerRegions);
+        $visibleRegions = $this->calculateVisibleRegions($playerRegions, $this->getRadarRegions($player));
 
         $regions = [];
         foreach ($world->getWorldRegions() as $region) {
@@ -261,40 +262,102 @@ final class WorldController extends BaseGameController
     }
 
     /**
-     * Calculate which regions are visible (owned + 6 hex neighbors)
-     * Uses odd-r offset hex grid: odd rows are shifted right
-     * @param array<string, true> $playerRegions
-     * @return array<string, true>
+     * Coordinates of owned regions that have a Radar Station, mapped to the radar's level.
+     * @return array<string, int>
      */
-    private function calculateVisibleRegions(array $playerRegions): array
+    private function getRadarRegions(Player $player): array
     {
-        $visibleRegions = $playerRegions;
-
-        foreach (array_keys($playerRegions) as $coordString) {
-            [$x, $y] = explode(',', $coordString);
-            $x = (int)$x;
-            $y = (int)$y;
-
-            // 6 hex neighbors (pointy-top, odd-r offset)
-            $visibleRegions[($x - 1) . ',' . $y] = true;
-            $visibleRegions[($x + 1) . ',' . $y] = true;
-
-            if ($y % 2 === 0) {
-                // Even row
-                $visibleRegions[($x - 1) . ',' . ($y - 1)] = true;
-                $visibleRegions[$x . ',' . ($y - 1)] = true;
-                $visibleRegions[($x - 1) . ',' . ($y + 1)] = true;
-                $visibleRegions[$x . ',' . ($y + 1)] = true;
-            } else {
-                // Odd row (shifted right)
-                $visibleRegions[$x . ',' . ($y - 1)] = true;
-                $visibleRegions[($x + 1) . ',' . ($y - 1)] = true;
-                $visibleRegions[$x . ',' . ($y + 1)] = true;
-                $visibleRegions[($x + 1) . ',' . ($y + 1)] = true;
+        $radarRegions = [];
+        foreach ($player->getWorldRegions() as $region) {
+            $level = $region->getUnitLevel(GameUnitEnum::RADAR_STATION);
+            if ($level > 0) {
+                $radarRegions[$region->getX() . ',' . $region->getY()] = $level;
             }
         }
 
+        return $radarRegions;
+    }
+
+    /**
+     * Calculate which regions are visible: every owned region plus its 1-hex ring, extended
+     * to a radius equal to the Radar Station level around regions that have one.
+     *
+     * @param array<string, true> $playerRegions
+     * @param array<string, int> $radarRegions
+     * @return array<string, true>
+     */
+    private function calculateVisibleRegions(array $playerRegions, array $radarRegions): array
+    {
+        $visibleRegions = $playerRegions;
+
+        // Base 1-hex ring of vision around every owned region.
+        foreach (array_keys($playerRegions) as $coordString) {
+            [$x, $y] = explode(',', $coordString);
+            foreach ($this->getHexNeighbors((int)$x, (int)$y) as $neighbor) {
+                $visibleRegions[$neighbor] = true;
+            }
+        }
+
+        // Radar stations extend vision to a radius equal to their level.
+        foreach ($radarRegions as $coordString => $level) {
+            [$x, $y] = explode(',', $coordString);
+            $this->revealRings($visibleRegions, (int)$x, (int)$y, $level);
+        }
+
         return $visibleRegions;
+    }
+
+    /**
+     * The 6 hex neighbors of a tile (pointy-top, odd-r offset; odd rows shifted right).
+     * @return list<string>
+     */
+    private function getHexNeighbors(int $x, int $y): array
+    {
+        $neighbors = [
+            ($x - 1) . ',' . $y,
+            ($x + 1) . ',' . $y,
+        ];
+
+        if ($y % 2 === 0) {
+            $neighbors[] = ($x - 1) . ',' . ($y - 1);
+            $neighbors[] = $x . ',' . ($y - 1);
+            $neighbors[] = ($x - 1) . ',' . ($y + 1);
+            $neighbors[] = $x . ',' . ($y + 1);
+        } else {
+            $neighbors[] = $x . ',' . ($y - 1);
+            $neighbors[] = ($x + 1) . ',' . ($y - 1);
+            $neighbors[] = $x . ',' . ($y + 1);
+            $neighbors[] = ($x + 1) . ',' . ($y + 1);
+        }
+
+        return $neighbors;
+    }
+
+    /**
+     * Reveal a hex disk of the given radius (in rings) around a center tile.
+     *
+     * @param array<string, true> $visibleRegions
+     */
+    private function revealRings(array &$visibleRegions, int $x, int $y, int $rings): void
+    {
+        $visited = [$x . ',' . $y => true];
+        $frontier = [[$x, $y]];
+
+        for ($ring = 0; $ring < $rings; $ring++) {
+            $next = [];
+            foreach ($frontier as [$cx, $cy]) {
+                foreach ($this->getHexNeighbors($cx, $cy) as $neighbor) {
+                    if (isset($visited[$neighbor])) {
+                        continue;
+                    }
+                    $visited[$neighbor] = true;
+                    $visibleRegions[$neighbor] = true;
+                    [$nx, $ny] = explode(',', $neighbor);
+                    $next[] = [(int)$nx, (int)$ny];
+                }
+            }
+            $frontier = $next;
+        }
     }
 
     /**

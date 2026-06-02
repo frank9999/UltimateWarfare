@@ -15,7 +15,7 @@ enum GameUnitEnum: int
 
     // Defense Buildings (Category 2)
     case SEA_MINE = 100;
-    case LAND_MINE = 101;
+    case MINE_FIELD = 101;
     case BUNKER = 102;
     case ANTI_AIRCRAFT_GUN = 103;
 

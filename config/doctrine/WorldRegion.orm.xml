@@ -53,7 +53,8 @@
         <option name="default">0</option>
       </options>
     </field>
-    <one-to-many field="worldRegionUnits" target-entity="FrankProjects\UltimateWarfare\Entity\WorldRegionUnit" mapped-by="worldRegion"/>
+    <one-to-many field="worldRegionStackableUnits" target-entity="FrankProjects\UltimateWarfare\Entity\WorldRegionStackableUnit" mapped-by="worldRegion"/>
+    <one-to-many field="worldRegionLeveledUnits" target-entity="FrankProjects\UltimateWarfare\Entity\WorldRegionLeveledUnit" mapped-by="worldRegion"/>
     <one-to-many field="constructions" target-entity="FrankProjects\UltimateWarfare\Entity\Construction" mapped-by="worldRegion"/>
     <one-to-many field="fleets" target-entity="FrankProjects\UltimateWarfare\Entity\Fleet" mapped-by="worldRegion"/>
     <one-to-many field="targetFleets" target-entity="FrankProjects\UltimateWarfare\Entity\Fleet" mapped-by="targetWorldRegion"/>

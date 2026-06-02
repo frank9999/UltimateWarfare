@@ -13,13 +13,7 @@ class AirUnitBehavior extends AbstractGameUnitBehavior
 {
     public function canBuild(WorldRegion $region, Player $player): bool
     {
-        foreach ($region->getWorldRegionUnits() as $regionUnit) {
-            if ($regionUnit->getGameUnit() === GameUnitEnum::AIRFIELD) {
-                return true;
-            }
-        }
-
-        return false;
+        return $region->getLeveledUnit(GameUnitEnum::AIRFIELD) !== null;
     }
 
     public function getBuildRequirementDescription(): string

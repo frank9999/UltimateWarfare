@@ -11,7 +11,7 @@ use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitEnum;
 use FrankProjects\UltimateWarfare\Entity\Player;
 use FrankProjects\UltimateWarfare\Entity\World;
 use FrankProjects\UltimateWarfare\Entity\WorldRegion;
-use FrankProjects\UltimateWarfare\Entity\WorldRegionUnit;
+use FrankProjects\UltimateWarfare\Entity\WorldRegionStackableUnit;
 use FrankProjects\UltimateWarfare\Repository\WorldRegionRepository;
 
 final class DoctrineWorldRegionRepository implements WorldRegionRepository
@@ -57,10 +57,10 @@ final class DoctrineWorldRegionRepository implements WorldRegionRepository
     {
         $results = $this->entityManager
             ->createQuery(
-                'SELECT wru.gameUnit, sum(wru.amount) as total
-              FROM ' . WorldRegionUnit::class . ' wru
-              WHERE wru.worldRegion = :worldRegion
-              GROUP BY wru.gameUnit'
+                'SELECT wrsu.gameUnit, sum(wrsu.amount) as total
+              FROM ' . WorldRegionStackableUnit::class . ' wrsu
+              WHERE wrsu.worldRegion = :worldRegion
+              GROUP BY wrsu.gameUnit'
             )->setParameter('worldRegion', $worldRegion)
             ->getArrayResult();
 
@@ -80,11 +80,11 @@ final class DoctrineWorldRegionRepository implements WorldRegionRepository
     {
         $results = $this->entityManager
             ->createQuery(
-                'SELECT IDENTITY(wru.worldRegion) as regionId, wru.gameUnit, sum(wru.amount) as total
-              FROM ' . WorldRegionUnit::class . ' wru
-              JOIN ' . WorldRegion::class . ' wr WITH wru.worldRegion = wr
+                'SELECT IDENTITY(wrsu.worldRegion) as regionId, wrsu.gameUnit, sum(wrsu.amount) as total
+              FROM ' . WorldRegionStackableUnit::class . ' wrsu
+              JOIN ' . WorldRegion::class . ' wr WITH wrsu.worldRegion = wr
               WHERE wr.player = :player
-              GROUP BY regionId, wru.gameUnit'
+              GROUP BY regionId, wrsu.gameUnit'
             )->setParameter('player', $player)
             ->getArrayResult();
 

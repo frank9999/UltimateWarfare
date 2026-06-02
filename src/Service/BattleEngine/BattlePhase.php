@@ -8,7 +8,8 @@ use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitEnum;
 use FrankProjects\UltimateWarfare\Entity\FleetUnit;
 use FrankProjects\UltimateWarfare\Entity\GameUnit;
 use FrankProjects\UltimateWarfare\Entity\BattleStats\AbstractBattleStats;
-use FrankProjects\UltimateWarfare\Entity\WorldRegionUnit;
+use FrankProjects\UltimateWarfare\Entity\WorldRegionLeveledUnit;
+use FrankProjects\UltimateWarfare\Entity\WorldRegionStackableUnit;
 use FrankProjects\UltimateWarfare\Repository\GameUnitRegistry;
 use RuntimeException;
 
@@ -26,7 +27,7 @@ abstract class BattlePhase implements IBattlePhase
     protected array $attackerGameUnits;
 
     /**
-     * @var WorldRegionUnit[]
+     * @var array<WorldRegionStackableUnit|WorldRegionLeveledUnit>
      */
     protected array $defenderGameUnits;
 
@@ -41,7 +42,7 @@ abstract class BattlePhase implements IBattlePhase
 
     /**
      * @param FleetUnit[] $attackerGameUnits
-     * @param WorldRegionUnit[] $defenderGameUnits
+     * @param array<WorldRegionStackableUnit|WorldRegionLeveledUnit> $defenderGameUnits
      */
     private function __construct(
         string $name,
@@ -59,7 +60,7 @@ abstract class BattlePhase implements IBattlePhase
 
     /**
      * @param FleetUnit[] $attackerGameUnits
-     * @param WorldRegionUnit[] $defenderGameUnits
+     * @param array<WorldRegionStackableUnit|WorldRegionLeveledUnit> $defenderGameUnits
      */
     public static function factory(
         string $battlePhaseName,
@@ -96,7 +97,7 @@ abstract class BattlePhase implements IBattlePhase
     }
 
     /**
-     * @return WorldRegionUnit[]
+     * @return array<WorldRegionStackableUnit|WorldRegionLeveledUnit>
      */
     public function getDefenderGameUnits(): array
     {
@@ -149,21 +150,45 @@ abstract class BattlePhase implements IBattlePhase
     }
 
     /**
-     * @param FleetUnit[]|WorldRegionUnit[] $gameUnits
+     * @param array<FleetUnit|WorldRegionStackableUnit|WorldRegionLeveledUnit> $gameUnits
      *
-     * @return ($action is 'defending' ? WorldRegionUnit[] : FleetUnit[])
+     * @return ($action is 'defending' ? array<WorldRegionStackableUnit|WorldRegionLeveledUnit> : FleetUnit[])
      */
     private function processBattlePhase(int $power, array $gameUnits, string $action): array
     {
         foreach ($gameUnits as $index => $gameUnit) {
             $resolvedUnit = $this->gameUnitRegistry->find($gameUnit->getGameUnit());
+
+            // Leveled buildings (Defense / Special) absorb damage on their health pool.
+            // Their level is never reduced by combat, only their health.
+            if ($gameUnit instanceof WorldRegionLeveledUnit) {
+                $armor = $resolvedUnit->getBattleStats()->getArmor();
+                $damage = $armor > 0 ? intval($power / $armor) : $power;
+                $remainingHealth = $gameUnit->getHealth() - $damage;
+
+                if ($remainingHealth <= 0) {
+                    unset($gameUnits[$index]);
+                    $this->addToBattleLog(
+                        "{$action} {$resolvedUnit->getName()} (level {$gameUnit->getLevel()}) was destroyed"
+                    );
+                } else {
+                    $gameUnit->setHealth($remainingHealth);
+                    $this->addToBattleLog(
+                        "{$action} {$resolvedUnit->getName()} (level {$gameUnit->getLevel()}) "
+                        . "took {$damage} damage, {$remainingHealth} health remaining"
+                    );
+                }
+
+                continue;
+            }
+
             $deaths = $this->calculateCasualties($resolvedUnit, $power);
 
             if ($deaths >= $gameUnit->getAmount()) {
                 unset($gameUnits[$index]);
                 $this->addToBattleLog("All {$action} {$resolvedUnit->getNameMulti()} died in the fight");
             } elseif ($deaths > 0) {
-                $gameUnits[$index]->setAmount($gameUnit->getAmount() - $deaths);
+                $gameUnit->setAmount($gameUnit->getAmount() - $deaths);
                 $this->addToBattleLog(
                     "{$deaths} {$action} {$resolvedUnit->getNameMulti()} died in the fight"
                 );
@@ -217,10 +242,13 @@ abstract class BattlePhase implements IBattlePhase
     public function getDefensePower(): int
     {
         $power = 0;
-        foreach ($this->getDefenderGameUnits() as $worldRegionUnit) {
-            $gameUnit = $this->gameUnitRegistry->find($worldRegionUnit->getGameUnit());
-            $power += $this->getBattlePhaseBattleStats($gameUnit)->getDefence()
-                * $worldRegionUnit->getAmount();
+        foreach ($this->getDefenderGameUnits() as $worldRegionStackableUnit) {
+            $gameUnit = $this->gameUnitRegistry->find($worldRegionStackableUnit->getGameUnit());
+            // Leveled buildings contribute defence per level; stackable units per amount.
+            $multiplier = $worldRegionStackableUnit instanceof WorldRegionLeveledUnit
+                ? $worldRegionStackableUnit->getLevel()
+                : $worldRegionStackableUnit->getAmount();
+            $power += $this->getBattlePhaseBattleStats($gameUnit)->getDefence() * $multiplier;
         }
 
         return $power;

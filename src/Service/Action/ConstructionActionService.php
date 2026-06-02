@@ -13,7 +13,7 @@ use FrankProjects\UltimateWarfare\Entity\WorldRegion;
 use FrankProjects\UltimateWarfare\Repository\ConstructionRepository;
 use FrankProjects\UltimateWarfare\Repository\GameUnitRegistry;
 use FrankProjects\UltimateWarfare\Repository\PlayerRepository;
-use FrankProjects\UltimateWarfare\Repository\WorldRegionUnitRepository;
+use FrankProjects\UltimateWarfare\Repository\WorldRegionStackableUnitRepository;
 use FrankProjects\UltimateWarfare\Service\GameUnit\GameUnitBehaviorFactory;
 use FrankProjects\UltimateWarfare\Service\NetWorthUpdaterService;
 use RuntimeException;
@@ -23,7 +23,7 @@ final class ConstructionActionService
     private ConstructionRepository $constructionRepository;
     private GameUnitRegistry $gameUnitRegistry;
     private PlayerRepository $playerRepository;
-    private WorldRegionUnitRepository $worldRegionUnitRepository;
+    private WorldRegionStackableUnitRepository $worldRegionStackableUnitRepository;
     private NetWorthUpdaterService $netWorthUpdaterService;
     private GameUnitBehaviorFactory $behaviorFactory;
 
@@ -31,14 +31,14 @@ final class ConstructionActionService
         ConstructionRepository $constructionRepository,
         GameUnitRegistry $gameUnitRegistry,
         PlayerRepository $playerRepository,
-        WorldRegionUnitRepository $worldRegionUnitRepository,
+        WorldRegionStackableUnitRepository $worldRegionStackableUnitRepository,
         NetWorthUpdaterService $netWorthUpdaterService,
         GameUnitBehaviorFactory $behaviorFactory
     ) {
         $this->constructionRepository = $constructionRepository;
         $this->gameUnitRegistry = $gameUnitRegistry;
         $this->playerRepository = $playerRepository;
-        $this->worldRegionUnitRepository = $worldRegionUnitRepository;
+        $this->worldRegionStackableUnitRepository = $worldRegionStackableUnitRepository;
         $this->netWorthUpdaterService = $netWorthUpdaterService;
         $this->behaviorFactory = $behaviorFactory;
     }
@@ -52,9 +52,13 @@ final class ConstructionActionService
         GameUnitCategory $gameUnitCategory,
         array $constructionData
     ): void {
-        $this->validateCategoryAllowed($region, $gameUnitCategory);
+        if ($gameUnitCategory->isLeveled()) {
+            throw new RuntimeException(
+                'Leveled buildings must be built through the dedicated building endpoints.'
+            );
+        }
 
-        $regionBuildingIndex = $this->getRegionBuildingIndex($region);
+        $this->validateCategoryAllowed($region, $gameUnitCategory);
 
         $priceCash = 0;
         $priceWood = 0;
@@ -78,7 +82,7 @@ final class ConstructionActionService
                 continue;
             }
 
-            $this->validateUnitAllowed($gameUnit, $region, $regionBuildingIndex);
+            $this->validateUnitAllowed($gameUnit, $region);
 
             $behavior = $this->behaviorFactory->create($gameUnit);
             if (!$behavior->canBuild($region, $player)) {
@@ -95,15 +99,24 @@ final class ConstructionActionService
                 );
             }
 
-            $priceCash = $priceCash + ($amount * $gameUnit->getCost()->getCash());
-            $priceWood = $priceWood + ($amount * $gameUnit->getCost()->getWood());
-            $priceSteel = $priceSteel + ($amount * $gameUnit->getCost()->getSteel());
+            $costMultiplier = $amount;
+            $duration = $this->calculateBuildDuration($gameUnit, $region);
+
+            $priceCash = $priceCash + ($costMultiplier * $gameUnit->getCost()->getCash());
+            $priceWood = $priceWood + ($costMultiplier * $gameUnit->getCost()->getWood());
+            $priceSteel = $priceSteel + ($costMultiplier * $gameUnit->getCost()->getSteel());
 
             if ($gameUnitCategory === GameUnitCategory::BUILDINGS) {
                 $totalBuild = $totalBuild + $amount;
             }
 
-            $constructions[] = Construction::create($region, $player, $gameUnit->getGameUnitEnum(), $amount);
+            $constructions[] = Construction::create(
+                $region,
+                $player,
+                $gameUnit->getGameUnitEnum(),
+                $amount,
+                $duration
+            );
         }
 
         if ($gameUnitCategory === GameUnitCategory::BUILDINGS) {
@@ -153,15 +166,17 @@ final class ConstructionActionService
      */
     private function validateCategoryAllowed(WorldRegion $region, GameUnitCategory $gameUnitCategory): void
     {
-        $buildingIndex = $this->getRegionBuildingIndex($region);
-
         match ($gameUnitCategory) {
-            GameUnitCategory::TROOPS => $this->requireBuilding($buildingIndex, 'barrack', 'a Barrack'),
-            GameUnitCategory::AIR_UNITS => $this->requireBuilding($buildingIndex, 'airfield', 'an Airfield'),
-            GameUnitCategory::NAVAL_UNITS => $this->requireBuilding($buildingIndex, 'harbor', 'a Harbor'),
-            GameUnitCategory::MISSILES => $this->requireBuilding(
-                $buildingIndex,
-                'missile_factory',
+            GameUnitCategory::TROOPS => $this->requireLeveledBuilding($region, GameUnitEnum::BARRACK, 'a Barrack'),
+            GameUnitCategory::AIR_UNITS => $this->requireLeveledBuilding(
+                $region,
+                GameUnitEnum::AIRFIELD,
+                'an Airfield'
+            ),
+            GameUnitCategory::NAVAL_UNITS => $this->requireLeveledBuilding($region, GameUnitEnum::HARBOR, 'a Harbor'),
+            GameUnitCategory::MISSILES => $this->requireLeveledBuilding(
+                $region,
+                GameUnitEnum::MISSILE_FACTORY,
                 'a Missile Factory'
             ),
             GameUnitCategory::BUILDINGS,
@@ -172,17 +187,15 @@ final class ConstructionActionService
 
     /**
      * Validate that a specific game unit is allowed to be built on this region.
-     *
-     * @param array<string, int> $buildingIndex
      */
-    private function validateUnitAllowed(GameUnit $gameUnit, WorldRegion $region, array $buildingIndex): void
+    private function validateUnitAllowed(GameUnit $gameUnit, WorldRegion $region): void
     {
         $rowName = $gameUnit->getRowName();
         $regionType = $region->getType();
 
         // Tanks require a Factory on this region
         if ($rowName === 'tank') {
-            $this->requireBuilding($buildingIndex, 'factory', 'a Factory');
+            $this->requireLeveledBuilding($region, GameUnitEnum::FACTORY, 'a Factory');
         }
 
         // Harbor can only be built on sand regions
@@ -201,33 +214,54 @@ final class ConstructionActionService
     }
 
     /**
-     * Check that a building with the given row_name exists (built or in construction) on the region.
-     *
-     * @param array<string, int> $buildingIndex
+     * Check that a leveled building (Defense / Special) of the given type is built on the region.
      */
-    private function requireBuilding(array $buildingIndex, string $rowName, string $readableName): void
+    private function requireLeveledBuilding(WorldRegion $region, GameUnitEnum $gameUnit, string $readableName): void
     {
-        if (($buildingIndex[$rowName] ?? 0) < 1) {
+        if ($region->getLeveledUnit($gameUnit) === null) {
             throw new RuntimeException("This region requires $readableName before you can build this.");
         }
     }
 
     /**
-     * Build an index of building row_names => total amounts for a region.
-     *
-     * @return array<string, int>
+     * Apply the build-speed bonus of the relevant enabling Special building (5% per level
+     * above level 1, capped at level 10) to a unit's base build time.
      */
-    private function getRegionBuildingIndex(WorldRegion $region): array
+    private function calculateBuildDuration(GameUnit $gameUnit, WorldRegion $region): int
     {
-        $index = [];
-
-        foreach ($region->getWorldRegionUnits() as $worldRegionUnit) {
-            $gameUnit = $this->gameUnitRegistry->find($worldRegionUnit->getGameUnit());
-            $rowName = $gameUnit->getRowName();
-            $index[$rowName] = ($index[$rowName] ?? 0) + $worldRegionUnit->getAmount();
+        $base = $gameUnit->getTimestamp();
+        $enabling = $this->getEnablingBuildingEnum($gameUnit);
+        if ($enabling === null) {
+            return $base;
         }
 
-        return $index;
+        $level = $region->getUnitLevel($enabling);
+        if ($level < 2) {
+            return $base;
+        }
+
+        $factor = 0.05 * ($level - 1);
+
+        return max(1, (int) round($base * (1.0 - $factor)));
+    }
+
+    /**
+     * The Special building whose level speeds up construction of the given unit, if any.
+     * Tanks and artillery are sped up by the Factory; other category units by their gate.
+     */
+    private function getEnablingBuildingEnum(GameUnit $gameUnit): ?GameUnitEnum
+    {
+        if (in_array($gameUnit->getRowName(), ['tank', 'artillery'], true)) {
+            return GameUnitEnum::FACTORY;
+        }
+
+        return match ($gameUnit->getGameUnitCategory()) {
+            GameUnitCategory::TROOPS => GameUnitEnum::BARRACK,
+            GameUnitCategory::AIR_UNITS => GameUnitEnum::AIRFIELD,
+            GameUnitCategory::NAVAL_UNITS => GameUnitEnum::HARBOR,
+            GameUnitCategory::MISSILES => GameUnitEnum::MISSILE_FACTORY,
+            default => null,
+        };
     }
 
     /**
@@ -239,6 +273,10 @@ final class ConstructionActionService
         GameUnitCategory $gameUnitCategory,
         array $destroyData
     ): void {
+        if ($gameUnitCategory->isLeveled()) {
+            throw new RuntimeException('Leveled buildings cannot be destroyed.');
+        }
+
         $isRemoving = false;
         foreach ($destroyData as $gameUnitId => $amount) {
             $amount = intval($amount);
@@ -332,7 +370,7 @@ final class ConstructionActionService
     public function getCountGameUnitsInWorldRegion(WorldRegion $worldRegion, GameUnitCategory $gameUnitCategory): int
     {
         $regionBuildings = 0;
-        foreach ($worldRegion->getWorldRegionUnits() as $regionUnit) {
+        foreach ($worldRegion->getWorldRegionStackableUnits() as $regionUnit) {
             $gameUnit = $this->gameUnitRegistry->find($regionUnit->getGameUnit());
             if ($gameUnit->getGameUnitCategory() === $gameUnitCategory) {
                 $regionBuildings += $regionUnit->getAmount();
@@ -355,17 +393,17 @@ final class ConstructionActionService
 
     private function removeGameUnitsFromWorldRegion(WorldRegion $worldRegion, GameUnit $gameUnit, int $amount): void
     {
-        foreach ($worldRegion->getWorldRegionUnits() as $worldRegionUnit) {
-            if ($worldRegionUnit->getGameUnit() !== $gameUnit->getGameUnitEnum()) {
+        foreach ($worldRegion->getWorldRegionStackableUnits() as $worldRegionStackableUnit) {
+            if ($worldRegionStackableUnit->getGameUnit() !== $gameUnit->getGameUnitEnum()) {
                 continue;
             }
 
-            if ($amount > $worldRegionUnit->getAmount()) {
+            if ($amount > $worldRegionStackableUnit->getAmount()) {
                 throw new RuntimeException('You do not have that many ' . $gameUnit->getName() . "s!");
             }
 
-            $worldRegionUnit->setAmount($worldRegionUnit->getAmount() - $amount);
-            $this->worldRegionUnitRepository->save($worldRegionUnit);
+            $worldRegionStackableUnit->setAmount($worldRegionStackableUnit->getAmount() - $amount);
+            $this->worldRegionStackableUnitRepository->save($worldRegionStackableUnit);
         }
     }
 }

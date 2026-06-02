@@ -10,8 +10,9 @@ use FrankProjects\UltimateWarfare\Entity\WorldRegion;
 use FrankProjects\UltimateWarfare\Repository\ConstructionRepository;
 use FrankProjects\UltimateWarfare\Repository\GameUnitRegistry;
 use FrankProjects\UltimateWarfare\Repository\PlayerRepository;
+use FrankProjects\UltimateWarfare\Repository\WorldRegionLeveledUnitRepository;
 use FrankProjects\UltimateWarfare\Repository\WorldRegionRepository;
-use FrankProjects\UltimateWarfare\Repository\WorldRegionUnitRepository;
+use FrankProjects\UltimateWarfare\Repository\WorldRegionStackableUnitRepository;
 use FrankProjects\UltimateWarfare\Util\ReportCreator;
 use RuntimeException;
 
@@ -23,7 +24,8 @@ abstract class OperationProcessor implements OperationInterface
     protected int $amount;
     protected ReportCreator $reportCreator;
     protected PlayerRepository $playerRepository;
-    protected WorldRegionUnitRepository $worldRegionUnitRepository;
+    protected WorldRegionStackableUnitRepository $worldRegionStackableUnitRepository;
+    protected WorldRegionLeveledUnitRepository $worldRegionLeveledUnitRepository;
     protected WorldRegionRepository $worldRegionRepository;
     protected ConstructionRepository $constructionRepository;
     protected GameUnitRegistry $gameUnitRegistry;
@@ -39,7 +41,8 @@ abstract class OperationProcessor implements OperationInterface
         int $amount,
         ReportCreator $reportCreator,
         PlayerRepository $playerRepository,
-        WorldRegionUnitRepository $worldRegionUnitRepository,
+        WorldRegionStackableUnitRepository $worldRegionStackableUnitRepository,
+        WorldRegionLeveledUnitRepository $worldRegionLeveledUnitRepository,
         WorldRegionRepository $worldRegionRepository,
         ConstructionRepository $constructionRepository,
         GameUnitRegistry $gameUnitRegistry
@@ -50,7 +53,8 @@ abstract class OperationProcessor implements OperationInterface
         $this->amount = $amount;
         $this->reportCreator = $reportCreator;
         $this->playerRepository = $playerRepository;
-        $this->worldRegionUnitRepository = $worldRegionUnitRepository;
+        $this->worldRegionStackableUnitRepository = $worldRegionStackableUnitRepository;
+        $this->worldRegionLeveledUnitRepository = $worldRegionLeveledUnitRepository;
         $this->worldRegionRepository = $worldRegionRepository;
         $this->constructionRepository = $constructionRepository;
         $this->gameUnitRegistry = $gameUnitRegistry;
@@ -63,7 +67,8 @@ abstract class OperationProcessor implements OperationInterface
         int $amount,
         ReportCreator $reportCreator,
         PlayerRepository $playerRepository,
-        WorldRegionUnitRepository $worldRegionUnitRepository,
+        WorldRegionStackableUnitRepository $worldRegionStackableUnitRepository,
+        WorldRegionLeveledUnitRepository $worldRegionLeveledUnitRepository,
         WorldRegionRepository $worldRegionRepository,
         ConstructionRepository $constructionRepository,
         GameUnitRegistry $gameUnitRegistry
@@ -80,7 +85,8 @@ abstract class OperationProcessor implements OperationInterface
             $amount,
             $reportCreator,
             $playerRepository,
-            $worldRegionUnitRepository,
+            $worldRegionStackableUnitRepository,
+            $worldRegionLeveledUnitRepository,
             $worldRegionRepository,
             $constructionRepository,
             $gameUnitRegistry

@@ -23,7 +23,7 @@ use FrankProjects\UltimateWarfare\Entity\GameUnit\Farm;
 use FrankProjects\UltimateWarfare\Entity\GameUnit\Fighter;
 use FrankProjects\UltimateWarfare\Entity\GameUnit\Harbor;
 use FrankProjects\UltimateWarfare\Entity\GameUnit\House;
-use FrankProjects\UltimateWarfare\Entity\GameUnit\LandMine;
+use FrankProjects\UltimateWarfare\Entity\GameUnit\MineField;
 use FrankProjects\UltimateWarfare\Entity\GameUnit\IronMine;
 use FrankProjects\UltimateWarfare\Entity\GameUnit\MineCountermeasuresShip;
 use FrankProjects\UltimateWarfare\Entity\GameUnit\MineSweeper;
@@ -55,7 +55,7 @@ final class GameUnitRegistry
             new Woodcutter(),
             new House(),
             new SeaMine(),
-            new LandMine(),
+            new MineField(),
             new Bunker(),
             new AntiAircraftGun(),
             new Airfield(),
@@ -169,10 +169,9 @@ final class GameUnitRegistry
             ],
         ];
 
-        foreach ($region->getWorldRegionUnits() as $worldRegionUnit) {
-            $gameUnit = $this->find($worldRegionUnit->getGameUnit());
-            $amount = $worldRegionUnit->getAmount();
-            $unitName = $gameUnit->getName();
+        foreach ($region->getWorldRegionStackableUnits() as $worldRegionStackableUnit) {
+            $gameUnit = $this->find($worldRegionStackableUnit->getGameUnit());
+            $amount = $worldRegionStackableUnit->getAmount();
             $key = match ($gameUnit->getGameUnitCategory()) {
                 GameUnitCategory::BUILDINGS => 'buildings',
                 GameUnitCategory::DEFENSE_BUILDINGS => 'defences',
@@ -184,7 +183,27 @@ final class GameUnitRegistry
             };
 
             $summary[$key] += $amount;
-            $summary['details'][$key][] = ['name' => $unitName, 'amount' => $amount];
+            $summary['details'][$key][] = ['name' => $gameUnit->getName(), 'amount' => $amount];
+        }
+
+        // Leveled buildings (Defense / Special) are summarised by their level.
+        foreach ($region->getWorldRegionLeveledUnits() as $leveledUnit) {
+            $gameUnit = $this->find($leveledUnit->getGameUnit());
+            $key = match ($gameUnit->getGameUnitCategory()) {
+                GameUnitCategory::DEFENSE_BUILDINGS => 'defences',
+                GameUnitCategory::SPECIAL_BUILDINGS => 'special',
+                default => null,
+            };
+            if ($key === null) {
+                continue;
+            }
+
+            $summary[$key] += 1;
+            $summary['details'][$key][] = [
+                'name' => $gameUnit->getName(),
+                'amount' => 1,
+                'level' => $leveledUnit->getLevel(),
+            ];
         }
 
         return $summary;
@@ -208,9 +227,9 @@ final class GameUnitRegistry
             'missiles' => false,
         ];
 
-        foreach ($region->getWorldRegionUnits() as $worldRegionUnit) {
-            if ($worldRegionUnit->getAmount() > 0) {
-                $gameUnit = $this->find($worldRegionUnit->getGameUnit());
+        foreach ($region->getWorldRegionStackableUnits() as $worldRegionStackableUnit) {
+            if ($worldRegionStackableUnit->getAmount() > 0) {
+                $gameUnit = $this->find($worldRegionStackableUnit->getGameUnit());
                 $key = match ($gameUnit->getGameUnitCategory()) {
                     GameUnitCategory::BUILDINGS => 'buildings',
                     GameUnitCategory::DEFENSE_BUILDINGS => 'defences',
@@ -220,6 +239,18 @@ final class GameUnitRegistry
                     GameUnitCategory::AIR_UNITS => 'airUnits',
                     GameUnitCategory::MISSILES => 'missiles',
                 };
+                $presence[$key] = true;
+            }
+        }
+
+        foreach ($region->getWorldRegionLeveledUnits() as $leveledUnit) {
+            $gameUnit = $this->find($leveledUnit->getGameUnit());
+            $key = match ($gameUnit->getGameUnitCategory()) {
+                GameUnitCategory::DEFENSE_BUILDINGS => 'defences',
+                GameUnitCategory::SPECIAL_BUILDINGS => 'special',
+                default => null,
+            };
+            if ($key !== null) {
                 $presence[$key] = true;
             }
         }

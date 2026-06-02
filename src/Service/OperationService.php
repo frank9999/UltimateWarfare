@@ -12,7 +12,8 @@ use FrankProjects\UltimateWarfare\Repository\ConstructionRepository;
 use FrankProjects\UltimateWarfare\Repository\GameUnitRegistry;
 use FrankProjects\UltimateWarfare\Repository\PlayerRepository;
 use FrankProjects\UltimateWarfare\Repository\WorldRegionRepository;
-use FrankProjects\UltimateWarfare\Repository\WorldRegionUnitRepository;
+use FrankProjects\UltimateWarfare\Repository\WorldRegionLeveledUnitRepository;
+use FrankProjects\UltimateWarfare\Repository\WorldRegionStackableUnitRepository;
 use FrankProjects\UltimateWarfare\Service\OperationEngine\OperationProcessor;
 use FrankProjects\UltimateWarfare\Util\ReportCreator;
 use RuntimeException;
@@ -25,7 +26,8 @@ final class OperationService
     private NetWorthUpdaterService $netWorthUpdaterService;
     private IncomeUpdaterService $incomeUpdaterService;
     private PlayerRepository $playerRepository;
-    private WorldRegionUnitRepository $worldRegionUnitRepository;
+    private WorldRegionStackableUnitRepository $worldRegionStackableUnitRepository;
+    private WorldRegionLeveledUnitRepository $worldRegionLeveledUnitRepository;
     private WorldRegionRepository $worldRegionRepository;
     private ConstructionRepository $constructionRepository;
     private BombardmentCooldownRepository $bombardmentCooldownRepository;
@@ -36,7 +38,8 @@ final class OperationService
         NetWorthUpdaterService $netWorthUpdaterService,
         IncomeUpdaterService $incomeUpdaterService,
         PlayerRepository $playerRepository,
-        WorldRegionUnitRepository $worldRegionUnitRepository,
+        WorldRegionStackableUnitRepository $worldRegionStackableUnitRepository,
+        WorldRegionLeveledUnitRepository $worldRegionLeveledUnitRepository,
         WorldRegionRepository $worldRegionRepository,
         ConstructionRepository $constructionRepository,
         BombardmentCooldownRepository $bombardmentCooldownRepository,
@@ -46,7 +49,8 @@ final class OperationService
         $this->netWorthUpdaterService = $netWorthUpdaterService;
         $this->incomeUpdaterService = $incomeUpdaterService;
         $this->playerRepository = $playerRepository;
-        $this->worldRegionUnitRepository = $worldRegionUnitRepository;
+        $this->worldRegionStackableUnitRepository = $worldRegionStackableUnitRepository;
+        $this->worldRegionLeveledUnitRepository = $worldRegionLeveledUnitRepository;
         $this->worldRegionRepository = $worldRegionRepository;
         $this->constructionRepository = $constructionRepository;
         $this->bombardmentCooldownRepository = $bombardmentCooldownRepository;
@@ -81,7 +85,8 @@ final class OperationService
             $amount,
             $this->reportCreator,
             $this->playerRepository,
-            $this->worldRegionUnitRepository,
+            $this->worldRegionStackableUnitRepository,
+            $this->worldRegionLeveledUnitRepository,
             $this->worldRegionRepository,
             $this->constructionRepository,
             $this->gameUnitRegistry
@@ -155,7 +160,7 @@ final class OperationService
             throw new RuntimeException("Can not send negative game units");
         }
 
-        foreach ($region->getWorldRegionUnits() as $regionUnit) {
+        foreach ($region->getWorldRegionStackableUnits() as $regionUnit) {
             if ($regionUnit->getGameUnit() === $operation->getGameUnit()) {
                 if ($regionUnit->getAmount() >= $amount) {
                     return;

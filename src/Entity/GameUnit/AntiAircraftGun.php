@@ -26,7 +26,8 @@ final class AntiAircraftGun extends GameUnit
             image: 'gu_anti_aircraft_gun.jpg',
             netWorth: 0,
             timestamp: 14400,
-            description: 'Anti Aircraft Guns have 1% chance of taking an enemy aircraft down.',
+            description: 'Anti aircraft guns defend this region against air, sea and ground '
+                . 'attacks. Each level adds more guns, increasing both defence and durability.',
             gameUnitCategory: GameUnitCategory::DEFENSE_BUILDINGS,
             behaviorClass: null,
             cost: new Cost(cash: 25000, food: 0, wood: 150, steel: 350),

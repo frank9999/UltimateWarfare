@@ -6,11 +6,10 @@ namespace FrankProjects\UltimateWarfare\Entity;
 
 use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitEnum;
 
-class WorldRegionUnit
+class WorldRegionStackableUnit
 {
     private int $id;
     private int $amount;
-    private int $morale;
     private WorldRegion $worldRegion;
     private GameUnitEnum $gameUnit;
 
@@ -34,16 +33,6 @@ class WorldRegionUnit
         return $this->amount;
     }
 
-    public function setMorale(int $morale): void
-    {
-        $this->morale = $morale;
-    }
-
-    public function getMorale(): int
-    {
-        return $this->morale;
-    }
-
     public function getWorldRegion(): WorldRegion
     {
         return $this->worldRegion;
@@ -64,14 +53,16 @@ class WorldRegionUnit
         $this->gameUnit = $gameUnit;
     }
 
-    public static function create(WorldRegion $worldRegion, GameUnitEnum $gameUnit, int $amount): WorldRegionUnit
-    {
-        $worldRegionUnit = new WorldRegionUnit();
-        $worldRegionUnit->setWorldRegion($worldRegion);
-        $worldRegionUnit->setGameUnit($gameUnit);
-        $worldRegionUnit->setAmount($amount);
-        $worldRegionUnit->setMorale(100);
+    public static function create(
+        WorldRegion $worldRegion,
+        GameUnitEnum $gameUnit,
+        int $amount
+    ): WorldRegionStackableUnit {
+        $worldRegionStackableUnit = new WorldRegionStackableUnit();
+        $worldRegionStackableUnit->setWorldRegion($worldRegion);
+        $worldRegionStackableUnit->setGameUnit($gameUnit);
+        $worldRegionStackableUnit->setAmount($amount);
 
-        return $worldRegionUnit;
+        return $worldRegionStackableUnit;
     }
 }

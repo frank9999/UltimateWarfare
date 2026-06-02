@@ -263,6 +263,10 @@
         const container = document.getElementById('buildUnitsContainer');
         const spaceInfo = document.getElementById('buildSpaceInfo');
         const imgBase = WorldApp.imageBasePath;
+        const isLeveledCategory = data.gameUnitCategory.id === 2 || data.gameUnitCategory.id === 3;
+
+        // Leveled categories use per-unit Build/Upgrade buttons; hide the bulk button.
+        confirmBuildBtn.style.display = isLeveledCategory ? 'none' : '';
 
         if (data.gameUnitCategory.id === 1) {
             spaceInfo.style.display = 'block';
@@ -281,11 +285,50 @@
             const card = document.createElement('div');
             card.className = 'build-unit-card';
 
-            const constructionText = unit.inConstruction > 0 ? ' (' + unit.inConstruction + ')' : '';
             const hours = Math.floor(unit.timestamp / 3600);
             const minutes = Math.floor((unit.timestamp % 3600) / 60);
             const seconds = unit.timestamp % 60;
             const timeStr = String(hours).padStart(2, '0') + ':' + String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
+
+            // Escalating cost for leveled buildings: base cost x target level.
+            const nextLevel = unit.isLeveled ? (unit.level + unit.inConstruction + 1) : 1;
+            const costMultiplier = unit.isLeveled ? nextLevel : 1;
+            const costCash = unit.costCash * costMultiplier;
+            const costWood = unit.costWood * costMultiplier;
+            const costSteel = unit.costSteel * costMultiplier;
+
+            let statusHtml;
+            let actionHtml;
+            if (unit.isLeveled) {
+                const atMax = (unit.level + unit.inConstruction) >= unit.maxLevel;
+                const levelText = unit.level > 0 ? ('Level ' + unit.level) : 'Not built';
+                const queuedText = unit.inConstruction > 0 ? ' (' + unit.inConstruction + ' queued)' : '';
+                const healthText = (unit.level > 0 && unit.maxHealth > 0)
+                    ? ' — HP ' + unit.health + '/' + unit.maxHealth
+                    : '';
+                statusHtml = '<div class="build-unit-owned">' + levelText + queuedText + healthText + '</div>';
+
+                let buttons = '';
+                if (unit.canBuild) {
+                    if (atMax) {
+                        buttons += '<button class="build-action-btn" disabled>Max level</button>';
+                    } else {
+                        const action = unit.level === 0 ? 'build' : 'upgrade';
+                        const label = unit.level === 0 ? 'Build' : ('Upgrade to level ' + nextLevel);
+                        buttons += '<button class="build-action-btn" data-unit-id="' + unit.gameUnitEnum + '" data-action="' + action + '">' + label + '</button>';
+                    }
+                }
+                if (unit.level > 0 && unit.health < unit.maxHealth) {
+                    buttons += '<button class="build-action-btn build-repair-btn" data-unit-id="' + unit.gameUnitEnum + '" data-action="repair">Repair</button>';
+                }
+                actionHtml = buttons ? ('<div class="build-unit-input">' + buttons + '</div>') : '';
+            } else {
+                const constructionText = unit.inConstruction > 0 ? ' (' + unit.inConstruction + ')' : '';
+                statusHtml = '<div class="build-unit-owned">You have: ' + unit.owned + constructionText + '</div>';
+                actionHtml = '<div class="build-unit-input">' +
+                    '<input type="number" min="0" value="0" data-unit-id="' + unit.gameUnitEnum + '" class="build-quantity-input">' +
+                '</div>';
+            }
 
             card.innerHTML =
                 '<div class="build-unit-header ' + (!unit.canBuild ? 'unit-locked' : '') + '">' +
@@ -295,18 +338,16 @@
                             ' <span class="build-unit-info-icon" data-unit-id="' + unit.gameUnitEnum + '">i</span></div>' +
                         (!unit.canBuild
                             ? '<div class="build-requirement">' + unit.buildRequirement + '</div>'
-                            : '<div class="build-unit-owned">You have: ' + unit.owned + constructionText + '</div>') +
+                            : statusHtml) +
                     '</div>' +
                 '</div>' +
                 '<div class="build-unit-costs">' +
-                    '<div class="build-unit-cost-item"><img src="' + imgBase + '/icons/resource_cash.jpg" class="build-unit-cost-icon"><span>' + unit.costCash.toLocaleString() + '</span></div>' +
-                    '<div class="build-unit-cost-item"><img src="' + imgBase + '/icons/resource_wood.jpg" class="build-unit-cost-icon"><span>' + unit.costWood.toLocaleString() + '</span></div>' +
-                    '<div class="build-unit-cost-item"><img src="' + imgBase + '/icons/resource_steel.jpg" class="build-unit-cost-icon"><span>' + unit.costSteel.toLocaleString() + '</span></div>' +
+                    '<div class="build-unit-cost-item"><img src="' + imgBase + '/icons/resource_cash.jpg" class="build-unit-cost-icon"><span>' + costCash.toLocaleString() + '</span></div>' +
+                    '<div class="build-unit-cost-item"><img src="' + imgBase + '/icons/resource_wood.jpg" class="build-unit-cost-icon"><span>' + costWood.toLocaleString() + '</span></div>' +
+                    '<div class="build-unit-cost-item"><img src="' + imgBase + '/icons/resource_steel.jpg" class="build-unit-cost-icon"><span>' + costSteel.toLocaleString() + '</span></div>' +
                     '<div class="build-unit-cost-item"><img src="' + imgBase + '/icons/time.gif" class="build-unit-cost-icon"><span>' + timeStr + '</span></div>' +
                 '</div>' +
-                '<div class="build-unit-input">' +
-                    '<input type="number" min="0" value="0" data-unit-id="' + unit.gameUnitEnum + '" class="build-quantity-input">' +
-                '</div>';
+                actionHtml;
 
             container.appendChild(card);
 
@@ -315,14 +356,63 @@
             infoIcon.addEventListener('mouseleave', function (e) { e.stopPropagation(); hideUnitInfoTooltip(); });
             infoIcon.addEventListener('mousemove', function (e) { e.stopPropagation(); updateUnitInfoTooltipPosition(e); });
 
-            card.querySelector('input').disabled = !unit.canBuild;
-        });
+            const qtyInput = card.querySelector('.build-quantity-input');
+            if (qtyInput) {
+                qtyInput.disabled = !unit.canBuild;
+                qtyInput.addEventListener('input', function (e) {
+                    buildQuantities[parseInt(e.target.dataset.unitId)] = parseInt(e.target.value) || 0;
+                });
+            }
 
-        document.querySelectorAll('.build-quantity-input').forEach(function (input) {
-            input.addEventListener('input', function (e) {
-                buildQuantities[parseInt(e.target.dataset.unitId)] = parseInt(e.target.value) || 0;
+            card.querySelectorAll('.build-action-btn[data-unit-id]').forEach(function (actionBtn) {
+                actionBtn.addEventListener('click', function () {
+                    leveledAction(parseInt(actionBtn.dataset.unitId), actionBtn.dataset.action, actionBtn);
+                });
             });
         });
+    }
+
+    async function leveledAction(unitId, action, button) {
+        if (!selectedBuildRegion) return;
+
+        const originalLabel = button.textContent;
+        button.disabled = true;
+        button.textContent = 'Working...';
+
+        try {
+            const response = await fetch('/game/api/world/region/leveled/' + action + '/' + selectedBuildRegion.id + '/' + unitId, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            const result = await response.json();
+
+            if (result.success) {
+                const amounts = document.querySelectorAll('.resource-amount');
+                if (result.newCash !== undefined && amounts[0]) amounts[0].textContent = result.newCash.toLocaleString('en-US');
+                if (result.newWood !== undefined && amounts[1]) amounts[1].textContent = result.newWood.toLocaleString('en-US');
+                if (result.newSteel !== undefined && amounts[3]) amounts[3].textContent = result.newSteel.toLocaleString('en-US');
+
+                showNotification(result.message, 'success');
+
+                // Refresh build data so level/queued counts update; keep the modal open.
+                const regionId = selectedBuildRegion.id;
+                delete buildDataCache[regionId];
+                const refreshed = await fetchAllBuildData(regionId);
+                if (refreshed.success && selectedBuildRegion && selectedBuildRegion.id === regionId) {
+                    setCachedData(regionId, refreshed);
+                    loadBuildData(selectedGameUnitCategoryId);
+                }
+            } else {
+                showNotification(result.message || 'Failed to build', 'error');
+                button.disabled = false;
+                button.textContent = originalLabel;
+            }
+        } catch (error) {
+            console.error('Error building unit:', error);
+            showNotification('An error occurred while building. Please try again.', 'error');
+            button.disabled = false;
+            button.textContent = originalLabel;
+        }
     }
 
     async function confirmBuild() {

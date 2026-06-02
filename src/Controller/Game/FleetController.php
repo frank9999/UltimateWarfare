@@ -134,12 +134,12 @@ final class FleetController extends BaseGameController
         }
 
         $units = [];
-        foreach ($playerRegion->getWorldRegionUnits() as $worldRegionUnit) {
-            if ($worldRegionUnit->getAmount() <= 0) {
+        foreach ($playerRegion->getWorldRegionStackableUnits() as $worldRegionStackableUnit) {
+            if ($worldRegionStackableUnit->getAmount() <= 0) {
                 continue;
             }
 
-            $gameUnitEnum = $worldRegionUnit->getGameUnit();
+            $gameUnitEnum = $worldRegionStackableUnit->getGameUnit();
             $gameUnit = $this->gameUnitRegistry->find($gameUnitEnum);
             $category = $gameUnit->getGameUnitCategory();
 
@@ -163,7 +163,7 @@ final class FleetController extends BaseGameController
                 'name' => $gameUnit->getName(),
                 'image' => $gameUnit->getImage(),
                 'imageDir' => $category->getImageDir(),
-                'amount' => $worldRegionUnit->getAmount(),
+                'amount' => $worldRegionStackableUnit->getAmount(),
                 'category' => $category->getLabel(),
             ];
         }
@@ -198,11 +198,12 @@ final class FleetController extends BaseGameController
                 continue; // Can't send to self
             }
 
-            $travelTime = $this->distanceCalculator->calculateDistanceTravelTime(
+            $travelTime = $this->distanceCalculator->calculateFleetTravelTime(
                 $worldRegion->getX(),
                 $worldRegion->getY(),
                 $sourceRegion->getX(),
-                $sourceRegion->getY()
+                $sourceRegion->getY(),
+                $sourceRegion->getUnitLevel(GameUnitEnum::TRAIN_STATION)
             );
 
             $targets[] = [
@@ -281,11 +282,12 @@ final class FleetController extends BaseGameController
             return new JsonResponse(['success' => false, 'message' => $e->getMessage()], 400);
         }
 
-        $travelTime = $this->distanceCalculator->calculateDistanceTravelTime(
+        $travelTime = $this->distanceCalculator->calculateFleetTravelTime(
             $targetRegion->getX(),
             $targetRegion->getY(),
             $sourceRegion->getX(),
-            $sourceRegion->getY()
+            $sourceRegion->getY(),
+            $sourceRegion->getUnitLevel(GameUnitEnum::TRAIN_STATION)
         );
 
         $sentUnits = [];

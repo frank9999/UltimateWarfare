@@ -11,11 +11,11 @@ use FrankProjects\UltimateWarfare\Entity\FleetUnit;
 use FrankProjects\UltimateWarfare\Entity\GameUnit;
 use FrankProjects\UltimateWarfare\Entity\Player;
 use FrankProjects\UltimateWarfare\Entity\WorldRegion;
-use FrankProjects\UltimateWarfare\Entity\WorldRegionUnit;
+use FrankProjects\UltimateWarfare\Entity\WorldRegionStackableUnit;
 use FrankProjects\UltimateWarfare\Repository\FleetRepository;
 use FrankProjects\UltimateWarfare\Repository\FleetUnitRepository;
 use FrankProjects\UltimateWarfare\Repository\GameUnitRegistry;
-use FrankProjects\UltimateWarfare\Repository\WorldRegionUnitRepository;
+use FrankProjects\UltimateWarfare\Repository\WorldRegionStackableUnitRepository;
 use FrankProjects\UltimateWarfare\Service\FleetFactory;
 use RuntimeException;
 use Doctrine\DBAL\LockMode;
@@ -26,7 +26,7 @@ final class FleetActionService
     private FleetRepository $fleetRepository;
     private FleetUnitRepository $fleetUnitRepository;
     private GameUnitRegistry $gameUnitRegistry;
-    private WorldRegionUnitRepository $worldRegionUnitRepository;
+    private WorldRegionStackableUnitRepository $worldRegionStackableUnitRepository;
     private EntityManagerInterface $entityManager;
     private FleetFactory $fleetFactory;
 
@@ -34,14 +34,14 @@ final class FleetActionService
         FleetRepository $fleetRepository,
         FleetUnitRepository $fleetUnitRepository,
         GameUnitRegistry $gameUnitRegistry,
-        WorldRegionUnitRepository $worldRegionUnitRepository,
+        WorldRegionStackableUnitRepository $worldRegionStackableUnitRepository,
         EntityManagerInterface $entityManager,
         FleetFactory $fleetFactory
     ) {
         $this->fleetRepository = $fleetRepository;
         $this->fleetUnitRepository = $fleetUnitRepository;
         $this->gameUnitRegistry = $gameUnitRegistry;
-        $this->worldRegionUnitRepository = $worldRegionUnitRepository;
+        $this->worldRegionStackableUnitRepository = $worldRegionStackableUnitRepository;
         $this->entityManager = $entityManager;
         $this->fleetFactory = $fleetFactory;
     }
@@ -181,29 +181,29 @@ final class FleetActionService
     private function addFleetUnitToWorldRegion(FleetUnit $fleetUnit, WorldRegion $worldRegion): void
     {
         $found = false;
-        foreach ($worldRegion->getWorldRegionUnits() as $worldRegionUnit) {
-            if ($fleetUnit->getGameUnit() === $worldRegionUnit->getGameUnit()) {
-                $worldRegionUnit->setAmount($worldRegionUnit->getAmount() + $fleetUnit->getAmount());
-                $this->worldRegionUnitRepository->save($worldRegionUnit);
+        foreach ($worldRegion->getWorldRegionStackableUnits() as $worldRegionStackableUnit) {
+            if ($fleetUnit->getGameUnit() === $worldRegionStackableUnit->getGameUnit()) {
+                $worldRegionStackableUnit->setAmount($worldRegionStackableUnit->getAmount() + $fleetUnit->getAmount());
+                $this->worldRegionStackableUnitRepository->save($worldRegionStackableUnit);
                 $found = true;
                 break;
             }
         }
 
         if ($found === false) {
-            $worldRegionUnit = WorldRegionUnit::create(
+            $worldRegionStackableUnit = WorldRegionStackableUnit::create(
                 $worldRegion,
                 $fleetUnit->getGameUnit(),
                 $fleetUnit->getAmount()
             );
-            $this->worldRegionUnitRepository->save($worldRegionUnit);
+            $this->worldRegionStackableUnitRepository->save($worldRegionStackableUnit);
         }
     }
 
     private function addFleetUnitToFleet(WorldRegion $region, GameUnit $gameUnit, int $amount, Fleet $fleet): void
     {
         $hasUnit = false;
-        foreach ($region->getWorldRegionUnits() as $regionUnit) {
+        foreach ($region->getWorldRegionStackableUnits() as $regionUnit) {
             if ($regionUnit->getGameUnit() === $gameUnit->getGameUnitEnum()) {
                 $hasUnit = true;
                 if ($amount > $regionUnit->getAmount()) {
@@ -216,9 +216,9 @@ final class FleetActionService
                 $this->fleetUnitRepository->save($fleetUnit);
 
                 if ($regionUnit->getAmount() === 0) {
-                    $this->worldRegionUnitRepository->remove($regionUnit);
+                    $this->worldRegionStackableUnitRepository->remove($regionUnit);
                 } else {
-                    $this->worldRegionUnitRepository->save($regionUnit);
+                    $this->worldRegionStackableUnitRepository->save($regionUnit);
                 }
                 break;
             }

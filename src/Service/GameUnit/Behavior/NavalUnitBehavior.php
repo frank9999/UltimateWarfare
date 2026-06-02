@@ -20,15 +20,7 @@ class NavalUnitBehavior extends AbstractGameUnitBehavior
     public function canBuild(WorldRegion $region, Player $player): bool
     {
         // Check 1: Must have Harbor
-        $hasHarbor = false;
-        foreach ($region->getWorldRegionUnits() as $regionUnit) {
-            if ($regionUnit->getGameUnit() === GameUnitEnum::HARBOR) {
-                $hasHarbor = true;
-                break;
-            }
-        }
-
-        if (!$hasHarbor) {
+        if ($region->getLeveledUnit(GameUnitEnum::HARBOR) === null) {
             return false;
         }
 

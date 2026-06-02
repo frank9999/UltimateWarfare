@@ -52,7 +52,7 @@ final class ConstructionController extends BaseGameController
             $unitName = $construction->getNumber() === 1
                 ? $gameUnit->getName()
                 : $gameUnit->getNameMulti();
-            $timeLeft = ($construction->getTimestamp() + $gameUnit->getTimestamp()) - time();
+            $timeLeft = ($construction->getTimestamp() + $construction->getDuration()) - time();
 
             $items[] = [
                 'id' => $construction->getId(),
@@ -216,13 +216,8 @@ final class ConstructionController extends BaseGameController
         $hasHarbor = false;
         $hasMissileFactory = false;
 
-        foreach ($worldRegion->getWorldRegionUnits() as $worldRegionUnit) {
-            $gameUnitEnum = $worldRegionUnit->getGameUnit();
-            if ($worldRegionUnit->getAmount() < 1) {
-                continue;
-            }
-
-            match ($gameUnitEnum) {
+        foreach ($worldRegion->getWorldRegionLeveledUnits() as $worldRegionLeveledUnit) {
+            match ($worldRegionLeveledUnit->getGameUnit()) {
                 GameUnitEnum::BARRACK => $hasBarrack = true,
                 GameUnitEnum::FACTORY => $hasFactory = true,
                 GameUnitEnum::AIRFIELD => $hasAirfield = true,
@@ -321,6 +316,14 @@ final class ConstructionController extends BaseGameController
                     $buildRequirement = $behavior->getBuildRequirementDescription();
                 }
 
+                $leveledUnit = $gameUnitCategory->isLeveled()
+                    ? $worldRegion->getLeveledUnit($gameUnit->getGameUnitEnum())
+                    : null;
+                $currentHealth = $leveledUnit?->getHealth() ?? 0;
+                $maxHealth = $leveledUnit !== null
+                    ? $gameUnit->getBattleStats()->getHealth() * $leveledUnit->getLevel()
+                    : 0;
+
                 $units[] = [
                     'gameUnitEnum' => $gameUnit->getGameUnitEnum(),
                     'name' => $gameUnit->getName(),
@@ -345,6 +348,11 @@ final class ConstructionController extends BaseGameController
                     'buildRequirement' => $buildRequirement,
                     'owned' => $gameUnitData[$gameUnit->getGameUnitEnum()->value] ?? 0,
                     'inConstruction' => $constructionData[$gameUnit->getGameUnitEnum()->value] ?? 0,
+                    'isLeveled' => $gameUnitCategory->isLeveled(),
+                    'level' => $leveledUnit?->getLevel() ?? 0,
+                    'maxLevel' => 10,
+                    'health' => $currentHealth,
+                    'maxHealth' => $maxHealth,
                 ];
             }
 

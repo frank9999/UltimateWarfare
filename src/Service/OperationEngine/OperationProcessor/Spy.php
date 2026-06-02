@@ -33,12 +33,22 @@ final class Spy extends OperationProcessor
     {
         /** @var array<int, array<int, array{name: string, amount: int}>> $unitsByCategory */
         $unitsByCategory = [];
-        foreach ($this->region->getWorldRegionUnits() as $worldRegionUnit) {
-            $resolvedUnit = $this->gameUnitRegistry->find($worldRegionUnit->getGameUnit());
+        foreach ($this->region->getWorldRegionStackableUnits() as $worldRegionStackableUnit) {
+            $resolvedUnit = $this->gameUnitRegistry->find($worldRegionStackableUnit->getGameUnit());
             $categoryValue = $resolvedUnit->getGameUnitCategory()->value;
             $unitsByCategory[$categoryValue][] = [
                 'name' => $resolvedUnit->getNameMulti(),
-                'amount' => $worldRegionUnit->getAmount(),
+                'amount' => $worldRegionStackableUnit->getAmount(),
+            ];
+        }
+
+        // Leveled buildings (Defense / Special) are reported by their level.
+        foreach ($this->region->getWorldRegionLeveledUnits() as $leveledUnit) {
+            $resolvedUnit = $this->gameUnitRegistry->find($leveledUnit->getGameUnit());
+            $categoryValue = $resolvedUnit->getGameUnitCategory()->value;
+            $unitsByCategory[$categoryValue][] = [
+                'name' => $resolvedUnit->getName() . ' (level)',
+                'amount' => $leveledUnit->getLevel(),
             ];
         }
 

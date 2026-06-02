@@ -135,12 +135,12 @@ final class AttackController extends BaseGameController
         $sourceIsCoastal = $this->isCoastalOrWater($playerRegion, $regionsByCoord);
 
         $units = [];
-        foreach ($playerRegion->getWorldRegionUnits() as $worldRegionUnit) {
-            if ($worldRegionUnit->getAmount() <= 0) {
+        foreach ($playerRegion->getWorldRegionStackableUnits() as $worldRegionStackableUnit) {
+            if ($worldRegionStackableUnit->getAmount() <= 0) {
                 continue;
             }
 
-            $gameUnitEnum = $worldRegionUnit->getGameUnit();
+            $gameUnitEnum = $worldRegionStackableUnit->getGameUnit();
             $gameUnit = $this->gameUnitRegistry->find($gameUnitEnum);
             $category = $gameUnit->getGameUnitCategory();
             $rowName = $gameUnit->getRowName();
@@ -167,7 +167,7 @@ final class AttackController extends BaseGameController
                 'name' => $gameUnit->getName(),
                 'image' => $gameUnit->getImage(),
                 'imageDir' => $category->getImageDir(),
-                'amount' => $worldRegionUnit->getAmount(),
+                'amount' => $worldRegionStackableUnit->getAmount(),
                 'category' => $category->getLabel(),
             ];
         }
@@ -238,11 +238,11 @@ final class AttackController extends BaseGameController
 
         // Build lookup of valid unit IDs for this attack
         $validUnitIds = [];
-        foreach ($playerRegion->getWorldRegionUnits() as $worldRegionUnit) {
-            if ($worldRegionUnit->getAmount() <= 0) {
+        foreach ($playerRegion->getWorldRegionStackableUnits() as $worldRegionStackableUnit) {
+            if ($worldRegionStackableUnit->getAmount() <= 0) {
                 continue;
             }
-            $gameUnitEnum = $worldRegionUnit->getGameUnit();
+            $gameUnitEnum = $worldRegionStackableUnit->getGameUnit();
             $gameUnit = $this->gameUnitRegistry->find($gameUnitEnum);
             $unitRange = $this->getUnitRange(
                 $gameUnit->getGameUnitCategory(),
@@ -286,11 +286,12 @@ final class AttackController extends BaseGameController
         }
 
         // Calculate travel time for the ETA
-        $travelTime = $this->distanceCalculator->calculateDistanceTravelTime(
+        $travelTime = $this->distanceCalculator->calculateFleetTravelTime(
             $targetRegion->getX(),
             $targetRegion->getY(),
             $playerRegion->getX(),
-            $playerRegion->getY()
+            $playerRegion->getY(),
+            $playerRegion->getUnitLevel(GameUnitEnum::TRAIN_STATION)
         );
 
         // Build unit list for frontend
@@ -412,12 +413,12 @@ final class AttackController extends BaseGameController
         $maxRange = 0;
         $sourceIsCoastal = $this->isCoastalOrWater($playerRegion, $regionsByCoord);
 
-        foreach ($playerRegion->getWorldRegionUnits() as $worldRegionUnit) {
-            if ($worldRegionUnit->getAmount() <= 0) {
+        foreach ($playerRegion->getWorldRegionStackableUnits() as $worldRegionStackableUnit) {
+            if ($worldRegionStackableUnit->getAmount() <= 0) {
                 continue;
             }
 
-            $gameUnit = $this->gameUnitRegistry->find($worldRegionUnit->getGameUnit());
+            $gameUnit = $this->gameUnitRegistry->find($worldRegionStackableUnit->getGameUnit());
             $unitRange = $this->getUnitRange(
                 $gameUnit->getGameUnitCategory(),
                 $gameUnit->getRowName(),

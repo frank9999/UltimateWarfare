@@ -6,19 +6,19 @@ namespace FrankProjects\UltimateWarfare\Controller\Game;
 
 use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitCategory;
 use FrankProjects\UltimateWarfare\Repository\GameUnitRegistry;
-use FrankProjects\UltimateWarfare\Repository\WorldRegionUnitRepository;
+use FrankProjects\UltimateWarfare\Repository\WorldRegionStackableUnitRepository;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 final class StatisticsController extends BaseGameController
 {
-    private WorldRegionUnitRepository $worldRegionUnitRepository;
+    private WorldRegionStackableUnitRepository $worldRegionStackableUnitRepository;
     private GameUnitRegistry $gameUnitRegistry;
 
     public function __construct(
-        WorldRegionUnitRepository $worldRegionUnitRepository,
+        WorldRegionStackableUnitRepository $worldRegionStackableUnitRepository,
         GameUnitRegistry $gameUnitRegistry
     ) {
-        $this->worldRegionUnitRepository = $worldRegionUnitRepository;
+        $this->worldRegionStackableUnitRepository = $worldRegionStackableUnitRepository;
         $this->gameUnitRegistry = $gameUnitRegistry;
     }
 
@@ -66,12 +66,12 @@ final class StatisticsController extends BaseGameController
             GameUnitCategory::SPECIAL_BUILDINGS,
         ];
 
-        $armyData = $this->worldRegionUnitRepository->getGameUnitSumByPlayerAndGameUnitCategories(
+        $armyData = $this->worldRegionStackableUnitRepository->getGameUnitSumByPlayerAndGameUnitCategories(
             $player,
             $armyCategories
         );
 
-        $infraData = $this->worldRegionUnitRepository->getGameUnitSumByPlayerAndGameUnitCategories(
+        $infraData = $this->worldRegionStackableUnitRepository->getGameUnitSumByPlayerAndGameUnitCategories(
             $player,
             $infraCategories
         );

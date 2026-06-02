@@ -6,6 +6,7 @@ namespace FrankProjects\UltimateWarfare\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitEnum;
 use RuntimeException;
 
 class WorldRegion
@@ -33,9 +34,14 @@ class WorldRegion
     private ?Player $player;
 
     /**
-     * @var Collection<int, WorldRegionUnit>
+     * @var Collection<int, WorldRegionStackableUnit>
      */
-    private Collection $worldRegionUnits;
+    private Collection $worldRegionStackableUnits;
+
+    /**
+     * @var Collection<int, WorldRegionLeveledUnit>
+     */
+    private Collection $worldRegionLeveledUnits;
 
     /**
      * @var Collection<int, Construction>
@@ -54,7 +60,8 @@ class WorldRegion
 
     public function __construct()
     {
-        $this->worldRegionUnits = new ArrayCollection();
+        $this->worldRegionStackableUnits = new ArrayCollection();
+        $this->worldRegionLeveledUnits = new ArrayCollection();
         $this->constructions = new ArrayCollection();
         $this->fleets = new ArrayCollection();
         $this->targetFleets = new ArrayCollection();
@@ -177,19 +184,59 @@ class WorldRegion
     }
 
     /**
-     * @return Collection<int, WorldRegionUnit>
+     * @return Collection<int, WorldRegionStackableUnit>
      */
-    public function getWorldRegionUnits(): Collection
+    public function getWorldRegionStackableUnits(): Collection
     {
-        return $this->worldRegionUnits;
+        return $this->worldRegionStackableUnits;
     }
 
     /**
-     * @param Collection<int, WorldRegionUnit> $worldRegionUnits
+     * @param Collection<int, WorldRegionStackableUnit> $worldRegionStackableUnits
      */
-    public function setWorldRegionUnits(Collection $worldRegionUnits): void
+    public function setWorldRegionStackableUnits(Collection $worldRegionStackableUnits): void
     {
-        $this->worldRegionUnits = $worldRegionUnits;
+        $this->worldRegionStackableUnits = $worldRegionStackableUnits;
+    }
+
+    /**
+     * @return Collection<int, WorldRegionLeveledUnit>
+     */
+    public function getWorldRegionLeveledUnits(): Collection
+    {
+        return $this->worldRegionLeveledUnits;
+    }
+
+    /**
+     * @param Collection<int, WorldRegionLeveledUnit> $worldRegionLeveledUnits
+     */
+    public function setWorldRegionLeveledUnits(Collection $worldRegionLeveledUnits): void
+    {
+        $this->worldRegionLeveledUnits = $worldRegionLeveledUnits;
+    }
+
+    /**
+     * Return the leveled building (Defense / Special) of the given type present in this
+     * region, or null when the building is not present.
+     */
+    public function getLeveledUnit(GameUnitEnum $gameUnit): ?WorldRegionLeveledUnit
+    {
+        foreach ($this->worldRegionLeveledUnits as $worldRegionLeveledUnit) {
+            if ($worldRegionLeveledUnit->getGameUnit() === $gameUnit) {
+                return $worldRegionLeveledUnit;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Return the level of a leveled building (Defense / Special) present in this region,
+     * or 0 when the building is not present.
+     */
+    public function getUnitLevel(GameUnitEnum $gameUnit): int
+    {
+        return $this->getLeveledUnit($gameUnit)?->getLevel() ?? 0;
     }
 
     public function getWorld(): World
@@ -272,7 +319,7 @@ class WorldRegion
     /**
      * @return array{
      *   id: int, x: int, y: int, z: int, type: string, owner: string,
-     *   units: array<int, WorldRegionUnit>, structures: array<never>
+     *   units: array<int, WorldRegionStackableUnit>, structures: array<int, WorldRegionLeveledUnit>
      * }
      */
     public function toArray(): array
@@ -289,8 +336,8 @@ class WorldRegion
             'z' => $this->getZ(),
             'type' => $this->getType(),
             'owner' => $playerName,
-            'units' => $this->getWorldRegionUnits()->toArray(),
-            'structures' => []
+            'units' => $this->getWorldRegionStackableUnits()->toArray(),
+            'structures' => $this->getWorldRegionLeveledUnits()->toArray()
         ];
     }
 }

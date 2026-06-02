@@ -592,6 +592,30 @@ Game/Api/Region/AllBuildData:
     requirements:
         regionId: '\d+'
 
+Game/Api/World/Region/Leveled/Build:
+    path:      /game/api/world/region/leveled/build/{regionId}/{gameUnitEnumId}
+    controller: FrankProjects\UltimateWarfare\Controller\Game\LeveledUnitController::buildApi
+    methods: [POST]
+    requirements:
+        regionId: '\d+'
+        gameUnitEnumId: '\d+'
+
+Game/Api/World/Region/Leveled/Upgrade:
+    path:      /game/api/world/region/leveled/upgrade/{regionId}/{gameUnitEnumId}
+    controller: FrankProjects\UltimateWarfare\Controller\Game\LeveledUnitController::upgradeApi
+    methods: [POST]
+    requirements:
+        regionId: '\d+'
+        gameUnitEnumId: '\d+'
+
+Game/Api/World/Region/Leveled/Repair:
+    path:      /game/api/world/region/leveled/repair/{regionId}/{gameUnitEnumId}
+    controller: FrankProjects\UltimateWarfare\Controller\Game\LeveledUnitController::repairApi
+    methods: [POST]
+    requirements:
+        regionId: '\d+'
+        gameUnitEnumId: '\d+'
+
 Game/Api/Region/Overview:
     path:      /game/api/region/overview
     controller: FrankProjects\UltimateWarfare\Controller\Game\RegionController::regionOverviewApi

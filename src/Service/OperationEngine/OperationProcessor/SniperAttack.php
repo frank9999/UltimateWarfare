@@ -34,17 +34,17 @@ final class SniperAttack extends OperationProcessor
     public function processSuccess(): void
     {
         $soldiers = 0;
-        foreach ($this->region->getWorldRegionUnits() as $worldRegionUnit) {
-            if ($worldRegionUnit->getGameUnit() === GameUnitEnum::SOLDIER) {
-                $soldiers = $soldiers + $worldRegionUnit->getAmount();
+        foreach ($this->region->getWorldRegionStackableUnits() as $worldRegionStackableUnit) {
+            if ($worldRegionStackableUnit->getGameUnit() === GameUnitEnum::SOLDIER) {
+                $soldiers = $soldiers + $worldRegionStackableUnit->getAmount();
             }
         }
 
         if (($this->amount * self::SOLDIERS_KILLED_PER_SNIPER) > $soldiers) {
-            foreach ($this->region->getWorldRegionUnits() as $worldRegionUnit) {
-                if ($worldRegionUnit->getGameUnit() === GameUnitEnum::SOLDIER) {
-                    $this->worldRegionUnitRepository->remove($worldRegionUnit);
-                    $unitName = $this->gameUnitRegistry->find($worldRegionUnit->getGameUnit())->getNameMulti();
+            foreach ($this->region->getWorldRegionStackableUnits() as $worldRegionStackableUnit) {
+                if ($worldRegionStackableUnit->getGameUnit() === GameUnitEnum::SOLDIER) {
+                    $this->worldRegionStackableUnitRepository->remove($worldRegionStackableUnit);
+                    $unitName = $this->gameUnitRegistry->find($worldRegionStackableUnit->getGameUnit())->getNameMulti();
                     $this->addToOperationLog("You killed {$soldiers} {$unitName}!");
                 }
             }
@@ -55,11 +55,11 @@ final class SniperAttack extends OperationProcessor
             $this->reportCreator->createReport($this->getTargetRegionPlayer(), time(), $reportText);
         } else {
             $soldiersKilled = $this->amount * self::SOLDIERS_KILLED_PER_SNIPER;
-            foreach ($this->region->getWorldRegionUnits() as $worldRegionUnit) {
-                if ($worldRegionUnit->getGameUnit() === GameUnitEnum::SOLDIER) {
-                    $worldRegionUnit->setAmount($worldRegionUnit->getAmount() - $soldiersKilled);
-                    $this->worldRegionUnitRepository->save($worldRegionUnit);
-                    $unitName = $this->gameUnitRegistry->find($worldRegionUnit->getGameUnit())->getNameMulti();
+            foreach ($this->region->getWorldRegionStackableUnits() as $worldRegionStackableUnit) {
+                if ($worldRegionStackableUnit->getGameUnit() === GameUnitEnum::SOLDIER) {
+                    $worldRegionStackableUnit->setAmount($worldRegionStackableUnit->getAmount() - $soldiersKilled);
+                    $this->worldRegionStackableUnitRepository->save($worldRegionStackableUnit);
+                    $unitName = $this->gameUnitRegistry->find($worldRegionStackableUnit->getGameUnit())->getNameMulti();
                     $this->addToOperationLog("You killed {$soldiersKilled} {$unitName}!");
                 }
             }
@@ -75,10 +75,10 @@ final class SniperAttack extends OperationProcessor
     {
         $snipersLost = intval($this->amount * 0.05);
 
-        foreach ($this->playerRegion->getWorldRegionUnits() as $worldRegionUnit) {
-            if ($worldRegionUnit->getGameUnit() === GameUnitEnum::SNIPER) {
-                $worldRegionUnit->setAmount(intval($worldRegionUnit->getAmount() - $snipersLost));
-                $this->worldRegionUnitRepository->save($worldRegionUnit);
+        foreach ($this->playerRegion->getWorldRegionStackableUnits() as $worldRegionStackableUnit) {
+            if ($worldRegionStackableUnit->getGameUnit() === GameUnitEnum::SNIPER) {
+                $worldRegionStackableUnit->setAmount(intval($worldRegionStackableUnit->getAmount() - $snipersLost));
+                $this->worldRegionStackableUnitRepository->save($worldRegionStackableUnit);
             }
         }
 

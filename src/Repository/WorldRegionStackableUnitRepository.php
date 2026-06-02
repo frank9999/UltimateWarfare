@@ -6,11 +6,11 @@ namespace FrankProjects\UltimateWarfare\Repository;
 
 use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitCategory;
 use FrankProjects\UltimateWarfare\Entity\Player;
-use FrankProjects\UltimateWarfare\Entity\WorldRegionUnit;
+use FrankProjects\UltimateWarfare\Entity\WorldRegionStackableUnit;
 
-interface WorldRegionUnitRepository
+interface WorldRegionStackableUnitRepository
 {
-    public function find(int $id): ?WorldRegionUnit;
+    public function find(int $id): ?WorldRegionStackableUnit;
 
     /**
      * @return array<int, array<string, int>>
@@ -24,7 +24,7 @@ interface WorldRegionUnitRepository
      */
     public function getGameUnitSumByPlayerAndGameUnitCategories(Player $player, array $gameUnitCategories): array;
 
-    public function remove(WorldRegionUnit $worldRegionUnit): void;
+    public function remove(WorldRegionStackableUnit $worldRegionStackableUnit): void;
 
-    public function save(WorldRegionUnit $worldRegionUnit): void;
+    public function save(WorldRegionStackableUnit $worldRegionStackableUnit): void;
 }

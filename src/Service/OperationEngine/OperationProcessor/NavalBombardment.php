@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace FrankProjects\UltimateWarfare\Service\OperationEngine\OperationProcessor;
 
-use FrankProjects\UltimateWarfare\Entity\WorldRegionUnit;
+use FrankProjects\UltimateWarfare\Entity\WorldRegionStackableUnit;
 use FrankProjects\UltimateWarfare\Service\OperationEngine\OperationProcessor;
 
 final class NavalBombardment extends OperationProcessor
@@ -43,12 +43,12 @@ final class NavalBombardment extends OperationProcessor
         $militaryUnits = [];
         $buildingUnits = [];
 
-        foreach ($this->region->getWorldRegionUnits() as $worldRegionUnit) {
-            $gameUnit = $this->gameUnitRegistry->find($worldRegionUnit->getGameUnit());
+        foreach ($this->region->getWorldRegionStackableUnits() as $worldRegionStackableUnit) {
+            $gameUnit = $this->gameUnitRegistry->find($worldRegionStackableUnit->getGameUnit());
             if ($gameUnit->getGameUnitCategory()->isSendable()) {
-                $militaryUnits[] = $worldRegionUnit;
+                $militaryUnits[] = $worldRegionStackableUnit;
             } else {
-                $buildingUnits[] = $worldRegionUnit;
+                $buildingUnits[] = $worldRegionStackableUnit;
             }
         }
 
@@ -72,7 +72,7 @@ final class NavalBombardment extends OperationProcessor
     }
 
     /**
-     * @param WorldRegionUnit[] $units
+     * @param WorldRegionStackableUnit[] $units
      */
     private function applyDamageToGroup(array $units, float $power): int
     {
@@ -82,9 +82,9 @@ final class NavalBombardment extends OperationProcessor
 
         $totalDestroyed = 0;
 
-        foreach ($units as $worldRegionUnit) {
-            $gameUnit = $this->gameUnitRegistry->find($worldRegionUnit->getGameUnit());
-            $amount = $worldRegionUnit->getAmount();
+        foreach ($units as $worldRegionStackableUnit) {
+            $gameUnit = $this->gameUnitRegistry->find($worldRegionStackableUnit->getGameUnit());
+            $amount = $worldRegionStackableUnit->getAmount();
 
             $battleStats = $gameUnit->getBattleStats();
             $effectiveHealth = $this->calculateEffectiveHealth(
@@ -105,12 +105,12 @@ final class NavalBombardment extends OperationProcessor
             }
 
             if ($casualties >= $amount) {
-                $this->worldRegionUnitRepository->remove($worldRegionUnit);
+                $this->worldRegionStackableUnitRepository->remove($worldRegionStackableUnit);
                 $this->addToOperationLog("All {$gameUnit->getNameMulti()} destroyed ({$amount})!");
                 $totalDestroyed += $amount;
             } else {
-                $worldRegionUnit->setAmount($amount - $casualties);
-                $this->worldRegionUnitRepository->save($worldRegionUnit);
+                $worldRegionStackableUnit->setAmount($amount - $casualties);
+                $this->worldRegionStackableUnitRepository->save($worldRegionStackableUnit);
                 $this->addToOperationLog("{$casualties} {$gameUnit->getNameMulti()} destroyed!");
                 $totalDestroyed += $casualties;
             }

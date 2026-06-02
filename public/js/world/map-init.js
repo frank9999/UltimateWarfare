@@ -134,9 +134,10 @@
                 } else {
                     if (fi.details && fi.details.length > 0) {
                         fi.details.forEach(function (unit) {
+                            const countText = unit.level !== undefined ? ('Level ' + unit.level) : unit.amount;
                             tooltipHtml += '<div class="tooltip-item">' +
                                 '<span class="unit-name">' + unit.name + '</span>' +
-                                '<span class="unit-count">' + unit.amount + '</span></div>';
+                                '<span class="unit-count">' + countText + '</span></div>';
                         });
                     }
                     tooltipHtml += '<div class="tooltip-total">Total: ' + fi.count + '</div>';

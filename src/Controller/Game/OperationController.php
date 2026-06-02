@@ -126,10 +126,10 @@ final class OperationController extends BaseGameController
             // Check if region has the required unit type (skip the check for unit-less ops like spy)
             if ($requiredGameUnitId !== null) {
                 $hasUnit = false;
-                foreach ($playerRegion->getWorldRegionUnits() as $worldRegionUnit) {
+                foreach ($playerRegion->getWorldRegionStackableUnits() as $worldRegionStackableUnit) {
                     if (
-                        $worldRegionUnit->getGameUnit() === $requiredGameUnitId
-                        && $worldRegionUnit->getAmount() > 0
+                        $worldRegionStackableUnit->getGameUnit() === $requiredGameUnitId
+                        && $worldRegionStackableUnit->getAmount() > 0
                     ) {
                         $hasUnit = true;
                         break;
@@ -188,9 +188,9 @@ final class OperationController extends BaseGameController
         $unitImage = null;
 
         if ($requiredGameUnitId !== null) {
-            foreach ($playerRegion->getWorldRegionUnits() as $worldRegionUnit) {
-                if ($worldRegionUnit->getGameUnit() === $requiredGameUnitId) {
-                    $availableAmount = $worldRegionUnit->getAmount();
+            foreach ($playerRegion->getWorldRegionStackableUnits() as $worldRegionStackableUnit) {
+                if ($worldRegionStackableUnit->getGameUnit() === $requiredGameUnitId) {
+                    $availableAmount = $worldRegionStackableUnit->getAmount();
                     break;
                 }
             }

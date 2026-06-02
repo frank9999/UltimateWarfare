@@ -7,7 +7,8 @@ namespace FrankProjects\UltimateWarfare\Service;
 use FrankProjects\UltimateWarfare\Entity\Fleet;
 use FrankProjects\UltimateWarfare\Entity\FleetUnit;
 use FrankProjects\UltimateWarfare\Entity\Player;
-use FrankProjects\UltimateWarfare\Entity\WorldRegionUnit;
+use FrankProjects\UltimateWarfare\Entity\WorldRegionLeveledUnit;
+use FrankProjects\UltimateWarfare\Entity\WorldRegionStackableUnit;
 use FrankProjects\UltimateWarfare\Repository\GameUnitRegistry;
 use FrankProjects\UltimateWarfare\Service\BattleEngine\BattlePhase;
 use FrankProjects\UltimateWarfare\Service\BattleEngine\BattleReportCreator;
@@ -50,7 +51,11 @@ final class BattleEngine
         $this->ensureCanAttack($fleet);
 
         $attackerGameUnits = $fleet->getFleetUnits()->toArray();
-        $defenderGameUnits = $fleet->getTargetWorldRegion()->getWorldRegionUnits()->toArray();
+        // Defenders are both stackable units and leveled buildings present in the region.
+        $defenderGameUnits = array_merge(
+            $fleet->getTargetWorldRegion()->getWorldRegionStackableUnits()->toArray(),
+            $fleet->getTargetWorldRegion()->getWorldRegionLeveledUnits()->toArray()
+        );
         $defenderDamageMultiplier = $this->getDefenderDamageMultiplier(
             $fleet->getTargetWorldRegion()->getPlayer()
         );
@@ -139,7 +144,7 @@ final class BattleEngine
 
     /**
      * @param array<FleetUnit> $attackerGameUnits
-     * @param array<WorldRegionUnit> $defenderGameUnits
+     * @param array<WorldRegionStackableUnit|WorldRegionLeveledUnit> $defenderGameUnits
      */
     private function processResults(
         BattleResult $battleResults,
