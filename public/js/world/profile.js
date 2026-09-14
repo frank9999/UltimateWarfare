@@ -77,13 +77,13 @@
     }
 
     function renderInfoTab() {
-        const status = profileData.active ? 'Active' : 'Banned';
-        const statusColor = profileData.active ? '#4caf50' : '#f44336';
+        const status = profileData.banned ? 'Banned' : 'Active';
+        const statusColor = profileData.banned ? '#f44336' : '#4caf50';
 
         let html = '<table style="width: 100%; border-collapse: collapse;">';
         html += '<tr><td style="padding: 8px; color: #aaa;">Username</td><td style="padding: 8px;">' + escapeHtml(profileData.username) + '</td></tr>';
         html += '<tr><td style="padding: 8px; color: #aaa;">Email</td><td style="padding: 8px;">' + escapeHtml(profileData.email) + '</td></tr>';
-        html += '<tr><td style="padding: 8px; color: #aaa;">Signup Date</td><td style="padding: 8px;">' + escapeHtml(profileData.signup) + '</td></tr>';
+        html += '<tr><td style="padding: 8px; color: #aaa;">Signup Date</td><td style="padding: 8px;">' + escapeHtml(profileData.signedUpAt) + '</td></tr>';
         html += '<tr><td style="padding: 8px; color: #aaa;">Account Type</td><td style="padding: 8px;">' + escapeHtml(profileData.accountType) + '</td></tr>';
         html += '<tr><td style="padding: 8px; color: #aaa;">Status</td><td style="padding: 8px; color: ' + statusColor + ';">' + status + '</td></tr>';
         html += '</table>';

@@ -34,7 +34,7 @@ final class RegisterController extends AbstractController
                 $this->addFlash(
                     'success',
                     "You successfully created an account!"
-                    . " An e-mail has been sent to {$user->getEmail()} with your activation code..."
+                    . " An e-mail has been sent to {$user->getEmail()} with your email verification link..."
                 );
             } catch (Throwable $e) {
                 $this->addFlash('error', $e->getMessage());
@@ -49,11 +49,11 @@ final class RegisterController extends AbstractController
         );
     }
 
-    public function activateUser(string $token): Response
+    public function verifyEmail(string $token): Response
     {
         try {
-            $this->registerActionService->activateUser($token);
-            $this->addFlash('success', 'You successfully activated your account!');
+            $this->registerActionService->verifyEmail($token);
+            $this->addFlash('success', 'You successfully verified your email address!');
         } catch (Throwable $e) {
             $this->addFlash('error', $e->getMessage());
         }

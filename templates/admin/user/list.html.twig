@@ -5,8 +5,8 @@
 {% block content %}
     <p class="text-center btn-group">
         <a href="{{ path('Admin/User/List') }}" class="btn btn-primary {{ app.request.attributes.get('filter') == '' ? 'active' : '' }}">All</a>
-        <a href="{{ path('Admin/User/List', {'filter': 'active'}) }}" class="btn btn-primary {{ app.request.attributes.get('filter') == 'active' ? 'active' : '' }}">Active</a>
-        <a href="{{ path('Admin/User/List', {'filter': 'disabled'}) }}" class="btn btn-primary {{ app.request.attributes.get('filter') == 'disabled' ? 'active' : '' }}">Disabled</a>
+        <a href="{{ path('Admin/User/List', {'filter': 'email-verified'}) }}" class="btn btn-primary {{ app.request.attributes.get('filter') == 'email-verified' ? 'active' : '' }}">Email verified</a>
+        <a href="{{ path('Admin/User/List', {'filter': 'email-unverified'}) }}" class="btn btn-primary {{ app.request.attributes.get('filter') == 'email-unverified' ? 'active' : '' }}">Email unverified</a>
         <a href="{{ path('Admin/User/List', {'filter': 'banned'}) }}" class="btn btn-primary {{ app.request.attributes.get('filter') == 'banned' ? 'active' : '' }}">Banned</a>
     </p>
     <div class="uw-card">
@@ -25,10 +25,10 @@
                 <tr>
                     <td>Username</td>
                     <td>Email</td>
-                    <td>Enabled</td>
+                    <td>Email verified</td>
                     <td>Players</td>
                     <td>Signup</td>
-                    <td>Last Login</td>
+                    <td>Last seen</td>
                     <td>Action</td>
                 </tr>
                 {% for user in users %}
@@ -40,7 +40,7 @@
                             {{ user.email }}
                         </td>
                         <td>
-                            {% if user.enabled == 1 %}
+                            {% if user.emailVerified %}
                                 <span class="good">Yes</span>
                             {% else %}
                                 <span class="bad">No</span>
@@ -54,11 +54,11 @@
                             {% endfor %}
                         </td>
                         <td>
-                            {{ user.signup|date("Y-m-d") }}
+                            {{ user.signedUpAt|date("Y-m-d") }}
                         </td>
                         <td>
-                            {% if user.lastLogin is not null %}
-                                {{ user.lastLogin|date("Y-m-d") }}
+                            {% if user.lastSeenAt is not null %}
+                                {{ user.lastSeenAt|date("Y-m-d") }}
                             {% endif %}
                         </td>
                         <td>

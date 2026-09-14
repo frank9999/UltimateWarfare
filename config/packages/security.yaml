@@ -23,6 +23,7 @@ security:
             pattern: ^/
             lazy: true
             entry_point: FrankProjects\UltimateWarfare\Security\ApiAwareAuthenticationEntryPoint
+            user_checker: FrankProjects\UltimateWarfare\Security\UserChecker
             form_login:
                 provider: frankprojects
                 default_target_path: /game/login

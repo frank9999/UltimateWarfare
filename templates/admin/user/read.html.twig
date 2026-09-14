@@ -17,20 +17,20 @@
                 </tr>
                 <tr>
                     <td>Sign-up date</td>
-                    <td>{{ user.signup|date("Y-m-d H:i:s") }}</td>
+                    <td>{{ user.signedUpAt|date("Y-m-d H:i:s") }}</td>
                 </tr>
                 <tr>
-                    <td>Last login</td>
+                    <td>Last seen</td>
                     <td>
-                        {% if user.lastLogin is not empty %}
-                            {{ user.lastLogin|date("Y-m-d H:i:s") }}
+                        {% if user.lastSeenAt is not empty %}
+                            {{ user.lastSeenAt|date("Y-m-d H:i:s") }}
                         {% endif %}
                     </td>
                 </tr>
                 <tr>
-                    <td>Enabled</td>
+                    <td>Email verified</td>
                     <td>
-                        {% if user.enabled == 1 %}
+                        {% if user.emailVerified %}
                             <span class="good">Yes</span>
                         {% else %}
                             <span class="bad">No</span>
@@ -38,23 +38,23 @@
                     </td>
                 </tr>
                 <tr>
-                    <td>Status</td>
+                    <td>Banned</td>
                     <td>
-                        {% if user.active == 1 %}
-                            <span class="good">Active</span>
+                        {% if user.banned %}
+                            <span class="bad">Yes</span>
                         {% else %}
-                            <span class="bad">Banned/De-activated</span>
+                            <span class="good">No</span>
                         {% endif %}
                     </td>
                 </tr>
                 {% if uw_forum_enabled == true %}
                     <tr>
-                        <td>Forum</td>
+                        <td>Forum banned</td>
                         <td>
-                            {% if user.forumBan == 1 %}
-                                <span class="bad">Banned</span>
+                            {% if user.forumBanned %}
+                                <span class="bad">Yes</span>
                             {% else %}
-                                <span class="good">Active</span>
+                                <span class="good">No</span>
                             {% endif %}
                         </td>
                     </tr>
@@ -70,7 +70,7 @@
                 <tr>
                     <td colspan="2">
                         <p>
-                            {% if user.active == 1 %}
+                            {% if not user.banned %}
                                 <form method="POST" action="{{ path('Admin/User/Ban', {'userId': user.id}) }}" style="display:inline">
                                     <button type="submit" class="btn btn-danger">Ban</button>
                                 </form>
@@ -82,7 +82,7 @@
                         </p>
                         {% if uw_forum_enabled == true %}
                             <p>
-                                {% if user.forumBan == 1 %}
+                                {% if user.forumBanned %}
                                     <form method="POST" action="{{ path('Admin/User/ForumUnban', {'userId': user.id}) }}" style="display:inline">
                                         <button type="submit" class="btn btn-danger">Forum unban</button>
                                     </form>
@@ -93,10 +93,10 @@
                                 {% endif %}
                             </p>
                         {% endif %}
-                        {% if user.enabled == 0 %}
+                        {% if not user.emailVerified %}
                             <p>
-                                <form method="POST" action="{{ path('Admin/User/Enable', {'userId': user.id}) }}" style="display:inline">
-                                    <button type="submit" class="btn btn-danger">Enable account</button>
+                                <form method="POST" action="{{ path('Admin/User/VerifyEmail', {'userId': user.id}) }}" style="display:inline">
+                                    <button type="submit" class="btn btn-danger">Mark email as verified</button>
                                 </form>
                             </p>
                         {% endif %}
@@ -138,30 +138,30 @@
     </div>
 
     <div class="uw-card">
-        <div class="uw-card-header">Possible multi accounts (same IP: {{ user.lastIp ?? 'Unknown' }})</div>
+        <div class="uw-card-header">Possible multi accounts (same IP: {{ user.lastSeenIp ?? 'Unknown' }})</div>
         <div class="uw-card-body">
             <table class="table text-center">
                 {% if sameIpUsers|length > 0 %}
                     <tr>
                         <td>Username</td>
                         <td>Email</td>
-                        <td>Last login</td>
-                        <td>Status</td>
+                        <td>Last seen</td>
+                        <td>Banned</td>
                     </tr>
                     {% for sameIpUser in sameIpUsers %}
                         <tr>
                             <td><a href="{{ path('Admin/User/Read', {'userId': sameIpUser.id}) }}">{{ sameIpUser.username }}</a></td>
                             <td>{{ sameIpUser.email }}</td>
                             <td>
-                                {% if sameIpUser.lastLogin is not empty %}
-                                    {{ sameIpUser.lastLogin|date("Y-m-d H:i:s") }}
+                                {% if sameIpUser.lastSeenAt is not empty %}
+                                    {{ sameIpUser.lastSeenAt|date("Y-m-d H:i:s") }}
                                 {% endif %}
                             </td>
                             <td>
-                                {% if sameIpUser.active == 1 %}
-                                    <span class="good">Active</span>
+                                {% if sameIpUser.banned %}
+                                    <span class="bad">Yes</span>
                                 {% else %}
-                                    <span class="bad">Banned</span>
+                                    <span class="good">No</span>
                                 {% endif %}
                             </td>
                         </tr>

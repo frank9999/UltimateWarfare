@@ -28,8 +28,8 @@ final class UserController extends BaseGameController
 
     public function banned(Request $request): Response
     {
-        $user = $this->getGameUser(false);
-        if ($user->getActive()) {
+        $user = $this->getGameUser(allowBanned: true);
+        if (!$user->isBanned()) {
             $this->addFlash('error', 'You are not banned!');
             return $this->redirectToRoute('Game/WorldMap');
         }
@@ -71,9 +71,9 @@ final class UserController extends BaseGameController
             'data' => [
                 'username' => $user->getUsername(),
                 'email' => $user->getEmail(),
-                'signup' => $user->getSignup()->format('Y-m-d H:i:s'),
+                'signedUpAt' => $user->getSignedUpAt()->format('Y-m-d H:i:s'),
                 'accountType' => $this->getAccountType(),
-                'active' => $user->getActive(),
+                'banned' => $user->isBanned(),
                 'canSurrender' => $player->canSurrender(),
                 'isFederationFounder' => $isFederationFounder,
             ]

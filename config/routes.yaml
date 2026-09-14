@@ -60,9 +60,9 @@ Admin/User/Unban:
     requirements:
         userId: '\d+'
 
-Admin/User/Enable:
-    path:      /admin/user/enable/{userId}
-    controller: FrankProjects\UltimateWarfare\Controller\Admin\UserController::enable
+Admin/User/VerifyEmail:
+    path:      /admin/user/verify-email/{userId}
+    controller: FrankProjects\UltimateWarfare\Controller\Admin\UserController::verifyEmail
     methods:   [POST]
     requirements:
         userId: '\d+'
@@ -803,9 +803,9 @@ Site/Register:
     controller: FrankProjects\UltimateWarfare\Controller\Site\RegisterController::register
     methods:   [GET, POST]
 
-User/Activation:
+User/VerifyEmail:
     path:      /user/activate/{token}
-    controller: FrankProjects\UltimateWarfare\Controller\Site\RegisterController::activateUser
+    controller: FrankProjects\UltimateWarfare\Controller\Site\RegisterController::verifyEmail
     methods:   [GET]
 
 User/Password/Reset:

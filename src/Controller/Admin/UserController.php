@@ -30,10 +30,10 @@ final class UserController extends AbstractController
     public function ban(int $userId): RedirectResponse
     {
         $user = $this->getUserObject($userId);
-        if (!$user->getActive()) {
+        if ($user->isBanned()) {
             $this->addFlash('error', 'User is already banned');
         } else {
-            $user->setActive(false);
+            $user->setBanned(true);
             $this->userRepository->save($user);
             $this->addFlash('success', 'User banned!');
         }
@@ -44,10 +44,10 @@ final class UserController extends AbstractController
     public function unban(int $userId): RedirectResponse
     {
         $user = $this->getUserObject($userId);
-        if ($user->getActive()) {
+        if (!$user->isBanned()) {
             $this->addFlash('error', 'User is not banned');
         } else {
-            $user->setActive(true);
+            $user->setBanned(false);
             $this->userRepository->save($user);
             $this->addFlash('success', 'User unbanned!');
         }
@@ -55,16 +55,16 @@ final class UserController extends AbstractController
         return $this->redirectToRoute('Admin/User/Read', ['userId' => $userId]);
     }
 
-    public function enable(int $userId): RedirectResponse
+    public function verifyEmail(int $userId): RedirectResponse
     {
         $user = $this->getUserObject($userId);
-        if ($user->isEnabled()) {
-            $this->addFlash('error', 'User is already enabled');
+        if ($user->isEmailVerified()) {
+            $this->addFlash('error', 'User email address is already verified');
         } else {
-            $user->setEnabled(true);
-            $user->setConfirmationToken(null);
+            $user->setEmailVerified(true);
+            $user->setEmailVerificationToken(null);
             $this->userRepository->save($user);
-            $this->addFlash('success', 'User enabled!');
+            $this->addFlash('success', 'User email address marked as verified!');
         }
 
         return $this->redirectToRoute('Admin/User/Read', ['userId' => $userId]);
@@ -73,10 +73,10 @@ final class UserController extends AbstractController
     public function forumBan(int $userId): RedirectResponse
     {
         $user = $this->getUserObject($userId);
-        if ($user->getForumBan()) {
+        if ($user->isForumBanned()) {
             $this->addFlash('error', 'User is already forum banned');
         } else {
-            $user->setForumBan(true);
+            $user->setForumBanned(true);
             $this->userRepository->save($user);
             $this->addFlash('success', 'User forum banned!');
         }
@@ -87,10 +87,10 @@ final class UserController extends AbstractController
     public function forumUnban(int $userId): RedirectResponse
     {
         $user = $this->getUserObject($userId);
-        if (!$user->getForumBan()) {
+        if (!$user->isForumBanned()) {
             $this->addFlash('error', 'User is not forum banned');
         } else {
-            $user->setForumBan(false);
+            $user->setForumBanned(false);
             $this->userRepository->save($user);
             $this->addFlash('success', 'User forum unbanned!');
         }
@@ -102,8 +102,8 @@ final class UserController extends AbstractController
     {
         $user = match ($request->attributes->get('filter')) {
             'banned' => $this->userRepository->findAllBanned(),
-            'disabled' => $this->userRepository->findAllDisabled(),
-            'active' => $this->userRepository->findAllActive(),
+            'email-unverified' => $this->userRepository->findAllEmailUnverified(),
+            'email-verified' => $this->userRepository->findAllEmailVerified(),
             default => $this->userRepository->findAll(),
         };
 
@@ -146,9 +146,9 @@ final class UserController extends AbstractController
         $user = $this->getUserObject($userId);
 
         $sameIpUsers = [];
-        if ($user->getLastIp() !== null) {
+        if ($user->getLastSeenIp() !== null) {
             $sameIpUsers = array_filter(
-                $this->userRepository->findByLastIp($user->getLastIp()),
+                $this->userRepository->findByLastSeenIp($user->getLastSeenIp()),
                 static fn (User $other): bool => $other->getId() !== $user->getId()
             );
         }

@@ -66,11 +66,11 @@ final class LoginController extends BaseGameController
             throw new RuntimeException('You are not logged in!');
         }
 
-        if ($user->isEnabled() !== true) {
-            throw new RuntimeException('Your account is not enabled!');
+        if (!$user->isEmailVerified()) {
+            throw new RuntimeException('Your email address is not verified!');
         }
 
-        if ($user->getActive() !== true) {
+        if ($user->isBanned()) {
             throw new RuntimeException('You are banned!');
         }
 
