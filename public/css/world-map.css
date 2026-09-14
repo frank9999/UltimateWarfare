@@ -8,14 +8,15 @@
     background: #2a2a2a;
 }
 
-/* ===== Resource Ticker ===== */
+/* ===== Resource Ticker (inside top bar) ===== */
 .resource-ticker {
-    padding: 8px 15px;
-    background: #3a3a3a;
-    border-bottom: 2px solid #8B7355;
+    flex: 1;
+    min-width: 0;
     display: flex;
-    justify-content: space-around;
+    justify-content: center;
     align-items: center;
+    flex-wrap: wrap;
+    gap: 4px 24px;
     font-size: 11px;
     color: #f3e6c1;
 }
@@ -24,16 +25,18 @@
     display: flex;
     align-items: center;
     gap: 6px;
+    white-space: nowrap;
 }
 
 .resource-icon {
     width: auto;
-    height: 20px;
+    height: 18px;
 }
 
 .resource-details {
     display: flex;
-    flex-direction: column;
+    align-items: baseline;
+    gap: 5px;
 }
 
 .resource-amount {
@@ -58,15 +61,29 @@
     display: block;
     width: 100%;
     background: #1a1a1a;
-    height: calc(100vh - 150px);
+    height: calc(100vh - 90px);
     min-height: 400px;
 }
 
-/* ===== Map Controls ===== */
+/* ===== Top Bar (navigation, resources, profile) ===== */
 .map-controls {
-    padding: 15px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 6px 10px;
     background: #3a3a3a;
     border-bottom: 2px solid #8B7355;
+    border-radius: 6px 6px 0 0;
+}
+
+@media (max-width: 576px) {
+    .resource-ticker {
+        gap: 4px 12px;
+    }
+
+    .resource-income {
+        display: none;
+    }
 }
 
 .map-controls form {
@@ -102,7 +119,9 @@
 }
 
 .nav-dropdown-btn {
-    padding: 5px 15px;
+    height: 32px;
+    padding: 0 12px;
+    line-height: 1;
     background: #8B7355;
     color: #f3e6c1;
     border: none;
@@ -155,7 +174,9 @@
 }
 
 .profile-icon {
-    padding: 5px 10px;
+    height: 32px;
+    padding: 0 10px;
+    line-height: 1;
     background: #8B7355;
     color: #f3e6c1;
     border: none;
