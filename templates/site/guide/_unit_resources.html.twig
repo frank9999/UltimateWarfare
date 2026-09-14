@@ -1,10 +1,3 @@
-{% macro clock_icon() %}
-    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="12" cy="12" r="10"/>
-        <polyline points="12 6 12 12 16 14"/>
-    </svg>
-{% endmacro %}
-
 {% macro format_time(seconds) %}
     {{- '%02d' | format((seconds // 3600)) }}:{{ '%02d' | format(((seconds % 3600) // 60)) }}:{{ '%02d' | format((seconds % 60)) -}}
 {% endmacro %}
@@ -12,7 +5,7 @@
 {% macro resource_row(icon, value, cssClass) %}
     {% if value != 0 %}
         <span class="guide-resource-item {{ cssClass }}">
-            <img src="{{ asset('images/icons/' ~ icon) }}" width="20" height="20" alt="">
+            <img src="{{ asset('images/icons/' ~ icon) }}" alt="">
             {% if cssClass == 'guide-income' %}+{% endif %}{% if cssClass == 'guide-upkeep' %}-{% endif %}{{ value | number_format }}
         </span>
     {% endif %}
@@ -24,10 +17,10 @@
         <div class="guide-unit-section">
             <div class="guide-section-label">Cost</div>
             <div class="guide-resource-list">
-                {{ resource_row('resource_cash.jpg', cost.cash, '') }}
-                {{ resource_row('resource_wood.jpg', cost.wood, '') }}
-                {{ resource_row('resource_steel.jpg', cost.steel, '') }}
-                {{ resource_row('resource_food.jpg', cost.food, '') }}
+                {{ resource_row('resource_cash.svg', cost.cash, '') }}
+                {{ resource_row('resource_wood.svg', cost.wood, '') }}
+                {{ resource_row('resource_steel.svg', cost.steel, '') }}
+                {{ resource_row('resource_grain_wheat.svg', cost.food, '') }}
             </div>
         </div>
     {% endif %}
@@ -39,10 +32,10 @@
         <div class="guide-unit-section">
             <div class="guide-section-label">Income <small>(per hour)</small></div>
             <div class="guide-resource-list">
-                {{ resource_row('resource_cash.jpg', income.cash, 'guide-income') }}
-                {{ resource_row('resource_wood.jpg', income.wood, 'guide-income') }}
-                {{ resource_row('resource_steel.jpg', income.steel, 'guide-income') }}
-                {{ resource_row('resource_food.jpg', income.food, 'guide-income') }}
+                {{ resource_row('resource_cash.svg', income.cash, 'guide-income') }}
+                {{ resource_row('resource_wood.svg', income.wood, 'guide-income') }}
+                {{ resource_row('resource_steel.svg', income.steel, 'guide-income') }}
+                {{ resource_row('resource_grain_wheat.svg', income.food, 'guide-income') }}
             </div>
         </div>
     {% endif %}
@@ -54,21 +47,21 @@
         <div class="guide-unit-section">
             <div class="guide-section-label">Upkeep <small>(per hour)</small></div>
             <div class="guide-resource-list">
-                {{ resource_row('resource_cash.jpg', upkeep.cash, 'guide-upkeep') }}
-                {{ resource_row('resource_wood.jpg', upkeep.wood, 'guide-upkeep') }}
-                {{ resource_row('resource_steel.jpg', upkeep.steel, 'guide-upkeep') }}
-                {{ resource_row('resource_food.jpg', upkeep.food, 'guide-upkeep') }}
+                {{ resource_row('resource_cash.svg', upkeep.cash, 'guide-upkeep') }}
+                {{ resource_row('resource_wood.svg', upkeep.wood, 'guide-upkeep') }}
+                {{ resource_row('resource_steel.svg', upkeep.steel, 'guide-upkeep') }}
+                {{ resource_row('resource_grain_wheat.svg', upkeep.food, 'guide-upkeep') }}
             </div>
         </div>
     {% endif %}
 {% endmacro %}
 
 {% macro build_time(seconds) %}
-    {% from _self import clock_icon, format_time %}
+    {% from _self import format_time %}
     <div class="guide-unit-section">
         <div class="guide-section-label">Construction Time</div>
         <div class="guide-build-time">
-            {{ clock_icon() }}
+            <img src="{{ asset('images/icons/time.svg') }}" alt="">
             {{ format_time(seconds) }}
         </div>
     </div>

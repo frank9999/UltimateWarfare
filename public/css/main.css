@@ -541,6 +541,8 @@ a:hover {
 
 .guide-resource-item img {
     vertical-align: middle;
+    width: auto;
+    height: 20px;
 }
 
 .guide-income {
@@ -558,8 +560,8 @@ a:hover {
     color: #f3e6c1;
 }
 
-.guide-build-time svg {
-    width: 16px;
+.guide-build-time img {
+    width: auto;
     height: 16px;
 }
 

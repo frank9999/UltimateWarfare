@@ -11,10 +11,31 @@
     let selectedGameUnitCategoryId = 1;
     let buildQuantities = {};
     let availableCategories = [];
+    let buildTimerInterval = null;
 
     // ===== Build data cache =====
     const buildDataCache = {};
     const CACHE_TTL_MS = 30000;
+
+    // ===== Resource / time icons for the cost row (all illustrated SVG assets) =====
+    const COST_ICON_FILE = {
+        cash: 'resource_cash.svg',
+        wood: 'resource_wood.svg',
+        steel: 'resource_steel.svg',
+        food: 'resource_grain_wheat.svg',
+        time: 'time.svg'
+    };
+
+    function costRowHtml(items) {
+        return '<div class="build-unit-costs">' + items.map(function (item) {
+            const type = item[0];
+            const value = item[1];
+            const display = typeof value === 'number' ? value.toLocaleString() : value;
+            return '<div class="build-unit-cost-item build-cost-' + type + '">' +
+                '<img class="build-cost-img" src="' + WorldApp.imageBasePath + '/icons/' + COST_ICON_FILE[type] + '" alt="">' +
+                '<span>' + display + '</span></div>';
+        }).join('') + '</div>';
+    }
 
     function getCachedData(regionId) {
         const entry = buildDataCache[regionId];
@@ -67,10 +88,10 @@
         tooltipHtml += '<div class="unit-info-section"><div class="unit-info-section-title">Build Cost</div><div class="unit-info-grid">';
 
         const costItems = [
-            { key: 'costCash', icon: 'resource_cash.jpg', label: 'Cash' },
-            { key: 'costWood', icon: 'resource_wood.jpg', label: 'Wood' },
-            { key: 'costSteel', icon: 'resource_steel.jpg', label: 'Steel' },
-            { key: 'costFood', icon: 'resource_food.jpg', label: 'Food' }
+            { key: 'costCash', icon: 'resource_cash.svg', label: 'Cash' },
+            { key: 'costWood', icon: 'resource_wood.svg', label: 'Wood' },
+            { key: 'costSteel', icon: 'resource_steel.svg', label: 'Steel' },
+            { key: 'costFood', icon: 'resource_grain_wheat.svg', label: 'Food' }
         ];
         costItems.forEach(function (item) {
             if (unit[item.key] > 0) {
@@ -83,10 +104,10 @@
         tooltipHtml += '</div></div>';
 
         const incomeItems = [
-            { key: 'incomeCash', icon: 'resource_cash.jpg', label: 'Cash' },
-            { key: 'incomeWood', icon: 'resource_wood.jpg', label: 'Wood' },
-            { key: 'incomeSteel', icon: 'resource_steel.jpg', label: 'Steel' },
-            { key: 'incomeFood', icon: 'resource_food.jpg', label: 'Food' }
+            { key: 'incomeCash', icon: 'resource_cash.svg', label: 'Cash' },
+            { key: 'incomeWood', icon: 'resource_wood.svg', label: 'Wood' },
+            { key: 'incomeSteel', icon: 'resource_steel.svg', label: 'Steel' },
+            { key: 'incomeFood', icon: 'resource_grain_wheat.svg', label: 'Food' }
         ];
         const hasIncome = incomeItems.some(function (i) { return unit[i.key] > 0; });
         if (hasIncome) {
@@ -103,10 +124,10 @@
         }
 
         const upkeepItems = [
-            { key: 'upkeepCash', icon: 'resource_cash.jpg', label: 'Cash' },
-            { key: 'upkeepWood', icon: 'resource_wood.jpg', label: 'Wood' },
-            { key: 'upkeepSteel', icon: 'resource_steel.jpg', label: 'Steel' },
-            { key: 'upkeepFood', icon: 'resource_food.jpg', label: 'Food' }
+            { key: 'upkeepCash', icon: 'resource_cash.svg', label: 'Cash' },
+            { key: 'upkeepWood', icon: 'resource_wood.svg', label: 'Wood' },
+            { key: 'upkeepSteel', icon: 'resource_steel.svg', label: 'Steel' },
+            { key: 'upkeepFood', icon: 'resource_grain_wheat.svg', label: 'Food' }
         ];
         const hasUpkeep = upkeepItems.some(function (i) { return unit[i.key] > 0; });
         if (hasUpkeep) {
@@ -130,7 +151,7 @@
         tooltipHtml += '<div class="unit-info-section"><div class="unit-info-grid">' +
             '<div class="unit-info-item"><span class="unit-info-label">Net Worth:</span>' +
             '<span class="unit-info-value">' + unit.netWorth.toLocaleString() + '</span></div>' +
-            '<div class="unit-info-item"><img src="' + imgBase + '/icons/time.gif" class="unit-info-icon">' +
+            '<div class="unit-info-item"><img src="' + imgBase + '/icons/time.svg" class="unit-info-icon">' +
             '<span class="unit-info-label">Build Time:</span>' +
             '<span class="unit-info-value">' + timeStr + '</span></div></div></div>';
 
@@ -290,8 +311,8 @@
             const seconds = unit.timestamp % 60;
             const timeStr = String(hours).padStart(2, '0') + ':' + String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
 
-            // Escalating cost for leveled buildings: base cost x target level.
-            const nextLevel = unit.isLeveled ? (unit.level + unit.inConstruction + 1) : 1;
+            // Escalating cost for leveled buildings: base cost x the next actionable level.
+            const nextLevel = unit.isLeveled ? (unit.level + 1) : 1;
             const costMultiplier = unit.isLeveled ? nextLevel : 1;
             const costCash = unit.costCash * costMultiplier;
             const costWood = unit.costWood * costMultiplier;
@@ -300,28 +321,49 @@
             let statusHtml;
             let actionHtml;
             if (unit.isLeveled) {
-                const atMax = (unit.level + unit.inConstruction) >= unit.maxLevel;
+                const inProgress = unit.inConstruction > 0;
                 const levelText = unit.level > 0 ? ('Level ' + unit.level) : 'Not built';
-                const queuedText = unit.inConstruction > 0 ? ' (' + unit.inConstruction + ' queued)' : '';
-                const healthText = (unit.level > 0 && unit.maxHealth > 0)
-                    ? ' — HP ' + unit.health + '/' + unit.maxHealth
-                    : '';
-                statusHtml = '<div class="build-unit-owned">' + levelText + queuedText + healthText + '</div>';
+                statusHtml = '<div class="build-unit-owned">' + levelText + '</div>';
+
+                // Show a live "under construction" countdown while a build/upgrade is queued.
+                if (inProgress) {
+                    statusHtml +=
+                        '<div class="build-unit-construction">' +
+                            '<span class="build-construction-label">Under construction</span>' +
+                            '<span class="build-unit-timer" data-timeleft="' + unit.constructionTimeLeft + '">' + formatTime(unit.constructionTimeLeft) + '</span>' +
+                        '</div>';
+                }
+
+                // Show a color-coded health bar once the building exists.
+                if (unit.level > 0 && unit.maxHealth > 0) {
+                    const pct = Math.max(0, Math.min(100, Math.round(unit.health / unit.maxHealth * 100)));
+                    const tier = pct >= 66 ? 'health-high' : (pct >= 33 ? 'health-mid' : 'health-low');
+                    statusHtml +=
+                        '<div class="build-unit-health">' +
+                            '<div class="build-unit-health-bar">' +
+                                '<div class="build-unit-health-fill ' + tier + '" style="width:' + pct + '%"></div>' +
+                            '</div>' +
+                            '<span class="build-unit-health-label">HP ' + unit.health.toLocaleString() + ' / ' + unit.maxHealth.toLocaleString() + '</span>' +
+                        '</div>';
+                }
 
                 let buttons = '';
-                if (unit.canBuild) {
-                    if (atMax) {
-                        buttons += '<button class="build-action-btn" disabled>Max level</button>';
+                if (inProgress) {
+                    const inProgressLabel = unit.level === 0 ? 'Building…' : ('Upgrading to level ' + (unit.level + 1) + '…');
+                    buttons += '<button class="build-action-btn build-action-primary" disabled>' + inProgressLabel + '</button>';
+                } else if (unit.canBuild) {
+                    if (unit.level >= unit.maxLevel) {
+                        buttons += '<button class="build-action-btn build-action-primary" disabled>Max level</button>';
                     } else {
                         const action = unit.level === 0 ? 'build' : 'upgrade';
                         const label = unit.level === 0 ? 'Build' : ('Upgrade to level ' + nextLevel);
-                        buttons += '<button class="build-action-btn" data-unit-id="' + unit.gameUnitEnum + '" data-action="' + action + '">' + label + '</button>';
+                        buttons += '<button class="build-action-btn build-action-primary" data-unit-id="' + unit.gameUnitEnum + '" data-action="' + action + '">' + label + '</button>';
                     }
                 }
                 if (unit.level > 0 && unit.health < unit.maxHealth) {
-                    buttons += '<button class="build-action-btn build-repair-btn" data-unit-id="' + unit.gameUnitEnum + '" data-action="repair">Repair</button>';
+                    buttons += '<button class="build-action-btn build-action-repair" data-unit-id="' + unit.gameUnitEnum + '" data-action="repair">Repair</button>';
                 }
-                actionHtml = buttons ? ('<div class="build-unit-input">' + buttons + '</div>') : '';
+                actionHtml = buttons ? ('<div class="build-unit-actions">' + buttons + '</div>') : '';
             } else {
                 const constructionText = unit.inConstruction > 0 ? ' (' + unit.inConstruction + ')' : '';
                 statusHtml = '<div class="build-unit-owned">You have: ' + unit.owned + constructionText + '</div>';
@@ -341,12 +383,7 @@
                             : statusHtml) +
                     '</div>' +
                 '</div>' +
-                '<div class="build-unit-costs">' +
-                    '<div class="build-unit-cost-item"><img src="' + imgBase + '/icons/resource_cash.jpg" class="build-unit-cost-icon"><span>' + costCash.toLocaleString() + '</span></div>' +
-                    '<div class="build-unit-cost-item"><img src="' + imgBase + '/icons/resource_wood.jpg" class="build-unit-cost-icon"><span>' + costWood.toLocaleString() + '</span></div>' +
-                    '<div class="build-unit-cost-item"><img src="' + imgBase + '/icons/resource_steel.jpg" class="build-unit-cost-icon"><span>' + costSteel.toLocaleString() + '</span></div>' +
-                    '<div class="build-unit-cost-item"><img src="' + imgBase + '/icons/time.gif" class="build-unit-cost-icon"><span>' + timeStr + '</span></div>' +
-                '</div>' +
+                costRowHtml([['cash', costCash], ['wood', costWood], ['steel', costSteel], ['time', timeStr]]) +
                 actionHtml;
 
             container.appendChild(card);
@@ -370,6 +407,69 @@
                 });
             });
         });
+
+        startBuildTimers();
+    }
+
+    function formatTime(seconds) {
+        if (seconds <= 0) { return 'Done'; }
+        const h = Math.floor(seconds / 3600);
+        const m = Math.floor((seconds % 3600) / 60);
+        const s = seconds % 60;
+        const parts = [];
+        if (h > 0) { parts.push(h + 'h'); }
+        if (m > 0) { parts.push(m + 'm'); }
+        parts.push(s + 's');
+        return parts.join(' ');
+    }
+
+    function stopBuildTimers() {
+        if (buildTimerInterval) {
+            clearInterval(buildTimerInterval);
+            buildTimerInterval = null;
+        }
+    }
+
+    function startBuildTimers() {
+        stopBuildTimers();
+
+        const container = document.getElementById('buildUnitsContainer');
+        if (!container.querySelector('.build-unit-timer')) {
+            return;
+        }
+
+        buildTimerInterval = setInterval(function () {
+            const timers = container.querySelectorAll('.build-unit-timer');
+            let completed = false;
+            timers.forEach(function (el) {
+                let timeLeft = parseInt(el.getAttribute('data-timeleft'), 10) - 1;
+                if (timeLeft <= 0) {
+                    timeLeft = 0;
+                    completed = true;
+                }
+                el.setAttribute('data-timeleft', String(timeLeft));
+                el.textContent = formatTime(timeLeft);
+            });
+
+            // A construction just finished: refresh so the new level/health bar/buttons appear.
+            if (completed) {
+                stopBuildTimers();
+                refreshBuildData();
+            }
+        }, 1000);
+    }
+
+    // Re-fetch build data for the open region and re-render, keeping the modal open.
+    async function refreshBuildData() {
+        if (!selectedBuildRegion) return;
+
+        const regionId = selectedBuildRegion.id;
+        delete buildDataCache[regionId];
+        const refreshed = await fetchAllBuildData(regionId);
+        if (refreshed.success && selectedBuildRegion && selectedBuildRegion.id === regionId) {
+            setCachedData(regionId, refreshed);
+            loadBuildData(selectedGameUnitCategoryId);
+        }
     }
 
     async function leveledAction(unitId, action, button) {
@@ -394,14 +494,8 @@
 
                 showNotification(result.message, 'success');
 
-                // Refresh build data so level/queued counts update; keep the modal open.
-                const regionId = selectedBuildRegion.id;
-                delete buildDataCache[regionId];
-                const refreshed = await fetchAllBuildData(regionId);
-                if (refreshed.success && selectedBuildRegion && selectedBuildRegion.id === regionId) {
-                    setCachedData(regionId, refreshed);
-                    loadBuildData(selectedGameUnitCategoryId);
-                }
+                // Refresh build data so level/construction state updates; keep the modal open.
+                await refreshBuildData();
             } else {
                 showNotification(result.message || 'Failed to build', 'error');
                 button.disabled = false;
@@ -462,7 +556,7 @@
         }
     }
 
-    buildModal.addEventListener('hidden.bs.modal', function () { selectedBuildRegion = null; });
+    buildModal.addEventListener('hidden.bs.modal', function () { selectedBuildRegion = null; stopBuildTimers(); });
     confirmBuildBtn.onclick = confirmBuild;
 
     // Expose globally

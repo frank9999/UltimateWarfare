@@ -261,6 +261,14 @@ final class ConstructionController extends BaseGameController
         // Query unit counts and construction counts once for the entire region
         $gameUnitData = $this->worldRegionRepository->getWorldGameUnitSumByWorldRegion($worldRegion);
         $constructionData = $this->constructionRepository->getGameUnitConstructionSumByWorldRegion($worldRegion);
+
+        // Remaining construction time (seconds) per game unit, used to show an ETA countdown.
+        $constructionTimeLeft = [];
+        foreach ($this->constructionRepository->findByWorldRegion($worldRegion) as $construction) {
+            $key = $construction->getGameUnit()->value;
+            $left = max(0, ($construction->getTimestamp() + $construction->getDuration()) - time());
+            $constructionTimeLeft[$key] = max($constructionTimeLeft[$key] ?? 0, $left);
+        }
         $spaceLeft = $this->constructionActionService->getBuildingSpaceLeft(GameUnitCategory::BUILDINGS, $worldRegion);
         $player = $this->getPlayer();
 
@@ -348,6 +356,7 @@ final class ConstructionController extends BaseGameController
                     'buildRequirement' => $buildRequirement,
                     'owned' => $gameUnitData[$gameUnit->getGameUnitEnum()->value] ?? 0,
                     'inConstruction' => $constructionData[$gameUnit->getGameUnitEnum()->value] ?? 0,
+                    'constructionTimeLeft' => $constructionTimeLeft[$gameUnit->getGameUnitEnum()->value] ?? 0,
                     'isLeveled' => $gameUnitCategory->isLeveled(),
                     'level' => $leveledUnit?->getLevel() ?? 0,
                     'maxLevel' => 10,

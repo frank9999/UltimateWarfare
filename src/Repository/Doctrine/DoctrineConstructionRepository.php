@@ -46,6 +46,15 @@ final class DoctrineConstructionRepository implements ConstructionRepository
         return $this->repository->findBy(['player' => $player]);
     }
 
+    /**
+     * @param WorldRegion $worldRegion
+     * @return Construction[]
+     */
+    public function findByWorldRegion(WorldRegion $worldRegion): array
+    {
+        return $this->repository->findBy(['worldRegion' => $worldRegion]);
+    }
+
     public function getGameUnitConstructionSumByWorldRegion(WorldRegion $worldRegion): array
     {
         $results = $this->entityManager
@@ -85,10 +94,10 @@ final class DoctrineConstructionRepository implements ConstructionRepository
             ->setParameter('unitIds', $unitIds)
             ->getArrayResult();
 
-        /** @var array{total: int|null} $result */
+        /** @var array{total: numeric-string|null} $result */
         $result = $results[0] ?? ['total' => null];
 
-        return $result['total'] ?? 0;
+        return (int) ($result['total'] ?? 0);
     }
 
     /**

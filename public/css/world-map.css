@@ -27,9 +27,8 @@
 }
 
 .resource-icon {
-    width: 20px;
+    width: auto;
     height: 20px;
-    border-radius: 3px;
 }
 
 .resource-details {
@@ -890,28 +889,90 @@
 }
 
 .build-unit-costs {
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-    font-size: 11px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px 12px;
+    font-size: 12px;
 }
 
 .build-unit-cost-item {
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: 6px;
+    color: #f3e6c1;
 }
 
 .build-unit-cost-icon {
     width: 18px;
     height: 18px;
+    flex-shrink: 0;
+}
+
+/* Resource icons use illustrated SVG assets; size by height to keep aspect ratio */
+.build-cost-img {
+    width: auto;
+    height: 18px;
+    flex-shrink: 0;
 }
 
 .build-unit-owned {
+    font-size: 12px;
+    color: #ccc;
+}
+
+/* ===== Leveled unit construction countdown ===== */
+.build-unit-construction {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 4px;
+}
+
+.build-construction-label {
+    font-size: 11px;
+    color: #e0a800;
+}
+
+.build-unit-timer {
+    font-size: 11px;
+    font-weight: bold;
+    color: #f3e6c1;
+    font-variant-numeric: tabular-nums;
+}
+
+/* ===== Leveled unit health bar ===== */
+.build-unit-health {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    margin-top: 5px;
+}
+
+.build-unit-health-bar {
+    width: 100%;
+    height: 9px;
+    background: #2a2a2a;
+    border: 1px solid #1c1c1c;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.build-unit-health-fill {
+    height: 100%;
+    border-radius: 5px 0 0 5px;
+    transition: width 0.3s ease, background-color 0.3s ease;
+}
+
+.build-unit-health-fill.health-high { background: #4CAF50; }
+.build-unit-health-fill.health-mid { background: #e0a800; }
+.build-unit-health-fill.health-low { background: #d9534f; }
+
+.build-unit-health-label {
     font-size: 11px;
     color: #ccc;
 }
 
+/* ===== Build action buttons ===== */
 .build-unit-input {
     display: flex;
     align-items: center;
@@ -925,6 +986,65 @@
     background: #2a2a2a;
     color: #f3e6c1;
     border-radius: 3px;
+}
+
+.build-unit-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: auto;
+}
+
+.build-action-btn {
+    font-family: inherit;
+    border: 1px solid #8B7355;
+    border-radius: 4px;
+    color: #f3e6c1;
+    background: #5a4a35;
+    cursor: pointer;
+    transition: background-color 0.15s, transform 0.1s, box-shadow 0.15s;
+}
+
+.build-action-btn:hover:not(:disabled) {
+    background: #6e5a42;
+}
+
+.build-action-btn:active:not(:disabled) {
+    transform: translateY(1px);
+}
+
+.build-action-btn:disabled {
+    background: #3a3a3a;
+    color: #888;
+    border-color: #555;
+    cursor: not-allowed;
+}
+
+/* Primary Build / Upgrade button — the main call to action */
+.build-action-primary {
+    width: 100%;
+    padding: 13px 14px;
+    font-size: 15px;
+    font-weight: bold;
+    background: #8B7355;
+    box-shadow: 0 2px 0 rgba(0, 0, 0, 0.3);
+}
+
+.build-action-primary:hover:not(:disabled) {
+    background: #9d8463;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.4);
+}
+
+/* Secondary Repair button */
+.build-action-repair {
+    width: 100%;
+    padding: 7px 10px;
+    font-size: 13px;
+    background: transparent;
+}
+
+.build-action-repair:hover:not(:disabled) {
+    background: #4a4a4a;
 }
 
 .build-space-info {
@@ -1018,7 +1138,7 @@
 }
 
 #unitInfoTooltip .unit-info-icon {
-    width: 16px;
+    width: auto;
     height: 16px;
 }
 
