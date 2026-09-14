@@ -583,6 +583,78 @@ a:hover {
     border-color: #3a3a3a;
 }
 
+/* ===== Admin Server Logs ===== */
+.server-log-scroll {
+    overflow: auto;
+    max-height: 70vh;
+}
+
+.server-log-table {
+    font-size: 13px;
+    width: 100%;
+}
+
+.server-log-table thead th {
+    position: sticky;
+    top: 0;
+    background: #3a3a3a;
+    z-index: 1;
+}
+
+.server-log-table td {
+    vertical-align: top;
+}
+
+.server-log-time {
+    white-space: nowrap;
+}
+
+.server-log-message {
+    overflow-wrap: anywhere;
+    min-width: 300px;
+}
+
+.server-log-message summary {
+    cursor: pointer;
+}
+
+.server-log-message pre {
+    margin: 6px 0 0;
+    padding: 8px;
+    background: #1a1a1a;
+    color: #f3e6c1;
+    border-radius: 4px;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    font-size: 12px;
+}
+
+.server-log-level {
+    display: inline-block;
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-size: 11px;
+    font-weight: bold;
+    background: #4a4a4a;
+    color: #f3e6c1;
+}
+
+.server-log-level-info {
+    background: #2f5d7c;
+}
+
+.server-log-level-notice,
+.server-log-level-warning {
+    background: #8a6d1f;
+}
+
+.server-log-level-error,
+.server-log-level-critical,
+.server-log-level-alert,
+.server-log-level-emergency {
+    background: #8b2e2e;
+}
+
 /* ===== World Select Table ===== */
 .uw-world-table {
     margin-bottom: 0;
