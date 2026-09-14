@@ -1,6 +1,6 @@
 /**
  * Destroy modal logic.
- * Depends on: build.js (WorldBuild.invalidateCache), notifications.js (showNotification), WorldApp.imageBasePath.
+ * Depends on: build.js (WorldBuild.getBuildData, WorldBuild.applyBuildData), notifications.js (showNotification), WorldApp.imageBasePath.
  */
 (function () {
     const destroyModal = document.getElementById('destroyModal');
@@ -23,8 +23,7 @@
         tabsContainer.innerHTML = '';
 
         try {
-            const response = await fetch('/game/api/world/region/all-build-data/' + region.id);
-            const result = await response.json();
+            const result = await WorldBuild.getBuildData(region.id);
 
             if (result.success) {
                 renderCategories(result);
@@ -135,16 +134,8 @@
                 showNotification(result.message, 'success');
                 bootstrap.Modal.getInstance(destroyModal).hide();
 
-                // Invalidate build cache so fresh data is loaded next time
-                if (WorldBuild && WorldBuild.invalidateCache) {
-                    WorldBuild.invalidateCache(selectedDestroyRegion.id);
-                }
-
-                // Update worldmap unit display
-                if (result.regionId && result.units && window.WorldApp && WorldApp.worldMap) {
-                    WorldApp.worldMap.fleetManager.updateRegionUnits(result.regionId, result.units);
-                    WorldApp.worldMap.render();
-                }
+                // Update the build data cache and the worldmap unit display
+                WorldBuild.applyBuildData(result.buildData);
 
                 selectedDestroyRegion = null;
                 destroyQuantities = {};

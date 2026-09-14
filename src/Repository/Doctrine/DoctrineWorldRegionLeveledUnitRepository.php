@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace FrankProjects\UltimateWarfare\Repository\Doctrine;
 
+use Doctrine\Common\Collections\AbstractLazyCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitEnum;
@@ -67,6 +68,13 @@ final class DoctrineWorldRegionLeveledUnitRepository implements WorldRegionLevel
 
     public function remove(WorldRegionLeveledUnit $worldRegionLeveledUnit): void
     {
+        // Keep an already loaded collection in sync; an unloaded one is fetched fresh from the database when accessed
+        $worldRegion = $worldRegionLeveledUnit->getWorldRegion();
+        $collection = $worldRegion->getWorldRegionLeveledUnits();
+        if (!$collection instanceof AbstractLazyCollection || $collection->isInitialized()) {
+            $worldRegion->removeWorldRegionLeveledUnit($worldRegionLeveledUnit);
+        }
+
         $this->entityManager->remove($worldRegionLeveledUnit);
         $this->entityManager->flush();
     }

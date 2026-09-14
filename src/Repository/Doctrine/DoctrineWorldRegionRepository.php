@@ -50,27 +50,25 @@ final class DoctrineWorldRegionRepository implements WorldRegionRepository
     }
 
     /**
-     * @param WorldRegion $worldRegion
-     * @return array<int|string, mixed>
+     * @return WorldRegion[]
      */
-    public function getWorldGameUnitSumByWorldRegion(WorldRegion $worldRegion): array
+    public function findByPlayerWithUnitsAndConstructions(Player $player): array
     {
-        $results = $this->entityManager
-            ->createQuery(
-                'SELECT wrsu.gameUnit, sum(wrsu.amount) as total
-              FROM ' . WorldRegionStackableUnit::class . ' wrsu
-              WHERE wrsu.worldRegion = :worldRegion
-              GROUP BY wrsu.gameUnit'
-            )->setParameter('worldRegion', $worldRegion)
-            ->getArrayResult();
-
-        $gameUnits = [];
-        /** @var array{'gameUnit': GameUnitEnum, 'total': int} $result */
-        foreach ($results as $result) {
-            $gameUnits[$result['gameUnit']->value] = $result['total'];
+        // Separate fetch joins per collection, as joining them all at once multiplies the result rows
+        $worldRegions = [];
+        foreach (['worldRegionStackableUnits', 'worldRegionLeveledUnits', 'constructions'] as $collection) {
+            /** @var WorldRegion[] $worldRegions */
+            $worldRegions = $this->entityManager
+                ->createQuery(
+                    'SELECT wr, item
+                  FROM ' . WorldRegion::class . ' wr
+                  LEFT JOIN wr.' . $collection . ' item
+                  WHERE wr.player = :player'
+                )->setParameter('player', $player)
+                ->getResult();
         }
 
-        return $gameUnits;
+        return $worldRegions;
     }
 
     /**

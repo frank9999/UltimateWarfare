@@ -63,6 +63,9 @@ class WorldRegionStackableUnit
         $worldRegionStackableUnit->setGameUnit($gameUnit);
         $worldRegionStackableUnit->setAmount($amount);
 
+        // Keep the inverse side in sync, so already loaded collections include the new unit
+        $worldRegion->addWorldRegionStackableUnit($worldRegionStackableUnit);
+
         return $worldRegionStackableUnit;
     }
 }

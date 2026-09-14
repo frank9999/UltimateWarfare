@@ -5,14 +5,12 @@ declare(strict_types=1);
 namespace FrankProjects\UltimateWarfare\Controller\Game;
 
 use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitCategory;
-use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitEnum;
 use FrankProjects\UltimateWarfare\Exception\WorldRegionNotFoundException;
 use FrankProjects\UltimateWarfare\Repository\ConstructionRepository;
 use FrankProjects\UltimateWarfare\Repository\GameUnitRegistry;
-use FrankProjects\UltimateWarfare\Repository\WorldRegionRepository;
 use FrankProjects\UltimateWarfare\Service\Action\ConstructionActionService;
 use FrankProjects\UltimateWarfare\Service\Action\RegionActionService;
-use FrankProjects\UltimateWarfare\Service\GameUnit\GameUnitBehaviorFactory;
+use FrankProjects\UltimateWarfare\Service\RegionBuildDataService;
 use Symfony\Component\HttpFoundation\Request;
 use Throwable;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -20,26 +18,23 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 final class ConstructionController extends BaseGameController
 {
     private ConstructionRepository $constructionRepository;
-    private WorldRegionRepository $worldRegionRepository;
     private ConstructionActionService $constructionActionService;
     private RegionActionService $regionActionService;
     private GameUnitRegistry $gameUnitRegistry;
-    private GameUnitBehaviorFactory $behaviorFactory;
+    private RegionBuildDataService $regionBuildDataService;
 
     public function __construct(
         ConstructionRepository $constructionRepository,
-        WorldRegionRepository $worldRegionRepository,
         ConstructionActionService $constructionActionService,
         RegionActionService $regionActionService,
         GameUnitRegistry $gameUnitRegistry,
-        GameUnitBehaviorFactory $behaviorFactory
+        RegionBuildDataService $regionBuildDataService
     ) {
         $this->constructionRepository = $constructionRepository;
-        $this->worldRegionRepository = $worldRegionRepository;
         $this->constructionActionService = $constructionActionService;
         $this->regionActionService = $regionActionService;
         $this->gameUnitRegistry = $gameUnitRegistry;
-        $this->behaviorFactory = $behaviorFactory;
+        $this->regionBuildDataService = $regionBuildDataService;
     }
 
     public function constructionOverviewApi(): JsonResponse
@@ -76,10 +71,11 @@ final class ConstructionController extends BaseGameController
     public function cancelApi(int $constructionId): JsonResponse
     {
         try {
-            $this->constructionActionService->cancelConstruction($this->getPlayer(), $constructionId);
+            $worldRegion = $this->constructionActionService->cancelConstruction($this->getPlayer(), $constructionId);
             return new JsonResponse([
                 'success' => true,
                 'message' => 'Successfully cancelled construction queue!',
+                'buildData' => $this->regionBuildDataService->getBuildData($worldRegion, $this->getPlayer()),
             ]);
         } catch (Throwable $e) {
             return new JsonResponse([
@@ -132,7 +128,8 @@ final class ConstructionController extends BaseGameController
                 'message' => $message,
                 'newCash' => $player->getResources()->getCash(),
                 'newWood' => $player->getResources()->getWood(),
-                'newSteel' => $player->getResources()->getSteel()
+                'newSteel' => $player->getResources()->getSteel(),
+                'buildData' => $this->regionBuildDataService->getBuildData($worldRegion, $player),
             ]);
         } catch (Throwable $e) {
             return new JsonResponse([
@@ -182,8 +179,7 @@ final class ConstructionController extends BaseGameController
             return new JsonResponse([
                 'success' => true,
                 'message' => $message,
-                'regionId' => $worldRegion->getId(),
-                'units' => $this->gameUnitRegistry->getRegionUnitSummary($worldRegion),
+                'buildData' => $this->regionBuildDataService->getBuildData($worldRegion, $this->getPlayer()),
             ]);
         } catch (Throwable $e) {
             return new JsonResponse([
@@ -204,179 +200,8 @@ final class ConstructionController extends BaseGameController
             ], 400);
         }
 
-        $regionType = $worldRegion->getType();
-        $waterTypes = ['deep_water', 'water', 'shallow_water', 'sand'];
-        $isSandOrWater = in_array($regionType, $waterTypes, true);
-        $isSand = $regionType === 'sand';
-
-        // Detect relevant buildings in this region (units + constructions in progress)
-        $hasBarrack = false;
-        $hasFactory = false;
-        $hasAirfield = false;
-        $hasHarbor = false;
-        $hasMissileFactory = false;
-
-        foreach ($worldRegion->getWorldRegionLeveledUnits() as $worldRegionLeveledUnit) {
-            match ($worldRegionLeveledUnit->getGameUnit()) {
-                GameUnitEnum::BARRACK => $hasBarrack = true,
-                GameUnitEnum::FACTORY => $hasFactory = true,
-                GameUnitEnum::AIRFIELD => $hasAirfield = true,
-                GameUnitEnum::HARBOR => $hasHarbor = true,
-                GameUnitEnum::MISSILE_FACTORY => $hasMissileFactory = true,
-                default => null,
-            };
-        }
-
-        foreach ($worldRegion->getConstructions() as $construction) {
-            match ($construction->getGameUnit()) {
-                GameUnitEnum::BARRACK => $hasBarrack = true,
-                GameUnitEnum::FACTORY => $hasFactory = true,
-                GameUnitEnum::AIRFIELD => $hasAirfield = true,
-                GameUnitEnum::HARBOR => $hasHarbor = true,
-                GameUnitEnum::MISSILE_FACTORY => $hasMissileFactory = true,
-                default => null,
-            };
-        }
-
-        // Determine available categories based on buildings
-        $availableCategories = [
-            GameUnitCategory::BUILDINGS,
-            GameUnitCategory::DEFENSE_BUILDINGS,
-            GameUnitCategory::SPECIAL_BUILDINGS,
-        ];
-
-        if ($hasBarrack) {
-            $availableCategories[] = GameUnitCategory::TROOPS;
-        }
-        if ($hasAirfield) {
-            $availableCategories[] = GameUnitCategory::AIR_UNITS;
-        }
-        if ($hasHarbor) {
-            $availableCategories[] = GameUnitCategory::NAVAL_UNITS;
-        }
-        if ($hasMissileFactory) {
-            $availableCategories[] = GameUnitCategory::MISSILES;
-        }
-
-        // Query unit counts and construction counts once for the entire region
-        $gameUnitData = $this->worldRegionRepository->getWorldGameUnitSumByWorldRegion($worldRegion);
-        $constructionData = $this->constructionRepository->getGameUnitConstructionSumByWorldRegion($worldRegion);
-
-        // Remaining construction time (seconds) per game unit, used to show an ETA countdown.
-        $constructionTimeLeft = [];
-        foreach ($this->constructionRepository->findByWorldRegion($worldRegion) as $construction) {
-            $key = $construction->getGameUnit()->value;
-            $left = max(0, ($construction->getTimestamp() + $construction->getDuration()) - time());
-            $constructionTimeLeft[$key] = max($constructionTimeLeft[$key] ?? 0, $left);
-        }
-        $spaceLeft = $this->constructionActionService->getBuildingSpaceLeft(GameUnitCategory::BUILDINGS, $worldRegion);
-        $player = $this->getPlayer();
-
-        // Build player's completed research slugs for research gating
-        $completedResearchSlugs = [];
-        foreach ($player->getPlayerResearch() as $playerResearch) {
-            if ($playerResearch->getActive() === true) {
-                $completedResearchSlugs[] = $playerResearch->getResearchSlug();
-            }
-        }
-
-        $categories = [];
-        foreach ($availableCategories as $gameUnitCategory) {
-            $gameUnits = $this->gameUnitRegistry->findByCategory($gameUnitCategory);
-            $units = [];
-
-            foreach ($gameUnits as $gameUnit) {
-                $rowName = $gameUnit->getRowName();
-
-                // Filter harbor from special buildings when region is not sand
-                if ($gameUnitCategory === GameUnitCategory::SPECIAL_BUILDINGS && $rowName === 'harbor' && !$isSand) {
-                    continue;
-                }
-
-                // Filter sea mines from defense buildings when region is not sand or water
-                if (
-                    $gameUnitCategory === GameUnitCategory::DEFENSE_BUILDINGS
-                    && $rowName === 'sea_mine'
-                    && !$isSandOrWater
-                ) {
-                    continue;
-                }
-
-                $behavior = $this->behaviorFactory->create($gameUnit);
-                $canBuild = $behavior->canBuild($worldRegion, $player);
-                $buildRequirement = '';
-
-                // Filter tanks from troops when no factory
-                if ($gameUnitCategory === GameUnitCategory::TROOPS && $rowName === 'tank' && !$hasFactory) {
-                    $canBuild = false;
-                    $buildRequirement = 'Requires a Factory';
-                }
-
-                // Check research gating
-                $researchSlug = $gameUnit->getResearchSlug();
-                $hasRequiredResearch = $researchSlug === null
-                    || in_array($researchSlug, $completedResearchSlugs, true);
-
-                if (!$hasRequiredResearch) {
-                    $canBuild = false;
-                    $buildRequirement = 'Requires ' . $gameUnit->getResearchName() . ' research';
-                } elseif (!$canBuild && $buildRequirement === '') {
-                    $buildRequirement = $behavior->getBuildRequirementDescription();
-                }
-
-                $leveledUnit = $gameUnitCategory->isLeveled()
-                    ? $worldRegion->getLeveledUnit($gameUnit->getGameUnitEnum())
-                    : null;
-                $currentHealth = $leveledUnit?->getHealth() ?? 0;
-                $maxHealth = $leveledUnit !== null
-                    ? $gameUnit->getBattleStats()->getHealth() * $leveledUnit->getLevel()
-                    : 0;
-
-                $units[] = [
-                    'gameUnitEnum' => $gameUnit->getGameUnitEnum(),
-                    'name' => $gameUnit->getName(),
-                    'description' => $gameUnit->getDescription(),
-                    'image' => $gameUnit->getImage(),
-                    'imageDir' => $gameUnitCategory->getImageDir(),
-                    'costCash' => $gameUnit->getCost()->getCash(),
-                    'costWood' => $gameUnit->getCost()->getWood(),
-                    'costSteel' => $gameUnit->getCost()->getSteel(),
-                    'costFood' => $gameUnit->getCost()->getFood(),
-                    'incomeCash' => $gameUnit->getIncome()->getCash(),
-                    'incomeWood' => $gameUnit->getIncome()->getWood(),
-                    'incomeSteel' => $gameUnit->getIncome()->getSteel(),
-                    'incomeFood' => $gameUnit->getIncome()->getFood(),
-                    'upkeepCash' => $gameUnit->getUpkeep()->getCash(),
-                    'upkeepWood' => $gameUnit->getUpkeep()->getWood(),
-                    'upkeepSteel' => $gameUnit->getUpkeep()->getSteel(),
-                    'upkeepFood' => $gameUnit->getUpkeep()->getFood(),
-                    'netWorth' => $gameUnit->getNetWorth(),
-                    'timestamp' => $gameUnit->getTimestamp(),
-                    'canBuild' => $canBuild,
-                    'buildRequirement' => $buildRequirement,
-                    'owned' => $gameUnitData[$gameUnit->getGameUnitEnum()->value] ?? 0,
-                    'inConstruction' => $constructionData[$gameUnit->getGameUnitEnum()->value] ?? 0,
-                    'constructionTimeLeft' => $constructionTimeLeft[$gameUnit->getGameUnitEnum()->value] ?? 0,
-                    'isLeveled' => $gameUnitCategory->isLeveled(),
-                    'level' => $leveledUnit?->getLevel() ?? 0,
-                    'maxLevel' => 10,
-                    'health' => $currentHealth,
-                    'maxHealth' => $maxHealth,
-                ];
-            }
-
-            $categories[] = [
-                'id' => $gameUnitCategory->value,
-                'name' => $gameUnitCategory->getLabel(),
-                'units' => $units,
-            ];
-        }
-
-        return new JsonResponse([
-            'success' => true,
-            'regionType' => $regionType,
-            'spaceLeft' => $spaceLeft,
-            'categories' => $categories,
-        ]);
+        return new JsonResponse(
+            ['success' => true] + $this->regionBuildDataService->getBuildData($worldRegion, $this->getPlayer())
+        );
     }
 }

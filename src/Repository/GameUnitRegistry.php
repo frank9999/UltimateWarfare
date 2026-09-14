@@ -146,67 +146,78 @@ final class GameUnitRegistry
     }
 
     /**
+     * Summary of a region's units per map category, including the construction queue, so it
+     * must only be shown to the region owner. Per category it holds the owned count, the count
+     * under construction (for leveled buildings: new buildings only, not upgrades) and a detail
+     * row per unit type with its own construction count (for leveled buildings: queued levels).
+     *
      * @return array<string, mixed>
      */
     public function getRegionUnitSummary(WorldRegion $region): array
     {
-        $summary = [
-            'buildings' => 0,
-            'defences' => 0,
-            'special' => 0,
-            'troops' => 0,
-            'navalUnits' => 0,
-            'airUnits' => 0,
-            'missiles' => 0,
-            'details' => [
-                'buildings' => [],
-                'defences' => [],
-                'special' => [],
-                'troops' => [],
-                'navalUnits' => [],
-                'airUnits' => [],
-                'missiles' => [],
-            ],
-        ];
+        $categoryKeys = ['buildings', 'defences', 'special', 'troops', 'navalUnits', 'airUnits', 'missiles'];
+
+        $counts = array_fill_keys($categoryKeys, 0);
+        $inConstruction = array_fill_keys($categoryKeys, 0);
+        /** @var array<string, list<array{name: string, amount: int, inConstruction: int, level?: int}>> $details */
+        $details = array_fill_keys($categoryKeys, []);
+        // Detail row index per category and game unit, so constructions merge into existing rows
+        /** @var array<string, array<int, int>> $rowIndex */
+        $rowIndex = [];
 
         foreach ($region->getWorldRegionStackableUnits() as $worldRegionStackableUnit) {
             $gameUnit = $this->find($worldRegionStackableUnit->getGameUnit());
+            $key = $this->getSummaryKey($gameUnit->getGameUnitCategory());
             $amount = $worldRegionStackableUnit->getAmount();
-            $key = match ($gameUnit->getGameUnitCategory()) {
-                GameUnitCategory::BUILDINGS => 'buildings',
-                GameUnitCategory::DEFENSE_BUILDINGS => 'defences',
-                GameUnitCategory::SPECIAL_BUILDINGS => 'special',
-                GameUnitCategory::TROOPS => 'troops',
-                GameUnitCategory::NAVAL_UNITS => 'navalUnits',
-                GameUnitCategory::AIR_UNITS => 'airUnits',
-                GameUnitCategory::MISSILES => 'missiles',
-            };
 
-            $summary[$key] += $amount;
-            $summary['details'][$key][] = ['name' => $gameUnit->getName(), 'amount' => $amount];
+            $counts[$key] += $amount;
+            $rowIndex[$key][$gameUnit->getGameUnitEnum()->value] = count($details[$key]);
+            $details[$key][] = ['name' => $gameUnit->getName(), 'amount' => $amount, 'inConstruction' => 0];
         }
 
         // Leveled buildings (Defense / Special) are summarised by their level.
         foreach ($region->getWorldRegionLeveledUnits() as $leveledUnit) {
             $gameUnit = $this->find($leveledUnit->getGameUnit());
-            $key = match ($gameUnit->getGameUnitCategory()) {
-                GameUnitCategory::DEFENSE_BUILDINGS => 'defences',
-                GameUnitCategory::SPECIAL_BUILDINGS => 'special',
-                default => null,
-            };
-            if ($key === null) {
+            if (!$gameUnit->getGameUnitCategory()->isLeveled()) {
                 continue;
             }
+            $key = $this->getSummaryKey($gameUnit->getGameUnitCategory());
 
-            $summary[$key] += 1;
-            $summary['details'][$key][] = [
+            $counts[$key] += 1;
+            $rowIndex[$key][$gameUnit->getGameUnitEnum()->value] = count($details[$key]);
+            $details[$key][] = [
                 'name' => $gameUnit->getName(),
                 'amount' => 1,
+                'inConstruction' => 0,
                 'level' => $leveledUnit->getLevel(),
             ];
         }
 
-        return $summary;
+        foreach ($region->getConstructions() as $construction) {
+            $gameUnit = $this->find($construction->getGameUnit());
+            $isLeveled = $gameUnit->getGameUnitCategory()->isLeveled();
+            $key = $this->getSummaryKey($gameUnit->getGameUnitCategory());
+            $gameUnitId = $gameUnit->getGameUnitEnum()->value;
+
+            if (!isset($rowIndex[$key][$gameUnitId])) {
+                $rowIndex[$key][$gameUnitId] = count($details[$key]);
+                $details[$key][] = $isLeveled
+                    ? ['name' => $gameUnit->getName(), 'amount' => 0, 'inConstruction' => 0, 'level' => 0]
+                    : ['name' => $gameUnit->getName(), 'amount' => 0, 'inConstruction' => 0];
+
+                if ($isLeveled) {
+                    // A leveled building that does not exist yet
+                    $inConstruction[$key] += 1;
+                }
+            }
+
+            $details[$key][$rowIndex[$key][$gameUnitId]]['inConstruction'] += $construction->getNumber();
+            if (!$isLeveled) {
+                $inConstruction[$key] += $construction->getNumber();
+            }
+        }
+
+        return array_merge($counts, ['inConstruction' => $inConstruction, 'details' => $details]);
     }
 
     /**
@@ -230,31 +241,30 @@ final class GameUnitRegistry
         foreach ($region->getWorldRegionStackableUnits() as $worldRegionStackableUnit) {
             if ($worldRegionStackableUnit->getAmount() > 0) {
                 $gameUnit = $this->find($worldRegionStackableUnit->getGameUnit());
-                $key = match ($gameUnit->getGameUnitCategory()) {
-                    GameUnitCategory::BUILDINGS => 'buildings',
-                    GameUnitCategory::DEFENSE_BUILDINGS => 'defences',
-                    GameUnitCategory::SPECIAL_BUILDINGS => 'special',
-                    GameUnitCategory::TROOPS => 'troops',
-                    GameUnitCategory::NAVAL_UNITS => 'navalUnits',
-                    GameUnitCategory::AIR_UNITS => 'airUnits',
-                    GameUnitCategory::MISSILES => 'missiles',
-                };
-                $presence[$key] = true;
+                $presence[$this->getSummaryKey($gameUnit->getGameUnitCategory())] = true;
             }
         }
 
         foreach ($region->getWorldRegionLeveledUnits() as $leveledUnit) {
             $gameUnit = $this->find($leveledUnit->getGameUnit());
-            $key = match ($gameUnit->getGameUnitCategory()) {
-                GameUnitCategory::DEFENSE_BUILDINGS => 'defences',
-                GameUnitCategory::SPECIAL_BUILDINGS => 'special',
-                default => null,
-            };
-            if ($key !== null) {
-                $presence[$key] = true;
+            if ($gameUnit->getGameUnitCategory()->isLeveled()) {
+                $presence[$this->getSummaryKey($gameUnit->getGameUnitCategory())] = true;
             }
         }
 
         return $presence;
+    }
+
+    private function getSummaryKey(GameUnitCategory $gameUnitCategory): string
+    {
+        return match ($gameUnitCategory) {
+            GameUnitCategory::BUILDINGS => 'buildings',
+            GameUnitCategory::DEFENSE_BUILDINGS => 'defences',
+            GameUnitCategory::SPECIAL_BUILDINGS => 'special',
+            GameUnitCategory::TROOPS => 'troops',
+            GameUnitCategory::NAVAL_UNITS => 'navalUnits',
+            GameUnitCategory::AIR_UNITS => 'airUnits',
+            GameUnitCategory::MISSILES => 'missiles',
+        };
     }
 }

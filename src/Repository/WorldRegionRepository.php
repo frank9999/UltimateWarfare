@@ -22,9 +22,12 @@ interface WorldRegionRepository
     public function findByWorldXY(World $world, int $x, int $y): ?WorldRegion;
 
     /**
-     * @return array<int|string, mixed>
+     * Find the player's regions with their stackable units, leveled units and constructions loaded,
+     * using one query per collection instead of one query per region per collection
+     *
+     * @return WorldRegion[]
      */
-    public function getWorldGameUnitSumByWorldRegion(WorldRegion $worldRegion): array;
+    public function findByPlayerWithUnitsAndConstructions(Player $player): array;
 
     /**
      * @return array<int, array<int, int>>

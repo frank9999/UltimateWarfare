@@ -199,6 +199,16 @@ class WorldRegion
         $this->worldRegionStackableUnits = $worldRegionStackableUnits;
     }
 
+    public function addWorldRegionStackableUnit(WorldRegionStackableUnit $worldRegionStackableUnit): void
+    {
+        $this->worldRegionStackableUnits->add($worldRegionStackableUnit);
+    }
+
+    public function removeWorldRegionStackableUnit(WorldRegionStackableUnit $worldRegionStackableUnit): void
+    {
+        $this->worldRegionStackableUnits->removeElement($worldRegionStackableUnit);
+    }
+
     /**
      * @return Collection<int, WorldRegionLeveledUnit>
      */
@@ -213,6 +223,16 @@ class WorldRegion
     public function setWorldRegionLeveledUnits(Collection $worldRegionLeveledUnits): void
     {
         $this->worldRegionLeveledUnits = $worldRegionLeveledUnits;
+    }
+
+    public function addWorldRegionLeveledUnit(WorldRegionLeveledUnit $worldRegionLeveledUnit): void
+    {
+        $this->worldRegionLeveledUnits->add($worldRegionLeveledUnit);
+    }
+
+    public function removeWorldRegionLeveledUnit(WorldRegionLeveledUnit $worldRegionLeveledUnit): void
+    {
+        $this->worldRegionLeveledUnits->removeElement($worldRegionLeveledUnit);
     }
 
     /**
@@ -289,6 +309,16 @@ class WorldRegion
     public function getConstructions(): Collection
     {
         return $this->constructions;
+    }
+
+    public function addConstruction(Construction $construction): void
+    {
+        $this->constructions->add($construction);
+    }
+
+    public function removeConstruction(Construction $construction): void
+    {
+        $this->constructions->removeElement($construction);
     }
 
     public function getRegionName(): string

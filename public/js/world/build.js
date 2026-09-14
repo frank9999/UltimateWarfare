@@ -53,20 +53,57 @@
         buildDataCache[regionId] = { data: data, timestamp: Date.now() };
     }
 
-    async function fetchAllBuildData(regionId) {
-        const response = await fetch('/game/api/world/region/all-build-data/' + regionId);
-        return await response.json();
+    // In-flight requests per region, so concurrent callers share a single request
+    const pendingRequests = {};
+
+    // Refresh the region's unit icons on the world map from an API response
+    function updateMapRegionUnits(result) {
+        if (result.regionId && result.units && WorldApp.worldMap) {
+            WorldApp.worldMap.fleetManager.updateRegionUnits(result.regionId, result.units);
+            WorldApp.worldMap.render();
+        }
     }
 
-    async function prefetchBuildData(regionId) {
-        try {
-            const result = await fetchAllBuildData(regionId);
-            if (result.success) {
-                setCachedData(regionId, result);
-            }
-        } catch (e) {
-            // Silent failure - next manual open will fetch fresh
-        }
+    function fetchAllBuildData(regionId) {
+        if (pendingRequests[regionId]) return pendingRequests[regionId];
+
+        const request = fetch('/game/api/world/region/all-build-data/' + regionId)
+            .then(function (response) { return response.json(); })
+            .then(function (result) {
+                // Don't cache responses of requests that were invalidated while in flight
+                if (result.success && pendingRequests[regionId] === request) {
+                    setCachedData(regionId, result);
+                    updateMapRegionUnits(result);
+                }
+                return result;
+            })
+            .finally(function () {
+                if (pendingRequests[regionId] === request) delete pendingRequests[regionId];
+            });
+
+        pendingRequests[regionId] = request;
+        return request;
+    }
+
+    function invalidateCache(regionId) {
+        delete buildDataCache[regionId];
+        delete pendingRequests[regionId];
+    }
+
+    // Store up-to-date build data returned by an action response, so reopening the modal needs no request
+    function applyBuildData(buildData) {
+        if (!buildData) return;
+
+        // A response of a request still in flight would be older, so don't let it overwrite this
+        delete pendingRequests[buildData.regionId];
+        setCachedData(buildData.regionId, buildData);
+        updateMapRegionUnits(buildData);
+    }
+
+    // Returns fresh cached data when available, otherwise fetches it
+    async function getBuildData(regionId) {
+        if (isCacheFresh(regionId)) return getCachedData(regionId).data;
+        return fetchAllBuildData(regionId);
     }
 
     // ===== Unit Info Tooltip =====
@@ -232,12 +269,9 @@
             if (!isCacheFresh(region.id)) {
                 try {
                     const result = await fetchAllBuildData(region.id);
-                    if (result.success) {
-                        setCachedData(region.id, result);
-                        // Re-render current tab if modal is still showing this region
-                        if (selectedBuildRegion && selectedBuildRegion.id === region.id) {
-                            loadBuildData(selectedGameUnitCategoryId);
-                        }
+                    // Re-render current tab if modal is still showing this region
+                    if (result.success && selectedBuildRegion && selectedBuildRegion.id === region.id) {
+                        loadBuildData(selectedGameUnitCategoryId);
                     }
                 } catch (e) {
                     // Keep showing stale data
@@ -249,11 +283,11 @@
         // No cache - show loading and fetch
         container.innerHTML = '<div class="build-loading">Loading...</div>';
         tabsContainer.innerHTML = '';
+        document.getElementById('buildSpaceInfo').style.display = 'none';
 
         try {
             const result = await fetchAllBuildData(region.id);
             if (result.success) {
-                setCachedData(region.id, result);
                 renderFromCache(result);
             } else {
                 container.innerHTML = '<div class="build-loading" style="color: #f44336;">' + result.message + '</div>';
@@ -275,7 +309,9 @@
         currentBuildData = {
             gameUnitCategory: { id: category.id, name: category.name },
             spaceLeft: cached.data.spaceLeft,
-            units: category.units
+            units: category.units,
+            // Seconds since the data was fetched, to correct construction countdowns
+            ageSeconds: Math.floor((Date.now() - cached.timestamp) / 1000)
         };
         renderBuildUnits(currentBuildData);
     }
@@ -327,10 +363,11 @@
 
                 // Show a live "under construction" countdown while a build/upgrade is queued.
                 if (inProgress) {
+                    const timeLeft = Math.max(0, unit.constructionTimeLeft - data.ageSeconds);
                     statusHtml +=
                         '<div class="build-unit-construction">' +
                             '<span class="build-construction-label">Under construction</span>' +
-                            '<span class="build-unit-timer" data-timeleft="' + unit.constructionTimeLeft + '">' + formatTime(unit.constructionTimeLeft) + '</span>' +
+                            '<span class="build-unit-timer" data-timeleft="' + timeLeft + '">' + formatTime(timeLeft) + '</span>' +
                         '</div>';
                 }
 
@@ -464,10 +501,9 @@
         if (!selectedBuildRegion) return;
 
         const regionId = selectedBuildRegion.id;
-        delete buildDataCache[regionId];
+        invalidateCache(regionId);
         const refreshed = await fetchAllBuildData(regionId);
         if (refreshed.success && selectedBuildRegion && selectedBuildRegion.id === regionId) {
-            setCachedData(regionId, refreshed);
             loadBuildData(selectedGameUnitCategoryId);
         }
     }
@@ -494,8 +530,11 @@
 
                 showNotification(result.message, 'success');
 
-                // Refresh build data so level/construction state updates; keep the modal open.
-                await refreshBuildData();
+                // Re-render from the returned build data so level/construction state updates; keep the modal open.
+                applyBuildData(result.buildData);
+                if (selectedBuildRegion && result.buildData && selectedBuildRegion.id === result.buildData.regionId) {
+                    loadBuildData(selectedGameUnitCategoryId);
+                }
             } else {
                 showNotification(result.message || 'Failed to build', 'error');
                 button.disabled = false;
@@ -535,12 +574,8 @@
                 if (result.newSteel !== undefined && amounts[3]) amounts[3].textContent = result.newSteel.toLocaleString('en-US');
 
                 showNotification(result.message, 'success');
+                applyBuildData(result.buildData);
                 bootstrap.Modal.getInstance(buildModal).hide();
-
-                // Invalidate cache and prefetch fresh data in background
-                const regionId = selectedBuildRegion.id;
-                delete buildDataCache[regionId];
-                prefetchBuildData(regionId);
 
                 selectedBuildRegion = null;
                 buildQuantities = {};
@@ -562,7 +597,8 @@
     // Expose globally
     window.WorldBuild = {
         showBuildModal: showBuildModal,
-        prefetchBuildData: prefetchBuildData,
-        invalidateCache: function (regionId) { delete buildDataCache[regionId]; }
+        getBuildData: getBuildData,
+        applyBuildData: applyBuildData,
+        invalidateCache: invalidateCache
     };
 })();

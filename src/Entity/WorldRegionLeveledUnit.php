@@ -81,6 +81,9 @@ class WorldRegionLeveledUnit
         $worldRegionLeveledUnit->setLevel($level);
         $worldRegionLeveledUnit->setHealth($health);
 
+        // Keep the inverse side in sync, so already loaded collections include the new unit
+        $worldRegion->addWorldRegionLeveledUnit($worldRegionLeveledUnit);
+
         return $worldRegionLeveledUnit;
     }
 }

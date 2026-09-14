@@ -88,6 +88,27 @@
 
     // ===== Unit Tooltip =====
     const unitTooltip = document.getElementById('unitTooltip');
+
+    // Count text for a tooltip row, including what is under construction
+    function unitCountHtml(unit) {
+        const inConstruction = unit.inConstruction || 0;
+
+        if (unit.level === undefined) {
+            const constructionText = inConstruction > 0
+                ? ' <span class="unit-construction">(+' + inConstruction + ')</span>'
+                : '';
+            return unit.amount + constructionText;
+        }
+
+        if (inConstruction === 0) {
+            return 'Level ' + unit.level;
+        }
+        if (unit.level === 0) {
+            return '<span class="unit-construction">Under construction</span>';
+        }
+        return 'Level ' + unit.level + ' <span class="unit-construction">&rarr; ' + (unit.level + inConstruction) + '</span>';
+    }
+
     let tooltipRAF = null;
 
     worldMap.canvas.addEventListener('mousemove', function (e) {
@@ -134,13 +155,18 @@
                 } else {
                     if (fi.details && fi.details.length > 0) {
                         fi.details.forEach(function (unit) {
-                            const countText = unit.level !== undefined ? ('Level ' + unit.level) : unit.amount;
                             tooltipHtml += '<div class="tooltip-item">' +
                                 '<span class="unit-name">' + unit.name + '</span>' +
-                                '<span class="unit-count">' + countText + '</span></div>';
+                                '<span class="unit-count">' + unitCountHtml(unit) + '</span></div>';
                         });
                     }
-                    tooltipHtml += '<div class="tooltip-total">Total: ' + fi.count + '</div>';
+                    const totalConstruction = fi.inConstruction > 0
+                        ? ' <span class="unit-construction">(+' + fi.inConstruction + ')</span>'
+                        : '';
+                    tooltipHtml += '<div class="tooltip-total">Total: ' + fi.count + totalConstruction + '</div>';
+                    if (fi.hasConstruction) {
+                        tooltipHtml += '<div class="tooltip-note">Orange: under construction</div>';
+                    }
                 }
 
                 unitTooltip.innerHTML = tooltipHtml;

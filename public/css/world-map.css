@@ -671,6 +671,17 @@
     font-weight: bold;
 }
 
+#unitTooltip .unit-construction {
+    color: #ffa500;
+    font-weight: normal;
+}
+
+#unitTooltip .tooltip-note {
+    margin-top: 4px;
+    color: #ffa500;
+    font-size: 11px;
+}
+
 /* ===== Fleet Widgets ===== */
 .fleet-widget {
     position: absolute;

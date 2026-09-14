@@ -369,8 +369,11 @@ class FleetManager {
                 // Remove fleet from list
                 this.removeFleet(fleet.id);
 
-                // Update region unit data
+                // Update region unit data; cached build data of this region is now outdated
                 this.updateRegionUnits(result.regionId, result.units);
+                if (window.WorldBuild) {
+                    WorldBuild.invalidateCache(result.regionId);
+                }
 
                 // Show success message
                 this.showNotification(result.message, 'success');
@@ -416,8 +419,11 @@ class FleetManager {
                 // Remove fleet from list
                 this.removeFleet(fleet.id);
 
-                // Update region unit data
+                // Update region unit data; cached build data of this region is now outdated
                 this.updateRegionUnits(result.regionId, result.units);
+                if (window.WorldBuild) {
+                    WorldBuild.invalidateCache(result.regionId);
+                }
 
                 // Show success message
                 this.showNotification(result.message, 'success');

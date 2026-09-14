@@ -137,6 +137,8 @@
                     // Update region units on map if returned
                     if (result.regionId && result.units) {
                         WorldApp.worldMap.fleetManager.updateRegionUnits(result.regionId, result.units);
+                        // Unit counts changed, so cached build data of this region is outdated
+                        WorldBuild.invalidateCache(result.regionId);
                     }
 
                     WorldApp.worldMap.render();

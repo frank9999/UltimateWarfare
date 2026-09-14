@@ -203,6 +203,8 @@
                 // Update source region units on the map
                 if (result.sourceRegionId && result.sourceRegionUnits) {
                     WorldApp.worldMap.fleetManager.updateRegionUnits(result.sourceRegionId, result.sourceRegionUnits);
+                    // Unit counts changed, so cached build data of this region is outdated
+                    WorldBuild.invalidateCache(result.sourceRegionId);
                 }
 
                 // Add fleet to the map and start ETA countdown

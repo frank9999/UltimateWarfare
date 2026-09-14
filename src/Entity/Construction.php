@@ -105,6 +105,9 @@ class Construction
         $construction->setTimestamp(time());
         $construction->setDuration($duration);
 
+        // Keep the inverse side in sync, so an already loaded collection includes the new construction
+        $worldRegion->addConstruction($construction);
+
         return $construction;
     }
 }

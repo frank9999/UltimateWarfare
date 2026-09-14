@@ -153,6 +153,8 @@
             if (result.success) {
                 showNotification(result.message, 'success');
                 loadConstruction();
+                // Update the build data cache and the worldmap unit display
+                WorldBuild.applyBuildData(result.buildData);
             } else {
                 showNotification(result.message || 'Failed to cancel construction', 'error');
             }

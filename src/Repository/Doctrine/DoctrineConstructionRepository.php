@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace FrankProjects\UltimateWarfare\Repository\Doctrine;
 
+use Doctrine\Common\Collections\AbstractLazyCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use FrankProjects\UltimateWarfare\Entity\Construction;
@@ -44,35 +45,6 @@ final class DoctrineConstructionRepository implements ConstructionRepository
     public function findByPlayer(Player $player): array
     {
         return $this->repository->findBy(['player' => $player]);
-    }
-
-    /**
-     * @param WorldRegion $worldRegion
-     * @return Construction[]
-     */
-    public function findByWorldRegion(WorldRegion $worldRegion): array
-    {
-        return $this->repository->findBy(['worldRegion' => $worldRegion]);
-    }
-
-    public function getGameUnitConstructionSumByWorldRegion(WorldRegion $worldRegion): array
-    {
-        $results = $this->entityManager
-            ->createQuery(
-                'SELECT c.gameUnit, sum(c.number) as total
-              FROM ' . Construction::class . ' c
-              WHERE c.worldRegion = :worldRegion
-              GROUP BY c.gameUnit'
-            )->setParameter('worldRegion', $worldRegion)
-            ->getArrayResult();
-
-        $gameUnits = [];
-        /** @var array{gameUnit: GameUnitEnum, total: int} $result */
-        foreach ($results as $result) {
-            $gameUnits[$result['gameUnit']->value] = $result['total'];
-        }
-
-        return $gameUnits;
     }
 
     public function getGameUnitConstructionSumByWorldRegionAndCategory(
@@ -173,15 +145,14 @@ final class DoctrineConstructionRepository implements ConstructionRepository
      */
     public function getCompletedConstructions(int $timestamp): array
     {
-        /** @var Construction[] $allConstructions */
-        $allConstructions = $this->repository->findAll();
-
-        $completed = [];
-        foreach ($allConstructions as $construction) {
-            if (($construction->getTimestamp() + $construction->getDuration()) < $timestamp) {
-                $completed[] = $construction;
-            }
-        }
+        /** @var Construction[] $completed */
+        $completed = $this->entityManager
+            ->createQuery(
+                'SELECT c
+              FROM ' . Construction::class . ' c
+              WHERE c.timestamp + c.duration < :timestamp'
+            )->setParameter('timestamp', $timestamp)
+            ->getResult();
 
         return $completed;
     }
@@ -196,6 +167,13 @@ final class DoctrineConstructionRepository implements ConstructionRepository
 
     public function remove(Construction $construction): void
     {
+        // Keep an already loaded collection in sync; an unloaded one is fetched fresh from the database when accessed
+        $worldRegion = $construction->getWorldRegion();
+        $collection = $worldRegion->getConstructions();
+        if (!$collection instanceof AbstractLazyCollection || $collection->isInitialized()) {
+            $worldRegion->removeConstruction($construction);
+        }
+
         $this->entityManager->remove($construction);
         $this->entityManager->flush();
     }

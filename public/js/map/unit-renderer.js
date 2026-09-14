@@ -298,13 +298,20 @@ class UnitRenderer {
             { key: 'missiles', color: '#d64545', label: 'Missiles' },
         ];
 
-        // Collect active unit types
+        // Collect active unit types (owned, or under construction for own regions)
         const activeTypes = [];
         categories.forEach(function (cat) {
-            if (units[cat.key] && units[cat.key] !== 0) {
+            const details = units.details ? units.details[cat.key] : null;
+            const hasConstruction = !isMasked && !!details && details.some(function (unit) {
+                return unit.inConstruction > 0;
+            });
+
+            if ((units[cat.key] && units[cat.key] !== 0) || hasConstruction) {
                 activeTypes.push({
                     type: cat.key,
                     count: isMasked ? '?' : units[cat.key],
+                    inConstruction: units.inConstruction ? (units.inConstruction[cat.key] || 0) : 0,
+                    hasConstruction: hasConstruction,
                     color: cat.color,
                     label: cat.label
                 });
@@ -331,6 +338,8 @@ class UnitRenderer {
                 size: iconSize,
                 type: item.type,
                 count: item.count,
+                inConstruction: item.inConstruction,
+                hasConstruction: item.hasConstruction,
                 label: item.label,
                 color: item.color,
                 details: units.details ? units.details[item.type] : null
@@ -344,8 +353,26 @@ class UnitRenderer {
             this.ctx.fill();
             this.ctx.restore();
 
-            // Draw the icon
+            // Draw the icon, faded when nothing of this category is built yet
+            this.ctx.save();
+            if (item.count === 0) {
+                this.ctx.globalAlpha = 0.5;
+            }
             this.drawUnitIcon(item.type, iconX, iconY, iconSize, item.color);
+            this.ctx.restore();
+
+            // Draw a construction badge when units of this category are under construction
+            if (item.hasConstruction) {
+                this.ctx.save();
+                this.ctx.fillStyle = '#ffa500';
+                this.ctx.strokeStyle = '#000000';
+                this.ctx.lineWidth = 1;
+                this.ctx.beginPath();
+                this.ctx.arc(iconX + iconSize * 0.6, iconY - iconSize * 0.6, 2.5, 0, Math.PI * 2);
+                this.ctx.fill();
+                this.ctx.stroke();
+                this.ctx.restore();
+            }
         });
     }
 }

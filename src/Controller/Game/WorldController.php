@@ -12,6 +12,7 @@ use FrankProjects\UltimateWarfare\Repository\BombardmentCooldownRepository;
 use FrankProjects\UltimateWarfare\Repository\GameUnitRegistry;
 use FrankProjects\UltimateWarfare\Repository\PlayerRepository;
 use FrankProjects\UltimateWarfare\Repository\FleetRepository;
+use FrankProjects\UltimateWarfare\Repository\WorldRegionRepository;
 use FrankProjects\UltimateWarfare\Repository\WorldRepository;
 use FrankProjects\UltimateWarfare\Service\PlayerSetupService;
 use FrankProjects\UltimateWarfare\Service\WorldGeneratorService;
@@ -28,19 +29,22 @@ final class WorldController extends BaseGameController
     private FleetRepository $fleetRepository;
     private BombardmentCooldownRepository $bombardmentCooldownRepository;
     private GameUnitRegistry $gameUnitRegistry;
+    private WorldRegionRepository $worldRegionRepository;
 
     public function __construct(
         PlayerRepository $playerRepository,
         WorldRepository $worldRepository,
         FleetRepository $fleetRepository,
         BombardmentCooldownRepository $bombardmentCooldownRepository,
-        GameUnitRegistry $gameUnitRegistry
+        GameUnitRegistry $gameUnitRegistry,
+        WorldRegionRepository $worldRegionRepository
     ) {
         $this->playerRepository = $playerRepository;
         $this->worldRepository = $worldRepository;
         $this->fleetRepository = $fleetRepository;
         $this->bombardmentCooldownRepository = $bombardmentCooldownRepository;
         $this->gameUnitRegistry = $gameUnitRegistry;
+        $this->worldRegionRepository = $worldRegionRepository;
     }
 
     public function create(WorldGeneratorService $worldGeneratorService): Response
@@ -211,6 +215,10 @@ final class WorldController extends BaseGameController
      */
     private function getWorldRegionsData(World $world, Player $player): array
     {
+        // Load the units and constructions of the player's regions upfront, instead of querying per region.
+        // This must run before anything reads those collections, such as the radar lookup below.
+        $this->worldRegionRepository->findByPlayerWithUnitsAndConstructions($player);
+
         $playerRegions = $this->getPlayerRegionCoordinates($player);
         $visibleRegions = $this->calculateVisibleRegions($playerRegions, $this->getRadarRegions($player));
 

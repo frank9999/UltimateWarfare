@@ -258,9 +258,6 @@
             '<p><strong>Owner:</strong> <span style="color: #6bafff;">You</span></p>' +
             '</div></div>';
         bootstrap.Modal.getOrCreateInstance(yourModal).show();
-
-        // Preload build data while user views region info
-        WorldBuild.prefetchBuildData(region.id);
     }
 
     yourModal.addEventListener('hidden.bs.modal', function () { selectedYourRegion = null; });

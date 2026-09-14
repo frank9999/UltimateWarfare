@@ -9,6 +9,7 @@ use FrankProjects\UltimateWarfare\Exception\WorldRegionNotFoundException;
 use FrankProjects\UltimateWarfare\Repository\GameUnitRegistry;
 use FrankProjects\UltimateWarfare\Service\Action\LeveledUnitActionService;
 use FrankProjects\UltimateWarfare\Service\Action\RegionActionService;
+use FrankProjects\UltimateWarfare\Service\RegionBuildDataService;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Throwable;
 
@@ -22,15 +23,18 @@ final class LeveledUnitController extends BaseGameController
     private RegionActionService $regionActionService;
     private LeveledUnitActionService $leveledUnitActionService;
     private GameUnitRegistry $gameUnitRegistry;
+    private RegionBuildDataService $regionBuildDataService;
 
     public function __construct(
         RegionActionService $regionActionService,
         LeveledUnitActionService $leveledUnitActionService,
-        GameUnitRegistry $gameUnitRegistry
+        GameUnitRegistry $gameUnitRegistry,
+        RegionBuildDataService $regionBuildDataService
     ) {
         $this->regionActionService = $regionActionService;
         $this->leveledUnitActionService = $leveledUnitActionService;
         $this->gameUnitRegistry = $gameUnitRegistry;
+        $this->regionBuildDataService = $regionBuildDataService;
     }
 
     public function buildApi(int $regionId, int $gameUnitEnumId): JsonResponse
@@ -77,6 +81,7 @@ final class LeveledUnitController extends BaseGameController
                 'newCash' => $player->getResources()->getCash(),
                 'newWood' => $player->getResources()->getWood(),
                 'newSteel' => $player->getResources()->getSteel(),
+                'buildData' => $this->regionBuildDataService->getBuildData($worldRegion, $player),
             ]);
         } catch (Throwable $e) {
             return new JsonResponse(['success' => false, 'message' => $e->getMessage()], 400);

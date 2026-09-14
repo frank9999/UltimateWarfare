@@ -64,7 +64,8 @@ final class ConstructionActionService
         $priceWood = 0;
         $priceSteel = 0;
         $totalBuild = 0;
-        $constructions = [];
+        /** @var list<array{gameUnit: GameUnit, amount: int, duration: int}> $queue */
+        $queue = [];
 
         foreach ($constructionData as $gameUnitId => $amount) {
             $amount = intval($amount);
@@ -110,13 +111,7 @@ final class ConstructionActionService
                 $totalBuild = $totalBuild + $amount;
             }
 
-            $constructions[] = Construction::create(
-                $region,
-                $player,
-                $gameUnit->getGameUnitEnum(),
-                $amount,
-                $duration
-            );
+            $queue[] = ['gameUnit' => $gameUnit, 'amount' => $amount, 'duration' => $duration];
         }
 
         if ($gameUnitCategory === GameUnitCategory::BUILDINGS) {
@@ -141,7 +136,7 @@ final class ConstructionActionService
             throw new RuntimeException("You don't have enough steel to build that.");
         }
 
-        if (count($constructions) === 0) {
+        if (count($queue) === 0) {
             throw new RuntimeException("You didn't select anything to build.");
         }
 
@@ -152,12 +147,18 @@ final class ConstructionActionService
         $player->setResources($resources);
         $this->playerRepository->save($player);
 
-        foreach ($constructions as $construction) {
+        // Constructions are only created once validation passed, as creating one adds it to the region
+        foreach ($queue as $item) {
+            $construction = Construction::create(
+                $region,
+                $player,
+                $item['gameUnit']->getGameUnitEnum(),
+                $item['amount'],
+                $item['duration']
+            );
             $this->constructionRepository->save($construction);
 
-            $constructionGameUnit = $this->gameUnitRegistry->find($construction->getGameUnit());
-            $behavior = $this->behaviorFactory->create($constructionGameUnit);
-            $behavior->onBuild($region, $construction->getNumber());
+            $this->behaviorFactory->create($item['gameUnit'])->onBuild($region, $item['amount']);
         }
     }
 
@@ -305,7 +306,10 @@ final class ConstructionActionService
         }
     }
 
-    public function cancelConstruction(Player $player, int $constructionId): void
+    /**
+     * @return WorldRegion The region the cancelled construction belonged to
+     */
+    public function cancelConstruction(Player $player, int $constructionId): WorldRegion
     {
         $construction = $this->constructionRepository->find($constructionId);
 
@@ -318,6 +322,8 @@ final class ConstructionActionService
         }
 
         $this->constructionRepository->remove($construction);
+
+        return $construction->getWorldRegion();
     }
 
     public function getBuildingSpaceLeft(GameUnitCategory $gameUnitCategory, WorldRegion $worldRegion): int

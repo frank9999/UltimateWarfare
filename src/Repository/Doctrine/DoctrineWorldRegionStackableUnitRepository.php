@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace FrankProjects\UltimateWarfare\Repository\Doctrine;
 
+use Doctrine\Common\Collections\AbstractLazyCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use FrankProjects\UltimateWarfare\Entity\Enum\GameUnitCategory;
@@ -106,6 +107,13 @@ final class DoctrineWorldRegionStackableUnitRepository implements WorldRegionSta
 
     public function remove(WorldRegionStackableUnit $worldRegionStackableUnit): void
     {
+        // Keep an already loaded collection in sync; an unloaded one is fetched fresh from the database when accessed
+        $worldRegion = $worldRegionStackableUnit->getWorldRegion();
+        $collection = $worldRegion->getWorldRegionStackableUnits();
+        if (!$collection instanceof AbstractLazyCollection || $collection->isInitialized()) {
+            $worldRegion->removeWorldRegionStackableUnit($worldRegionStackableUnit);
+        }
+
         $this->entityManager->remove($worldRegionStackableUnit);
         $this->entityManager->flush();
     }

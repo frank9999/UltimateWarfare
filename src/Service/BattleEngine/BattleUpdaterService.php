@@ -76,11 +76,17 @@ final class BattleUpdaterService
      */
     public function updateBattleLost(Fleet $fleet, array $attackerGameUnits, array $defenderGameUnits): void
     {
-        foreach ($fleet->getTargetWorldRegion()->getWorldRegionStackableUnits() as $regionUnit) {
-            $this->worldRegionStackableUnitRepository->remove($regionUnit);
+        // Defenders missing from $defenderGameUnits died in battle; survivors are updated in place
+        $targetWorldRegion = $fleet->getTargetWorldRegion();
+        foreach ($targetWorldRegion->getWorldRegionStackableUnits()->toArray() as $regionUnit) {
+            if (!in_array($regionUnit, $defenderGameUnits, true)) {
+                $this->worldRegionStackableUnitRepository->remove($regionUnit);
+            }
         }
-        foreach ($fleet->getTargetWorldRegion()->getWorldRegionLeveledUnits() as $leveledUnit) {
-            $this->worldRegionLeveledUnitRepository->remove($leveledUnit);
+        foreach ($targetWorldRegion->getWorldRegionLeveledUnits()->toArray() as $leveledUnit) {
+            if (!in_array($leveledUnit, $defenderGameUnits, true)) {
+                $this->worldRegionLeveledUnitRepository->remove($leveledUnit);
+            }
         }
         foreach ($defenderGameUnits as $worldRegionStackableUnit) {
             if ($worldRegionStackableUnit instanceof WorldRegionLeveledUnit) {
