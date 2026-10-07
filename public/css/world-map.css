@@ -1737,6 +1737,11 @@ body {
     margin-left: 5px;
 }
 
+.fed-multiline {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
 .fed-application-actions {
     margin-top: 10px;
 }
@@ -1904,26 +1909,23 @@ body {
     padding: 8px 20px;
 }
 
-.fed-aid-row {
-    margin-bottom: 10px;
+.fed-aid-recipient {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 10px;
+    max-width: 500px;
+    margin: 0 auto 15px;
 }
 
-.fed-aid-row label {
-    width: 60px;
-    color: #f3e6c1;
+.fed-aid-recipient .uw-label {
+    margin: 0;
+    white-space: nowrap;
 }
 
-.fed-aid-row span {
-    width: 80px;
-    color: #ccc;
-}
-
-.fed-aid-row .form-control {
-    flex: 1;
+.fed-aid-recipient .form-select {
     width: auto;
+    min-width: 200px;
 }
 
 /* Unit cards (send units / attack) */

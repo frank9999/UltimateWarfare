@@ -345,7 +345,7 @@
         if (fed.leaderMessage) {
             html += '<div class="uw-panel">';
             html += '<strong class="text-light-uw">Leader Message:</strong><br>';
-            html += '<span class="text-soft">' + escapeHtml(fed.leaderMessage) + '</span>';
+            html += '<div class="text-soft fed-multiline">' + escapeHtml(fed.leaderMessage) + '</div>';
             html += '</div>';
         }
 
@@ -532,30 +532,44 @@
         const members = cachedStatus.federation.members;
         const playerRes = cachedStatus.playerResources;
 
-        let html = '<div class="uw-form uw-form-wide">';
-        html += '<h3 class="uw-form-title">Send Aid</h3>';
+        const recipients = members.filter(function (m) {
+            return m.id !== cachedStatus.playerId;
+        });
 
-        html += '<div class="uw-field">';
-        html += '<label class="uw-label">To Player:</label>';
-        html += '<select id="fedAidPlayer" class="form-select">';
-        members.forEach(function (m) {
-            if (m.id === cachedStatus.playerId) return;
+        if (recipients.length === 0) {
+            federationContainer.innerHTML = '<div class="build-loading">There are no other members to send aid to</div>';
+            return;
+        }
+
+        let html = '<div class="fed-aid-recipient">';
+        html += '<label for="fedAidPlayer" class="uw-label">Send to</label>';
+        html += '<select id="fedAidPlayer" class="form-select form-select-sm">';
+        recipients.forEach(function (m) {
             html += '<option value="' + m.id + '">' + escapeHtml(m.name) + '</option>';
         });
         html += '</select>';
         html += '</div>';
 
+        html += '<table class="uw-table fed-bank-table">';
+        html += '<tr class="uw-table-head">';
+        html += '<th class="text-center">Resource</th>';
+        html += '<th class="text-center">You</th>';
+        html += '<th class="text-center">Amount</th>';
+        html += '</tr>';
+
         const resources = ['cash', 'wood', 'steel', 'food'];
         resources.forEach(function (res) {
-            html += '<div class="fed-aid-row">';
-            html += '<label>' + res.charAt(0).toUpperCase() + res.slice(1) + ':</label>';
-            html += '<span>(' + playerRes[res].toLocaleString('en-US') + ')</span>';
-            html += '<input type="number" id="fedAid_' + res + '" min="0" value="0" class="form-control">';
-            html += '</div>';
+            html += '<tr>';
+            html += '<td class="text-center">' + res.charAt(0).toUpperCase() + res.slice(1) + '</td>';
+            html += '<td class="text-center">' + (res === 'cash' ? '$ ' : '') + playerRes[res].toLocaleString('en-US') + '</td>';
+            html += '<td class="text-center"><input type="number" id="fedAid_' + res + '" min="0" value="0" class="form-control form-control-sm fed-bank-input"></td>';
+            html += '</tr>';
         });
 
-        html += '<button id="fedAidSubmitBtn" class="market-action-btn uw-btn-block uw-btn-spaced">Send Aid</button>';
-        html += '</div>';
+        html += '<tr><td colspan="3" class="text-center fed-bank-submit-cell">';
+        html += '<button id="fedAidSubmitBtn" class="market-action-btn fed-bank-submit">Send Aid</button>';
+        html += '</td></tr>';
+        html += '</table>';
 
         federationContainer.innerHTML = html;
 
@@ -683,7 +697,8 @@
             result.applications.forEach(function (app) {
                 html += '<div class="uw-panel">';
                 html += '<p><strong class="text-light-uw">Player:</strong> ' + escapeHtml(app.playerName) + '</p>';
-                html += '<p><strong class="text-light-uw">Application:</strong><br>' + escapeHtml(app.application) + '</p>';
+                html += '<p><strong class="text-light-uw">Application:</strong></p>';
+                html += '<p class="fed-multiline">' + escapeHtml(app.application) + '</p>';
                 html += '<div class="fed-application-actions">';
                 html += '<button class="market-action-btn fed-accept-btn" data-id="' + app.id + '">Accept</button>';
                 html += '<button class="market-action-btn market-action-btn-danger fed-reject-btn" data-id="' + app.id + '">Reject</button>';
