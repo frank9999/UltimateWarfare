@@ -262,13 +262,13 @@
 
 /* ===== Overlay Legend ===== */
 .map-overlay-legend {
+    display: none;
     position: absolute;
     bottom: 20px;
     left: 20px;
     background: rgba(42, 42, 42, 0.9);
     border-radius: 4px;
     padding: 8px 12px;
-    display: flex;
     flex-direction: column;
     gap: 6px;
     font-size: 12px;
@@ -290,6 +290,18 @@
     border-radius: 2px;
 }
 
+.legend-color-free {
+    background: rgba(74, 124, 89, 0.5);
+}
+
+.legend-color-enemy {
+    background: rgba(124, 74, 74, 0.5);
+}
+
+.legend-color-own {
+    background: rgba(74, 90, 124, 0.5);
+}
+
 /* ===== Modal Dark Theme (Bootstrap overrides) ===== */
 .modal-content {
     background-color: #2a2a2a;
@@ -303,6 +315,44 @@
 
 .modal-footer {
     border-top: none;
+}
+
+.modal-scroll {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.modal-unit-info {
+    margin-bottom: 15px;
+    font-size: 13px;
+}
+
+.btn-operation,
+.btn-operation:hover,
+.btn-operation:active,
+.btn-operation:focus {
+    background: #9c27b0;
+    color: #f3e6c1;
+}
+
+.reports-pagination {
+    display: none;
+    margin-top: 15px;
+    text-align: center;
+}
+
+.reports-pagination span {
+    color: #f3e6c1;
+}
+
+.welcome-list {
+    margin: 10px 0;
+    padding-left: 20px;
+    color: #f3e6c1;
+}
+
+.welcome-farewell {
+    color: #ffa500;
 }
 
 .btn-close {
@@ -1080,6 +1130,7 @@
 }
 
 .build-space-info {
+    display: none;
     background: #4a4a4a;
     padding: 10px;
     border-radius: 4px;
