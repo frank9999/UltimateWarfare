@@ -1730,10 +1730,6 @@ body {
     margin-top: 10px;
 }
 
-.uw-spaced {
-    margin-bottom: 15px;
-}
-
 .uw-btn-block {
     width: 100%;
     padding: 10px;
@@ -1889,10 +1885,6 @@ body {
 .fed-title {
     color: #f3e6c1;
     margin: 0;
-}
-
-.fed-back-btn {
-    margin-bottom: 10px;
 }
 
 .fed-bank-tabs {

@@ -202,7 +202,6 @@
             }
 
             let html = '<div class="uw-field">';
-            html += '<button class="market-action-btn fed-back-btn" id="fedBackToListBtn">Back to list</button>';
             html += '<h3 class="fed-title">' + escapeHtml(result.federation.name) + '</h3>';
             html += '</div>';
 
@@ -225,10 +224,6 @@
 
             html += '</table>';
             federationContainer.innerHTML = html;
-
-            document.getElementById('fedBackToListBtn').onclick = function () {
-                renderFederationList();
-            };
         } catch (error) {
             console.error('Error loading federation:', error);
             federationContainer.innerHTML = '<div class="build-loading text-negative">Failed to load federation</div>';
@@ -238,7 +233,6 @@
     // ===== Send Application =====
     function renderSendApplication(federationId) {
         let html = '<div class="uw-form">';
-        html += '<button class="market-action-btn uw-spaced" id="fedBackToListBtn2">Back to list</button>';
         html += '<h3 class="uw-form-title">Apply to Join Federation</h3>';
         html += '<div class="uw-field">';
         html += '<label class="uw-label">Your application message:</label>';
@@ -248,10 +242,6 @@
         html += '</div>';
 
         federationContainer.innerHTML = html;
-
-        document.getElementById('fedBackToListBtn2').onclick = function () {
-            renderFederationList();
-        };
 
         document.getElementById('fedSubmitApplicationBtn').onclick = async function () {
             const text = document.getElementById('fedApplicationText').value.trim();
