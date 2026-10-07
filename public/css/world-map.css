@@ -319,6 +319,15 @@ body {
     border-top: none;
 }
 
+/* Confirmation dialog stacks above other open modals */
+.confirm-modal {
+    z-index: 1065;
+}
+
+.modal-backdrop ~ .modal-backdrop {
+    z-index: 1060;
+}
+
 .modal-scroll {
     max-height: 400px;
     overflow-y: auto;

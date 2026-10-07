@@ -181,7 +181,7 @@
         document.getElementById('surrenderBtn').onclick = surrender;
     }
 
-    async function surrender() {
+    function surrender() {
         const password = document.getElementById('surrenderPassword').value;
         const messageDiv = document.getElementById('surrenderMessage');
 
@@ -190,10 +190,12 @@
             return;
         }
 
-        if (!confirm('Are you sure you want to surrender? Your empire will be permanently deleted. This cannot be undone!')) {
-            return;
-        }
+        showConfirm('Are you sure you want to surrender? Your empire will be permanently deleted. This cannot be undone!', function () {
+            submitSurrender(password, messageDiv);
+        }, { title: 'Surrender', confirmText: 'Surrender' });
+    }
 
+    async function submitSurrender(password, messageDiv) {
         try {
             const response = await fetch('/game/api/profile/surrender', {
                 method: 'POST',

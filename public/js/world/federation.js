@@ -387,12 +387,12 @@
         const leaveBtn = document.getElementById('fedLeaveBtn');
         if (leaveBtn) {
             leaveBtn.onclick = function () {
-                if (confirm('Are you sure you want to leave the federation?')) {
+                showConfirm('Are you sure you want to leave the federation?', function () {
                     doPost('/game/api/federation/leave', {}, function () {
                         cachedStatus = null;
                         loadStatus();
                     });
-                }
+                }, { title: 'Leave Federation', confirmText: 'Leave' });
             };
         }
 
@@ -400,12 +400,12 @@
         federationContainer.querySelectorAll('.fed-kick-btn').forEach(function (btn) {
             btn.onclick = function () {
                 const playerId = parseInt(btn.getAttribute('data-id'), 10);
-                if (confirm('Are you sure you want to kick this player?')) {
+                showConfirm('Are you sure you want to kick this player?', function () {
                     doPost('/game/api/federation/kick/' + playerId, {}, function () {
                         cachedStatus = null;
                         loadStatus();
                     });
-                }
+                }, { title: 'Kick Player', confirmText: 'Kick' });
             };
         });
     }
@@ -662,12 +662,12 @@
         };
 
         document.getElementById('fedRemoveBtn').onclick = function () {
-            if (confirm('Are you sure you want to DELETE this federation? This cannot be undone!')) {
+            showConfirm('Are you sure you want to DELETE this federation? This cannot be undone!', function () {
                 doPost('/game/api/federation/remove', {}, function () {
                     cachedStatus = null;
                     loadStatus();
                 });
-            }
+            }, { title: 'Delete Federation', confirmText: 'Delete' });
         };
     }
 
