@@ -94,6 +94,12 @@
             const tab = document.createElement('div');
             tab.className = 'build-tab' + (currentTab === t.id ? ' active' : '');
             tab.textContent = t.name;
+            if (t.id === 'applications' && cachedStatus.applicationCount > 0) {
+                const badge = document.createElement('span');
+                badge.className = 'build-tab-badge';
+                badge.textContent = cachedStatus.applicationCount;
+                tab.appendChild(badge);
+            }
             tab.onclick = function () {
                 currentTab = t.id;
                 renderTabs();
@@ -686,6 +692,11 @@
             if (!result.success) {
                 federationContainer.innerHTML = '<div class="build-loading text-negative">' + escapeHtml(result.message) + '</div>';
                 return;
+            }
+
+            if (cachedStatus && cachedStatus.applicationCount !== result.applications.length) {
+                cachedStatus.applicationCount = result.applications.length;
+                renderTabs();
             }
 
             if (result.applications.length === 0) {
