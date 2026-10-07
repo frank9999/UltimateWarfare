@@ -216,8 +216,6 @@
             if (result.success) {
                 showNotification(result.message, 'success');
                 bootstrap.Modal.getInstance(sendMessageModal).hide();
-                const enemyInstance = bootstrap.Modal.getInstance(enemyModal);
-                if (enemyInstance) enemyInstance.hide();
             } else {
                 showNotification(result.message || 'Failed to send message', 'error');
             }
@@ -232,7 +230,13 @@
     };
 
     document.getElementById('sendMessageBtn').onclick = function () {
-        if (selectedEnemyRegion) showSendMessageModal(selectedEnemyRegion.ownerName);
+        if (!selectedEnemyRegion) return;
+        const ownerName = selectedEnemyRegion.ownerName;
+        bootstrap.Modal.getInstance(enemyModal).hide();
+        enemyModal.addEventListener('hidden.bs.modal', function handler() {
+            enemyModal.removeEventListener('hidden.bs.modal', handler);
+            showSendMessageModal(ownerName);
+        });
     };
     document.getElementById('attackBtn').onclick = function () {
         if (selectedEnemyRegion) WorldAttack.startAttackFromSelection(selectedEnemyRegion);

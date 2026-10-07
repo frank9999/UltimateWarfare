@@ -518,16 +518,6 @@ body {
     text-decoration: underline;
 }
 
-.message-delete-link {
-    color: #c44;
-    text-decoration: none;
-    font-size: 14px;
-}
-
-.message-delete-link:hover {
-    color: #f66;
-}
-
 .message-admin-tag {
     background: #c44;
     color: #fff;
@@ -1798,9 +1788,15 @@ body {
     font-size: 12px;
 }
 
-.messages-col-delete {
-    width: 60px;
-    text-align: center;
+.messages-table th.messages-col-actions,
+.messages-table td.messages-col-actions {
+    width: 1%;
+    text-align: right;
+    white-space: nowrap;
+}
+
+.messages-col-actions .market-action-btn + .market-action-btn {
+    margin-left: 5px;
 }
 
 /* Rankings */
@@ -2070,6 +2066,10 @@ body {
     .messages-table td {
         padding: 4px 6px;
         font-size: 12px;
+    }
+
+    .messages-col-actions .market-action-btn {
+        padding: 3px 8px;
     }
 
     .modal-footer {

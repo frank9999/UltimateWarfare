@@ -81,7 +81,7 @@
         html += '<th>' + (isInbox ? 'From' : 'To') + '</th>';
         html += '<th>Subject</th>';
         html += '<th>Date</th>';
-        html += '<th class="messages-col-delete">Delete</th>';
+        html += '<th class="messages-col-actions">Actions</th>';
         html += '</tr>';
 
         messages.forEach(function (msg) {
@@ -91,25 +91,27 @@
             html += '<td class="messages-col-from">' + escapeHtml(isInbox ? msg.from : msg.to) + '</td>';
             html += '<td><a href="#" class="message-subject-link" data-id="' + msg.id + '">' + adminTag + escapeHtml(msg.subject) + '</a></td>';
             html += '<td class="messages-col-date">' + msg.date + '</td>';
-            html += '<td class="messages-col-delete"><a href="#" class="message-delete-link" data-id="' + msg.id + '" title="Delete">&#10006;</a></td>';
+            html += '<td class="messages-col-actions">';
+            html += '<button class="market-action-btn message-read-btn" data-id="' + msg.id + '">Read</button>';
+            html += '<button class="market-action-btn market-action-btn-danger message-delete-btn" data-id="' + msg.id + '">Delete</button>';
+            html += '</td>';
             html += '</tr>';
         });
 
         html += '</table>';
         messagesContainer.innerHTML = html;
 
-        // Bind read links
-        messagesContainer.querySelectorAll('.message-subject-link').forEach(function (link) {
+        // Bind read links and buttons
+        messagesContainer.querySelectorAll('.message-subject-link, .message-read-btn').forEach(function (link) {
             link.onclick = function (e) {
                 e.preventDefault();
                 readMessage(parseInt(this.getAttribute('data-id')));
             };
         });
 
-        // Bind delete links
-        messagesContainer.querySelectorAll('.message-delete-link').forEach(function (link) {
-            link.onclick = function (e) {
-                e.preventDefault();
+        // Bind delete buttons
+        messagesContainer.querySelectorAll('.message-delete-btn').forEach(function (btn) {
+            btn.onclick = function () {
                 deleteMessage(parseInt(this.getAttribute('data-id')));
             };
         });
