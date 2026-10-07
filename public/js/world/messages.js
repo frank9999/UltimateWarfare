@@ -61,11 +61,11 @@
             if (result.success) {
                 renderMessageList(result.messages);
             } else {
-                messagesContainer.innerHTML = '<div class="build-loading" style="color: #f44336;">Failed to load messages</div>';
+                messagesContainer.innerHTML = '<div class="build-loading text-negative">Failed to load messages</div>';
             }
         } catch (error) {
             console.error('Error loading messages:', error);
-            messagesContainer.innerHTML = '<div class="build-loading" style="color: #f44336;">Failed to load messages</div>';
+            messagesContainer.innerHTML = '<div class="build-loading text-negative">Failed to load messages</div>';
         }
     }
 
@@ -81,17 +81,17 @@
         html += '<th>' + (isInbox ? 'From' : 'To') + '</th>';
         html += '<th>Subject</th>';
         html += '<th>Date</th>';
-        html += '<th style="width: 60px;">Delete</th>';
+        html += '<th class="messages-col-delete">Delete</th>';
         html += '</tr>';
 
         messages.forEach(function (msg) {
             const rowClass = (isInbox && msg.isNew) ? ' class="message-unread"' : '';
             const adminTag = (isInbox && msg.isAdmin) ? '<span class="message-admin-tag">Admin</span> ' : '';
             html += '<tr' + rowClass + '>';
-            html += '<td style="width: 120px;">' + escapeHtml(isInbox ? msg.from : msg.to) + '</td>';
+            html += '<td class="messages-col-from">' + escapeHtml(isInbox ? msg.from : msg.to) + '</td>';
             html += '<td><a href="#" class="message-subject-link" data-id="' + msg.id + '">' + adminTag + escapeHtml(msg.subject) + '</a></td>';
-            html += '<td style="width: 140px; color: #aaa; font-size: 12px;">' + msg.date + '</td>';
-            html += '<td style="width: 60px; text-align: center;"><a href="#" class="message-delete-link" data-id="' + msg.id + '" title="Delete">&#10006;</a></td>';
+            html += '<td class="messages-col-date">' + msg.date + '</td>';
+            html += '<td class="messages-col-delete"><a href="#" class="message-delete-link" data-id="' + msg.id + '" title="Delete">&#10006;</a></td>';
             html += '</tr>';
         });
 
@@ -126,11 +126,11 @@
             if (result.success) {
                 renderReadMessage(result.message);
             } else {
-                messagesContainer.innerHTML = '<div class="build-loading" style="color: #f44336;">' + escapeHtml(result.message) + '</div>';
+                messagesContainer.innerHTML = '<div class="build-loading text-negative">' + escapeHtml(result.message) + '</div>';
             }
         } catch (error) {
             console.error('Error reading message:', error);
-            messagesContainer.innerHTML = '<div class="build-loading" style="color: #f44336;">Failed to load message</div>';
+            messagesContainer.innerHTML = '<div class="build-loading text-negative">Failed to load message</div>';
         }
     }
 
