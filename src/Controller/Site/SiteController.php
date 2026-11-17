@@ -18,9 +18,4 @@ final class SiteController extends BaseController
     {
         return $this->render('site/privacy.html.twig');
     }
-
-    public function community(): Response
-    {
-        return $this->render('site/community.html.twig');
-    }
 }

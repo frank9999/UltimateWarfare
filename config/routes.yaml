@@ -800,8 +800,11 @@ Site/About:
 
 Site/Community:
     path:      /community
-    controller: FrankProjects\UltimateWarfare\Controller\Site\SiteController::community
+    controller: Symfony\Bundle\FrameworkBundle\Controller\RedirectController
     methods:   [GET]
+    defaults:
+        route: Site/About
+        permanent: true
 
 Site/Contact:
     path:      /contact

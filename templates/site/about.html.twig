@@ -9,22 +9,26 @@
         <div class="uw-card-body">
             <p>{{ 'about.intro'|trans }}</p>
 
-            <h3>{{ 'about.storyline.heading'|trans }}</h3>
-            <p>{{ 'about.storyline.paragraph_1'|trans }}</p>
-            <p>{{ 'about.storyline.paragraph_2'|trans }}</p>
-            <p>{{ 'about.storyline.paragraph_3'|trans }}</p>
-            <p>{{ 'about.storyline.paragraph_4'|trans }}</p>
-            <p>{{ 'about.storyline.paragraph_5'|trans }}</p>
-
-            <h3>{{ 'about.team.heading'|trans }}</h3>
-            <p>{{ 'about.team.paragraph_1'|trans }}</p>
+            <h3>{{ 'about.game.heading'|trans }}</h3>
+            <ul>
+                {% for item in ['long_game', 'economy', 'military', 'diplomacy'] %}
+                    <li><b>{{ ('about.game.' ~ item ~ '.title')|trans }}</b> {{ ('about.game.' ~ item ~ '.text')|trans }}</li>
+                {% endfor %}
+            </ul>
             <p>
-                {{ 'about.team.paragraph_2'|trans({'%linkStart%': '<a href="https://frankprojects.com">', '%linkEnd%': '</a>'})|raw }}
+                {{ 'about.game.guide'|trans({'%linkStart%': '<a href="' ~ path('Guide') ~ '">', '%linkEnd%': '</a>'})|raw }}
             </p>
 
-            <h3>{{ 'about.contact.heading'|trans }}</h3>
+            <h3>{{ 'about.support.heading'|trans }}</h3>
             <p>
-                {{ 'about.contact.paragraph'|trans({'%linkStart%': '<a href="' ~ url('Site/Contact') ~ '">', '%linkEnd%': '</a>'})|raw }}
+                {{ 'about.support.paragraph_1'|trans({'%linkStart%': '<a href="https://frankprojects.com">', '%linkEnd%': '</a>'})|raw }}
+            </p>
+            <p>
+                {{ 'about.support.paragraph_2'|trans({'%linkStart%': '<a href="https://github.com/FrankProjects/UltimateWarfare">', '%linkEnd%': '</a>'})|raw }}
+            </p>
+            <p>{{ 'about.support.paragraph_3'|trans }}</p>
+            <p>
+                <a href="https://www.paypal.me/frankschreuder"><img src="{{ asset('images/donate.gif') }}" alt="{{ 'about.support.donate_alt'|trans }}" /></a>
             </p>
         </div>
     </div>
