@@ -45,7 +45,7 @@ final class UserSubscriber extends AbstractUserSubscriber implements EventSubscr
             $this->userActivityUpdaterService->updateActivity(
                 $user,
                 $event->getRequest()->getClientIp(),
-                new \DateTime()
+                new \DateTimeImmutable()
             );
         } catch (\Exception $e) {
         }

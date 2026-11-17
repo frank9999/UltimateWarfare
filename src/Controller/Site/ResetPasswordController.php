@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace FrankProjects\UltimateWarfare\Controller\Site;
 
-use DateTime;
+use DateTimeImmutable;
 use FrankProjects\UltimateWarfare\Entity\User;
 use FrankProjects\UltimateWarfare\Form\ResetPasswordType;
 use FrankProjects\UltimateWarfare\Repository\UserRepository;
@@ -48,7 +48,7 @@ final class ResetPasswordController extends AbstractController
                     $generator = new TokenGenerator();
                     $token = $generator->generateToken(40);
 
-                    $user->setPasswordResetRequestedAt(new DateTime());
+                    $user->setPasswordResetRequestedAt(new DateTimeImmutable());
                     $user->setPasswordResetToken($token);
                     $this->userRepository->save($user);
 

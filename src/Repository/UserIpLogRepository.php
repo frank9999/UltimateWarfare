@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace FrankProjects\UltimateWarfare\Repository;
 
-use DateTime;
+use DateTimeImmutable;
 use FrankProjects\UltimateWarfare\Entity\User;
 use FrankProjects\UltimateWarfare\Entity\UserIpLog;
 
@@ -41,5 +41,5 @@ interface UserIpLogRepository
     /**
      * @return int Number of removed rows
      */
-    public function removeLastSeenBefore(DateTime $dateTime): int;
+    public function removeLastSeenBefore(DateTimeImmutable $dateTime): int;
 }

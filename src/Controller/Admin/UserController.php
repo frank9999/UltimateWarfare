@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace FrankProjects\UltimateWarfare\Controller\Admin;
 
-use DateTime;
+use DateTimeImmutable;
 use FrankProjects\UltimateWarfare\Entity\User;
 use FrankProjects\UltimateWarfare\Repository\UserIpLogRepository;
 use FrankProjects\UltimateWarfare\Repository\UserRepository;
@@ -213,7 +213,7 @@ final class UserController extends AbstractController
     /**
      * Other users that used an IP address of this user, with the shared addresses and when they last used one.
      *
-     * @return array<int, array{user: User, ips: array<int, string>, lastSeenAt: DateTime}>
+     * @return array<int, array{user: User, ips: array<int, string>, lastSeenAt: DateTimeImmutable}>
      */
     private function getSameIpUsers(User $user): array
     {

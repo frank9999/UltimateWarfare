@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace FrankProjects\UltimateWarfare\Service\Action;
 
-use DateTime;
+use DateTimeImmutable;
 use Exception;
 use FrankProjects\UltimateWarfare\Entity\User;
 use FrankProjects\UltimateWarfare\Repository\UserRepository;
@@ -59,7 +59,7 @@ final class RegisterActionService
             throw new RuntimeException('TokenGenerator failed!');
         }
 
-        $user->setSignedUpAt(new DateTime());
+        $user->setSignedUpAt(new DateTimeImmutable());
         $user->setEmailVerificationToken($token);
 
         if ($this->userRepository->findByEmail($user->getEmail()) !== null) {

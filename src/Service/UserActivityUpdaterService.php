@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace FrankProjects\UltimateWarfare\Service;
 
-use DateTime;
+use DateTimeImmutable;
 use FrankProjects\UltimateWarfare\Entity\User;
 use FrankProjects\UltimateWarfare\Entity\UserIpLog;
 use FrankProjects\UltimateWarfare\Repository\UserIpLogRepository;
@@ -31,7 +31,7 @@ final class UserActivityUpdaterService
         $this->userIpLogRepository = $userIpLogRepository;
     }
 
-    public function updateActivity(User $user, ?string $ip, DateTime $now): void
+    public function updateActivity(User $user, ?string $ip, DateTimeImmutable $now): void
     {
         if ($ip !== null && $ip !== '') {
             $this->updateIpLog($user, $ip, $now);
@@ -44,7 +44,7 @@ final class UserActivityUpdaterService
         }
     }
 
-    private function updateIpLog(User $user, string $ip, DateTime $now): void
+    private function updateIpLog(User $user, string $ip, DateTimeImmutable $now): void
     {
         $latest = $this->userIpLogRepository->findLatestByUser($user);
 
@@ -63,7 +63,7 @@ final class UserActivityUpdaterService
         }
     }
 
-    private function secondsBetween(DateTime $from, DateTime $to): int
+    private function secondsBetween(DateTimeImmutable $from, DateTimeImmutable $to): int
     {
         return $to->getTimestamp() - $from->getTimestamp();
     }

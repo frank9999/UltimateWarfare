@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace FrankProjects\UltimateWarfare\Entity;
 
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use RuntimeException;
@@ -24,18 +24,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Equatab
     private bool $emailVerified = false;
     private string $password = '';
     /** Updated on requests (at most every few minutes, see UserActivityUpdaterService), not only on login */
-    private ?DateTime $lastSeenAt = null;
+    private ?DateTimeImmutable $lastSeenAt = null;
     /** Random string sent to the user email address to verify it */
     private ?string $emailVerificationToken = null;
     /** Random string sent to the user email address to reset the password */
     private ?string $passwordResetToken = null;
-    private ?DateTime $passwordResetRequestedAt = null;
+    private ?DateTimeImmutable $passwordResetRequestedAt = null;
 
     /**
      * @var array<int, string>
      */
     private array $roles;
-    private DateTime $signedUpAt;
+    private DateTimeImmutable $signedUpAt;
     /** Banned from the whole site (game and forum); a banned user can still log in to request an unban */
     private bool $banned = false;
     /** Banned from posting in the forum only */
@@ -182,12 +182,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Equatab
         $this->email = $email;
     }
 
-    public function getLastSeenAt(): ?DateTime
+    public function getLastSeenAt(): ?DateTimeImmutable
     {
         return $this->lastSeenAt;
     }
 
-    public function setLastSeenAt(DateTime $lastSeenAt): void
+    public function setLastSeenAt(DateTimeImmutable $lastSeenAt): void
     {
         $this->lastSeenAt = $lastSeenAt;
     }
@@ -212,12 +212,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Equatab
         $this->passwordResetToken = $passwordResetToken;
     }
 
-    public function getPasswordResetRequestedAt(): ?DateTime
+    public function getPasswordResetRequestedAt(): ?DateTimeImmutable
     {
         return $this->passwordResetRequestedAt;
     }
 
-    public function setPasswordResetRequestedAt(DateTime $passwordResetRequestedAt): void
+    public function setPasswordResetRequestedAt(DateTimeImmutable $passwordResetRequestedAt): void
     {
         $this->passwordResetRequestedAt = $passwordResetRequestedAt;
     }
@@ -232,12 +232,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Equatab
         $this->emailVerified = $emailVerified;
     }
 
-    public function setSignedUpAt(DateTime $signedUpAt): void
+    public function setSignedUpAt(DateTimeImmutable $signedUpAt): void
     {
         $this->signedUpAt = $signedUpAt;
     }
 
-    public function getSignedUpAt(): DateTime
+    public function getSignedUpAt(): DateTimeImmutable
     {
         return $this->signedUpAt;
     }

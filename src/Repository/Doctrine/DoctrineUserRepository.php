@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace FrankProjects\UltimateWarfare\Repository\Doctrine;
 
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
@@ -112,12 +112,12 @@ final class DoctrineUserRepository implements UserRepository
     }
 
     /**
-     * @param DateTime $firstDateTime
-     * @param DateTime $lastDateTime
+     * @param DateTimeImmutable $firstDateTime
+     * @param DateTimeImmutable $lastDateTime
      * @return User[]
      */
     #[\Override]
-    public function findByLastSeenBetween(DateTime $firstDateTime, DateTime $lastDateTime): array
+    public function findByLastSeenBetween(DateTimeImmutable $firstDateTime, DateTimeImmutable $lastDateTime): array
     {
         return $this->repository->createQueryBuilder('u')
             ->where('u.lastSeenAt BETWEEN :firstDateTime AND :lastDateTime')
@@ -138,7 +138,7 @@ final class DoctrineUserRepository implements UserRepository
     }
 
     #[\Override]
-    public function removeUnverifiedSignedUpBefore(DateTime $dateTime): int
+    public function removeUnverifiedSignedUpBefore(DateTimeImmutable $dateTime): int
     {
         $removed = $this->entityManager->createQuery(
             'DELETE FROM ' . User::class . ' u

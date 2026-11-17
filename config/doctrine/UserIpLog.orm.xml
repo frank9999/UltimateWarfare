@@ -10,8 +10,8 @@
       <generator strategy="IDENTITY"/>
     </id>
     <field name="ip" column="ip" length="45"/>
-    <field name="firstSeenAt" type="datetime" column="first_seen_at"/>
-    <field name="lastSeenAt" type="datetime" column="last_seen_at"/>
+    <field name="firstSeenAt" type="datetime_immutable" column="first_seen_at"/>
+    <field name="lastSeenAt" type="datetime_immutable" column="last_seen_at"/>
     <many-to-one field="user" target-entity="FrankProjects\UltimateWarfare\Entity\User">
       <join-columns>
         <join-column name="user_id" nullable="false"/>

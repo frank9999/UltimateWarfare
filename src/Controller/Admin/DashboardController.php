@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace FrankProjects\UltimateWarfare\Controller\Admin;
 
-use DateTime;
+use DateTimeImmutable;
 use FrankProjects\UltimateWarfare\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -21,8 +21,8 @@ final class DashboardController extends AbstractController
 
     public function dashboard(): Response
     {
-        $firstDateTime = new DateTime('-24 hours');
-        $lastDateTime = new DateTime();
+        $firstDateTime = new DateTimeImmutable('-24 hours');
+        $lastDateTime = new DateTimeImmutable();
 
         return $this->render(
             'admin/dashboard.html.twig',

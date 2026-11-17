@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace FrankProjects\UltimateWarfare\Command\Maintenance;
 
-use DateTime;
+use DateTimeImmutable;
 use FrankProjects\UltimateWarfare\Repository\UserIpLogRepository;
 use FrankProjects\UltimateWarfare\Repository\UserRepository;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -40,12 +40,12 @@ final class PrivacyCleanupCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $removedIpLogs = $this->userIpLogRepository->removeLastSeenBefore(
-            new DateTime('-' . self::IP_LOG_RETENTION)
+            new DateTimeImmutable('-' . self::IP_LOG_RETENTION)
         );
         $output->writeln("Removed {$removedIpLogs} IP log rows older than " . self::IP_LOG_RETENTION);
 
         $removedUsers = $this->userRepository->removeUnverifiedSignedUpBefore(
-            new DateTime('-' . self::UNVERIFIED_ACCOUNT_RETENTION)
+            new DateTimeImmutable('-' . self::UNVERIFIED_ACCOUNT_RETENTION)
         );
         $output->writeln(
             "Removed {$removedUsers} unverified accounts older than " . self::UNVERIFIED_ACCOUNT_RETENTION

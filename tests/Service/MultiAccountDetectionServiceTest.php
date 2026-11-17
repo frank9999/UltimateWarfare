@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace FrankProjects\UltimateWarfare\Tests\Service;
 
-use DateTime;
+use DateTimeImmutable;
 use FrankProjects\UltimateWarfare\Entity\User;
 use FrankProjects\UltimateWarfare\Entity\UserIpLog;
 use FrankProjects\UltimateWarfare\Repository\UserIpLogRepository;
@@ -37,7 +37,7 @@ class MultiAccountDetectionServiceTest extends TestCase
         self::assertSame(1, $pairs[0]->getOverlappingSessions());
         self::assertSame(1, $pairs[0]->getAdjacentSessions());
         self::assertSame(['10.0.0.1', '10.0.0.2'], $pairs[0]->getSharedIps());
-        self::assertEquals(new DateTime('2026-11-02 12:00'), $pairs[0]->getLastSharedAt());
+        self::assertEquals(new DateTimeImmutable('2026-11-02 12:00'), $pairs[0]->getLastSharedAt());
     }
 
     public function testPairsAreSortedByOverlappingThenAdjacentSessions(): void
@@ -92,8 +92,8 @@ class MultiAccountDetectionServiceTest extends TestCase
 
     private function createSession(User $user, string $ip, string $firstSeenAt, string $lastSeenAt): UserIpLog
     {
-        $session = UserIpLog::create($user, $ip, new DateTime($firstSeenAt));
-        $session->setLastSeenAt(new DateTime($lastSeenAt));
+        $session = UserIpLog::create($user, $ip, new DateTimeImmutable($firstSeenAt));
+        $session->setLastSeenAt(new DateTimeImmutable($lastSeenAt));
 
         return $session;
     }

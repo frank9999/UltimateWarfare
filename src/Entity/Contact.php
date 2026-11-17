@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace FrankProjects\UltimateWarfare\Entity;
 
-use DateTime;
+use DateTimeImmutable;
 use Exception;
 
 class Contact
@@ -14,11 +14,11 @@ class Contact
     private string $email = '';
     private string $subject = '';
     private string $message = '';
-    private DateTime $createDateTime;
+    private DateTimeImmutable $createDateTime;
 
     public function __construct()
     {
-        $this->createDateTime = new DateTime();
+        $this->createDateTime = new DateTimeImmutable();
     }
 
     public function setId(int $id): void
@@ -71,12 +71,12 @@ class Contact
         return $this->message;
     }
 
-    public function getCreateDateTime(): DateTime
+    public function getCreateDateTime(): DateTimeImmutable
     {
         return $this->createDateTime;
     }
 
-    public function setCreateDateTime(DateTime $createDateTime): void
+    public function setCreateDateTime(DateTimeImmutable $createDateTime): void
     {
         $this->createDateTime = $createDateTime;
     }

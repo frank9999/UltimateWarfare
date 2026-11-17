@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace FrankProjects\UltimateWarfare\Repository\Doctrine;
 
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use FrankProjects\UltimateWarfare\Entity\User;
 use FrankProjects\UltimateWarfare\Entity\UserIpLog;
@@ -129,7 +129,7 @@ final class DoctrineUserIpLogRepository implements UserIpLogRepository
     }
 
     #[\Override]
-    public function removeLastSeenBefore(DateTime $dateTime): int
+    public function removeLastSeenBefore(DateTimeImmutable $dateTime): int
     {
         $removed = $this->entityManager->createQuery(
             'DELETE FROM ' . UserIpLog::class . ' l WHERE l.lastSeenAt < :dateTime'

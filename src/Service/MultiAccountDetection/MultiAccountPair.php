@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace FrankProjects\UltimateWarfare\Service\MultiAccountDetection;
 
-use DateTime;
+use DateTimeImmutable;
 use FrankProjects\UltimateWarfare\Entity\User;
 
 /**
@@ -18,7 +18,7 @@ final class MultiAccountPair
     private int $adjacentSessions = 0;
     /** @var array<string, true> */
     private array $sharedIps = [];
-    private ?DateTime $lastSharedAt = null;
+    private ?DateTimeImmutable $lastSharedAt = null;
 
     public function __construct(
         public readonly User $userA,
@@ -26,7 +26,7 @@ final class MultiAccountPair
     ) {
     }
 
-    public function addSessionPair(string $ip, bool $overlapping, DateTime $sharedAt): void
+    public function addSessionPair(string $ip, bool $overlapping, DateTimeImmutable $sharedAt): void
     {
         if ($overlapping) {
             $this->overlappingSessions++;
@@ -58,7 +58,7 @@ final class MultiAccountPair
         return array_map('strval', array_keys($this->sharedIps));
     }
 
-    public function getLastSharedAt(): ?DateTime
+    public function getLastSharedAt(): ?DateTimeImmutable
     {
         return $this->lastSharedAt;
     }

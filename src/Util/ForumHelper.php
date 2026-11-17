@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace FrankProjects\UltimateWarfare\Util;
 
-use DateTime;
+use DateTimeImmutable;
 use Exception;
 use FrankProjects\UltimateWarfare\Entity\User;
 use FrankProjects\UltimateWarfare\Repository\PostRepository;
@@ -26,7 +26,7 @@ final class ForumHelper
 
     public function ensureNoMassPost(User $user): void
     {
-        $dateTime = new DateTime('- 10 seconds');
+        $dateTime = new DateTimeImmutable('- 10 seconds');
         $lastTopic = $this->topicRepository->getLastTopicByUser($user);
         $lastPost = $this->postRepository->getLastPostByUser($user);
 
@@ -45,8 +45,8 @@ final class ForumHelper
         }
     }
 
-    public function getCurrentDateTime(): DateTime
+    public function getCurrentDateTime(): DateTimeImmutable
     {
-        return new DateTime();
+        return new DateTimeImmutable();
     }
 }

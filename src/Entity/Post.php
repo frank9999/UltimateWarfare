@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace FrankProjects\UltimateWarfare\Entity;
 
-use DateTime;
+use DateTimeImmutable;
 
 class Post
 {
     private int $id;
     private string $content;
-    private DateTime $createDateTime;
+    private DateTimeImmutable $createDateTime;
     private bool $edited = false;
     private Topic $topic;
     /** Null once the author deleted their account; the content is kept */
@@ -47,12 +47,12 @@ class Post
         return $this->edited;
     }
 
-    public function getCreateDateTime(): DateTime
+    public function getCreateDateTime(): DateTimeImmutable
     {
         return $this->createDateTime;
     }
 
-    public function setCreateDateTime(DateTime $createDateTime): void
+    public function setCreateDateTime(DateTimeImmutable $createDateTime): void
     {
         $this->createDateTime = $createDateTime;
     }

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace FrankProjects\UltimateWarfare\Tests\Service;
 
-use DateTime;
+use DateTimeImmutable;
 use FrankProjects\UltimateWarfare\Entity\User;
 use FrankProjects\UltimateWarfare\Entity\UserIpLog;
 use FrankProjects\UltimateWarfare\Repository\UserIpLogRepository;
@@ -18,11 +18,11 @@ class UserDataExportServiceTest extends TestCase
         $user = new User();
         $user->setUsername('frank');
         $user->setEmail('frank@example.com');
-        $user->setSignedUpAt(new DateTime('2026-01-01 10:00:00'));
+        $user->setSignedUpAt(new DateTimeImmutable('2026-01-01 10:00:00'));
 
         $userIpLogRepository = self::createStub(UserIpLogRepository::class);
         $userIpLogRepository->method('findByUser')->willReturn([
-            UserIpLog::create($user, '10.0.0.1', new DateTime('2026-01-04 10:00:00')),
+            UserIpLog::create($user, '10.0.0.1', new DateTimeImmutable('2026-01-04 10:00:00')),
         ]);
 
         $export = (new UserDataExportService($userIpLogRepository))->export($user);
@@ -32,7 +32,7 @@ class UserDataExportServiceTest extends TestCase
             [
                 'username' => 'frank',
                 'email' => 'frank@example.com',
-                'signedUpAt' => (new DateTime('2026-01-01 10:00:00'))->format(DATE_ATOM),
+                'signedUpAt' => (new DateTimeImmutable('2026-01-01 10:00:00'))->format(DATE_ATOM),
             ],
             $export['account']
         );

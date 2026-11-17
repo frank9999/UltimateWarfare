@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace FrankProjects\UltimateWarfare\Entity;
 
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 
@@ -13,7 +13,7 @@ class Topic
     private int $id;
     private string $title = '';
     private string $content = '';
-    private DateTime $createDateTime;
+    private DateTimeImmutable $createDateTime;
     private bool $sticky = false;
     private bool $closed = false;
     private Category $category;
@@ -114,12 +114,12 @@ class Topic
         $this->editUser = $editUser;
     }
 
-    public function getCreateDateTime(): DateTime
+    public function getCreateDateTime(): DateTimeImmutable
     {
         return $this->createDateTime;
     }
 
-    public function setCreateDateTime(DateTime $createDateTime): void
+    public function setCreateDateTime(DateTimeImmutable $createDateTime): void
     {
         $this->createDateTime = $createDateTime;
     }

@@ -12,16 +12,16 @@
       </options>
     </field>
     <field name="password" column="password" length="255"/>
-    <field name="lastSeenAt" type="datetime" column="last_seen_at" nullable="true"/>
+    <field name="lastSeenAt" type="datetime_immutable" column="last_seen_at" nullable="true"/>
     <field name="emailVerificationToken" column="email_verification_token" length="180" unique="true" nullable="true"/>
     <field name="passwordResetToken" column="password_reset_token" length="180" unique="true" nullable="true"/>
-    <field name="passwordResetRequestedAt" type="datetime" column="password_reset_requested_at" nullable="true"/>
+    <field name="passwordResetRequestedAt" type="datetime_immutable" column="password_reset_requested_at" nullable="true"/>
     <field name="roles" type="json" column="roles">
       <options>
         <option name="fixed"/>
       </options>
     </field>
-    <field name="signedUpAt" type="datetime" column="signed_up_at"/>
+    <field name="signedUpAt" type="datetime_immutable" column="signed_up_at"/>
     <field name="banned" type="boolean" column="banned">
       <options>
         <option name="default">0</option>

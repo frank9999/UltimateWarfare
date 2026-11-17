@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace FrankProjects\UltimateWarfare\Entity;
 
-use DateTime;
+use DateTimeImmutable;
 
 /**
  * One continuous stretch of activity of a user from one IP address. A new row starts when the IP changes
@@ -16,10 +16,10 @@ class UserIpLog
     private int $id;
     private User $user;
     private string $ip;
-    private DateTime $firstSeenAt;
-    private DateTime $lastSeenAt;
+    private DateTimeImmutable $firstSeenAt;
+    private DateTimeImmutable $lastSeenAt;
 
-    public static function create(User $user, string $ip, DateTime $seenAt): self
+    public static function create(User $user, string $ip, DateTimeImmutable $seenAt): self
     {
         $userIpLog = new self();
         $userIpLog->user = $user;
@@ -45,17 +45,17 @@ class UserIpLog
         return $this->ip;
     }
 
-    public function getFirstSeenAt(): DateTime
+    public function getFirstSeenAt(): DateTimeImmutable
     {
         return $this->firstSeenAt;
     }
 
-    public function getLastSeenAt(): DateTime
+    public function getLastSeenAt(): DateTimeImmutable
     {
         return $this->lastSeenAt;
     }
 
-    public function setLastSeenAt(DateTime $lastSeenAt): void
+    public function setLastSeenAt(DateTimeImmutable $lastSeenAt): void
     {
         $this->lastSeenAt = clone $lastSeenAt;
     }

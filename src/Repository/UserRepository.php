@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace FrankProjects\UltimateWarfare\Repository;
 
-use DateTime;
+use DateTimeImmutable;
 use FrankProjects\UltimateWarfare\Entity\User;
 
 interface UserRepository
@@ -38,11 +38,11 @@ interface UserRepository
     public function findByUsername(string $username): ?User;
 
     /**
-     * @param DateTime $firstDateTime
-     * @param DateTime $lastDateTime
+     * @param DateTimeImmutable $firstDateTime
+     * @param DateTimeImmutable $lastDateTime
      * @return User[]
      */
-    public function findByLastSeenBetween(DateTime $firstDateTime, DateTime $lastDateTime): array;
+    public function findByLastSeenBetween(DateTimeImmutable $firstDateTime, DateTimeImmutable $lastDateTime): array;
 
     public function loadUserByUsername(string $username): ?User;
 
@@ -52,7 +52,7 @@ interface UserRepository
      *
      * @return int Number of removed users
      */
-    public function removeUnverifiedSignedUpBefore(DateTime $dateTime): int;
+    public function removeUnverifiedSignedUpBefore(DateTimeImmutable $dateTime): int;
 
     public function remove(User $user): void;
 

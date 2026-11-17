@@ -12,6 +12,6 @@
         <option name="default"/>
       </options>
     </field>
-    <field name="createDateTime" type="datetime" column="create_date_time"/>
+    <field name="createDateTime" type="datetime_immutable" column="create_date_time"/>
   </entity>
 </doctrine-mapping>
