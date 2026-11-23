@@ -258,6 +258,25 @@ a:hover {
     margin-top: 8px;
 }
 
+/* ===== Modals (Bootstrap Overrides) ===== */
+.modal-content {
+    background-color: #2a2a2a;
+    border: 2px solid #8B7355;
+    color: #f3e6c1;
+}
+
+.modal-header {
+    border-bottom-color: #8B7355;
+}
+
+.modal-footer {
+    border-top: none;
+}
+
+.btn-close {
+    filter: invert(1) grayscale(100%) brightness(200%);
+}
+
 /* ===== Forms (Bootstrap Overrides) ===== */
 .form-control {
     background: #1a1a1a;

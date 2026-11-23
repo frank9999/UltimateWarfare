@@ -115,11 +115,7 @@
                         {% endif %}
                         {% if 'ROLE_ADMIN' not in user.roles and not user.banned %}
                             <p>
-                                <form method="POST" action="{{ path('Admin/User/Delete', {'userId': user.id}) }}" class="d-inline">
-                                    <input type="hidden" name="_token" value="{{ csrf_token('admin_user_delete_' ~ user.id) }}">
-                                    <input type="text" name="confirmUsername" class="form-control d-inline w-auto" placeholder="Type the username to confirm" required>
-                                    <button type="submit" class="btn btn-danger">Delete user permanently</button>
-                                </form>
+                                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteUserModal">Delete user permanently</button>
                             </p>
                         {% endif %}
                     </td>
@@ -207,5 +203,28 @@
             </table>
         </div>
     </div>
+
+    {% if 'ROLE_ADMIN' not in user.roles and not user.banned %}
+        <div class="modal fade" id="deleteUserModal" tabindex="-1" aria-labelledby="deleteUserModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <form method="POST" action="{{ path('Admin/User/Delete', {'userId': user.id}) }}" class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteUserModalLabel">Delete user permanently</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>This removes all players of <strong>{{ user.username }}</strong>, their IP log and the account itself. Forum posts are kept as "[deleted user]". This cannot be undone.</p>
+                        <label for="deleteUserConfirmUsername" class="form-label">Type the username to confirm</label>
+                        <input type="hidden" name="_token" value="{{ csrf_token('admin_user_delete_' ~ user.id) }}">
+                        <input type="text" id="deleteUserConfirmUsername" name="confirmUsername" class="form-control" autocomplete="off" required>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    {% endif %}
 
 {% endblock %}

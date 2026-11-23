@@ -317,23 +317,9 @@ body {
     background: rgba(74, 90, 124, 0.5);
 }
 
-/* ===== Modal Dark Theme (Bootstrap overrides) ===== */
-.modal-content {
-    background-color: #2a2a2a;
-    border: 2px solid #8B7355;
-    color: #f3e6c1;
-}
-
-.modal-header {
-    border-bottom-color: #8B7355;
-}
-
+/* ===== Modal tweaks (dark theme lives in main.css) ===== */
 .modal-body {
     overflow-x: auto;
-}
-
-.modal-footer {
-    border-top: none;
 }
 
 .modal-footer:empty {
@@ -385,10 +371,6 @@ body {
 
 .welcome-farewell {
     color: #ffa500;
-}
-
-.btn-close {
-    filter: invert(1) grayscale(100%) brightness(200%);
 }
 
 .modal-dialog.modal-build {
